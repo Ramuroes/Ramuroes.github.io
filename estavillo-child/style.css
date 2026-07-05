@@ -1,0 +1,24 @@
+/*
+Theme Name:   Estavillo Child
+Theme URI:    https://ramiroestavillo.com
+Description:  Child theme de Kadence para el portfolio ESTAVILLO. Dark-first, sistema de tokens propio (prefijo es-), hero animado "system map" en SVG/JS vanilla. No pisa estilos globales de Kadence: todo vive bajo .es-page y variables --es-*.
+Author:       Ramiro Estavillo
+Author URI:   https://ramiroestavillo.com
+Template:     kadence
+Version:      0.1.0
+Requires PHP: 7.4
+Text Domain:  estavillo-child
+*/
+
+/*
+  Este archivo queda intencionalmente casi vacío.
+  Los estilos reales se cargan por módulos desde assets/css/
+  (ver inc/enqueue.php) para poder editar cada capa por separado:
+
+  tokens.css      → design tokens (colores, tipografía, espaciado)
+  base.css        → tipografía base y utilidades dentro de .es-page
+  layout.css      → contenedores, secciones, grillas
+  components.css  → botones, pills, cards, headers de sección
+  hero.css        → hero home + capa del system map
+  pages-home.css  → secciones específicas de la home
+*/

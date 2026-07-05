@@ -1,0 +1,232 @@
+/* =========================================================================
+   ESTAVILLO — Componentes
+   Botones, links con flecha, pills, cards, indicador "en vivo".
+   ========================================================================= */
+
+/* ---------- botón principal (outline pill con flecha) ---------- */
+
+.es-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	padding: 15px 26px;
+	border: 1px solid var(--es-accent-dim);
+	border-radius: 40px;
+	background: transparent;
+	font-family: var(--es-sans);
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--es-ink);
+	text-decoration: none;
+	cursor: pointer;
+	transition: background var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease,
+		gap 0.2s var(--es-ease);
+}
+
+.es-btn:hover {
+	background: var(--es-accent-soft);
+	border-color: var(--es-accent);
+	gap: 18px;
+}
+
+.es-btn__arrow {
+	color: var(--es-accent);
+}
+
+/* ---------- link con flecha ---------- */
+
+.es-link-arrow {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--es-accent);
+	text-decoration: none;
+	transition: gap 0.2s var(--es-ease);
+}
+
+.es-link-arrow:hover {
+	gap: 16px;
+}
+
+.es-link-arrow--quiet {
+	font-weight: 500;
+	font-size: 14.5px;
+	color: var(--es-ink-2);
+	transition: color var(--es-dur-fast) ease, gap 0.2s var(--es-ease);
+}
+
+.es-link-arrow--quiet:hover {
+	color: var(--es-accent);
+}
+
+/* ---------- pill de skill/tag ---------- */
+
+.es-pill {
+	display: inline-block;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	letter-spacing: 0.08em;
+	color: var(--es-ink-3);
+	border: 1px solid var(--es-line-strong);
+	border-radius: 30px;
+	padding: 8px 14px;
+}
+
+/* ---------- indicador "en vivo" (dot que respira) ---------- */
+
+.es-live-dot {
+	display: inline-block;
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: var(--es-accent);
+	animation: es-pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes es-pulse {
+	0%,
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	50% {
+		opacity: 0.35;
+		transform: scale(0.72);
+	}
+}
+
+/* ---------- card de caso ---------- */
+
+.es-card {
+	display: block;
+	text-decoration: none;
+	background: var(--es-paper-2);
+	border: 1px solid var(--es-line);
+	border-radius: var(--es-radius);
+	overflow: hidden;
+	transition: transform var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease;
+}
+
+.es-card:hover {
+	transform: translateY(-2px);
+	border-color: var(--es-line-strong);
+}
+
+.es-card__media {
+	position: relative;
+	aspect-ratio: 4 / 3;
+	background: var(--es-surface);
+	border-bottom: 1px solid var(--es-line);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.es-card__media img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.es-card__body {
+	padding: 20px 22px 24px;
+}
+
+.es-card__num {
+	font-family: var(--es-mono);
+	font-size: 12px;
+	color: var(--es-accent);
+	margin-bottom: 10px;
+}
+
+.es-card__kicker {
+	font-family: var(--es-mono);
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+	margin-bottom: 12px;
+}
+
+.es-card__title {
+	font-family: var(--es-serif);
+	font-size: 24px;
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	color: var(--es-ink);
+	margin-bottom: 8px;
+}
+
+.es-card__excerpt {
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+	margin-bottom: 16px;
+}
+
+.es-card__cta {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--es-accent);
+}
+
+/* ---------- placeholder de asset (marco punteado con diagonales) ---------- */
+
+.es-placeholder {
+	position: relative;
+	border: 1px dashed var(--es-line-strong);
+	border-radius: var(--es-radius);
+	background: var(--es-paper-2);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+}
+
+.es-placeholder__tag {
+	position: relative;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	color: var(--es-ink-4);
+	letter-spacing: 0.06em;
+	background: var(--es-paper-2);
+	border: 1px solid var(--es-line);
+	border-radius: var(--es-radius-sm);
+	padding: 6px 10px;
+}
+
+/* ---------- reveal on scroll (motion.js agrega .es-in) ---------- */
+
+.es-reveal {
+	opacity: 0;
+	transform: translateY(14px);
+	transition: opacity var(--es-dur) ease-out, transform var(--es-dur) ease-out;
+	transition-delay: var(--es-reveal-delay, 0ms);
+}
+
+.es-reveal.es-in {
+	opacity: 1;
+	transform: none;
+}
+
+/* sin JS o con reduced motion, todo visible */
+.no-js .es-reveal,
+.es-motion-off .es-reveal {
+	opacity: 1;
+	transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-reveal {
+		opacity: 1;
+		transform: none;
+	}
+}

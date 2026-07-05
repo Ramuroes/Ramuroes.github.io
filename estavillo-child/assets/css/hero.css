@@ -1,0 +1,109 @@
+/* =========================================================================
+   ESTAVILLO — Hero home
+   -------------------------------------------------------------------------
+   El system map es SIEMPRE una capa de fondo (nunca un bloque aparte):
+   - Desktop: ocupa el área derecha/fondo del hero, detrás y al costado
+     del copy. Un mask de degradado lo desvanece hacia la zona de texto.
+   - Mobile: capa absoluta detrás del texto, opacidad baja, sin empujar
+     contenido hacia abajo.
+   ========================================================================= */
+
+.es-hero {
+	position: relative;
+	border-bottom: 1px solid var(--es-line);
+	overflow: hidden;
+}
+
+/* ---------- capa visual (SVG inyectado por hero-system-map.js) ---------- */
+
+.es-hero__visual {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none; /* la interacción se captura a nivel .es-hero */
+}
+
+.es-hero__visual svg {
+	position: absolute;
+	top: 50%;
+	right: 0;
+	transform: translateY(-50%);
+	height: 100%;
+	max-height: 640px;
+	width: min(62vw, 860px);
+	opacity: 0.9;
+	/* desvanece hacia la columna de texto para preservar legibilidad */
+	-webkit-mask-image: linear-gradient(to right, transparent 0%, #000 34%);
+	mask-image: linear-gradient(to right, transparent 0%, #000 34%);
+}
+
+/* ---------- contenido ---------- */
+
+.es-hero__inner {
+	position: relative;
+	z-index: 1;
+	padding-top: clamp(56px, 8vw, 110px);
+	padding-bottom: clamp(56px, 8vw, 100px);
+	min-height: min(78vh, 760px);
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.es-hero__content {
+	max-width: 620px;
+}
+
+.es-hero__eyebrow {
+	margin-bottom: 26px;
+}
+
+.es-hero__title {
+	margin-bottom: 26px;
+}
+
+.es-hero__lead {
+	margin-bottom: 38px;
+}
+
+.es-hero__actions {
+	display: flex;
+	align-items: center;
+	gap: clamp(18px, 3vw, 34px);
+	flex-wrap: wrap;
+}
+
+/* ---------- mobile: mapa detrás del texto, sutil ---------- */
+
+@media (max-width: 1023px) {
+	.es-hero__visual svg {
+		top: 0;
+		right: -10%;
+		transform: none;
+		width: 120%;
+		height: 100%;
+		max-height: none;
+		opacity: 0.55;
+		-webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 92%);
+		mask-image: linear-gradient(to bottom, #000 0%, transparent 92%);
+	}
+
+	/* la variante "subtle" del Customizer baja aún más la presencia */
+	.es-hero[data-hero-mobile='system_map_subtle'] .es-hero__visual svg {
+		opacity: 0.3;
+	}
+
+	.es-hero__inner {
+		min-height: 0;
+	}
+
+	.es-hero__content {
+		max-width: 560px;
+	}
+}
+
+/* ---------- fallback estático: el JS dibuja el frame final sin animar ---------- */
+
+.es-hero--static .es-hero__visual svg {
+	opacity: 0.75;
+}
