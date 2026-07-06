@@ -108,8 +108,13 @@
 		var hero = host.closest('.es-hero') || host;
 		var reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 		var mqMobile = window.matchMedia('(max-width: 1023px)');
-		var vDesktop = hero.getAttribute('data-hero-desktop') || 'system_map_nodes';
-		var vMobile = hero.getAttribute('data-hero-mobile') || 'system_map_subtle';
+		// Prioridad: data-attribute del template → config localizada por PHP →
+		// default network. Ambas fuentes salen del mismo es_get_option, así que
+		// coinciden; la localizada cubre el caso de que un caché/optimizador
+		// reescriba el HTML y borre el atributo.
+		var cfg = window.EstavilloHeroConfig || {};
+		var vDesktop = hero.getAttribute('data-hero-desktop') || cfg.desktop || 'network_constellation';
+		var vMobile = hero.getAttribute('data-hero-mobile') || cfg.mobile || 'network_constellation_subtle';
 		return {
 			hero: hero,
 			reduced: reduced,

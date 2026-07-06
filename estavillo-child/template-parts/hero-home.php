@@ -25,12 +25,27 @@ $es_hero_lead  = apply_filters(
 
 $es_hero_primary_url   = apply_filters( 'es_home_hero_primary_url', '#work' );
 $es_hero_secondary_url = apply_filters( 'es_home_hero_secondary_url', '#process' );
+
+$es_hero_desktop = es_get_option( 'es_hero_variant_desktop' );
+$es_hero_mobile  = es_get_option( 'es_hero_variant_mobile' );
 ?>
 
+<?php
+// Debug temporal: ver el código fuente de la página (Ctrl+U) para confirmar qué
+// variante emite WordPress. Si acá dice network_constellation pero el hero se ve
+// distinto, es caché de JS/CSS del navegador o de un plugin de optimización.
+printf(
+	"\n<!-- Estavillo hero: desktop=%s mobile=%s font=%s theme_v=%s -->\n",
+	esc_html( $es_hero_desktop ),
+	esc_html( $es_hero_mobile ),
+	esc_html( es_get_option( 'es_font_preset' ) ),
+	esc_html( defined( 'ES_CHILD_VERSION' ) ? ES_CHILD_VERSION : '?' )
+);
+?>
 <section
 	class="es-hero"
-	data-hero-desktop="<?php echo esc_attr( es_get_option( 'es_hero_variant_desktop' ) ); ?>"
-	data-hero-mobile="<?php echo esc_attr( es_get_option( 'es_hero_variant_mobile' ) ); ?>"
+	data-hero-desktop="<?php echo esc_attr( $es_hero_desktop ); ?>"
+	data-hero-mobile="<?php echo esc_attr( $es_hero_mobile ); ?>"
 >
 	<div class="es-hero__visual" data-es-hero-map aria-hidden="true"></div>
 

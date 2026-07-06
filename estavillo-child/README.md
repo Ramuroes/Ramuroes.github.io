@@ -117,6 +117,33 @@ fuera de viewport / con la pestaña oculta.
 > iteración anterior) **sigue registrado** en el JS pero ya no aparece en el
 > Customizer. Se puede reactivar sumándolo al filtro `es_hero_variants`.
 
+### Cómo se pasa la variante al frontend (y troubleshooting)
+
+La variante seleccionada llega al motor por **dos vías redundantes**, ambas desde
+`es_get_option()`:
+
+1. **Data attribute** en el `<section class="es-hero">`: `data-hero-desktop` /
+   `data-hero-mobile`.
+2. **Config localizada** `window.EstavilloHeroConfig` (`wp_localize_script`), por
+   si un plugin de caché/optimización reescribe el HTML y borra el atributo.
+
+El JS lee: atributo → config → default `network_constellation`. Una variante
+desconocida siempre cae al default (nunca rompe).
+
+Los assets se versionan con **`filemtime()`** (`?ver=<mtime>`): cada cambio de un
+archivo fuerza la recarga en navegador/CDN. Esto resuelve el bug donde, al
+actualizar el tema, el HTML del servidor cambiaba pero el **JS/CSS cacheado
+quedaba viejo** (el hero mostraba el motor anterior aunque el Customizer emitiera
+la variante correcta).
+
+**Si el hero no cambia al elegir una variante:**
+- Mirá el código fuente de la página (Ctrl/Cmd+U): hay un comentario
+  `<!-- Estavillo hero: desktop=… mobile=… font=… theme_v=… -->`. Si dice la
+  variante correcta, WordPress está bien y el problema es **caché**.
+- Purgá la caché del sitio (plugin de caché / CDN) y hacé un **hard refresh**
+  (Ctrl/Cmd+Shift+R). Con el versionado por `filemtime` esto ya no debería pasar
+  tras re-subir el tema.
+
 ### Layout del hero (ambos motores animados)
 
 - **Desktop**: el SVG ocupa el área derecha/fondo, con mask de degradado hacia la
