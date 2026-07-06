@@ -74,26 +74,47 @@
 	padding: 8px 14px;
 }
 
-/* ---------- indicador "en vivo" (dot que respira) ---------- */
+/* ---------- indicador "en vivo" (señal verde que respira) ----------
+   El punto vive en un contenedor de tamaño FIJO y solo anima opacidad.
+   Antes animaba transform:scale, lo que en un inline-flex con
+   align-items:center recalculaba el centrado de la línea en cada frame
+   y hacía "vibrar" el texto contiguo (visible sobre todo en mobile).
+   Ahora la caja no cambia de tamaño y el repintado queda contenido. */
 
 .es-live-dot {
-	display: inline-block;
+	position: relative;
+	display: inline-flex;
 	width: 7px;
 	height: 7px;
-	border-radius: 50%;
-	background: var(--es-accent);
-	animation: es-pulse 2.6s ease-in-out infinite;
+	flex: none;
+	vertical-align: middle;
 }
 
+.es-live-dot::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: 50%;
+	background: var(--es-signal); /* señal viva = verde (§05) */
+	animation: es-pulse 2.6s ease-in-out infinite;
+	will-change: opacity;
+}
+
+/* solo opacidad: no toca el layout */
 @keyframes es-pulse {
 	0%,
 	100% {
 		opacity: 1;
-		transform: scale(1);
 	}
 	50% {
-		opacity: 0.35;
-		transform: scale(0.72);
+		opacity: 0.32;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-live-dot::before {
+		animation: none;
+		opacity: 1;
 	}
 }
 

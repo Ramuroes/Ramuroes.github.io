@@ -54,10 +54,53 @@ estavillo-child/
 | Opción | Valores | Default |
 |---|---|---|
 | Accent color | green / orange | green |
-| Desktop hero variant | system_map / static_fallback | system_map |
-| Mobile hero variant | system_map_subtle / static_fallback | system_map_subtle |
+| Desktop hero variant | system_map_nodes / blueprint_flow / static_fallback | system_map_nodes |
+| Mobile hero variant | system_map_subtle / blueprint_flow / static_fallback | system_map_subtle |
 
-El acento cambia todo el sitio vía `--es-accent` (clase `es-accent--orange` en `<body>`).
+El acento global cambia el *chrome* de marca (eyebrow, palabra destacada del
+titular, botones, links) vía `--es-accent` (clase `es-accent--orange` en `<body>`).
+
+### Semántica de color: verde + naranja coexisten (§05 del sistema visual)
+
+La regla de marca preferida no es "verde o naranja según la página", sino
+**verde primario con naranja usado con moderación para el punto de decisión**,
+ambos en la misma pantalla:
+
+- **`--es-signal` (verde)** = el sistema: camino activo/resuelto, señal viva, éxito.
+- **`--es-decision` (naranja)** = la decisión: el único punto de foco/juicio humano
+  (como máximo uno por vista).
+
+Estos tokens son **fijos**, independientes del toggle de acento global. Por eso
+en el hero conviven el camino verde y el diamante de decisión naranja aunque el
+acento global esté en verde. El toggle green/orange se mantiene por ahora
+(pedido explícito), pero la lógica de marca recomendada es la de arriba.
+
+## Hero variants (motores)
+
+Los tres motores viven en `assets/js/hero-system-map.js` (un dispatcher elige
+según la variante; solo se construye la geometría que se usa). Todos: SVG + rAF,
+cero librerías, `prefers-reduced-motion` → frame final instantáneo, y el rAF
+duerme fuera de viewport / con la pestaña oculta.
+
+- **`system_map_nodes`** (default) — campo ambiente de nodos y trazas que se
+  ensambla en la carga (~2.5s) y responde con **iluminación verde suave** al
+  hover (desktop) / pulso al touch (mobile). El punto de decisión es un **diamante
+  naranja** sobre el camino resuelto verde. Aliases: `system_map` (desktop),
+  `system_map_subtle` (mobile).
+- **`blueprint_flow`** — el motivo **Fig.00** del sistema visual: un flujo
+  `inputs → decide → resolve` sobre retícula blueprint. Se **ensambla una vez y
+  se mantiene** (orden §17: estructura → el camino verde se dibuja → el diamante
+  naranja se enciende con un pulso único → la resolución cierra → los labels mono
+  entran al final). **Sin loop, sin persecución de cursor.** En mobile: versión
+  simplificada (menos nodos, sin región OUTCOME), ensambla una vez.
+- **`static_fallback`** — frame final estático, sin listeners ni rAF.
+
+### Layout del hero (ambos motores animados)
+
+- **Desktop**: el SVG ocupa el área derecha/fondo, con mask de degradado hacia la
+  columna de texto (legibilidad). En `blueprint_flow` los inputs emergen difusos
+  desde la izquierda y las beats DECIDE/RESOLVE quedan nítidas a la derecha.
+- **Mobile**: capa absoluta detrás del texto, opacidad baja, sin empujar contenido.
 
 ## Editar contenido placeholder sin tocar archivos
 
@@ -84,14 +127,19 @@ add_filter( 'es_home_selected_work', function ( $cases ) {
 - **prefers-reduced-motion**: hero estático (frame final) y reveals visibles
   sin animación. Sin listeners ni rAF en ese modo.
 
-## Hero system map — comportamiento
+## Material de referencia — `reference/design-system/`
 
-- **Carga**: líneas y nodos aparecen en ~2.5s con barrido; el camino de decisión
-  (acento) se dibuja al final.
-- **Reposo**: casi estático; respiración sutil de opacidad en algunos nodos.
-  El rAF duerme fuera de viewport y con pestaña oculta.
-- **Hover** (desktop): nodos/conexiones cercanas se iluminan con el acento, con
-  inercia. **Touch** (mobile): pulso local que decae solo. Sin partículas.
-- **Desktop**: el SVG ocupa el área derecha/fondo, con mask de degradado hacia
-  la columna de texto. **Mobile**: capa absoluta detrás del texto, opacidad baja,
-  sin empujar contenido.
+La carpeta `reference/design-system/` (en la raíz del repo, **fuera del tema**)
+guarda el output del Claude Design Visual System v1.0 como **material fuente, no
+código de producción**:
+
+- `Estavillo-Visual-Design-System.dc.html` — el sistema visual completo.
+- `support.js` — runtime del canvas de Claude Design. **Nunca se encola ni se
+  ejecuta en el sitio.** Vive fuera del tema, así que WordPress no lo carga.
+- `NOTES.md` — las reglas útiles extraídas (tokens, tipografía, grilla, gramática
+  de diagrama, uso de verde/naranja, hero/motion), para no depender del HTML de
+  213 KB al implementar.
+
+Las reglas de ese sistema ya están aplicadas en el tema: tokens semánticos
+`--es-signal`/`--es-decision`, el diamante de decisión naranja, y el motor
+`blueprint_flow` (motivo Fig.00).

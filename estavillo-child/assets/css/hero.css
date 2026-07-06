@@ -69,8 +69,14 @@
 .es-hero__actions {
 	display: flex;
 	align-items: center;
-	gap: clamp(18px, 3vw, 34px);
+	gap: 16px clamp(18px, 3vw, 34px);
 	flex-wrap: wrap;
+}
+
+/* botón secundario: caja estable, sin saltos al envolver en mobile */
+.es-hero__actions .es-link-arrow {
+	min-height: 44px;
+	align-items: center;
 }
 
 /* ---------- mobile: mapa detrás del texto, sutil ---------- */
@@ -106,4 +112,39 @@
 
 .es-hero--static .es-hero__visual svg {
 	opacity: 0.75;
+}
+
+/* ---------- variant blueprint_flow: retícula técnica de fondo ----------
+   El motor blueprint dibuja el flujo inputs → decide → resolve sobre esta
+   grilla (§12). Muy baja presencia y con mask hacia la columna de texto. */
+
+.es-hero[data-hero-desktop='blueprint_flow'] .es-hero__visual::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background-image: linear-gradient(var(--es-line) 1px, transparent 1px),
+		linear-gradient(90deg, var(--es-line) 1px, transparent 1px);
+	background-size: 34px 34px;
+	opacity: 0.55;
+	-webkit-mask-image: linear-gradient(to right, transparent 0%, #000 42%);
+	mask-image: linear-gradient(to right, transparent 0%, #000 42%);
+}
+
+@media (max-width: 1023px) {
+	.es-hero[data-hero-mobile='blueprint_flow'] .es-hero__visual::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background-image: linear-gradient(var(--es-line) 1px, transparent 1px),
+			linear-gradient(90deg, var(--es-line) 1px, transparent 1px);
+		background-size: 30px 30px;
+		opacity: 0.3;
+		-webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 88%);
+		mask-image: linear-gradient(to bottom, #000 0%, transparent 88%);
+	}
+	/* en desktop-only el pseudo de blueprint no debe colarse en mobile */
+	.es-hero[data-hero-desktop='blueprint_flow']:not([data-hero-mobile='blueprint_flow'])
+		.es-hero__visual::before {
+		display: none;
+	}
 }

@@ -26,11 +26,13 @@ function es_theme_option_choices() {
 			'orange' => __( 'Orange', 'estavillo-child' ),
 		),
 		'es_hero_variant_desktop' => array(
-			'system_map'      => __( 'Animated system map (default)', 'estavillo-child' ),
-			'static_fallback' => __( 'Static fallback', 'estavillo-child' ),
+			'system_map_nodes' => __( 'System map · nodes (default)', 'estavillo-child' ),
+			'blueprint_flow'   => __( 'Blueprint flow · inputs → decide → resolve', 'estavillo-child' ),
+			'static_fallback'  => __( 'Static fallback', 'estavillo-child' ),
 		),
 		'es_hero_variant_mobile'  => array(
-			'system_map_subtle' => __( 'Subtle system map (default)', 'estavillo-child' ),
+			'system_map_subtle' => __( 'System map · subtle (default)', 'estavillo-child' ),
+			'blueprint_flow'    => __( 'Blueprint flow · simplified', 'estavillo-child' ),
 			'static_fallback'   => __( 'Static fallback', 'estavillo-child' ),
 		),
 	);
@@ -44,7 +46,7 @@ function es_theme_option_choices() {
 function es_theme_option_defaults() {
 	return array(
 		'es_accent_color'         => 'green',
-		'es_hero_variant_desktop' => 'system_map',
+		'es_hero_variant_desktop' => 'system_map_nodes',
 		'es_hero_variant_mobile'  => 'system_map_subtle',
 	);
 }

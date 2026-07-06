@@ -37,10 +37,28 @@
 	--es-accent-orange-dim: rgba(217, 142, 74, 0.42);
 	--es-accent-orange-soft: rgba(217, 142, 74, 0.12);
 
-	/* acento activo (default: green; el Customizer agrega la clase al body) */
+	/* acento activo (default: green; el Customizer agrega la clase al body).
+	   Gobierna SOLO el "chrome" de marca: eyebrow, palabra destacada del
+	   titular, botones, links, subrayado de nav. NO gobierna la semántica
+	   de los diagramas. */
 	--es-accent: var(--es-accent-green);
 	--es-accent-dim: var(--es-accent-green-dim);
 	--es-accent-soft: var(--es-accent-green-soft);
+
+	/* --- semántica de diagrama (fija, independiente del toggle de acento) ---
+	   Regla de marca §05: verde = el sistema (camino activo/resuelto, señal
+	   viva); naranja = la decisión (el único punto de foco/juicio humano,
+	   como máximo una vez por vista). Ambos coexisten en la misma pantalla:
+	   NO son dos modos de marca. Ver reference/design-system/NOTES.md §05.
+	   Verde primario; naranja usado con moderación para puntos de decisión. */
+	--es-signal: #58b183; /* green — active / resolved / system path */
+	--es-signal-2: #2fa968;
+	--es-signal-dim: rgba(88, 177, 131, 0.42);
+	--es-signal-soft: rgba(88, 177, 131, 0.12);
+	--es-decision: #d98e4a; /* orange — the one decision / focus point */
+	--es-decision-2: #c25e2b;
+	--es-decision-dim: rgba(217, 142, 74, 0.42);
+	--es-decision-soft: rgba(217, 142, 74, 0.15);
 
 	/* --- tipografía: tres voces --- */
 	--es-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
@@ -82,6 +100,15 @@
 	--es-accent-orange: #a85c1e;
 	--es-accent-orange-dim: rgba(168, 92, 30, 0.45);
 	--es-accent-orange-soft: rgba(168, 92, 30, 0.1);
+	/* semántica de diagrama en claro (contraste sobre papel claro) */
+	--es-signal: #2d6a4f;
+	--es-signal-2: #245a42;
+	--es-signal-dim: rgba(45, 106, 79, 0.45);
+	--es-signal-soft: rgba(45, 106, 79, 0.1);
+	--es-decision: #a85c1e;
+	--es-decision-2: #8c4a15;
+	--es-decision-dim: rgba(168, 92, 30, 0.45);
+	--es-decision-soft: rgba(168, 92, 30, 0.12);
 }
 
 /* ---------- acento naranja (Customizer → Estavillo → Accent color) ---------- */
