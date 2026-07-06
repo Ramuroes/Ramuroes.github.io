@@ -101,6 +101,45 @@ duerme fuera de viewport / con la pestaña oculta.
   columna de texto (legibilidad). En `blueprint_flow` los inputs emergen difusos
   desde la izquierda y las beats DECIDE/RESOLVE quedan nítidas a la derecha.
 - **Mobile**: capa absoluta detrás del texto, opacidad baja, sin empujar contenido.
+  El visual **nunca** es un bloque separado — vive detrás del texto (`z-index`).
+
+### Arquitectura de variants — agregar una nueva sin reescribir el tema
+
+Los motores se registran por nombre en un registry global. Hay **dos puntos de
+extensión** y ninguno requiere tocar los archivos del tema:
+
+1. **JS** — registrar el motor (en un archivo propio encolado *después* de
+   `es-hero-system-map`, o desde el `functions.php` de un plugin):
+
+   ```js
+   window.EstavilloHero
+     .register('mi_variante', function (host, ctx) {
+       // host = elemento [data-es-hero-map]
+       // ctx  = { hero, reduced, isMobile(), variant(), isStatic }
+       // respetar ctx.isStatic (frame final) y dormir el rAF fuera de viewport
+     })
+     .alias('nombre_viejo', 'mi_variante'); // opcional
+   ```
+
+2. **PHP** — sumar la clave al registro filtrable para que aparezca en el
+   Customizer (p. ej. desde Code Snippets):
+
+   ```php
+   add_filter( 'es_hero_variants', function ( $v ) {
+       $v['mi_variante'] = array(
+           'label'    => 'Mi variante',
+           'contexts' => array( 'desktop', 'mobile' ),
+       );
+       return $v;
+   } );
+   ```
+
+Garantías del dispatcher: una variante **desconocida cae al default**
+(`system_map_nodes`) sin romper; `static_fallback` dibuja el default en frame
+estático; los aliases resuelven valores viejos guardados. API del registry:
+`register(name, fn)`, `alias(from, to)`, `resolve(name)`, `has(name)`,
+`get(name)`, `list()`, `init()`. Estas verificaciones corren en las checks de
+navegador de cada iteración.
 
 ## Editar contenido placeholder sin tocar archivos
 

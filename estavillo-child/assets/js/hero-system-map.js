@@ -2,19 +2,24 @@
  * ESTAVILLO — Hero engines
  * -----------------------------------------------------------------------
  * Mapas técnicos/blueprint animados en SVG inline + rAF. Cero librerías.
- * Un solo dispatcher elige el motor según la variante del hero, así solo
- * se construye la geometría que se usa.
  *
- * Motores:
- *  - system_map_nodes  (default) — campo ambiente de nodos y trazas que se
+ * Registro extensible: los motores se registran por nombre en
+ * window.EstavilloHero (ver "registro de motores" abajo). Un dispatcher
+ * elige el motor según la variante del hero y solo construye la geometría
+ * que se usa. Motores nuevos se agregan sin reescribir el tema.
+ *
+ * Motores incorporados:
+ *  - system_map_nodes  (DEFAULT) — campo ambiente de nodos y trazas que se
  *    ensambla en la carga y responde con iluminación suave al hover/touch.
- *    Alias: "system_map" (desktop), "system_map_subtle" (mobile).
- *  - blueprint_flow — el motivo Fig.00 del sistema visual: un flujo
- *    inputs → decide → resolve que se ensambla una vez y se mantiene
+ *    Aliases: "system_map" (desktop), "system_map_subtle" (mobile).
+ *  - blueprint_flow (opcional) — el motivo Fig.00 del sistema visual: un
+ *    flujo inputs → decide → resolve que se ensambla una vez y se mantiene
  *    (sin loop, sin persecución de cursor). Ver reference/design-system.
- *  - static_fallback — frame final estático, sin listeners ni rAF.
+ *  - static_fallback — modificador: dibuja el motor por defecto en su frame
+ *    final estático, sin listeners ni rAF.
  *
- * Semántica de color (§05, fija por tokens, NO por el acento global):
+ * Semántica de color (§05, fija por tokens, NO por el acento global; el
+ * naranja se usa con moderación: un solo punto de decisión por vista):
  *   verde  var(--es-signal)   = camino activo / resuelto / señal viva
  *   naranja var(--es-decision) = el único punto de decisión / foco
  *
@@ -523,25 +528,69 @@
 		});
 	}
 
-	/* ===================== dispatcher ===================== */
+	/* ===================== registro de motores =====================
+	   Arquitectura extensible: cada motor se registra por nombre. Agregar
+	   una variante nueva = registrar un builder (host, ctx) — desde este
+	   archivo o desde uno propio encolado DESPUÉS (con dependencia de
+	   'es-hero-system-map'), sin reescribir el tema:
 
-	function normalize(v) {
-		if (v === 'system_map') { return 'system_map_nodes'; }
-		if (v === 'system_map_subtle') { return 'system_map_nodes'; }
-		return v;
-	}
+	     window.EstavilloHero
+	       .register('mi_variante', function (host, ctx) { ... })
+	       .alias('nombre_viejo', 'mi_variante');
+
+	   Y sumar la clave al filtro PHP `es_hero_variants` (ver
+	   inc/theme-options.php) para que aparezca en el Customizer.
+
+	   Contrato del builder:
+	     host  = elemento [data-es-hero-map]
+	     ctx   = { hero, reduced, isMobile(), variant(), isStatic }
+	     Debe respetar ctx.isStatic (frame final sin animar) y dormir el
+	     rAF fuera de viewport / con pestaña oculta.
+
+	   'static_fallback' no es un motor: es un modificador que dibuja el
+	   motor por defecto en su frame final estático. */
+
+	var Hero = window.EstavilloHero = window.EstavilloHero || (function () {
+		var engines = {}; // nombre -> builder(host, ctx)
+		var aliases = {}; // alias -> nombre canónico
+		var api = {
+			DEFAULT: 'system_map_nodes',
+			register: function (name, builder) {
+				if (name && typeof builder === 'function') { engines[name] = builder; }
+				return api;
+			},
+			alias: function (from, to) { aliases[from] = to; return api; },
+			resolve: function (name) {
+				var seen = {};
+				while (aliases[name] && !seen[name]) { seen[name] = 1; name = aliases[name]; }
+				return name;
+			},
+			has: function (name) { return !!engines[api.resolve(name)]; },
+			get: function (name) { return engines[api.resolve(name)] || null; },
+			list: function () { return Object.keys(engines); }
+		};
+		return api;
+	})();
+
+	// motores incorporados + aliases (compatibilidad con valores guardados)
+	Hero.register('system_map_nodes', buildNodesMap)
+		.register('blueprint_flow', buildBlueprintFlow)
+		.alias('system_map', 'system_map_nodes')
+		.alias('system_map_subtle', 'system_map_nodes');
+
+	/* ===================== dispatcher ===================== */
 
 	function buildHost(host) {
 		var ctx = resolveContext(host);
-		var variant = normalize(ctx.variant());
-		ctx.isStatic = ctx.reduced || variant === 'static_fallback';
-		if (variant === 'static_fallback') { ctx.hero.classList.add('es-hero--static'); }
+		var raw = ctx.variant();
+		ctx.isStatic = ctx.reduced || raw === 'static_fallback';
+		if (raw === 'static_fallback') { ctx.hero.classList.add('es-hero--static'); }
 
-		if (variant === 'blueprint_flow') {
-			buildBlueprintFlow(host, ctx);
-		} else {
-			buildNodesMap(host, ctx); // default + aliases
-		}
+		// static_fallback → motor por defecto en modo estático.
+		// variante desconocida → cae al default (nunca rompe).
+		var name = raw === 'static_fallback' ? Hero.DEFAULT : raw;
+		var engine = Hero.get(name) || Hero.get(Hero.DEFAULT);
+		engine(host, ctx);
 	}
 
 	function init() {
@@ -556,6 +605,7 @@
 			}
 		}
 	}
+	Hero.init = init; // por si se inserta un hero dinámicamente
 
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', init);
