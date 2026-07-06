@@ -108,6 +108,60 @@
 	}
 }
 
+/* ---------- variant network_constellation: SVG a sangre completa ----------
+   La constelación NO va en columna derecha: llena el hero y vive detrás del
+   texto (la legibilidad la asegura la zona de exclusión del motor + el
+   z-index del contenido). Esta clase (.es-net-svg) pisa el posicionamiento
+   base de `.es-hero__visual svg` por mayor especificidad. */
+
+.es-hero__visual svg.es-net-svg {
+	position: absolute;
+	inset: 0;
+	top: 0;
+	right: 0;
+	transform: none;
+	width: 100%;
+	height: 100%;
+	max-height: none;
+	opacity: 0.92;
+	-webkit-mask-image: none;
+	mask-image: none;
+}
+
+@media (max-width: 1023px) {
+	/* mobile subtle: capa tenue detrás del texto, nunca un bloque aparte */
+	.es-hero__visual svg.es-net-svg {
+		opacity: 0.5;
+	}
+}
+
+/* respiración idle de la constelación (halo + nodos), muy sutil */
+@keyframes es-net-breathe {
+	0%,
+	100% {
+		opacity: 0.075;
+	}
+	50% {
+		opacity: 0.13;
+	}
+}
+
+@keyframes es-net-breathe-node {
+	0%,
+	100% {
+		opacity: 0.82;
+	}
+	50% {
+		opacity: 0.58;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-net-svg circle {
+		animation: none !important;
+	}
+}
+
 /* ---------- fallback estático: el JS dibuja el frame final sin animar ---------- */
 
 .es-hero--static .es-hero__visual svg {

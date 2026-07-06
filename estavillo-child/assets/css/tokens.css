@@ -117,3 +117,15 @@ body.es-accent--orange {
 	--es-accent-dim: var(--es-accent-orange-dim);
 	--es-accent-soft: var(--es-accent-orange-soft);
 }
+
+/* ---------- preset tipográfico (Customizer → Estavillo → Font preset) ----------
+   Default 'design_system' = tokens :root de arriba (Newsreader / Instrument
+   Sans / Spline Sans Mono) — NO se toca la tipografía por defecto.
+   'classic_mockup' = stack de sistema (sin web fonts). Si tu sitio previo
+   usaba otras fuentes exactas, reemplazá estos tres valores por las tuyas
+   (mismos tres roles: serif editorial / sans interfaz / mono técnico). */
+body.es-font--classic_mockup {
+	--es-serif: Georgia, 'Times New Roman', 'Times', serif;
+	--es-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+	--es-mono: ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Consolas, monospace;
+}

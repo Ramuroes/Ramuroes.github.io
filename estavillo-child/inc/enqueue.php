@@ -37,8 +37,12 @@ function es_child_enqueue_assets() {
 	wp_enqueue_style( 'kadence-parent', get_template_directory_uri() . '/style.css', array(), $v );
 	wp_enqueue_style( 'estavillo-child', get_stylesheet_uri(), array( 'kadence-parent' ), $v );
 
-	// Tipografías (desactivable via filtro).
-	if ( apply_filters( 'es_child_load_google_fonts', true ) ) {
+	// Tipografías: solo se cargan las Google Fonts si el preset es
+	// 'design_system'. Con 'classic_mockup' se usa el stack de sistema y no
+	// se pide ninguna web font (más liviano). Igual queda el filtro para
+	// forzar el comportamiento si hiciera falta.
+	$load_fonts = 'design_system' === es_get_option( 'es_font_preset' );
+	if ( apply_filters( 'es_child_load_google_fonts', $load_fonts ) ) {
 		wp_enqueue_style(
 			'es-fonts',
 			'https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Spline+Sans+Mono:wght@400;500;600&display=swap',

@@ -1,10 +1,19 @@
 # Estavillo Visual Design System v1.0 — extracted rules
 
-**Source material, not production code.** This folder holds the Claude Design
-output (`Estavillo-Visual-Design-System.dc.html` + its `support.js`) as a
-reference artifact. `support.js` is the Claude Design canvas runtime — it must
-**never** be enqueued or executed on the WordPress site. The rules below are the
-useful parts, distilled so the theme can implement them without shipping the HTML.
+**Source material, not production code.** This folder holds Claude Design output
+as reference artifacts:
+
+- `Estavillo-Visual-Design-System.dc.html` — the full visual system (rules below).
+- `Estavillo-Home-v4.dc.html` — motion source for the **`network_constellation`**
+  default hero (the living node-network / constellation). Its behavior was
+  re-implemented in vanilla JS in `assets/js/hero-system-map.js`; the DC file is
+  reference only.
+- `support.js` — the Claude Design canvas runtime. It must **never** be enqueued
+  or executed on the WordPress site (it lives outside the theme, so WP never loads
+  it). The `.dc.html` files reference it, but they are reference-only too.
+
+The rules below are the useful parts, distilled so the theme can implement them
+without shipping any of this HTML/JS.
 
 ## Tokens (dark-first)
 

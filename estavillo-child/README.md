@@ -54,11 +54,23 @@ estavillo-child/
 | Opción | Valores | Default |
 |---|---|---|
 | Accent color | green / orange | green |
-| Desktop hero variant | system_map_nodes / blueprint_flow / static_fallback | system_map_nodes |
-| Mobile hero variant | system_map_subtle / blueprint_flow / static_fallback | system_map_subtle |
+| Desktop hero variant | network_constellation / blueprint_flow / static_fallback | network_constellation |
+| Mobile hero variant | network_constellation_subtle / blueprint_flow / static_fallback | network_constellation_subtle |
+| Font preset | design_system / classic_mockup | design_system |
 
 El acento global cambia el *chrome* de marca (eyebrow, palabra destacada del
 titular, botones, links) vía `--es-accent` (clase `es-accent--orange` en `<body>`).
+
+### Preset tipográfico (Font preset)
+
+- **`design_system`** (default) — Newsreader / Instrument Sans / Spline Sans Mono
+  (las fuentes actuales; **no cambia nada** respecto de la versión anterior).
+- **`classic_mockup`** — stack de sistema (serif Georgia / sans system-ui / mono
+  ui-monospace), sin web fonts. Con este preset **no se piden Google Fonts**
+  (más liviano). Si tu sitio previo usaba otras fuentes exactas, reemplazá los
+  tres valores en `body.es-font--classic_mockup` (assets/css/tokens.css) por las
+  tuyas — mismos tres roles. El switch es una clase `es-font--…` en `<body>`; los
+  tamaños/escala no cambian, solo las familias.
 
 ### Semántica de color: verde + naranja coexisten (§05 del sistema visual)
 
@@ -77,23 +89,33 @@ acento global esté en verde. El toggle green/orange se mantiene por ahora
 
 ## Hero variants (motores)
 
-Los tres motores viven en `assets/js/hero-system-map.js` (un dispatcher elige
-según la variante; solo se construye la geometría que se usa). Todos: SVG + rAF,
-cero librerías, `prefers-reduced-motion` → frame final instantáneo, y el rAF
-duerme fuera de viewport / con la pestaña oculta.
+Los motores viven en `assets/js/hero-system-map.js` (un dispatcher elige según la
+variante; solo se construye la geometría que se usa). Todos: SVG + rAF, cero
+librerías, `prefers-reduced-motion` → frame final instantáneo, y el rAF duerme
+fuera de viewport / con la pestaña oculta.
 
-- **`system_map_nodes`** (default) — campo ambiente de nodos y trazas que se
-  ensambla en la carga (~2.5s) y responde con **iluminación verde suave** al
-  hover (desktop) / pulso al touch (mobile). El punto de decisión es un **diamante
-  naranja** sobre el camino resuelto verde. Aliases: `system_map` (desktop),
-  `system_map_subtle` (mobile).
-- **`blueprint_flow`** — el motivo **Fig.00** del sistema visual: un flujo
-  `inputs → decide → resolve` sobre retícula blueprint. Se **ensambla una vez y
-  se mantiene** (orden §17: estructura → el camino verde se dibuja → el diamante
-  naranja se enciende con un pulso único → la resolución cierra → los labels mono
-  entran al final). **Sin loop, sin persecución de cursor.** En mobile: versión
-  simplificada (menos nodos, sin región OUTCOME), ensambla una vez.
-- **`static_fallback`** — frame final estático, sin listeners ni rAF.
+- **`network_constellation`** (default) — red viva de nodos (constelación),
+  adaptada del **Home v4**. Se **ensambla una vez**: los nodos aparecen sueltos,
+  las conexiones se dibujan propagándose por BFS desde un nodo raíz, el foco se
+  ilumina en **verde** con halo + anillo, y todo se asienta. Idle: respiración muy
+  sutil (halo + 2–3 nodos) y un glow tipo radar. **Hover** (desktop, pointer fino):
+  campo de proximidad amortiguado — brillo, tamaño y un *lean* ≤3px, **sin
+  perseguir el cursor**. **Mobile** (`network_constellation_subtle`): el scroll
+  desliza la atención + parallax leve; capa **detrás del texto**, opacidad baja,
+  nunca un bloque aparte. El SVG es a sangre completa (`preserveAspectRatio:none`,
+  viewBox en px) y una **zona de exclusión** evita poblar sobre el texto
+  (legibilidad). Sin naranja: no hay punto de decisión en esta pieza.
+- **`blueprint_flow`** (opcional) — el motivo **Fig.00** del sistema visual: un
+  flujo `inputs → decide → resolve` sobre retícula blueprint. Se **ensambla una vez
+  y se mantiene** (§17: estructura → el camino verde se dibuja → el diamante naranja
+  se enciende con un pulso único → la resolución cierra → los labels mono al final).
+  **Sin loop, sin persecución de cursor.** Mobile: versión simplificada.
+- **`static_fallback`** — dibuja el motor por defecto en su frame final estático,
+  sin listeners ni rAF.
+
+> `system_map_nodes` (el motor de nodos con diamante de decisión naranja de la
+> iteración anterior) **sigue registrado** en el JS pero ya no aparece en el
+> Customizer. Se puede reactivar sumándolo al filtro `es_hero_variants`.
 
 ### Layout del hero (ambos motores animados)
 

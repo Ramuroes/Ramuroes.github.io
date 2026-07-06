@@ -35,19 +35,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function es_hero_variants() {
 	$variants = array(
-		'system_map_nodes'  => array(
-			'label'    => __( 'System map · nodes (default)', 'estavillo-child' ),
+		'network_constellation'        => array(
+			'label'    => __( 'Network constellation (default)', 'estavillo-child' ),
 			'contexts' => array( 'desktop' ),
 		),
-		'system_map_subtle' => array(
-			'label'    => __( 'System map · subtle (default)', 'estavillo-child' ),
+		'network_constellation_subtle' => array(
+			'label'    => __( 'Network constellation · subtle (default)', 'estavillo-child' ),
 			'contexts' => array( 'mobile' ),
 		),
-		'blueprint_flow'    => array(
+		'blueprint_flow'               => array(
 			'label'    => __( 'Blueprint flow · inputs → decide → resolve', 'estavillo-child' ),
 			'contexts' => array( 'desktop', 'mobile' ),
 		),
-		'static_fallback'   => array(
+		'static_fallback'              => array(
 			'label'    => __( 'Static fallback', 'estavillo-child' ),
 			'contexts' => array( 'desktop', 'mobile' ),
 		),
@@ -87,6 +87,10 @@ function es_theme_option_choices() {
 		),
 		'es_hero_variant_desktop' => es_hero_variant_choices( 'desktop' ),
 		'es_hero_variant_mobile'  => es_hero_variant_choices( 'mobile' ),
+		'es_font_preset'          => array(
+			'design_system' => __( 'Design system — Newsreader / Instrument Sans / Spline Sans Mono (default)', 'estavillo-child' ),
+			'classic_mockup' => __( 'Classic mockup — system font stack', 'estavillo-child' ),
+		),
 	);
 }
 
@@ -98,8 +102,9 @@ function es_theme_option_choices() {
 function es_theme_option_defaults() {
 	return array(
 		'es_accent_color'         => 'green',
-		'es_hero_variant_desktop' => 'system_map_nodes',
-		'es_hero_variant_mobile'  => 'system_map_subtle',
+		'es_hero_variant_desktop' => 'network_constellation',
+		'es_hero_variant_mobile'  => 'network_constellation_subtle',
+		'es_font_preset'          => 'design_system',
 	);
 }
 
@@ -158,6 +163,7 @@ function es_customize_register( $wp_customize ) {
 		'es_accent_color'         => __( 'Accent color', 'estavillo-child' ),
 		'es_hero_variant_desktop' => __( 'Desktop hero variant', 'estavillo-child' ),
 		'es_hero_variant_mobile'  => __( 'Mobile hero variant', 'estavillo-child' ),
+		'es_font_preset'          => __( 'Font preset', 'estavillo-child' ),
 	);
 
 	foreach ( $controls as $key => $label ) {
@@ -192,6 +198,7 @@ add_action( 'customize_register', 'es_customize_register' );
  */
 function es_body_classes( $classes ) {
 	$classes[] = 'es-accent--' . es_get_option( 'es_accent_color' );
+	$classes[] = 'es-font--' . es_get_option( 'es_font_preset' );
 	return $classes;
 }
 add_filter( 'body_class', 'es_body_classes' );
