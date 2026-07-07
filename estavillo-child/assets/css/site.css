@@ -1,0 +1,242 @@
+/* =========================================================================
+   ESTAVILLO — Site chrome (header + footer)
+   Scopeado al template standalone de la home. Dark premium, mobile-first.
+   ========================================================================= */
+
+/* ---------- header sticky ---------- */
+
+.es-site-header {
+	position: sticky;
+	top: 0;
+	z-index: 60;
+	background: color-mix(in srgb, var(--es-paper) 88%, transparent);
+	-webkit-backdrop-filter: blur(12px);
+	backdrop-filter: blur(12px);
+	border-bottom: 1px solid var(--es-line);
+}
+
+/* si hay admin bar de WP, bajar el sticky para no quedar tapado */
+.admin-bar .es-site-header {
+	top: 32px;
+}
+
+@media (max-width: 782px) {
+	.admin-bar .es-site-header {
+		top: 46px;
+	}
+}
+
+.es-nav {
+	height: 66px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+}
+
+.es-nav__brand {
+	font-size: 14px;
+	font-weight: 700;
+	letter-spacing: 0.22em;
+	color: var(--es-ink);
+	text-decoration: none;
+}
+
+.es-nav__links {
+	display: flex;
+	align-items: center;
+	gap: clamp(20px, 2.6vw, 36px);
+}
+
+.es-nav__link {
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--es-ink-2);
+	text-decoration: none;
+	padding: 6px 0;
+	background: linear-gradient(var(--es-accent), var(--es-accent)) left bottom / 0 1px no-repeat;
+	transition: background-size 0.2s ease, color 0.15s ease;
+}
+
+.es-nav__link:hover {
+	color: var(--es-ink);
+	background-size: 100% 1px;
+}
+
+.es-nav__lang {
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.12em;
+	color: var(--es-ink-4);
+}
+
+.es-nav__lang-on {
+	color: var(--es-accent);
+}
+
+.es-nav__burger {
+	display: none;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	margin-right: -10px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: var(--es-ink);
+	border-radius: 7px;
+}
+
+/* breakpoint del nav: colapsa a burger */
+@media (max-width: 919px) {
+	.es-nav__links {
+		display: none;
+	}
+	.es-nav__burger {
+		display: inline-flex;
+	}
+}
+
+/* ---------- mobile menu (overlay) ---------- */
+
+.es-mobile-menu {
+	position: fixed;
+	inset: 0;
+	z-index: 80;
+	background: var(--es-paper);
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+}
+
+.es-mobile-menu[hidden] {
+	display: none;
+}
+
+.es-mobile-menu__bar {
+	height: 66px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border-bottom: 1px solid var(--es-line);
+}
+
+.es-mobile-menu__bar .es-nav__burger {
+	display: inline-flex;
+}
+
+.es-mobile-menu__links {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 8px;
+	padding-top: 24px;
+	padding-bottom: 24px;
+}
+
+.es-mobile-menu__link {
+	display: flex;
+	align-items: baseline;
+	gap: 16px;
+	padding: 14px 0;
+	font-family: var(--es-serif);
+	font-size: 34px;
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	color: var(--es-ink);
+	text-decoration: none;
+	border-bottom: 1px solid var(--es-line);
+}
+
+.es-mobile-menu__link:last-child {
+	border-bottom: none;
+}
+
+.es-mobile-menu__num {
+	font-family: var(--es-mono);
+	font-size: 12px;
+	color: var(--es-accent);
+}
+
+.es-mobile-menu__foot {
+	padding: 24px 0 32px;
+	border-top: 1px solid var(--es-line);
+	font-family: var(--es-mono);
+	font-size: 12px;
+	letter-spacing: 0.12em;
+	color: var(--es-ink-4);
+}
+
+/* ---------- footer ---------- */
+
+.es-site-footer {
+	border-top: 1px solid var(--es-line);
+}
+
+.es-site-footer__inner {
+	padding-top: 28px;
+	padding-bottom: 30px;
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+.es-site-footer__row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 16px;
+	flex-wrap: wrap;
+}
+
+.es-site-footer__row--meta {
+	border-top: 1px solid var(--es-line);
+	padding-top: 18px;
+}
+
+.es-site-footer__brand {
+	color: var(--es-ink-3);
+	font-size: 12px;
+}
+
+.es-site-footer__nav {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	flex-wrap: wrap;
+}
+
+.es-site-footer__nav a {
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--es-ink-3);
+	text-decoration: none;
+	transition: color 0.15s ease;
+}
+
+.es-site-footer__nav a:hover {
+	color: var(--es-ink);
+}
+
+.es-site-footer__meta {
+	display: flex;
+	align-items: center;
+	gap: 18px;
+	flex-wrap: wrap;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	color: var(--es-ink-4);
+}
+
+.es-site-footer__meta a {
+	color: var(--es-ink-4);
+	text-decoration: none;
+	transition: color 0.15s ease;
+}
+
+.es-site-footer__meta a:hover {
+	color: var(--es-ink-2);
+}

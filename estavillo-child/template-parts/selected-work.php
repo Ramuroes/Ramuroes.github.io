@@ -1,11 +1,11 @@
 <?php
 /**
- * Selected work — grilla de casos destacados.
+ * Selected work — card ancha destacada + grilla 2-up (layout Home v4).
  *
- * CONTENIDO PLACEHOLDER: los tres casos por defecto salen de los mockups.
- * Editable sin tocar markup vía el filtro 'es_home_selected_work'
- * (Code Snippets), o más adelante conectando un CPT/páginas de caso.
- * Si 'image' es null se muestra el marco placeholder del design system.
+ * CONTENIDO PLACEHOLDER. Editable sin tocar markup vía el filtro
+ * 'es_home_selected_work'. El primer caso se muestra como card ancha; el
+ * resto en una grilla de dos columnas. Si 'image' es null se muestra el
+ * marco placeholder del design system.
  *
  * @package estavillo-child
  */
@@ -18,26 +18,29 @@ $es_cases = apply_filters(
 	'es_home_selected_work',
 	array(
 		array(
-			'num'     => '01',
-			'kicker'  => 'Product + System Design · In progress',
-			'title'   => 'Decision System for Estimating in Metal Workshops',
-			'excerpt' => 'An AI-assisted system that reduces quoting time, improves accuracy and brings consistency to the entire team.',
+			'label'   => 'Case 02',
+			'kicker'  => 'Thesis · Digital education',
+			'title'   => 'Trazur',
+			'excerpt' => 'Degree thesis turned case study: research-driven redesign of an e-learning product — UX research, service design and applied AI in digital education.',
+			'tags'    => array( 'UX Research', 'Service Design', 'Applied AI', 'E-learning' ),
 			'url'     => '#',
 			'image'   => null,
 		),
 		array(
-			'num'     => '02',
-			'kicker'  => 'UX Research · Service Design',
-			'title'   => 'Trazur Platform Redesign',
-			'excerpt' => 'UX research and service design for an e-learning platform about livestock traceability.',
+			'label'   => 'Case 03',
+			'kicker'  => 'Academic UX Case · Google UX Design Certificate',
+			'title'   => 'French Bakery',
+			'excerpt' => 'End-to-end UX process — research, wireframes, usability testing — from the Google UX Design Professional Certificate.',
+			'tags'    => array(),
 			'url'     => '#',
 			'image'   => null,
 		),
 		array(
-			'num'     => '03',
-			'kicker'  => 'Academic UX Case · Google UX Certificate',
-			'title'   => 'French Bakery (Academic Case)',
-			'excerpt' => 'UX case project developed during the Google UX Design Certificate.',
+			'label'   => 'Case 04',
+			'kicker'  => 'Legacy · Industrial e-commerce',
+			'title'   => 'Samic',
+			'excerpt' => 'E-commerce and visual systems for an industrial parts distributor.',
+			'tags'    => array(),
 			'url'     => '#',
 			'image'   => null,
 		),
@@ -45,13 +48,33 @@ $es_cases = apply_filters(
 );
 
 $es_view_all_url = apply_filters( 'es_home_view_all_url', '#' );
+
+$es_wide = array_shift( $es_cases );
+
+/**
+ * Imprime el marco placeholder o la imagen de un caso.
+ *
+ * @param array $case Datos del caso.
+ */
+if ( ! function_exists( 'es_work_media' ) ) {
+	function es_work_media( $case ) {
+		if ( ! empty( $case['image'] ) ) {
+			printf( '<img src="%s" alt="" loading="lazy" />', esc_url( $case['image'] ) );
+		} else {
+			printf(
+				'<span class="es-placeholder__tag">{asset: %s}</span>',
+				esc_html( sanitize_title( $case['title'] ) )
+			);
+		}
+	}
+}
 ?>
 
 <section class="es-section es-work" id="work">
 	<div class="es-container">
 		<div class="es-section-head" data-es-reveal>
 			<div class="es-section-head__title">
-				<span class="es-section-head__num">01</span>
+				<span class="es-section-head__num">03</span>
 				<h2 class="es-label"><?php echo esc_html( es__( 'work_label' ) ); ?></h2>
 			</div>
 			<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_view_all_url ); ?>">
@@ -60,33 +83,49 @@ $es_view_all_url = apply_filters( 'es_home_view_all_url', '#' );
 			</a>
 		</div>
 
-		<div class="es-grid es-grid--3">
-			<?php foreach ( $es_cases as $es_i => $es_case ) : ?>
-				<a
-					class="es-card"
-					href="<?php echo esc_url( $es_case['url'] ); ?>"
-					data-es-reveal
-					style="--es-reveal-delay: <?php echo esc_attr( $es_i * 90 ); ?>ms"
-				>
-					<div class="es-card__media">
-						<?php if ( ! empty( $es_case['image'] ) ) : ?>
-							<img src="<?php echo esc_url( $es_case['image'] ); ?>" alt="" loading="lazy" />
-						<?php else : ?>
-							<span class="es-placeholder__tag">{asset: <?php echo esc_html( sanitize_title( $es_case['title'] ) ); ?>}</span>
-						<?php endif; ?>
-					</div>
+		<div class="es-work__stack">
+			<?php if ( $es_wide ) : ?>
+				<a class="es-card es-card--wide" href="<?php echo esc_url( $es_wide['url'] ); ?>" data-es-reveal>
+					<div class="es-card__media"><?php es_work_media( $es_wide ); ?></div>
 					<div class="es-card__body">
-						<div class="es-card__num"><?php echo esc_html( $es_case['num'] ); ?></div>
-						<div class="es-card__kicker"><?php echo esc_html( $es_case['kicker'] ); ?></div>
-						<div class="es-card__title"><?php echo esc_html( $es_case['title'] ); ?></div>
-						<div class="es-card__excerpt"><?php echo esc_html( $es_case['excerpt'] ); ?></div>
-						<span class="es-card__cta">
-							<?php echo esc_html( es__( 'work_view_case' ) ); ?>
-							<span aria-hidden="true">&nearr;</span>
-						</span>
+						<div class="es-card__meta">
+							<?php if ( ! empty( $es_wide['label'] ) ) : ?>
+								<span class="es-card__label"><?php echo esc_html( $es_wide['label'] ); ?></span>
+							<?php endif; ?>
+							<span class="es-card__kicker"><?php echo esc_html( $es_wide['kicker'] ); ?></span>
+						</div>
+						<div class="es-card__title"><?php echo esc_html( $es_wide['title'] ); ?></div>
+						<div class="es-card__excerpt"><?php echo esc_html( $es_wide['excerpt'] ); ?></div>
+						<?php if ( ! empty( $es_wide['tags'] ) ) : ?>
+							<div class="es-card__tags">
+								<?php foreach ( $es_wide['tags'] as $es_tag ) : ?>
+									<span class="es-pill"><?php echo esc_html( $es_tag ); ?></span>
+								<?php endforeach; ?>
+							</div>
+						<?php endif; ?>
+						<span class="es-card__cta"><?php echo esc_html( es__( 'work_view_case' ) ); ?> <span aria-hidden="true">&nearr;</span></span>
 					</div>
 				</a>
-			<?php endforeach; ?>
+			<?php endif; ?>
+
+			<div class="es-grid es-grid--2">
+				<?php foreach ( $es_cases as $es_i => $es_case ) : ?>
+					<a class="es-card" href="<?php echo esc_url( $es_case['url'] ); ?>" data-es-reveal style="--es-reveal-delay: <?php echo esc_attr( $es_i * 90 ); ?>ms">
+						<div class="es-card__media"><?php es_work_media( $es_case ); ?></div>
+						<div class="es-card__body">
+							<div class="es-card__meta">
+								<?php if ( ! empty( $es_case['label'] ) ) : ?>
+									<span class="es-card__label"><?php echo esc_html( $es_case['label'] ); ?></span>
+								<?php endif; ?>
+								<span class="es-card__kicker"><?php echo esc_html( $es_case['kicker'] ); ?></span>
+							</div>
+							<div class="es-card__title"><?php echo esc_html( $es_case['title'] ); ?></div>
+							<div class="es-card__excerpt"><?php echo esc_html( $es_case['excerpt'] ); ?></div>
+							<span class="es-card__cta"><?php echo esc_html( es__( 'work_view_case' ) ); ?> <span aria-hidden="true">&nearr;</span></span>
+						</div>
+					</a>
+				<?php endforeach; ?>
+			</div>
 		</div>
 	</div>
 </section>

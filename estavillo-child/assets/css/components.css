@@ -199,6 +199,99 @@
 	color: var(--es-accent);
 }
 
+/* meta row (label + kicker) para las cards de Selected Work */
+.es-card__meta {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+	margin-bottom: 12px;
+}
+
+.es-card__label {
+	font-family: var(--es-mono);
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 0.14em;
+	color: var(--es-accent);
+}
+
+.es-card__meta .es-card__kicker {
+	margin-bottom: 0;
+}
+
+.es-card__tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 14px 0 16px;
+}
+
+.es-card__tags .es-pill {
+	padding: 6px 12px;
+	font-size: 10px;
+	border-color: var(--es-line);
+	background: var(--es-paper-2);
+}
+
+/* card ancha: media a un lado, texto al otro */
+.es-card--wide {
+	display: grid;
+	grid-template-columns: 1.05fr 1fr;
+}
+
+.es-card--wide .es-card__media {
+	aspect-ratio: auto;
+	min-height: 250px;
+	border-bottom: none;
+	border-right: 1px solid var(--es-line);
+}
+
+.es-card--wide .es-card__body {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	padding: clamp(22px, 2.8vw, 36px);
+}
+
+.es-card--wide .es-card__title {
+	font-size: clamp(26px, 2.6vw, 32px);
+	margin-bottom: 10px;
+}
+
+.es-card--wide .es-card__excerpt {
+	font-size: 14.5px;
+	line-height: 1.65;
+	max-width: 48ch;
+}
+
+@media (max-width: 767px) {
+	.es-card--wide {
+		grid-template-columns: 1fr;
+	}
+	.es-card--wide .es-card__media {
+		min-height: 190px;
+		border-right: none;
+		border-bottom: 1px solid var(--es-line);
+	}
+}
+
+/* pill de estado "en vivo" (In progress) */
+.es-status-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--es-ink-2);
+	border: 1px solid var(--es-block-line);
+	background: var(--es-block-2);
+	border-radius: 30px;
+	padding: 8px 14px;
+}
+
 /* ---------- placeholder de asset (marco punteado con diagonales) ---------- */
 
 .es-placeholder {

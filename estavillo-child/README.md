@@ -9,28 +9,57 @@ borrador para previsualizar.
 ```
 estavillo-child/
 ├── style.css                      → cabecera del child theme (Template: kadence)
-├── functions.php                  → constantes, includes, helpers Polylang (es__)
+├── functions.php                  → constantes, includes, helpers Polylang (es__, es_nav_links)
 ├── screenshot.png                 → miniatura en Apariencia → Temas
 ├── assets/
 │   ├── css/
-│   │   ├── tokens.css             → design tokens --es-* (dark-first, light, acento green/orange)
+│   │   ├── tokens.css             → design tokens --es-* (dark-first, light, acento, font preset)
 │   │   ├── base.css               → tipografía y utilidades bajo .es-page
 │   │   ├── layout.css             → contenedores, secciones, grillas
-│   │   ├── components.css         → botones, pills, cards, reveal
+│   │   ├── components.css         → botones, pills, cards (+ wide), status pill, reveal
+│   │   ├── site.css               → chrome: header sticky + menú mobile + footer
 │   │   ├── hero.css               → hero: visual detrás/al costado del copy (desktop y mobile)
-│   │   └── pages-home.css         → secciones específicas de la home
+│   │   └── pages-home.css         → secciones de la home (featured, process, work, about, connect)
 │   └── js/
-│       ├── hero-system-map.js     → mapa de sistema animado (SVG + rAF, 0 librerías)
-│       └── motion.js              → reveal on-scroll (IntersectionObserver)
+│       ├── hero-system-map.js     → motores de hero (registry, SVG + rAF, 0 librerías)
+│       ├── motion.js              → reveal on-scroll (IntersectionObserver)
+│       └── nav.js                 → menú mobile (overlay accesible)
 ├── template-parts/
+│   ├── site-header.php            → nav sticky ESTAVILLO + menú mobile
 │   ├── hero-home.php              → hero (copy placeholder, editable por filtros)
-│   ├── selected-work.php          → grilla de casos (editable por filtro es_home_selected_work)
-│   └── footer-cta.php             → "Let's talk" + banda de intersección
+│   ├── featured-case.php          → 01 Main case (filtro es_home_featured)
+│   ├── how-i-work.php             → 02 How I work · 6 pasos (filtro es_home_process_steps)
+│   ├── selected-work.php          → 03 Selected work: card ancha + 2-up (es_home_selected_work)
+│   ├── about-teaser.php           → 04 About (filtros es_home_about_*)
+│   ├── footer-cta.php             → 05 Connect · "Let's talk" (es_home_cta_*, es_contact_email)
+│   └── site-footer.php            → footer ESTAVILLO
 ├── templates/
-│   └── page-home-estavillo.php    → Template Name: "Estavillo — Home (Draft)"
+│   └── page-home-estavillo.php    → Template Name: "Estavillo — Home (Draft)" (standalone)
 └── inc/
-    ├── enqueue.php                → carga condicional de assets (home-only para hero/JS)
-    └── theme-options.php          → Customizer: acento + variantes de hero
+    ├── enqueue.php                → carga condicional de assets (home-only) + config localizada
+    └── theme-options.php          → Customizer: acento + variantes de hero + font preset
+```
+
+### Home v1 — estructura y edición
+
+El template **"Estavillo — Home (Draft)"** es *standalone*: renderiza su propio
+chrome dark premium (nav sticky + footer ESTAVILLO) vía `wp_head()`/`wp_footer()`,
+sin usar el header/footer de Kadence — el resto del sitio sigue con Kadence intacto.
+Orden de secciones (como Home v4): Hero → 01 Main case → 02 How I work →
+03 Selected work → 04 About → 05 Connect.
+
+Todo el copy es **placeholder editable por filtros** (Code Snippets), sin tocar
+archivos:
+
+```php
+add_filter( 'es_nav_links',            function ( $l ) { /* label + url por item */ return $l; } );
+add_filter( 'es_home_featured',        function ( $c ) { $c['url'] = '/work/gv/'; return $c; } );
+add_filter( 'es_home_process_steps',   function ( $s ) { return $s; } );
+add_filter( 'es_home_selected_work',   function ( $cases ) { return $cases; } ); // 1º = card ancha
+add_filter( 'es_home_about_text',      fn() => 'Nuevo texto de about.' );
+add_filter( 'es_home_about_portrait',  fn() => 'https://…/retrato.jpg' );
+add_filter( 'es_contact_email',        fn() => 'correo@dominio.com' );
+add_filter( 'es_social_links',         fn() => array( 'LinkedIn' => 'https://…', 'Behance' => 'https://…' ) );
 ```
 
 ## Instalación (sin riesgo para el sitio actual)

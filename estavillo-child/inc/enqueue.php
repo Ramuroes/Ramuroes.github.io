@@ -75,9 +75,10 @@ function es_child_enqueue_assets() {
 	wp_enqueue_style( 'es-layout', ES_CHILD_URI . '/assets/css/layout.css', array( 'es-base' ), es_asset_ver( 'assets/css/layout.css' ) );
 	wp_enqueue_style( 'es-components', ES_CHILD_URI . '/assets/css/components.css', array( 'es-layout' ), es_asset_ver( 'assets/css/components.css' ) );
 
-	// Capa específica de la home (hero animado + secciones).
+	// Capa específica de la home (chrome + hero animado + secciones).
 	if ( es_is_home_template() ) {
-		wp_enqueue_style( 'es-hero', ES_CHILD_URI . '/assets/css/hero.css', array( 'es-components' ), es_asset_ver( 'assets/css/hero.css' ) );
+		wp_enqueue_style( 'es-site', ES_CHILD_URI . '/assets/css/site.css', array( 'es-components' ), es_asset_ver( 'assets/css/site.css' ) );
+		wp_enqueue_style( 'es-hero', ES_CHILD_URI . '/assets/css/hero.css', array( 'es-site' ), es_asset_ver( 'assets/css/hero.css' ) );
 		wp_enqueue_style( 'es-pages-home', ES_CHILD_URI . '/assets/css/pages-home.css', array( 'es-hero' ), es_asset_ver( 'assets/css/pages-home.css' ) );
 
 		wp_enqueue_script(
@@ -85,6 +86,16 @@ function es_child_enqueue_assets() {
 			ES_CHILD_URI . '/assets/js/motion.js',
 			array(),
 			es_asset_ver( 'assets/js/motion.js' ),
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
+		);
+		wp_enqueue_script(
+			'es-nav',
+			ES_CHILD_URI . '/assets/js/nav.js',
+			array(),
+			es_asset_ver( 'assets/js/nav.js' ),
 			array(
 				'in_footer' => true,
 				'strategy'  => 'defer',

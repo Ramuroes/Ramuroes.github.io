@@ -2,12 +2,172 @@
    ESTAVILLO — Home (secciones específicas del template)
    ========================================================================= */
 
+/* ---------- featured case (Main case) ---------- */
+
+.es-featured__grid {
+	display: grid;
+	grid-template-columns: 0.95fr 1.05fr;
+	gap: clamp(32px, 5vw, 72px);
+	align-items: center;
+}
+
+.es-featured__kicker {
+	margin-bottom: 18px;
+}
+
+.es-featured__title {
+	font-family: var(--es-serif);
+	font-size: clamp(34px, 4vw, 52px);
+	font-weight: 500;
+	letter-spacing: -0.015em;
+	line-height: 1.06;
+	color: var(--es-ink);
+	margin: 0 0 20px;
+	text-wrap: balance;
+}
+
+.es-featured__title em {
+	font-style: italic;
+}
+
+.es-featured__body {
+	max-width: 56ch;
+	font-size: 15.5px;
+	line-height: 1.7;
+	color: var(--es-ink-2);
+	margin: 0 0 18px;
+}
+
+.es-featured__source {
+	max-width: 56ch;
+	font-size: 13px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+	margin: 0 0 20px;
+}
+
+.es-featured__status {
+	margin-bottom: 28px;
+}
+
+.es-featured__media {
+	position: relative;
+}
+
+.es-featured__placeholder {
+	aspect-ratio: 16 / 10;
+	background: var(--es-block-2);
+}
+
+@media (max-width: 900px) {
+	.es-featured__grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ---------- how I work (proceso) ---------- */
+
+.es-process__grid {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: clamp(22px, 2.8vw, 36px) clamp(24px, 3vw, 40px);
+}
+
+.es-process__step {
+	border-top: 1px solid var(--es-line);
+	padding-top: 20px;
+}
+
+.es-process__num {
+	font-family: var(--es-mono);
+	font-size: 12px;
+	color: var(--es-accent);
+	margin-bottom: 14px;
+}
+
+.es-process__title {
+	margin: 0 0 8px;
+	font-size: 17.5px;
+	font-weight: 600;
+	letter-spacing: -0.005em;
+	color: var(--es-ink);
+}
+
+.es-process__text {
+	margin: 0;
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+}
+
+@media (max-width: 680px) {
+	.es-process__grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 900px) and (min-width: 681px) {
+	.es-process__grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
 /* ---------- selected work ---------- */
+
+.es-work__stack {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(16px, 2vw, 24px);
+}
 
 .es-work__head-label {
 	display: flex;
 	align-items: baseline;
 	gap: 14px;
+}
+
+/* ---------- about ---------- */
+
+.es-about__grid {
+	display: grid;
+	grid-template-columns: 300px 1fr;
+	gap: clamp(32px, 5vw, 72px);
+	align-items: start;
+}
+
+.es-about__portrait {
+	position: relative;
+}
+
+.es-about__placeholder {
+	aspect-ratio: 3 / 4;
+}
+
+.es-about__text {
+	max-width: 50ch;
+	font-family: var(--es-serif);
+	font-size: clamp(20px, 2.3vw, 27px);
+	font-weight: 400;
+	line-height: 1.5;
+	letter-spacing: -0.005em;
+	color: var(--es-ink-2);
+	margin: 0 0 30px;
+}
+
+.es-about__body .es-section-head {
+	margin-bottom: 28px;
+}
+
+@media (max-width: 900px) {
+	.es-about__grid {
+		grid-template-columns: 1fr;
+	}
+	.es-about__portrait {
+		max-width: 320px;
+	}
 }
 
 /* ---------- footer CTA ---------- */
@@ -52,7 +212,14 @@
 	color: var(--es-accent);
 }
 
-/* ---------- banda "intersection of" ---------- */
+.es-footer-cta__actions {
+	display: flex;
+	align-items: center;
+	gap: 20px 28px;
+	flex-wrap: wrap;
+}
+
+/* ---------- banda "intersection of" (legacy, sin uso en Home v1) ---------- */
 
 .es-intersection {
 	border-bottom: none;

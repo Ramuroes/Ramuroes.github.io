@@ -47,11 +47,52 @@ function es_child_ui_strings() {
 		'hero_eyebrow'        => 'Product Designer · Systems & Operations',
 		'hero_cta_primary'    => 'View featured case',
 		'hero_cta_secondary'  => 'See how I work',
+		'nav_work'            => 'Work',
+		'nav_how'             => 'How I Work',
+		'nav_about'           => 'About',
+		'nav_connect'         => 'Connect',
+		'featured_label'      => 'Main case',
+		'featured_cta'        => 'Read the case study',
+		'process_label'       => 'How I work',
+		'process_cta'         => 'See my process',
 		'work_label'          => 'Selected work',
-		'work_view_all'       => 'View all cases',
+		'work_view_all'       => 'All work',
 		'work_view_case'      => 'View case study',
+		'about_label'         => 'About',
+		'about_cta'           => 'More about me',
 		'cta_label'           => 'Connect',
 		'cta_button'          => 'Write me',
+	);
+}
+
+/**
+ * Enlaces de navegación (header y footer). Editable por filtro.
+ * Por defecto anclan a las secciones de la home de una sola página; se
+ * pueden apuntar a páginas reales (Work/About/…) vía el filtro cuando existan.
+ *
+ * @return array<int,array{label:string,url:string}>
+ */
+function es_nav_links() {
+	return apply_filters(
+		'es_nav_links',
+		array(
+			array(
+				'label' => es__( 'nav_work' ),
+				'url'   => '#work',
+			),
+			array(
+				'label' => es__( 'nav_how' ),
+				'url'   => '#process',
+			),
+			array(
+				'label' => es__( 'nav_about' ),
+				'url'   => '#about',
+			),
+			array(
+				'label' => es__( 'nav_connect' ),
+				'url'   => '#connect',
+			),
+		)
 	);
 }
 
