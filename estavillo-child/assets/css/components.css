@@ -24,12 +24,15 @@
 }
 
 /* hover y focus-visible: texto claro, borde verde, fondo verde translúcido.
-   Nunca texto azul (antes el texto heredaba el a:hover azul de Kadene). */
+   Nunca texto azul (antes el texto heredaba el a:hover azul de Kadene).
+   Se declara el borde completo + box-shadow:none para que Kadence no meta
+   otro borde/anillo en a:hover / a:focus. */
 .es-btn:hover,
 .es-btn:focus-visible {
 	color: var(--es-ink);
 	background: var(--es-accent-soft);
-	border-color: var(--es-accent);
+	border: 1px solid var(--es-accent);
+	box-shadow: none;
 }
 
 /* el desplazamiento de la flecha (gap) solo en hover: sin salto en foco teclado */
@@ -84,6 +87,21 @@
 .es-link-arrow--quiet:focus,
 .es-link-arrow--quiet:active {
 	color: var(--es-accent);
+}
+
+/* El link con flecha (primario secundario "See how I work", CTAs de sección,
+   etc.) es SIEMPRE texto inline: nunca caja, borde, pill, fondo ni box-shadow
+   en reposo/hover/focus/active — aunque Kadence intente agregarlos en a:hover /
+   a:focus. No se toca padding → sin cambio de layout. El único indicador de
+   foco es el anillo verde de :focus-visible (solo teclado, ver base.css). */
+.es-link-arrow,
+.es-link-arrow:hover,
+.es-link-arrow:focus,
+.es-link-arrow:active {
+	border: 0;
+	background: none;
+	box-shadow: none;
+	border-radius: 0;
 }
 
 .es-link-arrow--quiet:visited {
