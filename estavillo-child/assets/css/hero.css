@@ -10,8 +10,21 @@
 
 .es-hero {
 	position: relative;
-	border-bottom: 1px solid var(--es-line);
 	overflow: hidden;
+}
+
+/* transición suave hacia la sección siguiente: la constelación se disuelve en
+   el papel (sin borde duro). No toca el motor ni el layout del hero. */
+.es-hero::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: clamp(90px, 14vh, 170px);
+	background: linear-gradient(to bottom, transparent, var(--es-paper));
+	pointer-events: none;
+	z-index: 0;
 }
 
 /* ---------- capa visual (SVG inyectado por hero-system-map.js) ---------- */

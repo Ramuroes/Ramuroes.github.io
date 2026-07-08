@@ -12,20 +12,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$es_num       = isset( $args['num'] ) ? $args['num'] : '05';
 $es_cta_title = apply_filters( 'es_home_cta_title', "Let's <em>talk.</em>" );
 $es_cta_lead  = apply_filters(
 	'es_home_cta_lead',
 	"I'm selectively open to product design opportunities with operational depth — especially systems, workflows and AI-assisted products."
 );
-$es_email        = apply_filters( 'es_contact_email', '' );
-$es_connect_url  = apply_filters( 'es_home_connect_url', '#connect' );
+$es_email       = es_contact_email();
+$es_connect_url = apply_filters( 'es_home_connect_url', '#connect' );
 ?>
 
 <section class="es-section es-footer-cta" id="connect">
 	<div class="es-container">
 		<div class="es-section-head" data-es-reveal>
 			<div class="es-section-head__title">
-				<span class="es-section-head__num">05</span>
+				<span class="es-section-head__num"><?php echo esc_html( $es_num ); ?></span>
 				<h2 class="es-label"><?php echo esc_html( es__( 'cta_label' ) ); ?></h2>
 			</div>
 		</div>
@@ -47,7 +48,7 @@ $es_connect_url  = apply_filters( 'es_home_connect_url', '#connect' );
 			<?php endif; ?>
 			<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_connect_url ); ?>">
 				<?php esc_html_e( 'All ways to connect', 'estavillo-child' ); ?>
-				<span aria-hidden="true">&rarr;</span>
+				<span class="es-link-arrow__icon" aria-hidden="true">&rarr;</span>
 			</a>
 		</div>
 	</div>

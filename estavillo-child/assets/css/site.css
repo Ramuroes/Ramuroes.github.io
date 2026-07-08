@@ -1,6 +1,8 @@
 /* =========================================================================
    ESTAVILLO — Site chrome (header + footer)
    Scopeado al template standalone de la home. Dark premium, mobile-first.
+   Estados interactivos: solo verde --es-accent, tintas --es-ink* y opacidad.
+   Nunca azul.
    ========================================================================= */
 
 /* ---------- header sticky ---------- */
@@ -8,7 +10,7 @@
 .es-site-header {
 	position: sticky;
 	top: 0;
-	z-index: 60;
+	z-index: 80; /* por encima del overlay del menú (70) para el morph del botón */
 	background: color-mix(in srgb, var(--es-paper) 88%, transparent);
 	-webkit-backdrop-filter: blur(12px);
 	backdrop-filter: blur(12px);
@@ -40,6 +42,20 @@
 	letter-spacing: 0.22em;
 	color: var(--es-ink);
 	text-decoration: none;
+	transition: color 0.15s ease;
+}
+
+/* logo hover/focus: cue verde de identidad — nunca azul */
+.es-nav__brand:hover,
+.es-nav__brand:focus-visible {
+	color: var(--es-accent);
+}
+
+/* cluster derecho: links + language + toggle slot + botón menu */
+.es-nav__right {
+	display: flex;
+	align-items: center;
+	gap: clamp(16px, 2.4vw, 30px);
 }
 
 .es-nav__links {
@@ -58,7 +74,8 @@
 	transition: background-size 0.2s ease, color 0.15s ease;
 }
 
-.es-nav__link:hover {
+.es-nav__link:hover,
+.es-nav__link:focus-visible {
 	color: var(--es-ink);
 	background-size: 100% 1px;
 }
@@ -68,42 +85,110 @@
 	font-size: 11px;
 	letter-spacing: 0.12em;
 	color: var(--es-ink-4);
+	white-space: nowrap;
 }
 
 .es-nav__lang-on {
 	color: var(--es-accent);
 }
 
-.es-nav__burger {
-	display: none;
+/* slot reservado para el futuro toggle Light/Dark (sin funcionalidad aún) */
+.es-nav__toggle {
+	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 44px;
-	height: 44px;
-	margin-right: -10px;
+	width: 34px;
+	height: 34px;
+	border: 1px solid var(--es-line-strong);
+	border-radius: 50%;
+	color: var(--es-ink-4);
+	opacity: 0.6;
+	cursor: default;
+	flex: none;
+}
+
+/* ---------- botón "Menu" + hamburguesa (mobile) ---------- */
+
+.es-nav__menu-btn {
+	display: none; /* solo mobile (ver breakpoint) */
+	align-items: center;
+	gap: 10px;
+	min-height: 44px;
+	padding: 6px 4px 6px 12px;
+	margin-right: -4px;
 	background: none;
-	border: none;
+	border: 0;
 	cursor: pointer;
 	color: var(--es-ink);
-	border-radius: 7px;
+	transition: color 0.15s ease;
 }
 
-/* estados del burger: cue verde de identidad, fondo transparente.
-   Evita cualquier azul de un `button:hover`/`button:focus` de Kadene. */
-.es-nav__burger:hover,
-.es-nav__burger:focus,
-.es-nav__burger:focus-visible,
-.es-nav__burger:active {
+/* estados del botón Menu: cue verde, fondo/borde transparentes en TODOS los
+   estados para que un `button:hover`/`button:focus` de Kadence no lo pinte
+   (nunca azul). El anillo verde de foco lo da :focus-visible (base.css). */
+.es-nav__menu-btn:hover,
+.es-nav__menu-btn:focus,
+.es-nav__menu-btn:focus-visible,
+.es-nav__menu-btn:active {
 	color: var(--es-accent);
 	background: none;
+	border: 0;
+	box-shadow: none;
 }
 
-/* breakpoint del nav: colapsa a burger */
+.es-nav__menu-label {
+	font-family: var(--es-mono);
+	font-size: 12px;
+	font-weight: 500;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+}
+
+/* hamburguesa de 2 líneas que morfa a X cuando aria-expanded="true" */
+.es-burger {
+	position: relative;
+	display: inline-block;
+	width: 22px;
+	height: 14px;
+	flex: none;
+}
+
+.es-burger span {
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 1.6px;
+	background: currentColor;
+	border-radius: 2px;
+	transition: transform 0.28s var(--es-ease), top 0.28s var(--es-ease);
+}
+
+.es-burger span:nth-child(1) {
+	top: 3px;
+}
+
+.es-burger span:nth-child(2) {
+	top: 9.4px;
+}
+
+[aria-expanded='true'] .es-burger span:nth-child(1) {
+	top: 6.2px;
+	transform: rotate(45deg);
+}
+
+[aria-expanded='true'] .es-burger span:nth-child(2) {
+	top: 6.2px;
+	transform: rotate(-45deg);
+}
+
+/* breakpoint del nav: colapsa a "Menu" */
 @media (max-width: 919px) {
-	.es-nav__links {
+	.es-nav__links,
+	.es-nav__lang,
+	.es-nav__toggle {
 		display: none;
 	}
-	.es-nav__burger {
+	.es-nav__menu-btn {
 		display: inline-flex;
 	}
 }
@@ -113,27 +198,38 @@
 .es-mobile-menu {
 	position: fixed;
 	inset: 0;
-	z-index: 80;
+	z-index: 70; /* debajo del header (80): el botón queda visible y morfa a X */
 	background: var(--es-paper);
 	display: flex;
 	flex-direction: column;
 	overflow-y: auto;
+	opacity: 0;
+	transition: opacity 0.28s var(--es-ease);
 }
 
 .es-mobile-menu[hidden] {
 	display: none;
 }
 
-.es-mobile-menu__bar {
-	height: 66px;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	border-bottom: 1px solid var(--es-line);
+.es-menu-open .es-mobile-menu {
+	opacity: 1;
 }
 
-.es-mobile-menu__bar .es-nav__burger {
-	display: inline-flex;
+.es-mobile-menu__panel {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	padding-top: 66px; /* deja ver la barra del header (logo + X) */
+	transform: translateY(10px);
+	transition: transform 0.3s var(--es-ease);
+}
+
+.admin-bar .es-mobile-menu__panel {
+	padding-top: 98px;
+}
+
+.es-menu-open .es-mobile-menu__panel {
+	transform: none;
 }
 
 .es-mobile-menu__links {
@@ -152,12 +248,33 @@
 	gap: 16px;
 	padding: 14px 0;
 	font-family: var(--es-serif);
-	font-size: 34px;
+	font-size: clamp(32px, 9vw, 40px);
 	font-weight: 500;
 	letter-spacing: -0.01em;
 	color: var(--es-ink);
 	text-decoration: none;
 	border-bottom: 1px solid var(--es-line);
+	transition: color 0.18s ease;
+	/* micro-animación de entrada (stagger) */
+	opacity: 0;
+	transform: translateY(10px);
+}
+
+.es-menu-open .es-mobile-menu__link {
+	opacity: 1;
+	transform: none;
+	transition: color 0.18s ease, opacity 0.32s var(--es-ease), transform 0.32s var(--es-ease);
+}
+
+.es-menu-open .es-mobile-menu__link:nth-child(1) { transition-delay: 0s, 0.06s, 0.06s; }
+.es-menu-open .es-mobile-menu__link:nth-child(2) { transition-delay: 0s, 0.11s, 0.11s; }
+.es-menu-open .es-mobile-menu__link:nth-child(3) { transition-delay: 0s, 0.16s, 0.16s; }
+.es-menu-open .es-mobile-menu__link:nth-child(4) { transition-delay: 0s, 0.21s, 0.21s; }
+.es-menu-open .es-mobile-menu__link:nth-child(5) { transition-delay: 0s, 0.26s, 0.26s; }
+
+.es-mobile-menu__link:hover,
+.es-mobile-menu__link:focus-visible {
+	color: var(--es-accent);
 }
 
 .es-mobile-menu__link:last-child {
@@ -168,6 +285,7 @@
 	font-family: var(--es-mono);
 	font-size: 12px;
 	color: var(--es-accent);
+	flex: none;
 }
 
 .es-mobile-menu__foot {
@@ -179,6 +297,20 @@
 	color: var(--es-ink-4);
 }
 
+/* reduced motion: sin desplazamientos ni stagger (aparece/desaparece limpio) */
+@media (prefers-reduced-motion: reduce) {
+	.es-mobile-menu,
+	.es-mobile-menu__panel,
+	.es-mobile-menu__link {
+		transition: none !important;
+		transform: none !important;
+		opacity: 1;
+	}
+	.es-mobile-menu {
+		opacity: 1;
+	}
+}
+
 /* ---------- footer ---------- */
 
 .es-site-footer {
@@ -186,24 +318,24 @@
 }
 
 .es-site-footer__inner {
-	padding-top: 28px;
-	padding-bottom: 30px;
+	padding-top: clamp(40px, 5vw, 60px);
+	padding-bottom: clamp(28px, 3.5vw, 40px);
 	display: flex;
 	flex-direction: column;
-	gap: 18px;
+	gap: clamp(16px, 2.4vw, 22px);
 }
 
 .es-site-footer__row {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	gap: 16px;
+	gap: 16px 24px;
 	flex-wrap: wrap;
 }
 
 .es-site-footer__row--meta {
 	border-top: 1px solid var(--es-line);
-	padding-top: 18px;
+	padding-top: clamp(16px, 2vw, 20px);
 }
 
 .es-site-footer__brand {
@@ -226,7 +358,8 @@
 	transition: color 0.15s ease;
 }
 
-.es-site-footer__nav a:hover {
+.es-site-footer__nav a:hover,
+.es-site-footer__nav a:focus-visible {
 	color: var(--es-ink);
 }
 
@@ -247,6 +380,7 @@
 	transition: color 0.15s ease;
 }
 
-.es-site-footer__meta a:hover {
-	color: var(--es-ink-2);
+.es-site-footer__meta a:hover,
+.es-site-footer__meta a:focus-visible {
+	color: var(--es-accent);
 }

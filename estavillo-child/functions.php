@@ -51,7 +51,7 @@ function es_child_ui_strings() {
 		'nav_how'             => 'How I Work',
 		'nav_about'           => 'About',
 		'nav_connect'         => 'Connect',
-		'featured_label'      => 'Main case',
+		'featured_label'      => 'Featured case',
 		'featured_cta'        => 'Read the case study',
 		'process_label'       => 'How I work',
 		'process_cta'         => 'See my process',
@@ -62,6 +62,53 @@ function es_child_ui_strings() {
 		'about_cta'           => 'More about me',
 		'cta_label'           => 'Connect',
 		'cta_button'          => 'Write me',
+	);
+}
+
+/**
+ * Email de contacto por defecto (editable por filtro es_contact_email).
+ *
+ * @return string
+ */
+function es_contact_email() {
+	return apply_filters( 'es_contact_email', 'hello@ramiroestavillo.com' );
+}
+
+/**
+ * Registro ordenado de secciones de la Home (fundación para editabilidad).
+ *
+ * Fuente única de la NARRATIVA de la home. Cada entrada mapea una clave de
+ * sección → su template part. El orden del array es el orden de render:
+ *
+ *   Hero → How I Work → Featured Case → Selected Work → About → Connect
+ *
+ * Reordenar / quitar / insertar secciones = filtrar 'es_home_sections' (p. ej.
+ * desde Code Snippets), sin editar el template PHP:
+ *
+ *   add_filter( 'es_home_sections', function ( $s ) {
+ *       // mover About antes de Selected Work, por ejemplo:
+ *       $about = $s['about']; unset( $s['about'] );
+ *       // ...reordenar el array y devolverlo
+ *       return $s;
+ *   } );
+ *
+ * MIGRACIÓN FUTURA: cada valor es hoy un template part; mañana cada clave puede
+ * apuntar a un block/pattern reutilizable sin reescribir el template — la clave
+ * de sección es el contrato estable. Ver README (Foundation for editability).
+ *
+ * @return array<string,string> clave de sección => slug del template part
+ */
+function es_home_sections() {
+	return apply_filters(
+		'es_home_sections',
+		array(
+			'hero'          => 'template-parts/hero-home',
+			'how-i-work'    => 'template-parts/how-i-work',
+			'featured'      => 'template-parts/featured-case',
+			'selected-work' => 'template-parts/selected-work',
+			'about'         => 'template-parts/about-teaser',
+			'connect'       => 'template-parts/footer-cta',
+		)
 	);
 }
 

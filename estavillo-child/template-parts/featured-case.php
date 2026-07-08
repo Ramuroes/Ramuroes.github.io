@@ -12,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$es_num = isset( $args['num'] ) ? $args['num'] : '02';
+
 $es_featured = apply_filters(
 	'es_home_featured',
 	array(
@@ -30,7 +32,7 @@ $es_featured = apply_filters(
 	<div class="es-container">
 		<div class="es-section-head" data-es-reveal>
 			<div class="es-section-head__title">
-				<span class="es-section-head__num">01</span>
+				<span class="es-section-head__num"><?php echo esc_html( $es_num ); ?></span>
 				<h2 class="es-label"><?php echo esc_html( es__( 'featured_label' ) ); ?></h2>
 			</div>
 		</div>
@@ -52,7 +54,7 @@ $es_featured = apply_filters(
 				<?php endif; ?>
 				<a class="es-link-arrow es-featured__cta" href="<?php echo esc_url( $es_featured['url'] ); ?>">
 					<?php echo esc_html( es__( 'featured_cta' ) ); ?>
-					<span aria-hidden="true">&rarr;</span>
+					<span class="es-link-arrow__icon" aria-hidden="true">&rarr;</span>
 				</a>
 			</div>
 

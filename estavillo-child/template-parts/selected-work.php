@@ -14,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$es_num = isset( $args['num'] ) ? $args['num'] : '03';
+
 $es_cases = apply_filters(
 	'es_home_selected_work',
 	array(
@@ -74,12 +76,12 @@ if ( ! function_exists( 'es_work_media' ) ) {
 	<div class="es-container">
 		<div class="es-section-head" data-es-reveal>
 			<div class="es-section-head__title">
-				<span class="es-section-head__num">03</span>
+				<span class="es-section-head__num"><?php echo esc_html( $es_num ); ?></span>
 				<h2 class="es-label"><?php echo esc_html( es__( 'work_label' ) ); ?></h2>
 			</div>
 			<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_view_all_url ); ?>">
 				<?php echo esc_html( es__( 'work_view_all' ) ); ?>
-				<span aria-hidden="true">&rarr;</span>
+				<span class="es-link-arrow__icon" aria-hidden="true">&rarr;</span>
 			</a>
 		</div>
 
@@ -103,7 +105,7 @@ if ( ! function_exists( 'es_work_media' ) ) {
 								<?php endforeach; ?>
 							</div>
 						<?php endif; ?>
-						<span class="es-card__cta"><?php echo esc_html( es__( 'work_view_case' ) ); ?> <span aria-hidden="true">&nearr;</span></span>
+						<span class="es-card__cta"><?php echo esc_html( es__( 'work_view_case' ) ); ?> <span class="es-card__arrow" aria-hidden="true">&rarr;</span></span>
 					</div>
 				</a>
 			<?php endif; ?>
@@ -121,7 +123,7 @@ if ( ! function_exists( 'es_work_media' ) ) {
 							</div>
 							<div class="es-card__title"><?php echo esc_html( $es_case['title'] ); ?></div>
 							<div class="es-card__excerpt"><?php echo esc_html( $es_case['excerpt'] ); ?></div>
-							<span class="es-card__cta"><?php echo esc_html( es__( 'work_view_case' ) ); ?> <span aria-hidden="true">&nearr;</span></span>
+							<span class="es-card__cta"><?php echo esc_html( es__( 'work_view_case' ) ); ?> <span class="es-card__arrow" aria-hidden="true">&rarr;</span></span>
 						</div>
 					</a>
 				<?php endforeach; ?>

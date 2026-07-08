@@ -81,11 +81,38 @@
 	padding-top: 20px;
 }
 
+/* fila de cabecera del paso: número + slot de ícono reservado. Reservar el
+   slot ahora garantiza que sumar íconos / motion / ilustración a futuro NO
+   cambie el layout de la sección. */
+.es-process__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 14px;
+}
+
 .es-process__num {
 	font-family: var(--es-mono);
 	font-size: 12px;
 	color: var(--es-accent);
-	margin-bottom: 14px;
+}
+
+.es-process__icon {
+	width: 26px;
+	height: 26px;
+	flex: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--es-accent);
+}
+
+/* placeholder sutil mientras no hay ícono (marca el lugar sin recargar) */
+.es-process__icon--empty {
+	border: 1px dashed var(--es-line-strong);
+	border-radius: 6px;
+	opacity: 0.4;
 }
 
 .es-process__title {

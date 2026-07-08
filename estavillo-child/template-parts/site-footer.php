@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $es_links   = es_nav_links();
-$es_email   = apply_filters( 'es_contact_email', '' );
+$es_email   = es_contact_email();
 $es_social  = apply_filters(
 	'es_social_links',
 	array(

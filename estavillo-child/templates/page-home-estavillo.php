@@ -41,28 +41,40 @@ if ( function_exists( 'wp_body_open' ) ) {
 
 	<main id="top" class="es-main">
 
-		<?php get_template_part( 'template-parts/hero-home' ); ?>
-
 		<?php
-		// Contenido de bloques del editor, si lo hay (entre hero y Featured).
-		while ( have_posts() ) :
-			the_post();
-			$es_page_content = trim( get_the_content() );
-			if ( '' !== $es_page_content ) :
-				?>
-				<section class="es-section es-page-content">
-					<div class="es-container"><?php the_content(); ?></div>
-				</section>
-				<?php
-			endif;
-		endwhile;
-		?>
+		/*
+		 * Render data-driven de la narrativa de la home. El orden y las
+		 * secciones salen de es_home_sections() (filtrable) — reordenar o
+		 * sumar secciones no requiere tocar este template. A cada sección de
+		 * contenido (todas menos el hero) se le pasa su número correlativo
+		 * ('num'), así la numeración sigue el orden automáticamente.
+		 */
+		$es_section_num = 0;
+		foreach ( es_home_sections() as $es_key => $es_part ) {
 
-		<?php get_template_part( 'template-parts/featured-case' ); ?>
-		<?php get_template_part( 'template-parts/how-i-work' ); ?>
-		<?php get_template_part( 'template-parts/selected-work' ); ?>
-		<?php get_template_part( 'template-parts/about-teaser' ); ?>
-		<?php get_template_part( 'template-parts/footer-cta' ); ?>
+			if ( 'hero' === $es_key ) {
+				get_template_part( $es_part );
+
+				// Contenido de bloques del editor, si lo hay (entre hero y la 1ª sección).
+				while ( have_posts() ) :
+					the_post();
+					$es_page_content = trim( get_the_content() );
+					if ( '' !== $es_page_content ) :
+						?>
+						<section class="es-section es-page-content">
+							<div class="es-container"><?php the_content(); ?></div>
+						</section>
+						<?php
+					endif;
+				endwhile;
+
+				continue;
+			}
+
+			$es_section_num++;
+			get_template_part( $es_part, null, array( 'num' => sprintf( '%02d', $es_section_num ) ) );
+		}
+		?>
 
 	</main>
 

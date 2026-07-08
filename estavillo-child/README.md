@@ -45,8 +45,27 @@ estavillo-child/
 El template **"Estavillo — Home (Draft)"** es *standalone*: renderiza su propio
 chrome dark premium (nav sticky + footer ESTAVILLO) vía `wp_head()`/`wp_footer()`,
 sin usar el header/footer de Kadence — el resto del sitio sigue con Kadence intacto.
-Orden de secciones (como Home v4): Hero → 01 Main case → 02 How I work →
-03 Selected work → 04 About → 05 Connect.
+
+**Narrativa (orden de secciones):** Hero → 01 How I Work → 02 Featured Case →
+03 Selected Work → 04 About → 05 Connect. *(Primero explica CÓMO trabajo, después
+lo prueba con el caso, luego muestra más trabajo.)* La numeración sigue el orden
+automáticamente (se pasa por `$args['num']` desde el loop del template).
+
+**Fundación de editabilidad** — el orden y las secciones son *data-driven* vía el
+filtro `es_home_sections()`: un mapa `clave de sección → template part`. El
+template recorre ese mapa; **reordenar / quitar / insertar secciones no requiere
+tocar PHP**. La clave de sección es el contrato estable: a futuro cada clave puede
+apuntar a un **block/pattern reutilizable** en vez de un template part, migrando
+sección por sección sin reescribir el template.
+
+```php
+// Reordenar / quitar / insertar secciones sin tocar archivos:
+add_filter( 'es_home_sections', function ( $s ) {
+    // p.ej. mover About antes de Selected Work, o quitar una sección:
+    // unset( $s['about'] );  return $s;
+    return $s;
+} );
+```
 
 Todo el copy es **placeholder editable por filtros** (Code Snippets), sin tocar
 archivos:
@@ -54,13 +73,22 @@ archivos:
 ```php
 add_filter( 'es_nav_links',            function ( $l ) { /* label + url por item */ return $l; } );
 add_filter( 'es_home_featured',        function ( $c ) { $c['url'] = '/work/gv/'; return $c; } );
-add_filter( 'es_home_process_steps',   function ( $s ) { return $s; } );
+add_filter( 'es_home_process_steps',   function ( $s ) { $s[0]['icon'] = '<svg…>'; return $s; } ); // slot de ícono reservado
 add_filter( 'es_home_selected_work',   function ( $cases ) { return $cases; } ); // 1º = card ancha
 add_filter( 'es_home_about_text',      fn() => 'Nuevo texto de about.' );
 add_filter( 'es_home_about_portrait',  fn() => 'https://…/retrato.jpg' );
-add_filter( 'es_contact_email',        fn() => 'correo@dominio.com' );
+add_filter( 'es_contact_email',        fn() => 'hola@dominio.com' ); // default: hello@ramiroestavillo.com
+add_filter( 'es_footer_location',      fn() => 'Montevideo, Uruguay' );
 add_filter( 'es_social_links',         fn() => array( 'LinkedIn' => 'https://…', 'Behance' => 'https://…' ) );
 ```
+
+**Chrome & UX:** header alineado (logo · nav · EN/ES · **slot reservado** para un
+futuro toggle Light/Dark, sin funcionalidad todavía). Nav mobile premium: botón
+"Menu" + hamburguesa que **morfa a X**, overlay con micro-animación, scroll lock,
+y cierre por X / Escape / click en link / click afuera. Estados interactivos solo
+en **verde / tinta / opacidad — nunca azul** (se neutraliza cualquier `a:hover` o
+`button:hover` heredado de Kadence). How I Work deja un **slot de ícono reservado**
+por paso para sumar íconos/motion/ilustración a futuro sin cambiar el layout.
 
 ## Instalación (sin riesgo para el sitio actual)
 

@@ -12,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$es_num = isset( $args['num'] ) ? $args['num'] : '04';
+
 $es_about_text = apply_filters(
 	'es_home_about_text',
 	"I'm Ramiro Estavillo, Product Designer. I studied Industrial Design and have spent over a decade designing across physical products, communication systems, digital interfaces and operational workflows. What connects all of it is a preference for understanding how things actually work before proposing how they could work better."
@@ -35,14 +37,14 @@ $es_about_portrait = apply_filters( 'es_home_about_portrait', '' );
 		<div class="es-about__body">
 			<div class="es-section-head" data-es-reveal>
 				<div class="es-section-head__title">
-					<span class="es-section-head__num">04</span>
+					<span class="es-section-head__num"><?php echo esc_html( $es_num ); ?></span>
 					<h2 class="es-label"><?php echo esc_html( es__( 'about_label' ) ); ?></h2>
 				</div>
 			</div>
 			<p class="es-about__text" data-es-reveal><?php echo esc_html( $es_about_text ); ?></p>
 			<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_about_url ); ?>" data-es-reveal>
 				<?php echo esc_html( es__( 'about_cta' ) ); ?>
-				<span aria-hidden="true">&rarr;</span>
+				<span class="es-link-arrow__icon" aria-hidden="true">&rarr;</span>
 			</a>
 		</div>
 	</div>

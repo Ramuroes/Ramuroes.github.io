@@ -247,6 +247,25 @@
 	color: var(--es-accent);
 }
 
+/* flecha de la card: mismo lenguaje que el hero — pequeña, se desliza unos px
+   y queda verde al hover. Nada de íconos de link externo, nada azul. */
+.es-card__arrow {
+	display: inline-block;
+	transition: transform 0.2s var(--es-ease);
+	will-change: transform;
+}
+
+.es-card:hover .es-card__arrow,
+.es-card:focus-visible .es-card__arrow {
+	transform: translateX(4px);
+}
+
+/* icono de flecha en los link-arrow (el desplazamiento del texto lo da el gap
+   del propio .es-link-arrow; el icono acompaña sin doble movimiento) */
+.es-link-arrow__icon {
+	display: inline-block;
+}
+
 /* meta row (label + kicker) para las cards de Selected Work */
 .es-card__meta {
 	display: flex;
