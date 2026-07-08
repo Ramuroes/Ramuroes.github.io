@@ -92,6 +92,18 @@
 	align-items: center;
 }
 
+/* telefonos reales: el CTA secundario ya no envuelve por accidente debajo del
+   primario — a este ancho se apilan a propósito, alineados a la izquierda con
+   spacing intencional. Mismo breakpoint "phone" que el resto del theme. */
+@media (max-width: 680px) {
+	.es-hero__actions {
+		flex-direction: column;
+		align-items: flex-start;
+		flex-wrap: nowrap;
+		gap: 22px;
+	}
+}
+
 /* ---------- mobile: mapa detrás del texto, sutil ---------- */
 
 @media (max-width: 1023px) {

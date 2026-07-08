@@ -272,9 +272,17 @@
 .es-menu-open .es-mobile-menu__link:nth-child(4) { transition-delay: 0s, 0.21s, 0.21s; }
 .es-menu-open .es-mobile-menu__link:nth-child(5) { transition-delay: 0s, 0.26s, 0.26s; }
 
+/* estados declarados explícitamente (incl. :active/:visited) con especificidad
+   clase+pseudo-clase, para que ganen a cualquier a:active/a:visited de Kadence
+   o de la red de seguridad global de base.css. Nunca azul. */
 .es-mobile-menu__link:hover,
-.es-mobile-menu__link:focus-visible {
+.es-mobile-menu__link:focus-visible,
+.es-mobile-menu__link:active {
 	color: var(--es-accent);
+}
+
+.es-mobile-menu__link:visited {
+	color: var(--es-ink);
 }
 
 .es-mobile-menu__link:last-child {

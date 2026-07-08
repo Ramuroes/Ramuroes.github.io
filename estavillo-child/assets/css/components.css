@@ -244,6 +244,13 @@
 	gap: 8px;
 	font-size: 14px;
 	font-weight: 600;
+	color: var(--es-ink);
+	transition: color var(--es-dur-fast) ease;
+}
+
+/* verde solo al hover/foco de la card entera (no permanente). Nunca azul. */
+.es-card:hover .es-card__cta,
+.es-card:focus-visible .es-card__cta {
 	color: var(--es-accent);
 }
 
