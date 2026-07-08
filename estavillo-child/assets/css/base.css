@@ -109,13 +109,50 @@
 	color: var(--es-ink-3);
 }
 
-/* ---------- accesibilidad ---------- */
+/* ---------- accesibilidad + estados interactivos (identidad, cero azul) ------
+   El azul heredado del navegador / WordPress / Kadence se neutraliza acá:
+   1) tap-highlight transparente → sin flash azul al tocar en mobile.
+   2) :focus sin el outline azul del navegador; el foco visible es verde.
+   3) red de seguridad: ningún estado de link cae al azul de Kadence
+      (color:inherit nunca es azul). Los componentes con color propio ganan
+      por especificidad (ver components.css / site.css / pages-home.css).
+   Paleta de estados: verde --es-accent (identidad), tintas --es-ink*, y
+   transparencias. Nunca azul. ------------------------------------------------ */
+
+.es-page a,
+.es-page button,
+.es-page [role='button'],
+.es-page input,
+.es-page textarea,
+.es-page select,
+.es-page summary,
+.es-page label {
+	-webkit-tap-highlight-color: transparent;
+}
+
+/* foco: quita el anillo azul del navegador; el foco visible (teclado) es verde */
+.es-page a:focus,
+.es-page button:focus,
+.es-page [tabindex]:focus {
+	outline: none;
+}
 
 .es-page a:focus-visible,
-.es-page button:focus-visible {
+.es-page button:focus-visible,
+.es-page [tabindex]:focus-visible,
+.es-page [role='button']:focus-visible {
 	outline: 2px solid var(--es-accent);
 	outline-offset: 3px;
 	border-radius: 2px;
+}
+
+/* red de seguridad anti-azul (baja especificidad vía :where → los componentes
+   con color propio ganan; solo evita que un link herede el azul de Kadence) */
+:where(.es-page) a:hover,
+:where(.es-page) a:focus,
+:where(.es-page) a:active,
+:where(.es-page) a:visited {
+	color: inherit;
 }
 
 .es-visually-hidden {

@@ -88,6 +88,16 @@
 	border-radius: 7px;
 }
 
+/* estados del burger: cue verde de identidad, fondo transparente.
+   Evita cualquier azul de un `button:hover`/`button:focus` de Kadene. */
+.es-nav__burger:hover,
+.es-nav__burger:focus,
+.es-nav__burger:focus-visible,
+.es-nav__burger:active {
+	color: var(--es-accent);
+	background: none;
+}
+
 /* breakpoint del nav: colapsa a burger */
 @media (max-width: 919px) {
 	.es-nav__links {

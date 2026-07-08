@@ -23,10 +23,25 @@
 		gap 0.2s var(--es-ease);
 }
 
-.es-btn:hover {
+/* hover y focus-visible: texto claro, borde verde, fondo verde translúcido.
+   Nunca texto azul (antes el texto heredaba el a:hover azul de Kadene). */
+.es-btn:hover,
+.es-btn:focus-visible {
+	color: var(--es-ink);
 	background: var(--es-accent-soft);
 	border-color: var(--es-accent);
+}
+
+/* el desplazamiento de la flecha (gap) solo en hover: sin salto en foco teclado */
+.es-btn:hover {
 	gap: 18px;
+}
+
+/* el CTA conserva texto claro en todos los estados de link */
+.es-btn:link,
+.es-btn:visited,
+.es-btn:active {
+	color: var(--es-ink);
 }
 
 .es-btn__arrow {
@@ -50,6 +65,14 @@
 	gap: 16px;
 }
 
+/* verde de identidad en todos los estados interactivos (aplica a plain y quiet;
+   el REST de cada variante lo definen las reglas base). Nunca azul. */
+.es-link-arrow:hover,
+.es-link-arrow:focus,
+.es-link-arrow:active {
+	color: var(--es-accent);
+}
+
 .es-link-arrow--quiet {
 	font-weight: 500;
 	font-size: 14.5px;
@@ -57,8 +80,14 @@
 	transition: color var(--es-dur-fast) ease, gap 0.2s var(--es-ease);
 }
 
-.es-link-arrow--quiet:hover {
+.es-link-arrow--quiet:hover,
+.es-link-arrow--quiet:focus,
+.es-link-arrow--quiet:active {
 	color: var(--es-accent);
+}
+
+.es-link-arrow--quiet:visited {
+	color: var(--es-ink-2);
 }
 
 /* ---------- pill de skill/tag ---------- */
@@ -123,6 +152,7 @@
 .es-card {
 	display: block;
 	text-decoration: none;
+	color: var(--es-ink); /* evita que el ancla herede el azul de link de Kadene */
 	background: var(--es-paper-2);
 	border: 1px solid var(--es-line);
 	border-radius: var(--es-radius);
