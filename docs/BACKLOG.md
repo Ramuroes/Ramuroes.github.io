@@ -87,6 +87,11 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   "Home Content" page (4 label+URL rows, edited individually). The same
   array feeds the desktop nav, the mobile menu, and the footer nav — one
   edit updates all three, since they already shared `es_nav_links()`.
+- **Done (Sprint 3)** — **Footer** is editable from the same "Home
+  Content" page: LinkedIn URL, Behance URL, and location. Nav links and
+  contact email were already covered by the Header/Connect tickets above
+  (same shared data), so Footer only needed its two genuinely footer-only
+  fields.
 - **P2** — Convert **Hero** to editable content (copy/CTAs are already
   filterable; coordinate with the Hero block/layout ticket above so
   editability doesn't get built on top of a layout that's about to
@@ -103,7 +108,8 @@ Editability priority order (for reference, full detail in
 4. How I Work — **done** (Home Content options page, per-step)
 5. Connect — **done** (Home Content options page)
 6. Header — **done** (Home Content options page, nav links)
-7. Hero
+7. Footer — **done** (Home Content options page, social links + location)
+8. Hero — not started (deferred until the Hero block/layout ticket lands)
 
 ## Accessibility / UX
 

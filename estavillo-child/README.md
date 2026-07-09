@@ -275,6 +275,15 @@ del tema cambió para estos tickets — el punto de extensión ya existía.
    un link roto).
 4. **Guardar Home Content.**
 
+**Footer:**
+
+1. Misma página, sección **Footer**: **LinkedIn URL**, **Behance URL** y
+   **Location**.
+2. Los nav links y el email de contacto del footer **ya se editan desde
+   las secciones Header y Connect** de arriba (son el mismo dato
+   compartido) — acá solo quedan los dos campos exclusivos del footer.
+3. **Guardar Home Content.**
+
 > Si además tenés un filtro por Code Snippets sobre el mismo hook (p. ej.
 > `es_home_about_text`), gana el que se registre último — es el
 > comportamiento normal de los filtros de WordPress, no un bug. No uses

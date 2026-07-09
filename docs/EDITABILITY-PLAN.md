@@ -259,15 +259,14 @@ As given by the project owner, highest priority first:
    `es_case_study` CPT (Phase 3) described above.
 2. **Featured Case** — **done.** Pulls from the same CPT as Selected Work
    (a case flagged "featured"), not a separate block pattern — see above.
-3. **About** — singular, block pattern (Phase 2).
-4. **How I Work** — singular, structured (steps), block pattern (Phase 2),
-   possibly a small custom block if the reserved icon/motion slot needs
-   structured fields per step.
-5. **Connect** — singular, block pattern (Phase 2).
-6. **Header** — singular; nav links are already filterable
-   (`es_nav_links`), goal is full in-admin editing (Phase 1/2).
-7. **Hero** — singular; copy/CTAs already filterable, goal is full in-admin
-   editing (Phase 1/2) — sequence this after the dedicated Hero
+3. **About** — **done.** Home Content options page (Phase 1 + wp-admin UI).
+4. **How I Work** — **done.** Same options page, per-step.
+5. **Connect** — **done.** Same options page.
+6. **Header** — **done.** Same options page, nav links.
+7. **Footer** — **done.** Same options page (social links + location only
+   — nav links and email are shared with Header/Connect).
+8. **Hero** — the only section left. Copy/CTAs are already filterable, but
+   this is deliberately sequenced **after** the dedicated Hero
    block/layout ticket flagged in `BACKLOG.md`, so editability isn't built
    on top of a layout that's about to change.
 

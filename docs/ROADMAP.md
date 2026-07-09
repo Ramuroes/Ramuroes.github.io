@@ -71,7 +71,7 @@ See `BACKLOG.md` P0 items for the exact list this sprint should clear.
   editing experience, not just the PHP data structure) before migrating any
   other section.
 
-**Status:** In progress.
+**Status:** Done, except Hero (deliberately deferred — see below).
 
 - Selected Work — **done**: "Case Study" custom post type (native fields +
   one small meta box, no ACF), with the current placeholder cases kept as
@@ -88,10 +88,19 @@ See `BACKLOG.md` P0 items for the exact list this sprint should clear.
 - Header — **done**: 4 nav links, edited individually. Same array feeds
   desktop nav, mobile menu, and footer nav (already shared before this
   ticket) — one edit updates all three.
-- Footer — next (only social links + location left; nav links and email
-  are already covered by Header/Connect above).
+- Footer — **done**: LinkedIn URL, Behance URL, location. Nav links and
+  contact email were already covered by Header/Connect above (same shared
+  data), so this ticket only needed its two genuinely footer-only fields.
 - Hero — deliberately deferred until the Hero block/layout ticket flagged
-  in `BACKLOG.md` lands first.
+  in `BACKLOG.md` lands first — editability shouldn't be built on top of a
+  layout that's about to change.
+
+Every section above (except Selected Work/Featured Case, which needed a
+CPT because they're repeatable) turned out to already have
+`apply_filters()` extension points from Home v1 — Sprint 3's real work for
+them was giving those filters a wp-admin UI (one shared "Home Content"
+options page in the plugin), not building new plumbing. No theme template
+was changed for About, How I Work, Connect, Header, or Footer.
 
 See `EDITABILITY-PLAN.md` for usage and the architecture rationale.
 

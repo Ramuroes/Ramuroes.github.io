@@ -118,6 +118,17 @@ function es_portfolio_home_content_save() {
 		$data['nav_links'] = $links;
 	}
 
+	// ---- Footer (social links + location) ----
+	if ( isset( $_POST['es_social_linkedin'] ) ) {
+		$data['social_linkedin'] = esc_url_raw( wp_unslash( $_POST['es_social_linkedin'] ) );
+	}
+	if ( isset( $_POST['es_social_behance'] ) ) {
+		$data['social_behance'] = esc_url_raw( wp_unslash( $_POST['es_social_behance'] ) );
+	}
+	if ( isset( $_POST['es_footer_location'] ) ) {
+		$data['footer_location'] = sanitize_text_field( wp_unslash( $_POST['es_footer_location'] ) );
+	}
+
 	update_option( 'es_portfolio_home_content', $data );
 	add_action( 'admin_notices', 'es_portfolio_home_content_saved_notice' );
 }
@@ -231,6 +242,23 @@ function es_portfolio_home_content_page() {
 						</td>
 					</tr>
 				<?php endfor; ?>
+			</table>
+
+			<h2><?php esc_html_e( 'Footer', 'estavillo-portfolio-core' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'Nav links and contact email are shared with Header and Connect above — only social links and location are footer-specific.', 'estavillo-portfolio-core' ); ?></p>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><label for="es_social_linkedin"><?php esc_html_e( 'LinkedIn URL', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="url" id="es_social_linkedin" name="es_social_linkedin" class="regular-text" value="<?php echo esc_attr( $data['social_linkedin'] ?? '' ); ?>" placeholder="https://linkedin.com/in/..."></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_social_behance"><?php esc_html_e( 'Behance URL', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="url" id="es_social_behance" name="es_social_behance" class="regular-text" value="<?php echo esc_attr( $data['social_behance'] ?? '' ); ?>" placeholder="https://behance.net/..."></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_footer_location"><?php esc_html_e( 'Location', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="text" id="es_footer_location" name="es_footer_location" class="regular-text" value="<?php echo esc_attr( $data['footer_location'] ?? '' ); ?>" placeholder="Montevideo, Uruguay"></td>
+				</tr>
 			</table>
 
 			<?php submit_button( __( 'Save Home Content', 'estavillo-portfolio-core' ), 'primary', 'es_portfolio_home_content_submit' ); ?>
@@ -354,3 +382,26 @@ function es_portfolio_filter_nav_links( $default ) {
 	return $merged;
 }
 add_filter( 'es_nav_links', 'es_portfolio_filter_nav_links' );
+
+/**
+ * Puente para Footer. Nav links y email ya están cubiertos por Header y
+ * Connect (mismos filtros, mismos datos) — acá solo faltan redes sociales
+ * y ubicación, lo único realmente exclusivo del footer.
+ */
+function es_portfolio_filter_social_links( $default ) {
+	$data = es_portfolio_get_home_content();
+	if ( ! empty( $data['social_linkedin'] ) ) {
+		$default['LinkedIn'] = $data['social_linkedin'];
+	}
+	if ( ! empty( $data['social_behance'] ) ) {
+		$default['Behance'] = $data['social_behance'];
+	}
+	return $default;
+}
+add_filter( 'es_social_links', 'es_portfolio_filter_social_links' );
+
+function es_portfolio_filter_footer_location( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['footer_location'] ) ? $data['footer_location'] : $default;
+}
+add_filter( 'es_footer_location', 'es_portfolio_filter_footer_location' );
