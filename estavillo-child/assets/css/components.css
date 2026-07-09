@@ -108,6 +108,32 @@
 	color: var(--es-ink-2);
 }
 
+/* Featured Case CTA ("Read the case study"): usa el markup existente
+   .es-link-arrow SIN el modificador --quiet, así que heredaba el verde
+   permanente de la variante "plana" (pensada para quedar siempre verde,
+   pero no es el caso de uso correcto acá). Se corrige solo el color, sin
+   tocar el template ni la variante --quiet: reposo neutro, verde en
+   hover/foco, igual que el resto de los CTAs secundarios de Home.
+   !important por el mismo motivo que .es-mobile-menu__link (ver site.css):
+   el color de link/visited de Kadence se emite con su propio !important. */
+.es-featured__cta {
+	color: var(--es-ink-2) !important;
+}
+
+.es-featured__cta:hover,
+.es-featured__cta:focus,
+.es-featured__cta:active {
+	color: var(--es-accent) !important;
+}
+
+.es-featured__cta:visited {
+	color: var(--es-ink-2) !important;
+}
+
+.es-featured__cta:visited {
+	color: var(--es-ink-2);
+}
+
 /* ---------- pill de skill/tag ---------- */
 
 .es-pill {

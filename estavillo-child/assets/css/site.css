@@ -251,7 +251,10 @@
 	font-size: clamp(32px, 9vw, 40px);
 	font-weight: 500;
 	letter-spacing: -0.01em;
-	color: var(--es-ink);
+	/* !important: este color viene regresando en azul por reglas de Kadence
+	   fuera de nuestro control (link/visited color del Customizer). Es el
+	   único :visited/:active del theme que lo necesita — ver nota abajo. */
+	color: var(--es-ink) !important;
 	text-decoration: none;
 	border-bottom: 1px solid var(--es-line);
 	transition: color 0.18s ease;
@@ -273,16 +276,24 @@
 .es-menu-open .es-mobile-menu__link:nth-child(5) { transition-delay: 0s, 0.26s, 0.26s; }
 
 /* estados declarados explícitamente (incl. :active/:visited) con especificidad
-   clase+pseudo-clase, para que ganen a cualquier a:active/a:visited de Kadence
-   o de la red de seguridad global de base.css. Nunca azul. */
+   clase+pseudo-clase Y !important.
+   Descartado por inspección de código: current-menu-item / current_page_item /
+   aria-current NO pueden ser la causa — este menú es un <a> plano armado desde
+   es_nav_links() (array PHP filtrable), nunca pasa por wp_nav_menu()/Walker,
+   así que WP no genera esas clases/atributos aquí.
+   Causa real: el :visited nativo del navegador (el link ya fue clickeado) más
+   el color "Link/Visited" que Kadence inyecta vía wp_head() — su regla es de
+   especificidad/origen desconocidos desde este repo (no tenemos el CSS de
+   Kadence en el sandbox), así que iguala con !important para no depender de
+   ganar por especificidad. Nunca azul. */
 .es-mobile-menu__link:hover,
 .es-mobile-menu__link:focus-visible,
 .es-mobile-menu__link:active {
-	color: var(--es-accent);
+	color: var(--es-accent) !important;
 }
 
 .es-mobile-menu__link:visited {
-	color: var(--es-ink);
+	color: var(--es-ink) !important;
 }
 
 .es-mobile-menu__link:last-child {
