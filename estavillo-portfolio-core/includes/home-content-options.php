@@ -104,6 +104,20 @@ function es_portfolio_home_content_save() {
 		$data['connect_url'] = esc_url_raw( wp_unslash( $_POST['es_connect_url'] ) );
 	}
 
+	// ---- Header (nav links) ----
+	if ( isset( $_POST['es_nav_link_label'] ) && is_array( $_POST['es_nav_link_label'] ) ) {
+		$labels = wp_unslash( $_POST['es_nav_link_label'] );
+		$urls   = isset( $_POST['es_nav_link_url'] ) && is_array( $_POST['es_nav_link_url'] ) ? wp_unslash( $_POST['es_nav_link_url'] ) : array();
+		$links  = array();
+		foreach ( $labels as $i => $label ) {
+			$links[ $i ] = array(
+				'label' => sanitize_text_field( $label ),
+				'url'   => isset( $urls[ $i ] ) ? esc_url_raw( $urls[ $i ] ) : '',
+			);
+		}
+		$data['nav_links'] = $links;
+	}
+
 	update_option( 'es_portfolio_home_content', $data );
 	add_action( 'admin_notices', 'es_portfolio_home_content_saved_notice' );
 }
@@ -200,6 +214,25 @@ function es_portfolio_home_content_page() {
 				</tr>
 			</table>
 
+			<h2><?php esc_html_e( 'Header (navigation links)', 'estavillo-portfolio-core' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'These 4 links are used in the header nav, the mobile menu, and the footer nav. Leave a row blank to keep its current label and URL.', 'estavillo-portfolio-core' ); ?></p>
+			<table class="form-table" role="presentation">
+				<?php
+				$es_nav_links_data = $data['nav_links'] ?? array();
+				for ( $i = 0; $i < 4; $i++ ) :
+					$es_link_label = $es_nav_links_data[ $i ]['label'] ?? '';
+					$es_link_url   = $es_nav_links_data[ $i ]['url'] ?? '';
+					?>
+					<tr>
+						<th scope="row"><?php echo esc_html( sprintf( __( 'Nav link %d', 'estavillo-portfolio-core' ), $i + 1 ) ); ?></th>
+						<td>
+							<input type="text" name="es_nav_link_label[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_link_label ); ?>" placeholder="<?php esc_attr_e( 'Label', 'estavillo-portfolio-core' ); ?>">
+							<input type="text" name="es_nav_link_url[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_link_url ); ?>" placeholder="<?php esc_attr_e( 'URL (e.g. #work or a real page URL)', 'estavillo-portfolio-core' ); ?>">
+						</td>
+					</tr>
+				<?php endfor; ?>
+			</table>
+
 			<?php submit_button( __( 'Save Home Content', 'estavillo-portfolio-core' ), 'primary', 'es_portfolio_home_content_submit' ); ?>
 		</form>
 	</div>
@@ -291,3 +324,33 @@ function es_portfolio_filter_connect_url( $default ) {
 	return ! empty( $data['connect_url'] ) ? $data['connect_url'] : $default;
 }
 add_filter( 'es_home_connect_url', 'es_portfolio_filter_connect_url' );
+
+/**
+ * Puente para Header: mismo merge por-item que How I Work. Un link sin
+ * label editado no pisa nada y sigue mostrando ESE link puntual como
+ * estaba (label + url originales) — así se puede editar uno solo sin
+ * tocar los otros 3. Si se edita el label pero se deja la URL vacía, la
+ * URL cae al default de ese mismo link (nunca queda un href vacío).
+ * es_nav_links() se usa en el header, el menú mobile y el footer — un
+ * solo array alimenta las tres, como ya era antes de este ticket.
+ */
+function es_portfolio_filter_nav_links( $default ) {
+	$data = es_portfolio_get_home_content();
+	if ( empty( $data['nav_links'] ) || ! is_array( $data['nav_links'] ) ) {
+		return $default;
+	}
+
+	$merged = $default;
+	foreach ( $data['nav_links'] as $i => $custom_link ) {
+		if ( empty( $custom_link['label'] ) ) {
+			continue;
+		}
+		$default_url = $merged[ $i ]['url'] ?? '#';
+		$merged[ $i ] = array(
+			'label' => $custom_link['label'],
+			'url'   => ! empty( $custom_link['url'] ) ? $custom_link['url'] : $default_url,
+		);
+	}
+	return $merged;
+}
+add_filter( 'es_nav_links', 'es_portfolio_filter_nav_links' );

@@ -83,9 +83,10 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   Content" page: title, lead text, contact email, and CTA URL. The
   contact email field is shared with the Footer (same `es_contact_email`
   filter both sections already used) — one field updates both.
-- **P2** — Convert **Header** to editable content (nav links are already
-  filterable via `es_nav_links`; goal is full in-admin editing, not just
-  a filter).
+- **Done (Sprint 3)** — **Header** nav links are editable from the same
+  "Home Content" page (4 label+URL rows, edited individually). The same
+  array feeds the desktop nav, the mobile menu, and the footer nav — one
+  edit updates all three, since they already shared `es_nav_links()`.
 - **P2** — Convert **Hero** to editable content (copy/CTAs are already
   filterable; coordinate with the Hero block/layout ticket above so
   editability doesn't get built on top of a layout that's about to
@@ -101,7 +102,7 @@ Editability priority order (for reference, full detail in
 3. About — **done** (Home Content options page)
 4. How I Work — **done** (Home Content options page, per-step)
 5. Connect — **done** (Home Content options page)
-6. Header
+6. Header — **done** (Home Content options page, nav links)
 7. Hero
 
 ## Accessibility / UX

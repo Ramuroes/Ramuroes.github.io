@@ -85,8 +85,11 @@ See `BACKLOG.md` P0 items for the exact list this sprint should clear.
   step doesn't require filling in all 6).
 - Connect — **done**: title, lead, contact email, CTA URL. Contact email
   is shared with Footer (same underlying filter both sections use).
-- Header, Footer — next, same "Home Content" options page, same pattern
-  (hook pre-existing filters, no new theme plumbing).
+- Header — **done**: 4 nav links, edited individually. Same array feeds
+  desktop nav, mobile menu, and footer nav (already shared before this
+  ticket) — one edit updates all three.
+- Footer — next (only social links + location left; nav links and email
+  are already covered by Header/Connect above).
 - Hero — deliberately deferred until the Hero block/layout ticket flagged
   in `BACKLOG.md` lands first.
 

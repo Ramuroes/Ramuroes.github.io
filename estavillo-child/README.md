@@ -261,6 +261,20 @@ del tema cambió para estos tickets — el punto de extensión ya existía.
    Footer), no hay que repetirlo.
 3. **Guardar Home Content.**
 
+**Header (nav links):**
+
+1. Misma página, sección **Header (navigation links)**: 4 filas (**Nav
+   link 1**–**4**), cada una con **Label** + **URL**.
+2. Estos 4 links alimentan el nav de escritorio, el menú mobile y el nav
+   del footer al mismo tiempo — son el mismo array (`es_nav_links()`) que
+   ya compartían las tres secciones antes de este ticket. Editar un link
+   acá lo cambia en los tres lugares.
+3. Podés editar **una sola fila** y dejar las otras 3 en blanco; las que
+   dejes vacías mantienen su label y URL actuales. Si completás el Label
+   pero dejás la URL vacía, esa fila conserva su URL actual (nunca queda
+   un link roto).
+4. **Guardar Home Content.**
+
 > Si además tenés un filtro por Code Snippets sobre el mismo hook (p. ej.
 > `es_home_about_text`), gana el que se registre último — es el
 > comportamiento normal de los filtros de WordPress, no un bug. No uses
