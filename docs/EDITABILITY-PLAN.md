@@ -109,9 +109,8 @@ a Case Study CPT. This supersedes treating Selected Work as a block pattern
 list; a CPT is the correct model for "add a new case without touching a
 template."
 
-**Implemented (Sprint 3):** `es_case_study` CPT, registered in
-`inc/case-study-cpt.php`. Deliberately minimal — no ACF, native WordPress
-fields only:
+**Implemented (Sprint 3):** `es_case_study` CPT. Deliberately minimal — no
+ACF, native WordPress fields only:
 
 | Field | Mechanism |
 |---|---|
@@ -122,11 +121,50 @@ fields only:
 | Home order | native `page-attributes` support ("Order" field) |
 | Eyebrow/category, case URL, label/status, placeholder text, show-on-Home flag | one small custom meta box (`Case details`) |
 
-`es_home_selected_work_source()` returns published Case Studies flagged
-"show on Home" (ordered by the native Order field), or — if none exist yet
-— the same three hardcoded placeholder cases the template always used, so
-Home can never render empty. The existing `es_home_selected_work` filter
-still runs on top of whichever source is used, unchanged.
+**Extracted into a companion plugin (Sprint 3, part 2):** the CPT
+registration, taxonomy, meta box, and Case Study query all moved out of
+the child theme into a standalone plugin, **Estavillo Portfolio Core**
+(`estavillo-portfolio-core/` at the repo root, `dist/estavillo-portfolio-core.zip`).
+This is the correct architectural boundary going forward: **content types
+are plugin territory, presentation is theme territory** — a theme switch
+(or a future headless/decoupled frontend) shouldn't take portfolio content
+down with it, and reinstalling/updating the visual theme shouldn't risk
+Case Study data or registration.
+
+The theme and plugin communicate through exactly one WordPress filter,
+`es_portfolio_case_studies_for_home` — no direct function calls cross the
+boundary in either direction:
+
+```php
+// Theme side (inc/selected-work-fallback.php) — always safe to call,
+// plugin present or not:
+function es_home_selected_work_source() {
+    $cases = apply_filters( 'es_portfolio_case_studies_for_home', array() );
+    return $cases ? $cases : es_home_selected_work_fallback_cases();
+}
+
+// Plugin side (includes/case-study-cpt.php) — only runs if the plugin is
+// active, and only overrides the theme's default when it actually has data:
+add_filter( 'es_portfolio_case_studies_for_home', function ( $default_cases ) {
+    $real_cases = es_portfolio_get_case_studies_for_home();
+    return $real_cases ? $real_cases : $default_cases;
+} );
+```
+
+Because the theme never calls a plugin function by name, there is no
+`function_exists()`/`is_plugin_active()` guard to maintain and no fatal
+error is possible if the plugin is deactivated — `apply_filters()` with no
+registered callback just returns the theme's own default, which is the
+same three hardcoded placeholder cases the template always used. Home can
+never render empty and never breaks, whether the plugin is active with
+Case Studies, active with none yet, or not installed at all. The existing
+`es_home_selected_work` filter still runs on top of whichever source is
+used, unchanged.
+
+The post type slug (`es_case_study`) and taxonomy slug (`es_case_tag`) did
+not change in the move, and neither did any meta key — existing Case Study
+posts created in wp-admin before this extraction continue to work exactly
+as before.
 
 No single Case Study detail template exists yet (explicitly out of scope
 for this ticket) — the CPT is publicly queryable, so an individual case

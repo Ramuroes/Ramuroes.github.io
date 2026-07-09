@@ -36,10 +36,15 @@ estavillo-child/
 ├── templates/
 │   └── page-home-estavillo.php    → Template Name: "Estavillo — Home (Draft)" (standalone)
 └── inc/
-    ├── enqueue.php                → carga condicional de assets (home-only) + config localizada
-    ├── theme-options.php          → Customizer: acento + variantes de hero + font preset
-    └── case-study-cpt.php         → CPT "Case Study": hace editable Selected Work en wp-admin
+    ├── enqueue.php                 → carga condicional de assets (home-only) + config localizada
+    ├── theme-options.php           → Customizer: acento + variantes de hero + font preset
+    └── selected-work-fallback.php  → placeholders + puente por filtro hacia el plugin (ver abajo)
 ```
+
+> El **Case Study CPT** (registro, meta box, queries) vive en el plugin
+> companion **Estavillo Portfolio Core** (`estavillo-portfolio-core/` en la
+> raíz del repo, `dist/estavillo-portfolio-core.zip`), no en este tema —
+> ver "Selected Work — editable vía Case Studies" más abajo.
 
 ### Home v1 — estructura y edición
 
@@ -94,9 +99,31 @@ por paso para sumar íconos/motion/ilustración a futuro sin cambiar el layout.
 ### Selected Work — editable vía Case Studies (Sprint 3)
 
 **Selected Work** ya no depende de editar PHP: es un custom post type
-**"Case Studies"** (aparece en el menú de wp-admin, ícono de portfolio), sin
-ACF ni dependencias nuevas — solo campos nativos de WordPress + un meta box
-propio y chico.
+**"Case Studies"**, sin ACF ni dependencias nuevas — solo campos nativos de
+WordPress + un meta box propio y chico.
+
+**Arquitectura (Sprint 3 extraction):** el CPT vive en un plugin separado,
+**Estavillo Portfolio Core** (`estavillo-portfolio-core/`), no en este
+tema. El tema y el plugin **no se llaman directamente**: el único puente es
+el filtro `es_portfolio_case_studies_for_home`. El tema lo dispara con sus
+3 casos placeholder como default; si el plugin está activo, engancha ese
+filtro y devuelve Case Studies reales cuando existen. Por eso:
+
+- **Con el plugin activo y con contenido** → Selected Work muestra los
+  Case Studies reales.
+- **Con el plugin activo pero sin ningún Case Study publicado (o todos
+  marcados "no mostrar en Home")** → Selected Work muestra los 3
+  placeholders de siempre.
+- **Con el plugin inactivo o no instalado** → exactamente lo mismo: 3
+  placeholders de siempre, **sin ningún error** — el tema nunca llama una
+  función del plugin directamente, solo dispara un filtro que, sin el
+  plugin, simplemente no tiene ningún callback enganchado.
+
+**Instalación del plugin:** Plugins → Añadir nuevo → Subir plugin →
+`estavillo-portfolio-core.zip` (en `dist/` del repo) → Instalar → **Activar**.
+Al activarlo aparece **Case Studies** en el menú de wp-admin (ícono de
+portfolio) y se flushean las reglas de reescritura automáticamente (no hace
+falta ir a Ajustes → Enlaces permanentes a mano).
 
 **Cómo crear/editar un caso (p. ej. Trazur o Presupuestador):**
 
@@ -131,20 +158,19 @@ propio y chico.
    los Case Studies publicados con el checkbox tildado, ordenados por
    "Order" — sin tocar ningún archivo del tema.
 
-**Fallback (Home nunca se rompe):** si no publicaste ningún Case Study
-todavía (o los tildaste todos como "no mostrar en Home"), Selected Work
-sigue mostrando los 3 casos placeholder de siempre (Trazur / French Bakery /
-Samic) exactamente como antes. En cuanto publiques el primer Case Study
-marcado para Home, los placeholders desaparecen y se muestran tus casos
-reales.
+En cuanto publiques el primer Case Study marcado para Home, los 3
+placeholders (Trazur / French Bakery / Samic) desaparecen y se muestran tus
+casos reales — ver la sección de arquitectura arriba para el detalle del
+fallback.
 
 El filtro `es_home_selected_work` documentado abajo sigue funcionando igual
 sobre el resultado final (Case Studies reales o fallback) — no fue
 reemplazado, solo tiene una fuente de datos nueva por defecto.
 
-> Si un link a un Case Study individual da 404: Ajustes → Enlaces
+> Si un link a un Case Study individual da 404 igual: Ajustes → Enlaces
 > permanentes → Guardar cambios (refresca las reglas de reescritura de
-> WordPress; suele hacer falta una sola vez tras activar el tema).
+> WordPress). No debería hacer falta — el plugin ya flushea al activarse —
+> pero es el primer lugar para mirar si pasa.
 
 ## Instalación (sin riesgo para el sitio actual)
 
@@ -158,6 +184,12 @@ reemplazado, solo tiene una fuente de datos nueva por defecto.
    o en vista previa del Customizer.)
 4. Cuando se decida el switch definitivo: activar el child theme. Kadence sigue
    siendo el parent, así que header/footer/ajustes de Kadence se conservan.
+5. **(Opcional, para editar Selected Work desde wp-admin)** instalar y
+   activar el plugin **Estavillo Portfolio Core**
+   (`dist/estavillo-portfolio-core.zip`) — ver "Selected Work — editable vía
+   Case Studies" arriba. No es requisito para que la Home funcione: sin
+   este plugin, Selected Work simplemente muestra los 3 placeholders de
+   siempre.
 
 > Requiere el tema **Kadence** instalado (es el parent). WordPress 6.3+ recomendado
 > (usa la estrategia `defer` para scripts; en versiones anteriores carga igual en footer).

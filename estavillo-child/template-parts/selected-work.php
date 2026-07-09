@@ -3,11 +3,12 @@
  * Selected work — card ancha destacada + grilla 2-up (layout Home v4).
  *
  * Editable sin tocar markup vía el filtro 'es_home_selected_work'. La
- * fuente de datos es es_home_selected_work_source() (inc/case-study-cpt.php):
- * Case Studies publicados si existen, si no los placeholders de siempre —
- * ver ese archivo para el detalle. El primer caso se muestra como card
- * ancha; el resto en una grilla de dos columnas. Si 'image' es null se
- * muestra el marco placeholder del design system.
+ * fuente de datos es es_home_selected_work_source()
+ * (inc/selected-work-fallback.php): Case Studies reales del plugin
+ * "Estavillo Portfolio Core" si existen y está activo, si no los
+ * placeholders de siempre — ver ese archivo para el detalle. El primer
+ * caso se muestra como card ancha; el resto en una grilla de dos columnas.
+ * Si 'image' es null se muestra el marco placeholder del design system.
  *
  * @package estavillo-child
  */
