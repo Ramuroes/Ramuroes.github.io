@@ -2,8 +2,11 @@
 /**
  * Featured case (Main case) — sección destacada, dos columnas.
  *
- * CONTENIDO PLACEHOLDER (copy del Home v4). Editable sin tocar markup vía el
- * filtro 'es_home_featured'. Si 'image' es null se muestra el marco placeholder.
+ * Editable sin tocar markup vía el filtro 'es_home_featured'. La fuente de
+ * datos es es_home_featured_source() (inc/featured-case-fallback.php): el
+ * Case Study marcado "featured" del plugin "Estavillo Portfolio Core" si
+ * existe y está activo, si no el placeholder de siempre — ver ese archivo
+ * para el detalle. Si 'image' es null se muestra el marco placeholder.
  *
  * @package estavillo-child
  */
@@ -14,18 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $es_num = isset( $args['num'] ) ? $args['num'] : '02';
 
-$es_featured = apply_filters(
-	'es_home_featured',
-	array(
-		'kicker'   => 'Product + System Design · In progress',
-		'title'    => 'A decision system for <em>metal workshop budgeting.</em>',
-		'body'     => "A metal fabrication workshop that quotes well — but slowly, and from one person's head. Estimates queue up, and hours go into requests that end up not closing. I'm designing a system that turns that tacit knowledge into explicit, versioned criteria: consistent, transferable, and able to answer early with an orientative range before hours are committed.",
-		'source'   => 'Developed and implemented at Guzmán Villalba — metal fabrication workshop, Montevideo.',
-		'status'   => 'In progress',
-		'url'      => '#',
-		'image'    => null,
-	)
-);
+$es_featured = apply_filters( 'es_home_featured', es_home_featured_source() );
+
+$es_featured_tag = ! empty( $es_featured['placeholder_label'] ) ? $es_featured['placeholder_label'] : 'featured-gv';
 ?>
 
 <section class="es-section es-section--block es-featured" id="featured">
@@ -63,7 +57,7 @@ $es_featured = apply_filters(
 					<img src="<?php echo esc_url( $es_featured['image'] ); ?>" alt="" loading="lazy" />
 				<?php else : ?>
 					<div class="es-placeholder es-featured__placeholder" role="img" aria-label="<?php esc_attr_e( 'Placeholder for the featured case visual', 'estavillo-child' ); ?>">
-						<span class="es-placeholder__tag">{asset: featured-gv}</span>
+						<span class="es-placeholder__tag">{asset: <?php echo esc_html( $es_featured_tag ); ?>}</span>
 					</div>
 				<?php endif; ?>
 			</div>

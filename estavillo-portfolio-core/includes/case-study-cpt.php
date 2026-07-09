@@ -102,8 +102,10 @@ function es_case_study_render_meta_box( $post ) {
 	$url               = get_post_meta( $post->ID, '_es_case_url', true );
 	$label             = get_post_meta( $post->ID, '_es_case_label', true );
 	$placeholder_label = get_post_meta( $post->ID, '_es_case_placeholder_label', true );
+	$source            = get_post_meta( $post->ID, '_es_case_source', true );
 	$show_on_home_raw  = get_post_meta( $post->ID, '_es_case_show_on_home', true );
 	$show_on_home      = ( '' === $show_on_home_raw ) ? true : ( '1' === $show_on_home_raw );
+	$featured          = '1' === get_post_meta( $post->ID, '_es_case_featured', true );
 	?>
 	<p>
 		<label for="es_case_kicker"><strong><?php esc_html_e( 'Eyebrow / category', 'estavillo-portfolio-core' ); ?></strong></label><br>
@@ -122,13 +124,23 @@ function es_case_study_render_meta_box( $post ) {
 		<input type="text" id="es_case_placeholder_label" name="es_case_placeholder_label" class="widefat" value="<?php echo esc_attr( $placeholder_label ); ?>" placeholder="<?php esc_attr_e( 'Used only if no Featured Image is set. Defaults to the case title.', 'estavillo-portfolio-core' ); ?>">
 	</p>
 	<p>
+		<label for="es_case_source"><strong><?php esc_html_e( 'Source / context line (optional)', 'estavillo-portfolio-core' ); ?></strong></label><br>
+		<input type="text" id="es_case_source" name="es_case_source" class="widefat" value="<?php echo esc_attr( $source ); ?>" placeholder="<?php esc_attr_e( 'e.g. Developed and implemented at ... — used only by Featured Case', 'estavillo-portfolio-core' ); ?>">
+	</p>
+	<p>
 		<label>
 			<input type="checkbox" name="es_case_show_on_home" value="1" <?php checked( $show_on_home ); ?>>
 			<?php esc_html_e( 'Show this case in Home → Selected Work', 'estavillo-portfolio-core' ); ?>
 		</label>
 	</p>
+	<p>
+		<label>
+			<input type="checkbox" name="es_case_featured" value="1" <?php checked( $featured ); ?>>
+			<?php esc_html_e( 'Feature this case on Home (Featured Case section)', 'estavillo-portfolio-core' ); ?>
+		</label>
+	</p>
 	<p class="description">
-		<?php esc_html_e( 'Title, Excerpt, Featured Image, Tags and Order use the standard WordPress fields above / in the sidebar.', 'estavillo-portfolio-core' ); ?>
+		<?php esc_html_e( 'Title, Excerpt, Featured Image, Tags and Order use the standard WordPress fields above / in the sidebar. If this case is featured, its Excerpt becomes the Featured Case body paragraph and Label/status becomes its status pill — write the Excerpt to work for both sections if you also show this case in Selected Work.', 'estavillo-portfolio-core' ); ?>
 	</p>
 	<?php
 }
@@ -149,7 +161,7 @@ function es_save_case_study_meta( $post_id ) {
 		return;
 	}
 
-	$text_fields = array( 'es_case_kicker', 'es_case_label', 'es_case_placeholder_label' );
+	$text_fields = array( 'es_case_kicker', 'es_case_label', 'es_case_placeholder_label', 'es_case_source' );
 	foreach ( $text_fields as $field ) {
 		if ( isset( $_POST[ $field ] ) ) {
 			update_post_meta( $post_id, '_' . $field, sanitize_text_field( wp_unslash( $_POST[ $field ] ) ) );
@@ -161,6 +173,7 @@ function es_save_case_study_meta( $post_id ) {
 	}
 
 	update_post_meta( $post_id, '_es_case_show_on_home', isset( $_POST['es_case_show_on_home'] ) ? '1' : '0' );
+	update_post_meta( $post_id, '_es_case_featured', isset( $_POST['es_case_featured'] ) ? '1' : '0' );
 }
 add_action( 'save_post_' . ES_CASE_STUDY_CPT, 'es_save_case_study_meta' );
 
@@ -228,3 +241,57 @@ function es_portfolio_filter_case_studies_for_home( $default_cases ) {
 	return $real_cases ? $real_cases : $default_cases;
 }
 add_filter( 'es_portfolio_case_studies_for_home', 'es_portfolio_filter_case_studies_for_home' );
+
+/**
+ * El Case Study publicado marcado "Feature this case on Home", en el shape
+ * que espera featured-case.php en el tema (kicker, title, body, source,
+ * status, url, image, placeholder_label). Si varios están marcados, gana
+ * el de menor "Order" (mismo campo nativo que usa Selected Work).
+ *
+ * @return array Vacío si no hay ninguno marcado.
+ */
+function es_portfolio_get_featured_case_for_home() {
+	$query = new WP_Query(
+		array(
+			'post_type'      => ES_CASE_STUDY_CPT,
+			'post_status'    => 'publish',
+			'posts_per_page' => 1,
+			'orderby'        => 'menu_order title',
+			'order'          => 'ASC',
+			'meta_key'       => '_es_case_featured',
+			'meta_value'     => '1',
+		)
+	);
+
+	if ( empty( $query->posts ) ) {
+		return array();
+	}
+
+	$es_post = $query->posts[0];
+	$es_url  = get_post_meta( $es_post->ID, '_es_case_url', true );
+
+	return array(
+		'kicker'            => get_post_meta( $es_post->ID, '_es_case_kicker', true ),
+		'title'             => get_the_title( $es_post ),
+		'body'              => get_the_excerpt( $es_post ),
+		'source'            => get_post_meta( $es_post->ID, '_es_case_source', true ),
+		'status'            => get_post_meta( $es_post->ID, '_es_case_label', true ),
+		'url'               => $es_url ? $es_url : get_permalink( $es_post ),
+		'image'             => get_the_post_thumbnail_url( $es_post, 'large' ),
+		'placeholder_label' => get_post_meta( $es_post->ID, '_es_case_placeholder_label', true ),
+	);
+}
+
+/**
+ * Callback del filtro 'es_portfolio_featured_case_for_home' que expone el
+ * tema: si hay un Case Study marcado como featured lo devuelve, si no deja
+ * pasar el default recibido (el fallback del tema) sin tocarlo.
+ *
+ * @param array $default_case Lo que el tema pasó como default (su fallback).
+ * @return array
+ */
+function es_portfolio_filter_featured_case_for_home( $default_case ) {
+	$real_case = es_portfolio_get_featured_case_for_home();
+	return $real_case ? $real_case : $default_case;
+}
+add_filter( 'es_portfolio_featured_case_for_home', 'es_portfolio_filter_featured_case_for_home' );

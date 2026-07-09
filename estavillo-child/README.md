@@ -36,9 +36,10 @@ estavillo-child/
 ├── templates/
 │   └── page-home-estavillo.php    → Template Name: "Estavillo — Home (Draft)" (standalone)
 └── inc/
-    ├── enqueue.php                 → carga condicional de assets (home-only) + config localizada
-    ├── theme-options.php           → Customizer: acento + variantes de hero + font preset
-    └── selected-work-fallback.php  → placeholders + puente por filtro hacia el plugin (ver abajo)
+    ├── enqueue.php                  → carga condicional de assets (home-only) + config localizada
+    ├── theme-options.php            → Customizer: acento + variantes de hero + font preset
+    ├── selected-work-fallback.php   → Selected Work: placeholders + puente por filtro hacia el plugin
+    └── featured-case-fallback.php   → Featured Case: placeholder + puente por filtro hacia el plugin
 ```
 
 > El **Case Study CPT** (registro, meta box, queries) vive en el plugin
@@ -151,9 +152,16 @@ falta ir a Ajustes → Enlaces permanentes a mano).
      (p. ej. "Case 01", o un estado como "In progress"). Vacío = no se
      muestra.
    - **Placeholder tag text** (opcional) → solo se usa si NO subiste imagen
-     destacada; reemplaza el texto `{asset: …}` del marco placeholder.
+     destacada; reemplaza el texto `{asset: …}` del marco placeholder (en
+     Selected Work y también en Featured Case si el caso está featured).
+   - **Source / context line** (opcional) → solo la usa Featured Case (ver
+     abajo); no aparece en las cards de Selected Work.
    - **Show this case in Home → Selected Work** → tildado por defecto.
      Destildalo para tener el caso guardado sin que aparezca en Home todavía.
+   - **Feature this case on Home (Featured Case section)** → ver la sección
+     de Featured Case más abajo. Independiente del checkbox anterior: un
+     caso puede estar en Selected Work, en Featured Case, en ambos, o en
+     ninguno.
 8. **Publicar.** La sección Selected Work de Home lee automáticamente todos
    los Case Studies publicados con el checkbox tildado, ordenados por
    "Order" — sin tocar ningún archivo del tema.
@@ -172,6 +180,46 @@ reemplazado, solo tiene una fuente de datos nueva por defecto.
 > WordPress). No debería hacer falta — el plugin ya flushea al activarse —
 > pero es el primer lugar para mirar si pasa.
 
+### Featured Case — editable vía Case Studies (Sprint 3, siguiente ticket)
+
+**Featured Case** usa el mismo mecanismo y el mismo CPT que Selected Work —
+no es contenido separado. Cualquier Case Study existente puede marcarse
+como el caso destacado con un solo checkbox.
+
+**Cómo destacar un caso:**
+
+1. wp-admin → **Case Studies** → abrí el caso que querés destacar (puede
+   ser uno que ya esté en Selected Work, o uno nuevo).
+2. En el meta box **"Case details"**, tildá **"Feature this case on Home
+   (Featured Case section)"**.
+3. Completá también, si hace falta:
+   - **Extracto** → se convierte en el párrafo de cuerpo de Featured Case
+     (el texto largo, no el resumen corto de una card). Si el mismo caso
+     también está en Selected Work, ese mismo Extracto es lo que se
+     muestra en ambos lugares — escribilo pensando en los dos usos, o no
+     marques el mismo caso para las dos secciones a la vez.
+   - **Label / status** → se muestra como el pill con punto verde animado
+     (p. ej. "In progress", "Live").
+   - **Source / context line** → la línea chica debajo del párrafo (p. ej.
+     "Developed and implemented at ..."). Solo la usa Featured Case.
+4. **Publicar/Actualizar.**
+
+**Si marcás más de un caso como featured:** gana el de menor **Order**
+(Atributos de página → Order), el mismo campo que ordena Selected Work.
+No es un error ni algo indefinido — es la regla de desempate.
+
+**Fallback (igual que Selected Work):** con el plugin inactivo, o activo
+pero sin ningún caso marcado "featured", Featured Case muestra exactamente
+el mismo contenido placeholder de siempre (el caso de Guzmán Villalba) —
+mismo markup, mismo CSS, cero cambio visual. El puente es un segundo
+filtro independiente, `es_portfolio_featured_case_for_home`, con la misma
+garantía que `es_portfolio_case_studies_for_home`: el tema nunca llama una
+función del plugin directamente, así que desactivar el plugin no puede
+romper esta sección.
+
+El filtro `es_home_featured` documentado abajo sigue funcionando igual
+sobre el resultado final.
+
 ## Instalación (sin riesgo para el sitio actual)
 
 1. **Subir el tema**: Apariencia → Temas → Añadir nuevo → Subir tema →
@@ -184,12 +232,12 @@ reemplazado, solo tiene una fuente de datos nueva por defecto.
    o en vista previa del Customizer.)
 4. Cuando se decida el switch definitivo: activar el child theme. Kadence sigue
    siendo el parent, así que header/footer/ajustes de Kadence se conservan.
-5. **(Opcional, para editar Selected Work desde wp-admin)** instalar y
-   activar el plugin **Estavillo Portfolio Core**
+5. **(Opcional, para editar Selected Work y/o Featured Case desde
+   wp-admin)** instalar y activar el plugin **Estavillo Portfolio Core**
    (`dist/estavillo-portfolio-core.zip`) — ver "Selected Work — editable vía
-   Case Studies" arriba. No es requisito para que la Home funcione: sin
-   este plugin, Selected Work simplemente muestra los 3 placeholders de
-   siempre.
+   Case Studies" y "Featured Case — editable vía Case Studies" arriba. No
+   es requisito para que la Home funcione: sin este plugin, ambas secciones
+   simplemente muestran su contenido placeholder de siempre.
 
 > Requiere el tema **Kadence** instalado (es el parent). WordPress 6.3+ recomendado
 > (usa la estrategia `defer` para scripts; en versiones anteriores carga igual en footer).

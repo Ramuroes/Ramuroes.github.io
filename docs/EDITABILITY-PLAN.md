@@ -101,7 +101,7 @@ Where a section's interaction detail can't be expressed as plain block
 markup (e.g. bespoke hover/motion behavior), wrap that piece as a small
 custom block (C) rather than forcing it into core blocks.
 
-### Phase 3 — CPT for case studies (D) — **done for Selected Work**
+### Phase 3 — CPT for case studies (D) — **done for Selected Work and Featured Case**
 
 For **Selected Work** specifically — the highest-priority section per the
 order below, and the most naturally repeatable/structured content — build
@@ -166,6 +166,48 @@ not change in the move, and neither did any meta key — existing Case Study
 posts created in wp-admin before this extraction continue to work exactly
 as before.
 
+**Featured Case, same pattern (Sprint 3, next ticket):** Featured Case now
+draws from the same `es_case_study` CPT instead of its own hardcoded array
+— no second content type. A Case Study gets one new boolean field, "Feature
+this case on Home," and reuses existing fields for the rest (`kicker` →
+eyebrow/category meta, `body` → native excerpt, `status` → the existing
+label/status meta, `url`/`image`/`placeholder_label` → the same fields
+Selected Work already uses). One new field was genuinely needed with no
+native or existing equivalent: `_es_case_source` (the small attribution
+line under the body paragraph, Featured Case-only).
+
+Selection rule: if more than one Case Study is flagged featured, the one
+with the lowest **Order** (the same native `page-attributes` field that
+orders Selected Work) wins — deterministic, no separate priority field.
+
+Same filter-bridge pattern, just a second, independent filter —
+`es_portfolio_featured_case_for_home` — so Selected Work and Featured Case
+can each be wired up, populated, or left on fallback independently of one
+another:
+
+```php
+// Theme side (inc/featured-case-fallback.php):
+function es_home_featured_source() {
+    $case = apply_filters( 'es_portfolio_featured_case_for_home', array() );
+    return $case ? $case : es_home_featured_fallback_case();
+}
+
+// Plugin side (includes/case-study-cpt.php) — WP_Query orders by
+// menu_order ASC and takes the first match, i.e. lowest Order wins:
+add_filter( 'es_portfolio_featured_case_for_home', function ( $default_case ) {
+    $real_case = es_portfolio_get_featured_case_for_home();
+    return $real_case ? $real_case : $default_case;
+} );
+```
+
+Same guarantee as Selected Work: no direct function call crosses the
+theme/plugin boundary, so deactivating the plugin cannot break Featured
+Case — it just falls back to the same hardcoded placeholder (the Guzmán
+Villalba case) that was already there, with byte-identical markup and CSS.
+A Case Study can independently be shown in Selected Work, set as the
+Featured Case, both, or neither — the two flags and their queries don't
+interact.
+
 No single Case Study detail template exists yet (explicitly out of scope
 for this ticket) — the CPT is publicly queryable, so an individual case
 falls back to Kadence's default single-post template if visited directly.
@@ -174,7 +216,8 @@ Sprint 4, alongside real Presupuestador/Trazur content) and is also where
 the breadcrumbs/accessibility strategy noted in `BACKLOG.md` applies.
 
 See `estavillo-child/README.md` → "Selected Work — editable vía Case
-Studies" for exact wp-admin usage instructions.
+Studies" and "Featured Case — editable vía Case Studies" for exact
+wp-admin usage instructions.
 
 ---
 
@@ -184,9 +227,8 @@ As given by the project owner, highest priority first:
 
 1. **Selected Work** — **done.** Repeatable, highest-churn, built as the
    `es_case_study` CPT (Phase 3) described above.
-2. **Featured Case** — singular, good fit for a block pattern (Phase 2);
-   may later pull from the same CPT as Selected Work (a case marked
-   "featured").
+2. **Featured Case** — **done.** Pulls from the same CPT as Selected Work
+   (a case flagged "featured"), not a separate block pattern — see above.
 3. **About** — singular, block pattern (Phase 2).
 4. **How I Work** — singular, structured (steps), block pattern (Phase 2),
    possibly a small custom block if the reserved icon/motion slot needs
@@ -203,5 +245,9 @@ As given by the project owner, highest priority first:
 
 Per `ROADMAP.md` Sprint 3: build **one** editable section end-to-end
 (Selected Work) — including the actual wp-admin editing experience, not
-just a data structure — before migrating any other section. Validate the
-approach works in practice before committing to it for the rest of Home.
+just a data structure — before migrating any other section. Validated in
+practice, then Featured Case reused the same CPT and filter-bridge pattern
+rather than introducing a new mechanism. The remaining singular sections
+(About, How I Work, Connect, Header, Hero) are still Phase 1/2 candidates
+(theme options / block patterns), not CPT-backed — they aren't naturally
+repeatable content the way Case Studies are.

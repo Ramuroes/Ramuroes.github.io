@@ -19,6 +19,7 @@ define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 require ES_CHILD_DIR . '/inc/enqueue.php';
 require ES_CHILD_DIR . '/inc/theme-options.php';
 require ES_CHILD_DIR . '/inc/selected-work-fallback.php';
+require ES_CHILD_DIR . '/inc/featured-case-fallback.php';
 
 /**
  * Textdomain del child theme.
