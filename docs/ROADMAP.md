@@ -81,8 +81,10 @@ See `BACKLOG.md` P0 items for the exact list this sprint should clear.
 - About — **done**: a plugin-owned "Home Content" options page hooks the
   `es_home_about_*` filters that already existed in the theme since Home
   v1 — no theme template changes needed.
-- How I Work, Connect, Header — next, same "Home Content" options page,
-  same pattern (hook pre-existing filters, no new theme plumbing).
+- How I Work — **done**: same options page, per-step merge (editing one
+  step doesn't require filling in all 6).
+- Connect, Header, Footer — next, same "Home Content" options page, same
+  pattern (hook pre-existing filters, no new theme plumbing).
 - Hero — deliberately deferred until the Hero block/layout ticket flagged
   in `BACKLOG.md` lands first.
 

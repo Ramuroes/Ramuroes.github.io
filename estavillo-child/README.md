@@ -241,6 +241,16 @@ del tema cambió para estos tickets — el punto de extensión ya existía.
 3. Dejá cualquier campo vacío para mantener el placeholder actual de ese
    campo — Home nunca se rompe. **Guardar Home Content.**
 
+**How I Work:**
+
+1. Misma página, sección **How I Work**: 6 filas, una por paso (**Step
+   1**–**Step 6**), cada una con título + descripción.
+2. Podés editar **un solo paso** y dejar los otros 5 en blanco — cada paso
+   se reemplaza de forma independiente; los que dejes vacíos siguen
+   mostrando su placeholder actual. No hace falta completar los 6 a la vez.
+3. **Link CTA de How I Work** (URL) es un campo aparte, opcional.
+4. **Guardar Home Content.**
+
 > Si además tenés un filtro por Code Snippets sobre el mismo hook (p. ej.
 > `es_home_about_text`), gana el que se registre último — es el
 > comportamiento normal de los filtros de WordPress, no un bug. No uses

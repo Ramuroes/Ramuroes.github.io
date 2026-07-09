@@ -73,6 +73,23 @@ function es_portfolio_home_content_save() {
 		$data['about_portrait'] = esc_url_raw( wp_unslash( $_POST['es_about_portrait'] ) );
 	}
 
+	// ---- How I Work ----
+	if ( isset( $_POST['es_process_step_title'] ) && is_array( $_POST['es_process_step_title'] ) ) {
+		$titles = wp_unslash( $_POST['es_process_step_title'] );
+		$texts  = isset( $_POST['es_process_step_text'] ) && is_array( $_POST['es_process_step_text'] ) ? wp_unslash( $_POST['es_process_step_text'] ) : array();
+		$steps  = array();
+		foreach ( $titles as $i => $title ) {
+			$steps[ $i ] = array(
+				'title' => sanitize_text_field( $title ),
+				'text'  => sanitize_text_field( $texts[ $i ] ?? '' ),
+			);
+		}
+		$data['process_steps'] = $steps;
+	}
+	if ( isset( $_POST['es_process_url'] ) ) {
+		$data['process_url'] = esc_url_raw( wp_unslash( $_POST['es_process_url'] ) );
+	}
+
 	update_option( 'es_portfolio_home_content', $data );
 	add_action( 'admin_notices', 'es_portfolio_home_content_saved_notice' );
 }
@@ -123,6 +140,29 @@ function es_portfolio_home_content_page() {
 				</tr>
 			</table>
 
+			<h2><?php esc_html_e( 'How I Work', 'estavillo-portfolio-core' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'Leave a step blank (both title and text) to keep its current placeholder — you can edit just one step without filling in all six.', 'estavillo-portfolio-core' ); ?></p>
+			<table class="form-table" role="presentation">
+				<?php
+				$es_steps = $data['process_steps'] ?? array();
+				for ( $i = 0; $i < 6; $i++ ) :
+					$es_step_title = $es_steps[ $i ]['title'] ?? '';
+					$es_step_text  = $es_steps[ $i ]['text'] ?? '';
+					?>
+					<tr>
+						<th scope="row"><?php echo esc_html( sprintf( __( 'Step %d', 'estavillo-portfolio-core' ), $i + 1 ) ); ?></th>
+						<td>
+							<input type="text" name="es_process_step_title[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_step_title ); ?>" placeholder="<?php esc_attr_e( 'Step title', 'estavillo-portfolio-core' ); ?>"><br>
+							<input type="text" name="es_process_step_text[<?php echo esc_attr( $i ); ?>]" class="large-text" value="<?php echo esc_attr( $es_step_text ); ?>" placeholder="<?php esc_attr_e( 'Step description', 'estavillo-portfolio-core' ); ?>">
+						</td>
+					</tr>
+				<?php endfor; ?>
+				<tr>
+					<th scope="row"><label for="es_process_url"><?php esc_html_e( 'How I Work link (CTA URL)', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="url" id="es_process_url" name="es_process_url" class="regular-text" value="<?php echo esc_attr( $data['process_url'] ?? '' ); ?>" placeholder="#process"></td>
+				</tr>
+			</table>
+
 			<?php submit_button( __( 'Save Home Content', 'estavillo-portfolio-core' ), 'primary', 'es_portfolio_home_content_submit' ); ?>
 		</form>
 	</div>
@@ -151,3 +191,37 @@ function es_portfolio_filter_about_portrait( $default ) {
 	return ! empty( $data['about_portrait'] ) ? $data['about_portrait'] : $default;
 }
 add_filter( 'es_home_about_portrait', 'es_portfolio_filter_about_portrait' );
+
+/**
+ * Puente para How I Work. A diferencia de About (campos sueltos), acá se
+ * mergea PASO A PASO contra el default: un paso sin título editado en
+ * Home Content no pisa nada y sigue mostrando el placeholder de ESE paso
+ * puntual — así el editor puede tocar un solo paso sin tener que llenar
+ * los 6. 'icon' nunca se toca (slot reservado a futuro, fuera de alcance).
+ */
+function es_portfolio_filter_process_steps( $default ) {
+	$data = es_portfolio_get_home_content();
+	if ( empty( $data['process_steps'] ) || ! is_array( $data['process_steps'] ) ) {
+		return $default;
+	}
+
+	$merged = $default;
+	foreach ( $data['process_steps'] as $i => $custom_step ) {
+		if ( empty( $custom_step['title'] ) ) {
+			continue;
+		}
+		if ( ! isset( $merged[ $i ] ) ) {
+			$merged[ $i ] = array( 'icon' => '' );
+		}
+		$merged[ $i ]['title'] = $custom_step['title'];
+		$merged[ $i ]['text']  = $custom_step['text'] ?? '';
+	}
+	return $merged;
+}
+add_filter( 'es_home_process_steps', 'es_portfolio_filter_process_steps' );
+
+function es_portfolio_filter_process_url( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['process_url'] ) ? $data['process_url'] : $default;
+}
+add_filter( 'es_home_process_url', 'es_portfolio_filter_process_url' );

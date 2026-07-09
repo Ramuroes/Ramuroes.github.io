@@ -74,7 +74,11 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   `es_home_about_url` / `es_home_about_portrait` filters that already
   existed since Home v1 — no theme template changes were needed. See
   `EDITABILITY-PLAN.md`.
-- **P2** — Convert **How I Work** to editable content.
+- **Done (Sprint 3)** — **How I Work** is editable from the same "Home
+  Content" page: each of the 6 steps (title + text) can be edited
+  individually — leaving a step blank keeps its current placeholder, so
+  editors don't have to fill in all 6 at once. Icon slot stays reserved
+  (out of scope, design/motion territory).
 - **P2** — Convert **Connect** to editable content.
 - **P2** — Convert **Header** to editable content (nav links are already
   filterable via `es_nav_links`; goal is full in-admin editing, not just
@@ -92,7 +96,7 @@ Editability priority order (for reference, full detail in
 1. Selected Work — **done** (Case Study CPT)
 2. Featured Case — **done** (Case Study CPT, "featured" flag)
 3. About — **done** (Home Content options page)
-4. How I Work
+4. How I Work — **done** (Home Content options page, per-step)
 5. Connect
 6. Header
 7. Hero
