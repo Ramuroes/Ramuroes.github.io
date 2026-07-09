@@ -23,10 +23,12 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   default and turn green **on hover only**, not permanently green.
   (`.es-card__cta` currently sets a base `color: var(--es-accent)` — this
   contradicts the intended default state and needs correcting.)
-- **P0** — On some real phones, "See how I work" wraps below the main CTA
-  in the hero actions row. Define the responsive behavior intentionally
-  (explicit stacking/wrap rule) instead of leaving it to accidental
-  flex-wrap behavior.
+- **P0/P1** — On mobile, the secondary hero link "See how I work" still
+  drops below the primary CTA in a way that doesn't feel intentional, even
+  after the Sprint 1 stacking fix (explicit column layout at ≤680px). Do
+  not patch this again with an isolated CSS tweak — it needs its own
+  focused Hero block/layout ticket (see `ROADMAP.md`), not a quick fix
+  bundled into unrelated work.
 - **P1** — Mobile hero needs a better mobile-specific constellation layout
   (current mobile treatment is a scaled-down desktop layer, not a
   purpose-built mobile composition).
@@ -51,29 +53,53 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
 
 ## Content / editability
 
-- **P0** — Home cannot remain a rigid PHP-only template forever; needs a
-  path toward WordPress-editable content. See `EDITABILITY-PLAN.md`.
-- **P1** — Make **Selected Work** the first section converted to editable
-  content (highest priority per the editability order below).
-- **P1** — Add real case content for Presupuestador and Trazur (Sprint 4).
+- **P0** — Home cannot remain a rigid PHP-only template forever; the goal
+  is to convert Home sections progressively into editable blocks/sections
+  (Header, Hero, Selected Work, Featured Case, How I Work, About,
+  Connect/Footer) — not one huge PHP-only template forever. See
+  `EDITABILITY-PLAN.md`. Do this as small, ticket-sized section
+  conversions, one at a time — not a single big migration.
+- **Done (Sprint 3)** — **Selected Work** is now the first section
+  converted to editable content: a "Case Study" custom post type, editable
+  in wp-admin, with a hardcoded-placeholder fallback so Home never breaks
+  if no case studies exist yet. See `EDITABILITY-PLAN.md` for exact usage.
+- **P1** — Add real case content for Presupuestador and Trazur, now that
+  the Case Study CPT exists (Sprint 4) — enter them as Case Study posts,
+  not template edits.
 - **P2** — Convert **Featured Case** to editable content.
 - **P2** — Convert **About** to editable content.
 - **P2** — Convert **How I Work** to editable content.
 - **P2** — Convert **Connect** to editable content.
+- **P2** — Convert **Header** to editable content (nav links are already
+  filterable via `es_nav_links`; goal is full in-admin editing, not just
+  a filter).
+- **P2** — Convert **Hero** to editable content (copy/CTAs are already
+  filterable; coordinate with the Hero block/layout ticket above so
+  editability doesn't get built on top of a layout that's about to
+  change).
 - **P2** — Real images / final asset placeholders across Home sections.
 - **P2** — Refine EN/ES copy for all Home sections.
-- **P3** — Structured Case Study content model (CPT or equivalent) so
-  portfolio cases can be authored without editing PHP or asking for a
-  Claude Code session per case.
 
 Editability priority order (for reference, full detail in
 `EDITABILITY-PLAN.md`):
 
-1. Selected Work
+1. Selected Work — **done** (Case Study CPT)
 2. Featured Case
 3. About
 4. How I Work
 5. Connect
+6. Header
+7. Hero
+
+## Accessibility / UX
+
+- **P2** — Sticky header refinement (behavior/visual polish beyond the
+  current acceptable state — see `BACKLOG.md` header alignment note
+  below).
+- **P2** — Optional "back to top" interaction.
+- **P2** — Breadcrumbs / accessibility strategy for internal case-study
+  pages — relevant once single Case Study pages are actually built (see
+  the Case Study CPT above; no single-case template exists yet).
 
 ## Hero variants
 

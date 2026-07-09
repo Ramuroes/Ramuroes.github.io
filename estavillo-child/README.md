@@ -37,7 +37,8 @@ estavillo-child/
 │   └── page-home-estavillo.php    → Template Name: "Estavillo — Home (Draft)" (standalone)
 └── inc/
     ├── enqueue.php                → carga condicional de assets (home-only) + config localizada
-    └── theme-options.php          → Customizer: acento + variantes de hero + font preset
+    ├── theme-options.php          → Customizer: acento + variantes de hero + font preset
+    └── case-study-cpt.php         → CPT "Case Study": hace editable Selected Work en wp-admin
 ```
 
 ### Home v1 — estructura y edición
@@ -89,6 +90,61 @@ y cierre por X / Escape / click en link / click afuera. Estados interactivos sol
 en **verde / tinta / opacidad — nunca azul** (se neutraliza cualquier `a:hover` o
 `button:hover` heredado de Kadence). How I Work deja un **slot de ícono reservado**
 por paso para sumar íconos/motion/ilustración a futuro sin cambiar el layout.
+
+### Selected Work — editable vía Case Studies (Sprint 3)
+
+**Selected Work** ya no depende de editar PHP: es un custom post type
+**"Case Studies"** (aparece en el menú de wp-admin, ícono de portfolio), sin
+ACF ni dependencias nuevas — solo campos nativos de WordPress + un meta box
+propio y chico.
+
+**Cómo crear/editar un caso (p. ej. Trazur o Presupuestador):**
+
+1. wp-admin → **Case Studies → Add New**.
+2. **Título** = título del caso (p. ej. "Presupuestador").
+3. **Extracto** (panel "Excerpt" del editor/sidebar) = la descripción corta
+   que se muestra en la card. Si tu editor no muestra el panel, activalo
+   desde Preferencias del editor (los tres puntos → Preferencias → Paneles).
+4. **Imagen destacada** = la imagen de la card. Si no subís ninguna, la card
+   muestra el marco placeholder del design system (como ahora).
+5. **Case Tags** (panel lateral) = tags de la card (UX Research, Fintech,
+   etc.), igual que Categorías/Tags de un post normal.
+6. **Atributos de página / Order** (panel lateral) = orden en Home. El caso
+   con el número más bajo se muestra como card ancha destacada; el resto
+   entra en la grilla de 2 columnas, ordenados por este número.
+7. Debajo del editor, meta box **"Case details (Selected Work)"**:
+   - **Eyebrow / category** → la línea sobre el título (p. ej. "Fintech ·
+     Budgeting tool").
+   - **Case link (URL)** → adónde apunta la card. Si lo dejás vacío, usa la
+     URL propia del Case Study — pero como todavía **no existe una página
+     de detalle de caso** (fuera de alcance de este ticket), lo más útil por
+     ahora es poner acá el destino real (o `#` si el caso todavía no tiene
+     dónde vivir).
+   - **Label / status** (opcional) → la etiqueta chica mono junto al eyebrow
+     (p. ej. "Case 01", o un estado como "In progress"). Vacío = no se
+     muestra.
+   - **Placeholder tag text** (opcional) → solo se usa si NO subiste imagen
+     destacada; reemplaza el texto `{asset: …}` del marco placeholder.
+   - **Show this case in Home → Selected Work** → tildado por defecto.
+     Destildalo para tener el caso guardado sin que aparezca en Home todavía.
+8. **Publicar.** La sección Selected Work de Home lee automáticamente todos
+   los Case Studies publicados con el checkbox tildado, ordenados por
+   "Order" — sin tocar ningún archivo del tema.
+
+**Fallback (Home nunca se rompe):** si no publicaste ningún Case Study
+todavía (o los tildaste todos como "no mostrar en Home"), Selected Work
+sigue mostrando los 3 casos placeholder de siempre (Trazur / French Bakery /
+Samic) exactamente como antes. En cuanto publiques el primer Case Study
+marcado para Home, los placeholders desaparecen y se muestran tus casos
+reales.
+
+El filtro `es_home_selected_work` documentado abajo sigue funcionando igual
+sobre el resultado final (Case Studies reales o fallback) — no fue
+reemplazado, solo tiene una fuente de datos nueva por defecto.
+
+> Si un link a un Case Study individual da 404: Ajustes → Enlaces
+> permanentes → Guardar cambios (refresca las reglas de reescritura de
+> WordPress; suele hacer falta una sola vez tras activar el tema).
 
 ## Instalación (sin riesgo para el sitio actual)
 

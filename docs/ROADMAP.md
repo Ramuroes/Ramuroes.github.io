@@ -71,6 +71,22 @@ See `BACKLOG.md` P0 items for the exact list this sprint should clear.
   editing experience, not just the PHP data structure) before migrating any
   other section.
 
+**Status:** Selected Work done — implemented as a "Case Study" custom post
+type (native fields + one small meta box, no ACF), with the current
+placeholder cases kept as an automatic fallback when no Case Studies exist
+yet. See `EDITABILITY-PLAN.md` for usage. Remaining sections (Featured
+Case, About, How I Work, Connect, Header, Hero) stay on the Phase
+1/2 plan in `EDITABILITY-PLAN.md` and are not started.
+
+**Flagged during this sprint, deliberately not built now** (logged to
+`BACKLOG.md` instead of expanding this sprint's scope):
+- A dedicated Hero block/layout ticket — the mobile secondary-CTA stacking
+  still doesn't feel intentional even after the Sprint 1 CSS fix; needs its
+  own focused pass, not another isolated patch.
+- Accessibility/UX items: sticky header refinement, an optional "back to
+  top" interaction, and a breadcrumbs/accessibility strategy for internal
+  case-study pages (relevant once a single Case Study template exists).
+
 ---
 
 ## Sprint 4 — Real content

@@ -2,10 +2,12 @@
 /**
  * Selected work — card ancha destacada + grilla 2-up (layout Home v4).
  *
- * CONTENIDO PLACEHOLDER. Editable sin tocar markup vía el filtro
- * 'es_home_selected_work'. El primer caso se muestra como card ancha; el
- * resto en una grilla de dos columnas. Si 'image' es null se muestra el
- * marco placeholder del design system.
+ * Editable sin tocar markup vía el filtro 'es_home_selected_work'. La
+ * fuente de datos es es_home_selected_work_source() (inc/case-study-cpt.php):
+ * Case Studies publicados si existen, si no los placeholders de siempre —
+ * ver ese archivo para el detalle. El primer caso se muestra como card
+ * ancha; el resto en una grilla de dos columnas. Si 'image' es null se
+ * muestra el marco placeholder del design system.
  *
  * @package estavillo-child
  */
@@ -16,38 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $es_num = isset( $args['num'] ) ? $args['num'] : '03';
 
-$es_cases = apply_filters(
-	'es_home_selected_work',
-	array(
-		array(
-			'label'   => 'Case 02',
-			'kicker'  => 'Thesis · Digital education',
-			'title'   => 'Trazur',
-			'excerpt' => 'Degree thesis turned case study: research-driven redesign of an e-learning product — UX research, service design and applied AI in digital education.',
-			'tags'    => array( 'UX Research', 'Service Design', 'Applied AI', 'E-learning' ),
-			'url'     => '#',
-			'image'   => null,
-		),
-		array(
-			'label'   => 'Case 03',
-			'kicker'  => 'Academic UX Case · Google UX Design Certificate',
-			'title'   => 'French Bakery',
-			'excerpt' => 'End-to-end UX process — research, wireframes, usability testing — from the Google UX Design Professional Certificate.',
-			'tags'    => array(),
-			'url'     => '#',
-			'image'   => null,
-		),
-		array(
-			'label'   => 'Case 04',
-			'kicker'  => 'Legacy · Industrial e-commerce',
-			'title'   => 'Samic',
-			'excerpt' => 'E-commerce and visual systems for an industrial parts distributor.',
-			'tags'    => array(),
-			'url'     => '#',
-			'image'   => null,
-		),
-	)
-);
+$es_cases = apply_filters( 'es_home_selected_work', es_home_selected_work_source() );
 
 $es_view_all_url = apply_filters( 'es_home_view_all_url', '#' );
 
@@ -63,9 +34,10 @@ if ( ! function_exists( 'es_work_media' ) ) {
 		if ( ! empty( $case['image'] ) ) {
 			printf( '<img src="%s" alt="" loading="lazy" />', esc_url( $case['image'] ) );
 		} else {
+			$es_tag = ! empty( $case['placeholder_label'] ) ? $case['placeholder_label'] : sanitize_title( $case['title'] );
 			printf(
 				'<span class="es-placeholder__tag">{asset: %s}</span>',
-				esc_html( sanitize_title( $case['title'] ) )
+				esc_html( $es_tag )
 			);
 		}
 	}

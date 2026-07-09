@@ -101,7 +101,7 @@ Where a section's interaction detail can't be expressed as plain block
 markup (e.g. bespoke hover/motion behavior), wrap that piece as a small
 custom block (C) rather than forcing it into core blocks.
 
-### Phase 3 — CPT for case studies (D)
+### Phase 3 — CPT for case studies (D) — **done for Selected Work**
 
 For **Selected Work** specifically — the highest-priority section per the
 order below, and the most naturally repeatable/structured content — build
@@ -109,15 +109,43 @@ a Case Study CPT. This supersedes treating Selected Work as a block pattern
 list; a CPT is the correct model for "add a new case without touching a
 template."
 
+**Implemented (Sprint 3):** `es_case_study` CPT, registered in
+`inc/case-study-cpt.php`. Deliberately minimal — no ACF, native WordPress
+fields only:
+
+| Field | Mechanism |
+|---|---|
+| Title | native post title |
+| Short description | native excerpt |
+| Featured image | native post thumbnail (placeholder frame if none) |
+| Tags | native taxonomy `es_case_tag` (non-hierarchical, tag UI) |
+| Home order | native `page-attributes` support ("Order" field) |
+| Eyebrow/category, case URL, label/status, placeholder text, show-on-Home flag | one small custom meta box (`Case details`) |
+
+`es_home_selected_work_source()` returns published Case Studies flagged
+"show on Home" (ordered by the native Order field), or — if none exist yet
+— the same three hardcoded placeholder cases the template always used, so
+Home can never render empty. The existing `es_home_selected_work` filter
+still runs on top of whichever source is used, unchanged.
+
+No single Case Study detail template exists yet (explicitly out of scope
+for this ticket) — the CPT is publicly queryable, so an individual case
+falls back to Kadence's default single-post template if visited directly.
+Building a real single-case template is future work (candidate for
+Sprint 4, alongside real Presupuestador/Trazur content) and is also where
+the breadcrumbs/accessibility strategy noted in `BACKLOG.md` applies.
+
+See `estavillo-child/README.md` → "Selected Work — editable vía Case
+Studies" for exact wp-admin usage instructions.
+
 ---
 
 ## Editability priority order
 
 As given by the project owner, highest priority first:
 
-1. **Selected Work** — repeatable, highest-churn, best fit for a CPT
-   (Phase 3), but can start as a block-pattern/loop (Phase 2) if the CPT
-   isn't ready yet.
+1. **Selected Work** — **done.** Repeatable, highest-churn, built as the
+   `es_case_study` CPT (Phase 3) described above.
 2. **Featured Case** — singular, good fit for a block pattern (Phase 2);
    may later pull from the same CPT as Selected Work (a case marked
    "featured").
@@ -126,6 +154,12 @@ As given by the project owner, highest priority first:
    possibly a small custom block if the reserved icon/motion slot needs
    structured fields per step.
 5. **Connect** — singular, block pattern (Phase 2).
+6. **Header** — singular; nav links are already filterable
+   (`es_nav_links`), goal is full in-admin editing (Phase 1/2).
+7. **Hero** — singular; copy/CTAs already filterable, goal is full in-admin
+   editing (Phase 1/2) — sequence this after the dedicated Hero
+   block/layout ticket flagged in `BACKLOG.md`, so editability isn't built
+   on top of a layout that's about to change.
 
 ## Sequencing note
 
