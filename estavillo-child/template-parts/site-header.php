@@ -16,6 +16,43 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $es_links    = es_nav_links();
 $es_home_url = apply_filters( 'es_home_url', home_url( '/' ) );
+
+/*
+ * Switcher de idioma real vía Polylang (Sprint 4A). function_exists()
+ * evita cualquier fatal si Polylang no está instalado — en ese caso
+ * $es_pll_langs queda vacío y es_print_lang_switcher() cae al markup
+ * estático "EN / ES" de siempre (mismas clases, mismo texto).
+ */
+$es_pll_langs = function_exists( 'pll_the_languages' ) ? pll_the_languages( array( 'raw' => 1 ) ) : array();
+
+if ( ! function_exists( 'es_print_lang_switcher' ) ) {
+	/**
+	 * Imprime el contenido del switcher de idioma (sin wrapper — cada lugar
+	 * que lo usa pone su propio <span>/<div>, igual que antes de este
+	 * ticket, así que ningún CSS necesita cambiar).
+	 *
+	 * @param array $langs Resultado de pll_the_languages( array( 'raw' => 1 ) ).
+	 */
+	function es_print_lang_switcher( $langs ) {
+		if ( empty( $langs ) ) {
+			echo '<span class="es-nav__lang-on">EN</span> / ES';
+			return;
+		}
+		$es_i = 0;
+		foreach ( $langs as $es_lang ) {
+			if ( $es_i > 0 ) {
+				echo ' / ';
+			}
+			$es_lang_label = esc_html( strtoupper( $es_lang['slug'] ) );
+			if ( ! empty( $es_lang['current_lang'] ) ) {
+				echo '<span class="es-nav__lang-on">' . $es_lang_label . '</span>';
+			} else {
+				printf( '<a href="%s">%s</a>', esc_url( $es_lang['url'] ), $es_lang_label );
+			}
+			$es_i++;
+		}
+	}
+}
 ?>
 
 <header class="es-site-header" data-screen-label="Nav">
@@ -31,8 +68,8 @@ $es_home_url = apply_filters( 'es_home_url', home_url( '/' ) );
 				<?php endforeach; ?>
 			</div>
 
-			<span class="es-nav__lang" aria-label="<?php esc_attr_e( 'Language: English active, Spanish coming later', 'estavillo-child' ); ?>">
-				<span class="es-nav__lang-on">EN</span> / ES
+			<span class="es-nav__lang" aria-label="<?php echo esc_attr( es__( 'lang_switch_label' ) ); ?>">
+				<?php es_print_lang_switcher( $es_pll_langs ); ?>
 			</span>
 
 			<?php /* Espacio reservado para un futuro toggle Light/Dark. Sin funcionalidad aún. */ ?>
@@ -71,7 +108,7 @@ $es_home_url = apply_filters( 'es_home_url', home_url( '/' ) );
 			<?php endforeach; ?>
 		</nav>
 		<div class="es-container es-mobile-menu__foot">
-			<span class="es-nav__lang-on">EN</span> / ES
+			<?php es_print_lang_switcher( $es_pll_langs ); ?>
 		</div>
 	</div>
 </div>

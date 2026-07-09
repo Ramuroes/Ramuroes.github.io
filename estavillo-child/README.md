@@ -17,15 +17,16 @@ estavillo-child/
 │   │   ├── base.css               → tipografía y utilidades bajo .es-page
 │   │   ├── layout.css             → contenedores, secciones, grillas
 │   │   ├── components.css         → botones, pills, cards (+ wide), status pill, reveal
-│   │   ├── site.css               → chrome: header sticky + menú mobile + footer
+│   │   ├── site.css               → chrome: header sticky + menú mobile + footer (Home Y single Case Study)
 │   │   ├── hero.css               → hero: visual detrás/al costado del copy (desktop y mobile)
-│   │   └── pages-home.css         → secciones de la home (featured, process, work, about, connect)
+│   │   ├── pages-home.css         → secciones de la home (featured, process, work, about, connect)
+│   │   └── case-study.css         → single de Case Study: meta row + prose de the_content()
 │   └── js/
 │       ├── hero-system-map.js     → motores de hero (registry, SVG + rAF, 0 librerías)
 │       ├── motion.js              → reveal on-scroll (IntersectionObserver)
 │       └── nav.js                 → menú mobile (overlay accesible)
 ├── template-parts/
-│   ├── site-header.php            → nav sticky ESTAVILLO + menú mobile
+│   ├── site-header.php            → nav sticky ESTAVILLO + menú mobile + switcher de idioma (Polylang)
 │   ├── hero-home.php              → hero (copy placeholder, editable por filtros)
 │   ├── featured-case.php          → 01 Main case (filtro es_home_featured)
 │   ├── how-i-work.php             → 02 How I work · 6 pasos (filtro es_home_process_steps)
@@ -35,8 +36,9 @@ estavillo-child/
 │   └── site-footer.php            → footer ESTAVILLO
 ├── templates/
 │   └── page-home-estavillo.php    → Template Name: "Estavillo — Home (Draft)" (standalone)
+├── single-es_case_study.php       → single de Case Study (standalone, reusa el chrome ESTAVILLO)
 └── inc/
-    ├── enqueue.php                  → carga condicional de assets (home-only) + config localizada
+    ├── enqueue.php                  → carga condicional de assets (Home + single Case Study) + config localizada
     ├── theme-options.php            → Customizer: acento + variantes de hero + font preset
     ├── selected-work-fallback.php   → Selected Work: placeholders + puente por filtro hacia el plugin
     └── featured-case-fallback.php   → Featured Case: placeholder + puente por filtro hacia el plugin
@@ -143,19 +145,21 @@ falta ir a Ajustes → Enlaces permanentes a mano).
 7. Debajo del editor, meta box **"Case details (Selected Work)"**:
    - **Eyebrow / category** → la línea sobre el título (p. ej. "Fintech ·
      Budgeting tool").
-   - **Case link (URL)** → adónde apunta la card. Si lo dejás vacío, usa la
-     URL propia del Case Study — pero como todavía **no existe una página
-     de detalle de caso** (fuera de alcance de este ticket), lo más útil por
-     ahora es poner acá el destino real (o `#` si el caso todavía no tiene
-     dónde vivir).
+   - **Case link (URL)** → adónde apunta la card (Selected Work / Featured
+     Case). Si lo dejás vacío, usa la URL propia del Case Study — es decir
+     su página individual (ver "Single Case Study page" más abajo).
    - **Label / status** (opcional) → la etiqueta chica mono junto al eyebrow
-     (p. ej. "Case 01", o un estado como "In progress"). Vacío = no se
-     muestra.
+     en las cards, el pill de Featured Case, y el meta "Status" de la
+     página individual. Vacío = no se muestra en ningún lado.
    - **Placeholder tag text** (opcional) → solo se usa si NO subiste imagen
      destacada; reemplaza el texto `{asset: …}` del marco placeholder (en
-     Selected Work y también en Featured Case si el caso está featured).
+     Selected Work, Featured Case, y la página individual).
    - **Source / context line** (opcional) → solo la usa Featured Case (ver
-     abajo); no aparece en las cards de Selected Work.
+     abajo); no aparece en las cards de Selected Work ni en la página
+     individual.
+   - **Role / Tools / Period** (opcionales) → solo los usa la página
+     individual del caso (ver "Single Case Study page" más abajo); no
+     aparecen en ningún otro lado.
    - **Show this case in Home → Selected Work** → tildado por defecto.
      Destildalo para tener el caso guardado sin que aparezca en Home todavía.
    - **Feature this case on Home (Featured Case section)** → ver la sección
@@ -219,6 +223,74 @@ romper esta sección.
 
 El filtro `es_home_featured` documentado abajo sigue funcionando igual
 sobre el resultado final.
+
+### Single Case Study page (Sprint 4B)
+
+Cada Case Study publicado ya tiene una página individual real — WordPress
+la resuelve solo (`single-es_case_study.php`), no hace falta activar nada.
+
+**Qué se muestra**, todo opcional salvo el título:
+
+- **Título**, **Extracto** (como bajada), **Tags**, **Imagen destacada**
+  (o el marco placeholder si no subiste ninguna) — los mismos campos
+  nativos que ya usás para Selected Work/Featured Case.
+- **Eyebrow / category** → del meta box "Case details".
+- Una fila de meta con **Status**, **Role**, **Tools** y **Period** — cada
+  uno del meta box "Case details", cada uno opcional; si dejás los 4
+  vacíos, la fila entera no se muestra.
+- **Contenido principal** → el editor estándar de WordPress (el mismo
+  cuadro grande de siempre, bloques o clásico). Esto NO es un campo nuevo:
+  es el contenido normal del post — escribí ahí el desarrollo completo del
+  caso (texto, imágenes, encabezados, lo que necesites). No hay un "case
+  builder" con secciones fijas.
+
+**Cómo escribir el caso completo:**
+
+1. wp-admin → **Case Studies** → abrí (o creá) el caso.
+2. Completá el contenido principal en el editor grande, igual que
+   escribirías cualquier post — encabezados (H2/H3), párrafos, imágenes,
+   lo que haga falta.
+3. Completá **Role**, **Tools**, **Period** en el meta box "Case details"
+   si querés que aparezcan en la fila de meta de la página.
+4. **Publicar.** La URL del caso (visible arriba del editor, o en **Case
+   link (URL)** si lo dejaste vacío) ya es una página real con el chrome
+   ESTAVILLO completo — header, menú mobile, footer, todo igual que Home.
+
+### Polylang (Sprint 4A)
+
+El sitio soporta EN/ES real vía [Polylang](https://wordpress.org/plugins/polylang/)
+(plugin externo, no incluido acá). Con Polylang **instalado y activo**:
+
+- **Case Studies son traducibles como cualquier post.** Al abrir/crear un
+  Case Study vas a ver la caja de idioma normal de Polylang. "Add
+  translation" crea un caso hermano en el otro idioma con sus propios
+  campos (título, extracto, imagen, meta box, todo) — no hace falta
+  ninguna configuración extra, el tema/plugin ya lo declara traducible.
+- **Los tags (Case Tags) NO se traducen** — quedan compartidos entre EN y
+  ES a propósito (decisión V1: mantenerlo simple). Si escribís un tag en
+  inglés, se va a ver en inglés también en la versión en español del caso.
+  Si más adelante hace falta traducirlos, es un cambio chico.
+- **El switcher de idioma del header y del menú mobile ahora es real** —
+  antes era un texto fijo "EN / ES". Con Polylang activo y al menos 2
+  idiomas configurados, muestra links reales a la traducción de la página
+  actual. Sin Polylang (o con un solo idioma configurado), se ve
+  exactamente igual que antes: "EN / ES" fijo, sin romper nada.
+- **Home Content (About, How I Work, Connect, Header, Footer) NO es
+  bilingüe todavía** — es un solo set de textos compartido entre EN y ES
+  (decisión V1 aprobada, ver `docs/EDITABILITY-PLAN.md`). Escribí esos
+  campos en el idioma que prefieras por ahora; la versión completamente
+  bilingüe de Home queda para cuando esas secciones migren a bloques
+  (V2).
+
+**Cómo armar Home en los dos idiomas:**
+
+1. Instalá y configurá Polylang normalmente (idiomas activos, estructura
+   de URL, etc. — eso es 100% configuración de Polylang, no del tema).
+2. La página "Home" que ya tenés (con el template **Estavillo — Home
+   (Draft)**) queda como tu Home en el primer idioma.
+3. Creá una segunda página, asignale el mismo template, y usá la caja de
+   idioma de Polylang para vincularla como traducción de la primera.
+4. Repetí para cada Case Study que quieras en los dos idiomas.
 
 ### Home Content — About, How I Work, Connect, Header, Footer (Sprint 3)
 

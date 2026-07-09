@@ -103,6 +103,9 @@ function es_case_study_render_meta_box( $post ) {
 	$label             = get_post_meta( $post->ID, '_es_case_label', true );
 	$placeholder_label = get_post_meta( $post->ID, '_es_case_placeholder_label', true );
 	$source            = get_post_meta( $post->ID, '_es_case_source', true );
+	$role              = get_post_meta( $post->ID, '_es_case_role', true );
+	$tools             = get_post_meta( $post->ID, '_es_case_tools', true );
+	$period            = get_post_meta( $post->ID, '_es_case_period', true );
 	$show_on_home_raw  = get_post_meta( $post->ID, '_es_case_show_on_home', true );
 	$show_on_home      = ( '' === $show_on_home_raw ) ? true : ( '1' === $show_on_home_raw );
 	$featured          = '1' === get_post_meta( $post->ID, '_es_case_featured', true );
@@ -128,6 +131,18 @@ function es_case_study_render_meta_box( $post ) {
 		<input type="text" id="es_case_source" name="es_case_source" class="widefat" value="<?php echo esc_attr( $source ); ?>" placeholder="<?php esc_attr_e( 'e.g. Developed and implemented at ... — used only by Featured Case', 'estavillo-portfolio-core' ); ?>">
 	</p>
 	<p>
+		<label for="es_case_role"><strong><?php esc_html_e( 'Role (optional)', 'estavillo-portfolio-core' ); ?></strong></label><br>
+		<input type="text" id="es_case_role" name="es_case_role" class="widefat" value="<?php echo esc_attr( $role ); ?>" placeholder="<?php esc_attr_e( 'e.g. Product Designer — used only by the single Case Study page', 'estavillo-portfolio-core' ); ?>">
+	</p>
+	<p>
+		<label for="es_case_tools"><strong><?php esc_html_e( 'Tools (optional)', 'estavillo-portfolio-core' ); ?></strong></label><br>
+		<input type="text" id="es_case_tools" name="es_case_tools" class="widefat" value="<?php echo esc_attr( $tools ); ?>" placeholder="<?php esc_attr_e( 'e.g. Figma, Notion, Airtable', 'estavillo-portfolio-core' ); ?>">
+	</p>
+	<p>
+		<label for="es_case_period"><strong><?php esc_html_e( 'Period (optional)', 'estavillo-portfolio-core' ); ?></strong></label><br>
+		<input type="text" id="es_case_period" name="es_case_period" class="widefat" value="<?php echo esc_attr( $period ); ?>" placeholder="<?php esc_attr_e( 'e.g. 2024–2025', 'estavillo-portfolio-core' ); ?>">
+	</p>
+	<p>
 		<label>
 			<input type="checkbox" name="es_case_show_on_home" value="1" <?php checked( $show_on_home ); ?>>
 			<?php esc_html_e( 'Show this case in Home → Selected Work', 'estavillo-portfolio-core' ); ?>
@@ -140,7 +155,7 @@ function es_case_study_render_meta_box( $post ) {
 		</label>
 	</p>
 	<p class="description">
-		<?php esc_html_e( 'Title, Excerpt, Featured Image, Tags and Order use the standard WordPress fields above / in the sidebar. If this case is featured, its Excerpt becomes the Featured Case body paragraph and Label/status becomes its status pill — write the Excerpt to work for both sections if you also show this case in Selected Work.', 'estavillo-portfolio-core' ); ?>
+		<?php esc_html_e( 'Title, Excerpt, Featured Image, Tags and Order use the standard WordPress fields above / in the sidebar. If this case is featured, its Excerpt becomes the Featured Case body paragraph and Label/status becomes its status pill — write the Excerpt to work for both sections if you also show this case in Selected Work. Role, Tools and Period are only used on this case\'s own single page — the body content below (or in the block editor) is that page\'s main content.', 'estavillo-portfolio-core' ); ?>
 	</p>
 	<?php
 }
@@ -161,7 +176,7 @@ function es_save_case_study_meta( $post_id ) {
 		return;
 	}
 
-	$text_fields = array( 'es_case_kicker', 'es_case_label', 'es_case_placeholder_label', 'es_case_source' );
+	$text_fields = array( 'es_case_kicker', 'es_case_label', 'es_case_placeholder_label', 'es_case_source', 'es_case_role', 'es_case_tools', 'es_case_period' );
 	foreach ( $text_fields as $field ) {
 		if ( isset( $_POST[ $field ] ) ) {
 			update_post_meta( $post_id, '_' . $field, sanitize_text_field( wp_unslash( $_POST[ $field ] ) ) );

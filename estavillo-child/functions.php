@@ -64,6 +64,11 @@ function es_child_ui_strings() {
 		'about_cta'           => 'More about me',
 		'cta_label'           => 'Connect',
 		'cta_button'          => 'Write me',
+		'lang_switch_label'   => 'Language switch',
+		'case_meta_status'    => 'Status',
+		'case_meta_role'      => 'Role',
+		'case_meta_tools'     => 'Tools',
+		'case_meta_period'    => 'Period',
 	);
 }
 

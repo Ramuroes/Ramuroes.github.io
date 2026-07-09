@@ -100,7 +100,19 @@
 		flex-direction: column;
 		align-items: flex-start;
 		flex-wrap: nowrap;
-		gap: 22px;
+		gap: 18px;
+	}
+
+	/* El botón primario tiene padding interno (26px): sin este ajuste, el
+	   texto del link secundario arrancaba ~26px más a la izquierda que el
+	   label del botón — mismo borde de caja, texto desalineado — y el
+	   apilado se leía como un wrap accidental en vez de una decisión de
+	   layout. Alineando el texto del link con el texto del botón, el par
+	   se lee como un grupo diseñado a propósito. No cambia el componente
+	   (sigue siendo el mismo link de texto plano que en el resto del
+	   sitio), solo su posición dentro del stack del hero. */
+	.es-hero__actions .es-link-arrow--quiet {
+		padding-left: 26px;
 	}
 }
 

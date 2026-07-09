@@ -208,16 +208,65 @@ A Case Study can independently be shown in Selected Work, set as the
 Featured Case, both, or neither — the two flags and their queries don't
 interact.
 
-No single Case Study detail template exists yet (explicitly out of scope
-for this ticket) — the CPT is publicly queryable, so an individual case
-falls back to Kadence's default single-post template if visited directly.
-Building a real single-case template is future work (candidate for
-Sprint 4, alongside real Presupuestador/Trazur content) and is also where
-the breadcrumbs/accessibility strategy noted in `BACKLOG.md` applies.
+**Single Case Study template — done (Sprint 4B).** `estavillo-child/single-es_case_study.php`
+is resolved automatically by WordPress's own template hierarchy for any
+`es_case_study` post — `single-{post_type}.php` in the active theme, no
+`template_include` filter and no plugin registration needed, since this is
+100% presentation and belongs to the theme like everything else chrome-
+related. It reuses `template-parts/site-header`/`site-footer` (same
+pattern as `templates/page-home-estavillo.php`) so a visitor never leaves
+the ESTAVILLO system. Deliberately minimal, no case builder: title,
+eyebrow (`_es_case_kicker`), excerpt, tags, featured image (or the same
+placeholder pattern as Selected Work), an optional Status/Role/Tools/
+Period meta row, and the post body via plain `the_content()` — Role,
+Tools, and Period are three new optional plain-text fields on the same
+"Case details" meta box, nothing more elaborate. Breadcrumbs/accessibility
+strategy (flagged in `BACKLOG.md`) is now unblocked whenever it's picked
+up, since a real single template exists to attach it to.
 
 See `estavillo-child/README.md` → "Selected Work — editable vía Case
-Studies" and "Featured Case — editable vía Case Studies" for exact
-wp-admin usage instructions.
+Studies", "Featured Case — editable vía Case Studies", and "Single Case
+Study page" for exact wp-admin usage instructions.
+
+### Polylang — done (Sprint 4A)
+
+Approved V1 decisions (see the architecture decision conversation this
+sprint implements):
+
+1. **Case Study CPT is translatable.** `estavillo-portfolio-core/includes/polylang-compat.php`
+   hooks Polylang's `pll_get_post_types` filter to add `es_case_study` —
+   self-configuring, no manual "enable translation" checkbox needed in
+   Polylang's settings. Since every Case Study field (meta box fields,
+   featured image, excerpt, tags) is post meta / native post data, and
+   Polylang's translation mechanism creates a full new linked post per
+   language, every field already works per-language automatically — no
+   extra code was needed for the fields themselves.
+2. **`es_case_tag` stays language-neutral** (deliberately not added to
+   `pll_get_taxonomies`) — tags are shared across EN/ES posts rather than
+   requiring a parallel translated tag vocabulary. Simpler for V1; revisit
+   only if bilingual tag precision becomes a real complaint.
+3. **The language switcher is real.** `template-parts/site-header.php`
+   now calls `pll_the_languages( array( 'raw' => 1 ) )` (guarded by
+   `function_exists()`) in both the desktop header and the mobile menu
+   foot, replacing what was a hardcoded, non-functional "EN / ES" string.
+   Same markup/classes (`.es-nav__lang`, `.es-nav__lang-on`) either way —
+   with Polylang active it renders real links to the translated URLs and
+   marks the current language; without Polylang (or with no languages
+   configured yet) it falls back to the exact original static text,
+   byte-for-byte.
+4. **Home Content options stay single/global for V1** (approved human
+   decision, not per-language) — see the "Phase 1, given a wp-admin UI"
+   section below for why: this data is explicitly a stopgap ahead of the
+   V2 block-pattern migration, and Gutenberg blocks on a Polylang-
+   translated Page get correct per-language content for free, which
+   bilingual-izing the options page now would just duplicate and then
+   discard.
+
+**What's still a wp-admin step, not code:** creating the actual Home (ES)
+page (a second WP Page using the same template, linked as a Polylang
+translation of the existing Home page) — see Sprint 4C in `ROADMAP.md`.
+Nothing in the code blocks this; it's simply not been created yet because
+real Spanish copy isn't ready.
 
 ### Phase 1, given a wp-admin UI — About, How I Work, Connect, Header, Footer
 

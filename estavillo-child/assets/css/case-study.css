@@ -1,0 +1,150 @@
+/* =========================================================================
+   ESTAVILLO — Single Case Study
+   -------------------------------------------------------------------------
+   Sprint 4B. Solo se carga en single-es_case_study.php. Reusa el chrome de
+   site.css y los tokens de tokens.css — ningún color ni tipografía nuevos
+   acá, solo nuevos selectores aplicando las mismas variables --es-*.
+   ========================================================================= */
+
+.es-case__head {
+	max-width: 760px;
+}
+
+.es-case__kicker {
+	margin-bottom: 18px;
+}
+
+.es-case__title {
+	margin-bottom: 22px;
+}
+
+.es-case__excerpt {
+	margin-bottom: 20px;
+}
+
+.es-case__tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 28px;
+}
+
+.es-case__meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px 32px;
+	margin: 0;
+}
+
+.es-case__meta-item dt {
+	font-family: var(--es-mono);
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+	margin-bottom: 4px;
+}
+
+.es-case__meta-item dd {
+	margin: 0;
+	font-size: 14px;
+	color: var(--es-ink-2);
+}
+
+/* ---------- media (imagen destacada o placeholder) ---------- */
+
+.es-case__media {
+	margin: clamp(32px, 5vw, 56px) 0;
+	border-radius: var(--es-radius);
+	overflow: hidden;
+	border: 1px solid var(--es-line);
+}
+
+.es-case__media img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.es-case__placeholder {
+	aspect-ratio: 16 / 9;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--es-paper-2);
+}
+
+/* ---------- prose: contenido del editor estándar (the_content()) ---------- */
+
+.es-case__body {
+	max-width: 720px;
+	font-size: 15.5px;
+	line-height: 1.75;
+	color: var(--es-ink-2);
+}
+
+.es-case__body > * + * {
+	margin-top: 1.4em;
+}
+
+.es-case__body h2,
+.es-case__body h3 {
+	font-family: var(--es-serif);
+	font-weight: 500;
+	letter-spacing: -0.012em;
+	color: var(--es-ink);
+	margin-top: 2em;
+}
+
+.es-case__body h2 {
+	font-size: clamp(24px, 2.6vw, 30px);
+}
+
+.es-case__body h3 {
+	font-size: clamp(19px, 2vw, 22px);
+}
+
+.es-case__body p {
+	margin: 0;
+}
+
+.es-case__body ul,
+.es-case__body ol {
+	padding-left: 1.3em;
+	margin: 0;
+}
+
+.es-case__body li + li {
+	margin-top: 0.5em;
+}
+
+/* verde de identidad, subrayado — nunca azul (misma red de seguridad
+   :where() de base.css cubre hover/focus/active/visited de este link). */
+.es-case__body a {
+	color: var(--es-accent);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.es-case__body blockquote {
+	margin: 0;
+	padding-left: 20px;
+	border-left: 2px solid var(--es-line-strong);
+	color: var(--es-ink-3);
+	font-style: italic;
+}
+
+.es-case__body img {
+	display: block;
+	width: 100%;
+	height: auto;
+	border-radius: var(--es-radius-sm);
+}
+
+.es-case__body figcaption {
+	margin-top: 8px;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	color: var(--es-ink-4);
+}

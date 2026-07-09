@@ -18,6 +18,7 @@ define( 'ES_PORTFOLIO_CORE_DIR', plugin_dir_path( __FILE__ ) );
 
 require ES_PORTFOLIO_CORE_DIR . 'includes/case-study-cpt.php';
 require ES_PORTFOLIO_CORE_DIR . 'includes/home-content-options.php';
+require ES_PORTFOLIO_CORE_DIR . 'includes/polylang-compat.php';
 
 /**
  * Al activar: registra el CPT/taxonomía antes de flushear, así las reglas

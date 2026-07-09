@@ -23,12 +23,18 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   default and turn green **on hover only**, not permanently green.
   (`.es-card__cta` currently sets a base `color: var(--es-accent)` — this
   contradicts the intended default state and needs correcting.)
-- **P0/P1** — On mobile, the secondary hero link "See how I work" still
-  drops below the primary CTA in a way that doesn't feel intentional, even
-  after the Sprint 1 stacking fix (explicit column layout at ≤680px). Do
-  not patch this again with an isolated CSS tweak — it needs its own
-  focused Hero block/layout ticket (see `ROADMAP.md`), not a quick fix
-  bundled into unrelated work.
+- **Done (Sprint 4)** — Mobile hero secondary CTA ("See how I work") no
+  longer reads as an accidental wrap below the primary button. Root cause:
+  the primary button's internal padding (26px) meant its label started
+  ~26px to the right of the secondary link's text, even though both
+  shared the same container edge — a real, measurable misalignment, not
+  just a vibe. Fixed by aligning the secondary link's text to the
+  button's text (`padding-left: 26px` at the ≤680px stack breakpoint) —
+  CSS-only, same component, same copy, same animation. Verified via
+  computed-position diffing (0.0px gap) at 375/390/428px plus visual
+  screenshots. Broader Hero block/layout work (mobile-specific
+  constellation composition, editability) remains its own future ticket —
+  this fix was scoped narrowly to the one reported alignment bug.
 - **P1** — Mobile hero needs a better mobile-specific constellation layout
   (current mobile treatment is a scaled-down desktop layer, not a
   purpose-built mobile composition).
@@ -64,8 +70,10 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   in wp-admin, with a hardcoded-placeholder fallback so Home never breaks
   if no case studies exist yet. See `EDITABILITY-PLAN.md` for exact usage.
 - **P1** — Add real case content for Presupuestador and Trazur, now that
-  the Case Study CPT exists (Sprint 4) — enter them as Case Study posts,
-  not template edits.
+  the Case Study CPT **and its single template** exist (Sprint 4B) — enter
+  them as Case Study posts (title, excerpt, tags, featured image, Role/
+  Tools/Period, and full body via the standard editor), not template
+  edits.
 - **Done (Sprint 3)** — **Featured Case** is editable: reuses the Case
   Study CPT with a "Feature this case on Home" checkbox instead of a
   separate mechanism. See `EDITABILITY-PLAN.md`.
@@ -92,12 +100,29 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   contact email were already covered by the Header/Connect tickets above
   (same shared data), so Footer only needed its two genuinely footer-only
   fields.
+- **Done (Sprint 4B)** — Case Study now has a real single page:
+  `single-es_case_study.php`, reusing the ESTAVILLO chrome, rendering
+  title, eyebrow, excerpt, tags, featured image (or placeholder), a
+  Status/Role/Tools/Period meta row, and the standard WordPress editor
+  body via `the_content()`. No case builder — the body is normal editor
+  content, same as any WordPress post. Role/Tools/Period are new optional
+  plain-text fields on the existing Case Study meta box.
+- **Done (Sprint 4A)** — Polylang readiness: the Case Study CPT registers
+  itself as translatable via `pll_get_post_types` (self-configuring, no
+  manual settings step); `es_case_tag` deliberately stays language-neutral
+  for V1 (see `EDITABILITY-PLAN.md`); the header and mobile-menu language
+  indicators are now a real Polylang switcher (`pll_the_languages()`),
+  guarded by `function_exists()` so the site is unaffected if Polylang is
+  inactive.
 - **P2** — Convert **Hero** to editable content (copy/CTAs are already
   filterable; coordinate with the Hero block/layout ticket above so
   editability doesn't get built on top of a layout that's about to
   change).
 - **P2** — Real images / final asset placeholders across Home sections.
 - **P2** — Refine EN/ES copy for all Home sections.
+- **P2** — Create the Home (ES) page (Polylang translation of the existing
+  Home page, same template) once real content is ready — mechanical setup
+  step in wp-admin, no code required (see `EDITABILITY-PLAN.md`).
 
 Editability priority order (for reference, full detail in
 `EDITABILITY-PLAN.md`):

@@ -5,8 +5,14 @@
  * Estrategia:
  *  - Los tokens y la base se cargan en todo el sitio (son inertes: solo
  *    definen variables --es-* y estilos bajo .es-page, no pisan Kadence).
- *  - hero.css, pages-home.css y los JS solo se cargan en el template
- *    "Estavillo — Home", para no sumar peso al resto del sitio.
+ *  - site.css (chrome: header + menú mobile + footer) y motion.js/nav.js
+ *    se cargan en la Home Y en el single de Case Study (Sprint 4B):
+ *    ambos reusan el mismo header/footer ESTAVILLO.
+ *  - hero.css, pages-home.css y hero-system-map.js son SOLO de la Home
+ *    (no hay hero en el single de Case Study).
+ *  - case-study.css es SOLO del single de Case Study.
+ *  - Ninguno de estos assets se carga en el resto del sitio (Kadence
+ *    intacto), para no sumar peso donde no hace falta.
  *  - Google Fonts (Newsreader / Instrument Sans / Spline Sans Mono) se
  *    puede desactivar con el filtro 'es_child_load_google_fonts' si
  *    Kadence ya sirve estas fuentes localmente.
@@ -25,6 +31,17 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function es_is_home_template() {
 	return is_page_template( 'templates/page-home-estavillo.php' );
+}
+
+/**
+ * ¿Estamos en la página single de un Case Study? No depende de que el
+ * plugin "Estavillo Portfolio Core" esté activo: is_singular() con un
+ * post_type no registrado simplemente devuelve false, nunca rompe.
+ *
+ * @return bool
+ */
+function es_is_case_study_single() {
+	return is_singular( 'es_case_study' );
 }
 
 /**
@@ -75,11 +92,13 @@ function es_child_enqueue_assets() {
 	wp_enqueue_style( 'es-layout', ES_CHILD_URI . '/assets/css/layout.css', array( 'es-base' ), es_asset_ver( 'assets/css/layout.css' ) );
 	wp_enqueue_style( 'es-components', ES_CHILD_URI . '/assets/css/components.css', array( 'es-layout' ), es_asset_ver( 'assets/css/components.css' ) );
 
-	// Capa específica de la home (chrome + hero animado + secciones).
-	if ( es_is_home_template() ) {
+	// Chrome ESTAVILLO (header + menú mobile + footer): lo comparten la
+	// Home y el single de Case Study — ambos usan template-parts/site-header
+	// y site-footer con el mismo markup/JS de menú.
+	$es_needs_chrome = es_is_home_template() || es_is_case_study_single();
+
+	if ( $es_needs_chrome ) {
 		wp_enqueue_style( 'es-site', ES_CHILD_URI . '/assets/css/site.css', array( 'es-components' ), es_asset_ver( 'assets/css/site.css' ) );
-		wp_enqueue_style( 'es-hero', ES_CHILD_URI . '/assets/css/hero.css', array( 'es-site' ), es_asset_ver( 'assets/css/hero.css' ) );
-		wp_enqueue_style( 'es-pages-home', ES_CHILD_URI . '/assets/css/pages-home.css', array( 'es-hero' ), es_asset_ver( 'assets/css/pages-home.css' ) );
 
 		wp_enqueue_script(
 			'es-motion',
@@ -101,6 +120,14 @@ function es_child_enqueue_assets() {
 				'strategy'  => 'defer',
 			)
 		);
+	}
+
+	// Capa específica de la home (hero animado + secciones) — no se carga
+	// en el single de Case Study, que no tiene hero.
+	if ( es_is_home_template() ) {
+		wp_enqueue_style( 'es-hero', ES_CHILD_URI . '/assets/css/hero.css', array( 'es-site' ), es_asset_ver( 'assets/css/hero.css' ) );
+		wp_enqueue_style( 'es-pages-home', ES_CHILD_URI . '/assets/css/pages-home.css', array( 'es-hero' ), es_asset_ver( 'assets/css/pages-home.css' ) );
+
 		wp_enqueue_script(
 			'es-hero-system-map',
 			ES_CHILD_URI . '/assets/js/hero-system-map.js',
@@ -125,6 +152,11 @@ function es_child_enqueue_assets() {
 				'version'    => ES_CHILD_VERSION,
 			)
 		);
+	}
+
+	// Capa específica del single de Case Study (prose body + meta row).
+	if ( es_is_case_study_single() ) {
+		wp_enqueue_style( 'es-case-study', ES_CHILD_URI . '/assets/css/case-study.css', array( 'es-site' ), es_asset_ver( 'assets/css/case-study.css' ) );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'es_child_enqueue_assets' );
