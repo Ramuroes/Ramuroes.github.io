@@ -251,6 +251,16 @@ del tema cambió para estos tickets — el punto de extensión ya existía.
 3. **Link CTA de How I Work** (URL) es un campo aparte, opcional.
 4. **Guardar Home Content.**
 
+**Connect:**
+
+1. Misma página, sección **Connect**: **Connect title** (acepta `<em>` para
+   la palabra en cursiva, igual que el placeholder actual), **Connect lead
+   text**, **Contact email** y **Connect link (CTA URL)**.
+2. El **Contact email** es el mismo dato que usa el Footer — completarlo
+   acá actualiza el mailto en las dos secciones a la vez (Connect y
+   Footer), no hay que repetirlo.
+3. **Guardar Home Content.**
+
 > Si además tenés un filtro por Code Snippets sobre el mismo hook (p. ej.
 > `es_home_about_text`), gana el que se registre último — es el
 > comportamiento normal de los filtros de WordPress, no un bug. No uses

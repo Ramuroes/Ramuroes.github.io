@@ -90,6 +90,20 @@ function es_portfolio_home_content_save() {
 		$data['process_url'] = esc_url_raw( wp_unslash( $_POST['es_process_url'] ) );
 	}
 
+	// ---- Connect ----
+	if ( isset( $_POST['es_cta_title'] ) ) {
+		$data['cta_title'] = wp_kses( wp_unslash( $_POST['es_cta_title'] ), array( 'em' => array() ) );
+	}
+	if ( isset( $_POST['es_cta_lead'] ) ) {
+		$data['cta_lead'] = sanitize_textarea_field( wp_unslash( $_POST['es_cta_lead'] ) );
+	}
+	if ( isset( $_POST['es_contact_email'] ) ) {
+		$data['contact_email'] = sanitize_email( wp_unslash( $_POST['es_contact_email'] ) );
+	}
+	if ( isset( $_POST['es_connect_url'] ) ) {
+		$data['connect_url'] = esc_url_raw( wp_unslash( $_POST['es_connect_url'] ) );
+	}
+
 	update_option( 'es_portfolio_home_content', $data );
 	add_action( 'admin_notices', 'es_portfolio_home_content_saved_notice' );
 }
@@ -163,6 +177,29 @@ function es_portfolio_home_content_page() {
 				</tr>
 			</table>
 
+			<h2><?php esc_html_e( 'Connect', 'estavillo-portfolio-core' ); ?></h2>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><label for="es_cta_title"><?php esc_html_e( 'Connect title', 'estavillo-portfolio-core' ); ?></label></th>
+					<td>
+						<input type="text" id="es_cta_title" name="es_cta_title" class="large-text" value="<?php echo esc_attr( $data['cta_title'] ?? '' ); ?>" placeholder="Let's &lt;em&gt;talk.&lt;/em&gt;">
+						<p class="description"><?php esc_html_e( 'The <em> tag is allowed here for emphasis, same as the current placeholder.', 'estavillo-portfolio-core' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_cta_lead"><?php esc_html_e( 'Connect lead text', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><textarea id="es_cta_lead" name="es_cta_lead" rows="3" class="large-text"><?php echo esc_textarea( $data['cta_lead'] ?? '' ); ?></textarea></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_contact_email"><?php esc_html_e( 'Contact email', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="email" id="es_contact_email" name="es_contact_email" class="regular-text" value="<?php echo esc_attr( $data['contact_email'] ?? '' ); ?>" placeholder="hello@ramiroestavillo.com"></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_connect_url"><?php esc_html_e( 'Connect link (CTA URL)', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="url" id="es_connect_url" name="es_connect_url" class="regular-text" value="<?php echo esc_attr( $data['connect_url'] ?? '' ); ?>" placeholder="#connect"></td>
+				</tr>
+			</table>
+
 			<?php submit_button( __( 'Save Home Content', 'estavillo-portfolio-core' ), 'primary', 'es_portfolio_home_content_submit' ); ?>
 		</form>
 	</div>
@@ -225,3 +262,32 @@ function es_portfolio_filter_process_url( $default ) {
 	return ! empty( $data['process_url'] ) ? $data['process_url'] : $default;
 }
 add_filter( 'es_home_process_url', 'es_portfolio_filter_process_url' );
+
+/**
+ * Puente para Connect. es_contact_email es compartido con el footer (ver
+ * es_portfolio_filter_contact_email más abajo): un solo campo alimenta el
+ * mailto de las dos secciones — es el mismo dato, no dos independientes.
+ */
+function es_portfolio_filter_cta_title( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['cta_title'] ) ? $data['cta_title'] : $default;
+}
+add_filter( 'es_home_cta_title', 'es_portfolio_filter_cta_title' );
+
+function es_portfolio_filter_cta_lead( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['cta_lead'] ) ? $data['cta_lead'] : $default;
+}
+add_filter( 'es_home_cta_lead', 'es_portfolio_filter_cta_lead' );
+
+function es_portfolio_filter_contact_email( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['contact_email'] ) ? $data['contact_email'] : $default;
+}
+add_filter( 'es_contact_email', 'es_portfolio_filter_contact_email' );
+
+function es_portfolio_filter_connect_url( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['connect_url'] ) ? $data['connect_url'] : $default;
+}
+add_filter( 'es_home_connect_url', 'es_portfolio_filter_connect_url' );

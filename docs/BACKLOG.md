@@ -79,7 +79,10 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   individually — leaving a step blank keeps its current placeholder, so
   editors don't have to fill in all 6 at once. Icon slot stays reserved
   (out of scope, design/motion territory).
-- **P2** — Convert **Connect** to editable content.
+- **Done (Sprint 3)** — **Connect** is editable from the same "Home
+  Content" page: title, lead text, contact email, and CTA URL. The
+  contact email field is shared with the Footer (same `es_contact_email`
+  filter both sections already used) — one field updates both.
 - **P2** — Convert **Header** to editable content (nav links are already
   filterable via `es_nav_links`; goal is full in-admin editing, not just
   a filter).
@@ -97,7 +100,7 @@ Editability priority order (for reference, full detail in
 2. Featured Case — **done** (Case Study CPT, "featured" flag)
 3. About — **done** (Home Content options page)
 4. How I Work — **done** (Home Content options page, per-step)
-5. Connect
+5. Connect — **done** (Home Content options page)
 6. Header
 7. Hero
 
