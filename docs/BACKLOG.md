@@ -66,8 +66,14 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
 - **P1** — Add real case content for Presupuestador and Trazur, now that
   the Case Study CPT exists (Sprint 4) — enter them as Case Study posts,
   not template edits.
-- **P2** — Convert **Featured Case** to editable content.
-- **P2** — Convert **About** to editable content.
+- **Done (Sprint 3)** — **Featured Case** is editable: reuses the Case
+  Study CPT with a "Feature this case on Home" checkbox instead of a
+  separate mechanism. See `EDITABILITY-PLAN.md`.
+- **Done (Sprint 3)** — **About** is editable: a plugin-owned "Home
+  Content" options page (wp-admin) now hooks the `es_home_about_text` /
+  `es_home_about_url` / `es_home_about_portrait` filters that already
+  existed since Home v1 — no theme template changes were needed. See
+  `EDITABILITY-PLAN.md`.
 - **P2** — Convert **How I Work** to editable content.
 - **P2** — Convert **Connect** to editable content.
 - **P2** — Convert **Header** to editable content (nav links are already
@@ -84,8 +90,8 @@ Editability priority order (for reference, full detail in
 `EDITABILITY-PLAN.md`):
 
 1. Selected Work — **done** (Case Study CPT)
-2. Featured Case
-3. About
+2. Featured Case — **done** (Case Study CPT, "featured" flag)
+3. About — **done** (Home Content options page)
 4. How I Work
 5. Connect
 6. Header

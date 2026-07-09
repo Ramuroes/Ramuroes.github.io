@@ -220,6 +220,32 @@ romper esta sección.
 El filtro `es_home_featured` documentado abajo sigue funcionando igual
 sobre el resultado final.
 
+### Home Content — About, How I Work, Connect, Header, Footer (Sprint 3)
+
+Estas secciones son singulares (no repetibles como Case Study), así que no
+usan un CPT — usan una página de opciones nueva en el plugin: **Case
+Studies → Home Content** (wp-admin).
+
+**Cómo funciona:** estas secciones ya se editaban desde siempre por
+filtros PHP (`es_home_about_text`, `es_home_process_steps`,
+`es_contact_email`, `es_nav_links`, etc. — ver la lista completa más
+abajo). La página **Home Content** no inventa un mecanismo nuevo: le da
+una interfaz de wp-admin a esos mismos filtros. Por eso ningún template
+del tema cambió para estos tickets — el punto de extensión ya existía.
+
+**About** (primer campo disponible):
+
+1. wp-admin → **Case Studies → Home Content**.
+2. Sección **About**: completá **About text**, **About link (CTA URL)**
+   y/o **Portrait image URL**.
+3. Dejá cualquier campo vacío para mantener el placeholder actual de ese
+   campo — Home nunca se rompe. **Guardar Home Content.**
+
+> Si además tenés un filtro por Code Snippets sobre el mismo hook (p. ej.
+> `es_home_about_text`), gana el que se registre último — es el
+> comportamiento normal de los filtros de WordPress, no un bug. No uses
+> las dos vías para el mismo campo a la vez.
+
 ## Instalación (sin riesgo para el sitio actual)
 
 1. **Subir el tema**: Apariencia → Temas → Añadir nuevo → Subir tema →

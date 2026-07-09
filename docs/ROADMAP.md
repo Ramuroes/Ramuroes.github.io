@@ -71,12 +71,22 @@ See `BACKLOG.md` P0 items for the exact list this sprint should clear.
   editing experience, not just the PHP data structure) before migrating any
   other section.
 
-**Status:** Selected Work done — implemented as a "Case Study" custom post
-type (native fields + one small meta box, no ACF), with the current
-placeholder cases kept as an automatic fallback when no Case Studies exist
-yet. See `EDITABILITY-PLAN.md` for usage. Remaining sections (Featured
-Case, About, How I Work, Connect, Header, Hero) stay on the Phase
-1/2 plan in `EDITABILITY-PLAN.md` and are not started.
+**Status:** In progress.
+
+- Selected Work — **done**: "Case Study" custom post type (native fields +
+  one small meta box, no ACF), with the current placeholder cases kept as
+  an automatic fallback when no Case Studies exist yet.
+- Featured Case — **done**: reuses the same Case Study CPT (a "feature
+  this case" flag) rather than a separate mechanism.
+- About — **done**: a plugin-owned "Home Content" options page hooks the
+  `es_home_about_*` filters that already existed in the theme since Home
+  v1 — no theme template changes needed.
+- How I Work, Connect, Header — next, same "Home Content" options page,
+  same pattern (hook pre-existing filters, no new theme plumbing).
+- Hero — deliberately deferred until the Hero block/layout ticket flagged
+  in `BACKLOG.md` lands first.
+
+See `EDITABILITY-PLAN.md` for usage and the architecture rationale.
 
 **Flagged during this sprint, deliberately not built now** (logged to
 `BACKLOG.md` instead of expanding this sprint's scope):

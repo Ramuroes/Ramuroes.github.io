@@ -219,6 +219,36 @@ See `estavillo-child/README.md` → "Selected Work — editable vía Case
 Studies" and "Featured Case — editable vía Case Studies" for exact
 wp-admin usage instructions.
 
+### Phase 1, given a wp-admin UI — About, How I Work, Connect, Header, Footer
+
+These sections are singular, not repeatable — a CPT is the wrong tool
+(that's what Phase 3 is for). Rather than jump to Phase 2 (block patterns)
+for them, Sprint 3 revisited Phase 1 with one observation: **these
+sections already had `apply_filters()` extension points since Home v1**
+(`es_home_about_text`, `es_home_process_steps`, `es_contact_email`,
+`es_nav_links`, `es_social_links`, `es_footer_location`, etc. — all
+documented in `estavillo-child/README.md` from the start as the
+"Code Snippets" editing mechanism). The only thing missing was a wp-admin
+UI over those filters.
+
+So the plugin gained one options page, **Case Studies → Home Content**
+(`estavillo-portfolio-core/includes/home-content-options.php`), storing a
+single option (`es_portfolio_home_content`, an associative array) and
+hooking each existing filter: if a field is set, the filter returns it; if
+empty, the filter returns the theme's own default untouched. No new
+filter names, no theme template changes, same "empty field → fallback,
+never breaks" guarantee as the CPT — just applied per-field instead of
+per-post.
+
+This is deliberately **not** Phase 2 (block patterns) — it's Phase 1 with
+better ergonomics. Block patterns remain the right call only if/when these
+sections need real in-admin rich-text/layout editing beyond flat fields;
+until then this is far cheaper and lower-risk, and matches "prefer native
+WordPress functionality, avoid new dependencies."
+
+See `estavillo-child/README.md` → "Home Content — About, How I Work,
+Connect, Header, Footer" for exact wp-admin usage instructions.
+
 ---
 
 ## Editability priority order
