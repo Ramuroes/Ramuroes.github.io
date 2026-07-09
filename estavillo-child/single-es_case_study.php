@@ -23,6 +23,11 @@
  * clases .es-case-* (case-study.css) para estructurar contenido dentro del
  * editor nativo — ver README para el listado completo con ejemplos.
  *
+ * Sprint 4D reordena el hero como grilla editorial de 2 columnas en
+ * desktop (texto a la izquierda, imagen/placeholder a la derecha) —
+ * mismos campos de siempre, solo cambia el markup/CSS del hero. En mobile
+ * sigue apilado (imagen debajo del texto). No toca .es-case-* del cuerpo.
+ *
  * @package estavillo-child
  */
 
@@ -100,48 +105,52 @@ if ( function_exists( 'wp_body_open' ) ) {
 				</nav>
 			<?php endif; ?>
 			<article class="es-section es-case">
-				<div class="es-container es-case__head" data-es-reveal>
-					<?php if ( ! empty( $es_case_kicker ) ) : ?>
-						<p class="es-eyebrow es-case__kicker"><?php echo esc_html( $es_case_kicker ); ?></p>
-					<?php endif; ?>
+				<div class="es-container es-case__hero" data-es-reveal>
+					<div class="es-case__hero-content">
+						<?php if ( ! empty( $es_case_kicker ) ) : ?>
+							<p class="es-eyebrow es-case__kicker"><?php echo esc_html( $es_case_kicker ); ?></p>
+						<?php endif; ?>
 
-					<h1 class="es-h1 es-case__title"><?php the_title(); ?></h1>
+						<h1 class="es-h1 es-case__title"><?php the_title(); ?></h1>
 
-					<?php if ( ! empty( $es_case_excerpt ) ) : ?>
-						<p class="es-lead es-case__excerpt"><?php echo esc_html( $es_case_excerpt ); ?></p>
-					<?php endif; ?>
+						<?php if ( ! empty( $es_case_excerpt ) ) : ?>
+							<p class="es-lead es-case__excerpt"><?php echo esc_html( $es_case_excerpt ); ?></p>
+						<?php endif; ?>
 
-					<?php if ( ! empty( $es_case_tags ) ) : ?>
-						<div class="es-case__tags">
-							<?php foreach ( $es_case_tags as $es_tag ) : ?>
-								<span class="es-pill"><?php echo esc_html( $es_tag->name ); ?></span>
-							<?php endforeach; ?>
-						</div>
-					<?php endif; ?>
+						<?php if ( ! empty( $es_case_tags ) ) : ?>
+							<div class="es-case__tags">
+								<?php foreach ( $es_case_tags as $es_tag ) : ?>
+									<span class="es-pill"><?php echo esc_html( $es_tag->name ); ?></span>
+								<?php endforeach; ?>
+							</div>
+						<?php endif; ?>
 
-					<?php if ( ! empty( $es_case_meta ) ) : ?>
-						<dl class="es-case__meta">
-							<?php foreach ( $es_case_meta as $es_meta_key => $es_meta_value ) : ?>
-								<div class="es-case__meta-item">
-									<dt><?php echo esc_html( es__( 'case_meta_' . $es_meta_key ) ); ?></dt>
-									<dd><?php echo esc_html( $es_meta_value ); ?></dd>
-								</div>
-							<?php endforeach; ?>
-						</dl>
-					<?php endif; ?>
+						<?php if ( ! empty( $es_case_meta ) ) : ?>
+							<dl class="es-case__meta">
+								<?php foreach ( $es_case_meta as $es_meta_key => $es_meta_value ) : ?>
+									<div class="es-case__meta-item">
+										<dt><?php echo esc_html( es__( 'case_meta_' . $es_meta_key ) ); ?></dt>
+										<dd><?php echo esc_html( $es_meta_value ); ?></dd>
+									</div>
+								<?php endforeach; ?>
+							</dl>
+						<?php endif; ?>
+					</div>
+
+					<div class="es-case__hero-media">
+						<?php if ( has_post_thumbnail() ) : ?>
+							<div class="es-case__media">
+								<?php the_post_thumbnail( 'large' ); ?>
+							</div>
+						<?php else : ?>
+							<div class="es-placeholder es-case__media es-case__placeholder" role="img" aria-label="<?php esc_attr_e( 'Placeholder for the case visual', 'estavillo-child' ); ?>">
+								<span class="es-placeholder__tag">{asset: <?php echo esc_html( sanitize_title( get_the_title() ) ); ?>}</span>
+							</div>
+						<?php endif; ?>
+					</div>
 				</div>
 
 				<div class="es-container">
-					<?php if ( has_post_thumbnail() ) : ?>
-						<div class="es-case__media" data-es-reveal>
-							<?php the_post_thumbnail( 'large' ); ?>
-						</div>
-					<?php else : ?>
-						<div class="es-placeholder es-case__media es-case__placeholder" role="img" aria-label="<?php esc_attr_e( 'Placeholder for the case visual', 'estavillo-child' ); ?>" data-es-reveal>
-							<span class="es-placeholder__tag">{asset: <?php echo esc_html( sanitize_title( get_the_title() ) ); ?>}</span>
-						</div>
-					<?php endif; ?>
-
 					<div class="es-case__body" data-es-reveal>
 						<?php the_content(); ?>
 					</div>

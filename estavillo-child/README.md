@@ -244,6 +244,14 @@ la resuelve solo (`single-es_case_study.php`), no hace falta activar nada.
   caso (texto, imágenes, encabezados, lo que necesites). No hay un "case
   builder" con secciones fijas.
 
+**Hero editorial de 2 columnas (Sprint 4D):** en desktop (≥1000px) el
+título/eyebrow/extracto/tags/meta va a la izquierda (siempre alineado a la
+izquierda, nunca centrado) y la imagen destacada (o el placeholder) a la
+derecha, en un marco 4:5. En mobile (<1000px) se apila: primero el texto,
+después la imagen — igual que antes de este ticket. Es solo el hero; el
+resto de la página (índice sticky, cuerpo del editor con `.es-case-*`) no
+cambió.
+
 **Cómo escribir el caso completo:**
 
 1. wp-admin → **Case Studies** → abrí (o creá) el caso.

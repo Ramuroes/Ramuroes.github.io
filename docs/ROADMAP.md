@@ -172,19 +172,31 @@ supersedes the narrower mobile-menu-only fix from Sprint 1's backlog item.
 See `estavillo-child/README.md` ("Sistema de formato de Case Study") for
 the full class reference and a copy-paste editor example.
 
-**Sprint 4D — EN/ES Home strategy — next.** Create the Home (ES) page as
+**Sprint 4D — Case Study hero polish — done.** The hero area of
+`single-es_case_study.php` felt too centered/narrow for a "premium
+editorial" feel. Reworked into a 2-column grid on desktop
+(`.es-case__hero-content` left: eyebrow/title/excerpt/tags/status-role-
+tools-period; `.es-case__hero-media` right: featured image or placeholder,
+4:5 frame), single stacked column on mobile (<1000px, text then image,
+unchanged from before). Text is explicitly left-aligned, never centered.
+No new fields, no change to the `.es-case-*` content-class library, no
+Home/typography/color changes. The sticky index is unaffected (separate
+element above the hero). Logged a future improvement in `BACKLOG.md`
+(desktop-only side index) rather than building it now.
+
+**Sprint 4E — EN/ES Home strategy — next.** Create the Home (ES) page as
 a Polylang translation of the existing Home page (same template, no new
 code) once real Spanish copy exists. Verify hero copy / UI strings
 resolve correctly per language through the existing `es__()` /
 `pll_register_string()` wiring.
 
-**Sprint 4E — Real content loading — next.** Enter real Presupuestador and
+**Sprint 4F — Real content loading — next.** Enter real Presupuestador and
 Trazur case studies as Case Study posts (now that the single template
 exists to display them properly, including the new `.es-case-*` formatting
-library), in both languages via their Polylang translations. Add real
-images. Refine EN/ES copy for all Home sections (within the
-single-language-global constraint of Home Content options — see Sprint 3
-notes above).
+library and the editorial hero layout), in both languages via their
+Polylang translations. Add real images. Refine EN/ES copy for all Home
+sections (within the single-language-global constraint of Home Content
+options — see Sprint 3 notes above).
 
 ---
 

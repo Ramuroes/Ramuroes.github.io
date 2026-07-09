@@ -153,6 +153,14 @@ Editability priority order (for reference, full detail in
 
 ## Accessibility / UX
 
+- **P2** — Case Study sticky index: currently a single horizontal strip
+  under the header on all viewport sizes (deliberately kept simple in
+  Sprint 4C). Future improvement once there's real multi-section case
+  content to test against: a **desktop-only side index pinned to the
+  left** of the case body (e.g. sticky column running alongside
+  `.es-case__body`), while mobile keeps today's horizontal/compact strip
+  unchanged. Not built now — do not overbuild the index ahead of real
+  content.
 - **P2** — Sticky header refinement (behavior/visual polish beyond the
   current acceptable state — see `BACKLOG.md` header alignment note
   below).

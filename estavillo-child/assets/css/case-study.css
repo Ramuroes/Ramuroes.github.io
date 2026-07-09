@@ -1,7 +1,7 @@
 /* =========================================================================
    ESTAVILLO — Single Case Study
    -------------------------------------------------------------------------
-   Sprint 4B + 4C. Solo se carga en single-es_case_study.php. Reusa el
+   Sprint 4B + 4C + 4D. Solo se carga en single-es_case_study.php. Reusa el
    chrome de site.css y los tokens de tokens.css — ningún color ni
    tipografía nuevos acá, solo nuevos selectores aplicando las mismas
    variables --es-*.
@@ -9,10 +9,15 @@
    Estructura del archivo:
    1. Índice sticky (.es-case-index)          — fuera de the_content()
    2. Hero del caso (.es-case__*)              — fuera de the_content()
+      Sprint 4D: grilla editorial de 2 columnas en desktop
+      (.es-case__hero-content izquierda / .es-case__hero-media derecha),
+      1 columna apilada en mobile (<1000px). Texto siempre alineado a la
+      izquierda, nunca centrado.
    3. Prose por defecto (.es-case__body h2...) — dentro de the_content()
    4. Librería de clases .es-case-* (sección, stats, timeline, decisiones,
       quote, status, details, browser chrome, etc.) — para USAR dentro del
       editor nativo de WordPress. Ver README para instrucciones y ejemplos.
+      Sin cambios en esta librería en Sprint 4D (solo se tocó el hero).
 
    Inspirado visualmente en el case study de referencia REstimator (Dark) —
    reimplementado desde cero acá como CSS propio del design system
@@ -84,10 +89,32 @@
 	color: var(--es-ink-3) !important;
 }
 
-/* ---------- hero del caso ---------- */
+/* ---------- hero del caso: grilla editorial 2 columnas en desktop ----------
+   Izquierda: eyebrow/título/extracto/tags/meta, texto siempre alineado a la
+   izquierda (nunca centrado). Derecha: imagen destacada o placeholder.
+   Mobile (<1000px): una sola columna apilada, imagen debajo del texto. */
 
-.es-case__head {
-	max-width: 760px;
+.es-case__hero {
+	display: grid;
+	grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+	align-items: start;
+	gap: clamp(40px, 6vw, 88px);
+	text-align: left;
+}
+
+.es-case__hero-content {
+	max-width: 560px;
+}
+
+@media (max-width: 999px) {
+	.es-case__hero {
+		grid-template-columns: 1fr;
+		gap: clamp(28px, 6vw, 40px);
+	}
+
+	.es-case__hero-content {
+		max-width: none;
+	}
 }
 
 .es-case__kicker {
@@ -134,19 +161,24 @@
 	color: var(--es-ink-2);
 }
 
-/* ---------- media (imagen destacada o placeholder) ---------- */
+/* ---------- media (imagen destacada o placeholder): columna derecha del hero ---------- */
 
 .es-case__media {
-	margin: clamp(32px, 5vw, 56px) 0;
+	margin: 0;
 	border-radius: var(--es-radius);
 	overflow: hidden;
 	border: 1px solid var(--es-line);
 }
 
+.es-case__hero-media .es-case__media {
+	aspect-ratio: 4 / 5;
+}
+
 .es-case__media img {
 	display: block;
 	width: 100%;
-	height: auto;
+	height: 100%;
+	object-fit: cover;
 }
 
 .es-case__placeholder {
@@ -157,10 +189,17 @@
 	background: var(--es-paper-2);
 }
 
+@media (max-width: 999px) {
+	.es-case__hero-media .es-case__media {
+		aspect-ratio: 4 / 3;
+	}
+}
+
 /* ---------- prose: contenido del editor estándar (the_content()) ---------- */
 
 .es-case__body {
 	max-width: 720px;
+	margin-top: clamp(48px, 6vw, 88px);
 	font-size: 15.5px;
 	line-height: 1.75;
 	color: var(--es-ink-2);
