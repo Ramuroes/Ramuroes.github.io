@@ -45,6 +45,30 @@ function es_is_case_study_single() {
 }
 
 /**
+ * ¿Estamos en alguna de las páginas fijas ESTAVILLO (Work / About / How I
+ * Work / Contact)? Todas son templates "standalone" igual que Home y el
+ * single de Case Study — reusan el mismo chrome (site-header/site-footer)
+ * y varias secciones de Home (Selected Work, How I Work, About, Connect),
+ * así que comparten la misma condición de assets que esas páginas.
+ *
+ * @return bool
+ */
+function es_is_estavillo_static_page() {
+	$templates = array(
+		'templates/page-work.php',
+		'templates/page-about.php',
+		'templates/page-how-i-work.php',
+		'templates/page-contact.php',
+	);
+	foreach ( $templates as $template ) {
+		if ( is_page_template( $template ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
  * Versión de cache-bust por archivo: usa filemtime() para que CADA cambio de
  * un asset genere un ?ver= nuevo y el navegador/CDN vuelva a bajarlo.
  *
@@ -93,9 +117,10 @@ function es_child_enqueue_assets() {
 	wp_enqueue_style( 'es-components', ES_CHILD_URI . '/assets/css/components.css', array( 'es-layout' ), es_asset_ver( 'assets/css/components.css' ) );
 
 	// Chrome ESTAVILLO (header + menú mobile + footer): lo comparten la
-	// Home y el single de Case Study — ambos usan template-parts/site-header
+	// Home, el single de Case Study y las 4 páginas fijas nuevas (Work /
+	// About / How I Work / Contact) — todas usan template-parts/site-header
 	// y site-footer con el mismo markup/JS de menú.
-	$es_needs_chrome = es_is_home_template() || es_is_case_study_single();
+	$es_needs_chrome = es_is_home_template() || es_is_case_study_single() || es_is_estavillo_static_page();
 
 	if ( $es_needs_chrome ) {
 		wp_enqueue_style( 'es-site', ES_CHILD_URI . '/assets/css/site.css', array( 'es-components' ), es_asset_ver( 'assets/css/site.css' ) );
@@ -122,11 +147,26 @@ function es_child_enqueue_assets() {
 		);
 	}
 
-	// Capa específica de la home (hero animado + secciones) — no se carga
-	// en el single de Case Study, que no tiene hero.
+	// Secciones de Home (Featured / How I Work / Selected Work / About /
+	// Connect): la Home Y las 4 páginas fijas nuevas las necesitan, porque
+	// Work/About/How I Work/Contact reusan esos mismos template-parts o su
+	// mismo lenguaje visual (cards, timeline, process grid, footer CTA) en
+	// vez de reinventar estilos nuevos — ver README, sección "Páginas fijas".
+	if ( es_is_home_template() || es_is_estavillo_static_page() ) {
+		wp_enqueue_style( 'es-pages-home', ES_CHILD_URI . '/assets/css/pages-home.css', array( 'es-site' ), es_asset_ver( 'assets/css/pages-home.css' ) );
+	}
+
+	// Capa propia de las 4 páginas fijas nuevas (page-head, separación
+	// selected/archive de Work, timeline/educación/hobbies/CV de About,
+	// layout de Contact) — nunca se carga en Home ni en Case Study.
+	if ( es_is_estavillo_static_page() ) {
+		wp_enqueue_style( 'es-pages', ES_CHILD_URI . '/assets/css/pages.css', array( 'es-pages-home' ), es_asset_ver( 'assets/css/pages.css' ) );
+	}
+
+	// Capa específica de la home (hero animado) — no se carga en el single
+	// de Case Study ni en las páginas fijas nuevas, que no tienen hero.
 	if ( es_is_home_template() ) {
-		wp_enqueue_style( 'es-hero', ES_CHILD_URI . '/assets/css/hero.css', array( 'es-site' ), es_asset_ver( 'assets/css/hero.css' ) );
-		wp_enqueue_style( 'es-pages-home', ES_CHILD_URI . '/assets/css/pages-home.css', array( 'es-hero' ), es_asset_ver( 'assets/css/pages-home.css' ) );
+		wp_enqueue_style( 'es-hero', ES_CHILD_URI . '/assets/css/hero.css', array( 'es-pages-home' ), es_asset_ver( 'assets/css/hero.css' ) );
 
 		wp_enqueue_script(
 			'es-hero-system-map',

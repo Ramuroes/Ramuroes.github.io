@@ -323,6 +323,28 @@ WordPress functionality, avoid new dependencies."
 See `estavillo-child/README.md` → "Home Content — About, How I Work,
 Connect, Header, Footer" for exact wp-admin usage instructions.
 
+### Fixed pages — Work / About / How I Work / Contact (mega sprint, V1)
+
+Same Phase 1 approach, extended to 4 new standalone page templates instead
+of Home-only sections:
+
+- **Work** reuses the exact same data as Selected Work (the CPT's "Show on
+  Home" flag) — no new field, just a second, fuller presentation of it
+  (plus an "Archive" group for cases explicitly opted out of Home).
+- **About** gained 4 new Phase-1 fields on the existing Home Content
+  options page (CV URL, career timeline, education/certificates, hobbies)
+  — same per-row "empty title = skip that row" merge pattern already
+  proven by How I Work's steps and Header's nav links.
+- **How I Work** and **Contact** pages add zero new fields — they reuse
+  the How I Work steps and the Connect/Footer fields, just rendered as
+  their own dedicated pages instead of Home sections.
+
+This is explicitly **V1**: fast, safe, built on the same
+options-page-plus-filters mechanism as the rest of Phase 1, not a new
+mechanism. See the README's "V1 / V2" note for what a Gutenberg-based V2
+would look like for these same sections, and "Páginas fijas" in
+`estavillo-child/README.md` for the full field reference.
+
 ---
 
 ## Editability priority order

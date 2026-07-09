@@ -26,6 +26,24 @@ define( 'ES_CASE_STUDY_CPT', 'es_case_study' );
 define( 'ES_CASE_TAG_TAX', 'es_case_tag' );
 
 /**
+ * Variantes de layout del hero del Case Study (Sprint "mega" — hero
+ * options). 'split-right' es el default histórico (texto izquierda /
+ * imagen derecha, Sprint 4D) y no requiere CSS de modificador — el resto
+ * son opt-in vía este select. Whitelist única (acá) usada tanto para
+ * sanitizar al guardar como para pintar el <select> del meta box.
+ *
+ * @return array<string,string> valor => label legible.
+ */
+function es_case_hero_layout_choices() {
+	return array(
+		'split-right' => __( 'Split — image right (default)', 'estavillo-portfolio-core' ),
+		'split-left'  => __( 'Split — image left', 'estavillo-portfolio-core' ),
+		'compact'     => __( 'Compact — horizontal image, shorter frame', 'estavillo-portfolio-core' ),
+		'stacked'     => __( 'Stacked — text first, image below (full width)', 'estavillo-portfolio-core' ),
+	);
+}
+
+/**
  * Registra el CPT "Case Study" y su taxonomía de tags.
  */
 function es_register_case_study_cpt() {
@@ -107,6 +125,10 @@ function es_case_study_render_meta_box( $post ) {
 	$tools             = get_post_meta( $post->ID, '_es_case_tools', true );
 	$period            = get_post_meta( $post->ID, '_es_case_period', true );
 	$index             = get_post_meta( $post->ID, '_es_case_index', true );
+	$hero_layout       = get_post_meta( $post->ID, '_es_case_hero_layout', true );
+	if ( ! $hero_layout ) {
+		$hero_layout = 'split-right';
+	}
 	$show_on_home_raw  = get_post_meta( $post->ID, '_es_case_show_on_home', true );
 	$show_on_home      = ( '' === $show_on_home_raw ) ? true : ( '1' === $show_on_home_raw );
 	$featured          = '1' === get_post_meta( $post->ID, '_es_case_featured', true );
@@ -147,6 +169,15 @@ function es_case_study_render_meta_box( $post ) {
 		<label for="es_case_index"><strong><?php esc_html_e( 'Case index (optional)', 'estavillo-portfolio-core' ); ?></strong></label><br>
 		<textarea id="es_case_index" name="es_case_index" class="widefat" rows="5" placeholder="<?php esc_attr_e( "One entry per line: Label|#anchor-id — e.g. Context|#context. Requires matching id=\"context\" attributes inside the body content. Leave empty to hide the sticky index entirely.", 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( $index ); ?></textarea>
 		<span class="description"><?php esc_html_e( 'Powers the sticky in-page index on this case\'s single page. One line per entry, format Label|#anchor-id.', 'estavillo-portfolio-core' ); ?></span>
+	</p>
+	<p>
+		<label for="es_case_hero_layout"><strong><?php esc_html_e( 'Hero layout', 'estavillo-portfolio-core' ); ?></strong></label><br>
+		<select id="es_case_hero_layout" name="es_case_hero_layout">
+			<?php foreach ( es_case_hero_layout_choices() as $es_layout_key => $es_layout_label ) : ?>
+				<option value="<?php echo esc_attr( $es_layout_key ); ?>" <?php selected( $hero_layout, $es_layout_key ); ?>><?php echo esc_html( $es_layout_label ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<span class="description"><?php esc_html_e( 'Controls how the title/excerpt block and the featured image are arranged on this case\'s single page. Safe to change any time — no other field is affected.', 'estavillo-portfolio-core' ); ?></span>
 	</p>
 	<p>
 		<label>
@@ -198,6 +229,17 @@ function es_save_case_study_meta( $post_id ) {
 	// sanitize_textarea_field() (nativo de WP) en vez del loop de arriba.
 	if ( isset( $_POST['es_case_index'] ) ) {
 		update_post_meta( $post_id, '_es_case_index', sanitize_textarea_field( wp_unslash( $_POST['es_case_index'] ) ) );
+	}
+
+	// Select contra whitelist: cualquier valor fuera de
+	// es_case_hero_layout_choices() cae al default 'split-right', nunca se
+	// guarda texto arbitrario.
+	if ( isset( $_POST['es_case_hero_layout'] ) ) {
+		$es_hero_layout_choice = sanitize_key( wp_unslash( $_POST['es_case_hero_layout'] ) );
+		if ( ! array_key_exists( $es_hero_layout_choice, es_case_hero_layout_choices() ) ) {
+			$es_hero_layout_choice = 'split-right';
+		}
+		update_post_meta( $post_id, '_es_case_hero_layout', $es_hero_layout_choice );
 	}
 
 	update_post_meta( $post_id, '_es_case_show_on_home', isset( $_POST['es_case_show_on_home'] ) ? '1' : '0' );
@@ -322,4 +364,83 @@ function es_portfolio_filter_featured_case_for_home( $default_case ) {
 	$real_case = es_portfolio_get_featured_case_for_home();
 	return $real_case ? $real_case : $default_case;
 }
+
+/**
+ * Todos los Case Studies publicados, separados en dos grupos para la página
+ * Work: 'selected' (los mismos que aparecen en Home → Selected Work, mismo
+ * flag _es_case_show_on_home que ya existía) y 'archive' (marcados
+ * explícitamente "no mostrar en Home" — se interpretan como trabajo
+ * más antiguo/secundario). No es un campo nuevo: reusa la misma casilla
+ * "Show this case in Home → Selected Work" del meta box, así que un caso
+ * no necesita configuración extra para aparecer correctamente clasificado
+ * acá.
+ *
+ * @return array{selected:array<int,array>,archive:array<int,array>}
+ */
+function es_portfolio_get_case_studies_for_work_page() {
+	$query = new WP_Query(
+		array(
+			'post_type'      => ES_CASE_STUDY_CPT,
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'orderby'        => 'menu_order title',
+			'order'          => 'ASC',
+		)
+	);
+
+	if ( empty( $query->posts ) ) {
+		return array(
+			'selected' => array(),
+			'archive'  => array(),
+		);
+	}
+
+	$selected = array();
+	$archive  = array();
+
+	foreach ( $query->posts as $es_post ) {
+		$es_url            = get_post_meta( $es_post->ID, '_es_case_url', true );
+		$es_show_on_home   = get_post_meta( $es_post->ID, '_es_case_show_on_home', true );
+		$es_case_data      = array(
+			'label'             => get_post_meta( $es_post->ID, '_es_case_label', true ),
+			'kicker'            => get_post_meta( $es_post->ID, '_es_case_kicker', true ),
+			'title'             => get_the_title( $es_post ),
+			'excerpt'           => get_the_excerpt( $es_post ),
+			'tags'              => wp_list_pluck( wp_get_post_terms( $es_post->ID, ES_CASE_TAG_TAX ), 'name' ),
+			'url'               => $es_url ? $es_url : get_permalink( $es_post ),
+			'image'             => get_the_post_thumbnail_url( $es_post, 'large' ),
+			'placeholder_label' => get_post_meta( $es_post->ID, '_es_case_placeholder_label', true ),
+		);
+
+		// '0' explícito = "no mostrar en Home" = trabajo de archivo en Work.
+		// Vacío/'1' (o el flag no existe todavía) = selected, igual que Home.
+		if ( '0' === $es_show_on_home ) {
+			$archive[] = $es_case_data;
+		} else {
+			$selected[] = $es_case_data;
+		}
+	}
+
+	return array(
+		'selected' => $selected,
+		'archive'  => $archive,
+	);
+}
+
+/**
+ * Callback del filtro 'es_portfolio_case_studies_for_work' que expone el
+ * tema: si hay algún Case Study publicado devuelve los dos grupos reales,
+ * si no deja pasar el default recibido (el fallback del tema) sin tocarlo.
+ *
+ * @param array $default_data Lo que el tema pasó como default (su fallback).
+ * @return array
+ */
+function es_portfolio_filter_case_studies_for_work( $default_data ) {
+	$real_data = es_portfolio_get_case_studies_for_work_page();
+	if ( empty( $real_data['selected'] ) && empty( $real_data['archive'] ) ) {
+		return $default_data;
+	}
+	return $real_data;
+}
+add_filter( 'es_portfolio_case_studies_for_work', 'es_portfolio_filter_case_studies_for_work' );
 add_filter( 'es_portfolio_featured_case_for_home', 'es_portfolio_filter_featured_case_for_home' );

@@ -24,25 +24,6 @@ $es_cases = apply_filters( 'es_home_selected_work', es_home_selected_work_source
 $es_view_all_url = apply_filters( 'es_home_view_all_url', '#' );
 
 $es_wide = array_shift( $es_cases );
-
-/**
- * Imprime el marco placeholder o la imagen de un caso.
- *
- * @param array $case Datos del caso.
- */
-if ( ! function_exists( 'es_work_media' ) ) {
-	function es_work_media( $case ) {
-		if ( ! empty( $case['image'] ) ) {
-			printf( '<img src="%s" alt="" loading="lazy" />', esc_url( $case['image'] ) );
-		} else {
-			$es_tag = ! empty( $case['placeholder_label'] ) ? $case['placeholder_label'] : sanitize_title( $case['title'] );
-			printf(
-				'<span class="es-placeholder__tag">{asset: %s}</span>',
-				esc_html( $es_tag )
-			);
-		}
-	}
-}
 ?>
 
 <section class="es-section es-work" id="work">

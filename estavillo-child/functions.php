@@ -20,6 +20,7 @@ require ES_CHILD_DIR . '/inc/enqueue.php';
 require ES_CHILD_DIR . '/inc/theme-options.php';
 require ES_CHILD_DIR . '/inc/selected-work-fallback.php';
 require ES_CHILD_DIR . '/inc/featured-case-fallback.php';
+require ES_CHILD_DIR . '/inc/work-page-fallback.php';
 
 /**
  * Textdomain del child theme.
@@ -148,6 +149,64 @@ function es_nav_links() {
 			),
 		)
 	);
+}
+
+/**
+ * Librería curada de íconos para los pasos de "How I Work" (línea fina,
+ * 16x16, currentColor — mismo lenguaje visual que el ícono del toggle
+ * Light/Dark en el header). Whitelist deliberada: el plugin solo guarda la
+ * CLAVE elegida en un <select> (nunca HTML libre), así que no hay superficie
+ * de XSS acá — ver es_portfolio_home_content_page() en el plugin, sección
+ * "How I Work".
+ *
+ * @return array<string,string> clave => markup SVG completo.
+ */
+function es_process_icon_library() {
+	$stroke = 'fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"';
+	return array(
+		'compass'  => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><circle cx="8" cy="8" r="6.2"/><path d="M10.2 5.8 8.9 8.9 5.8 10.2 7.1 7.1z"/></svg>',
+		'flow'     => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><circle cx="3" cy="8" r="1.4"/><circle cx="13" cy="8" r="1.4"/><path d="M4.4 8h7.2M9 5.2 11.8 8 9 10.8"/></svg>',
+		'target'   => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="3"/><circle cx="8" cy="8" r="0.6" fill="currentColor"/></svg>',
+		'layers'   => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><path d="M8 2 14 5.2 8 8.4 2 5.2Z"/><path d="M2 9.4 8 12.6 14 9.4"/></svg>',
+		'check'    => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><circle cx="8" cy="8" r="6.2"/><path d="M5.2 8.2 7.2 10.2 10.8 6"/></svg>',
+		'document' => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><rect x="3.2" y="2" width="9.6" height="12" rx="1"/><path d="M5.6 5.8h4.8M5.6 8.4h4.8M5.6 11h3"/></svg>',
+		'bulb'     => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><path d="M8 2.2a4 4 0 0 1 2.2 7.3c-.4.3-.7.9-.7 1.4v.3H6.5v-.3c0-.5-.3-1.1-.7-1.4A4 4 0 0 1 8 2.2Z"/><path d="M6.6 13.4h2.8M7 14.8h2"/></svg>',
+		'rocket'   => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><path d="M8 2c1.8 1.4 2.8 3.6 2.8 6.2 0 1-.2 2-.6 2.9H5.8c-.4-.9-.6-1.9-.6-2.9C5.2 5.6 6.2 3.4 8 2Z"/><circle cx="8" cy="7" r="1"/><path d="M5.8 11.1 4.4 13M10.2 11.1l1.4 1.9M6.6 13.6v1.2M9.4 13.6v1.2"/></svg>',
+	);
+}
+
+/**
+ * Choices para el <select> de ícono por paso en Home Content (wp-admin).
+ * Llamado desde el plugin con function_exists() como guarda (ver
+ * home-content-options.php) — el plugin nunca asume que el tema activo
+ * define esto.
+ *
+ * @return array<string,string> clave => label legible.
+ */
+function es_process_icon_choices() {
+	$labels = array(
+		'compass'  => __( 'Compass (understand)', 'estavillo-child' ),
+		'flow'     => __( 'Flow (map)', 'estavillo-child' ),
+		'target'   => __( 'Target (identify)', 'estavillo-child' ),
+		'layers'   => __( 'Layers (design)', 'estavillo-child' ),
+		'check'    => __( 'Check (validate)', 'estavillo-child' ),
+		'document' => __( 'Document (record)', 'estavillo-child' ),
+		'bulb'     => __( 'Bulb (idea)', 'estavillo-child' ),
+		'rocket'   => __( 'Rocket (scale)', 'estavillo-child' ),
+	);
+	return $labels;
+}
+
+/**
+ * Markup SVG de un ícono por clave, o cadena vacía si la clave no existe en
+ * la librería (nunca imprime HTML fuera de esta whitelist).
+ *
+ * @param string $key Clave dentro de es_process_icon_library().
+ * @return string
+ */
+function es_process_icon_svg( $key ) {
+	$library = es_process_icon_library();
+	return isset( $library[ $key ] ) ? $library[ $key ] : '';
 }
 
 /**

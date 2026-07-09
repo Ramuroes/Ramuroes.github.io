@@ -1,0 +1,171 @@
+/* =========================================================================
+   ESTAVILLO — Páginas fijas (Work / About / How I Work / Contact)
+   -------------------------------------------------------------------------
+   Solo se carga en las 4 páginas fijas nuevas (ver inc/enqueue.php →
+   es_is_estavillo_static_page()). Reusa tokens + componentes existentes
+   (.es-card, .es-pill, .es-btn, .es-label, .es-h1, .es-lead, .es-link-arrow,
+   .es-footer-cta__*, .es-work__*, .es-about__*, .es-process__* — todos ya
+   cargados vía pages-home.css/components.css/base.css en estas páginas).
+   Acá solo lo genuinamente nuevo: page-head, intro grande de About,
+   timeline de experiencia, grilla de educación, lista de hobbies, y el
+   layout específico de Contact. Ningún color ni tipografía nuevos — solo
+   nuevos selectores sobre las mismas variables --es-*.
+   ========================================================================= */
+
+/* ---------- page head (cabecera compartida por las 4 páginas) ---------- */
+
+.es-page-head {
+	padding-bottom: clamp(40px, 5vw, 64px);
+}
+
+.es-page-head__eyebrow {
+	margin-bottom: 18px;
+}
+
+.es-page-head__title {
+	margin-bottom: 18px;
+}
+
+.es-page-head__lead {
+	margin: 0;
+}
+
+/* ---------- About: intro (texto grande, mismo tratamiento que el teaser
+   de Home pero sin la restricción de espacio de la grilla del teaser) ---------- */
+
+.es-about-page__text {
+	max-width: 56ch;
+	font-family: var(--es-serif);
+	font-size: clamp(20px, 2.3vw, 27px);
+	font-weight: 400;
+	line-height: 1.5;
+	letter-spacing: -0.005em;
+	color: var(--es-ink-2);
+	margin: 0 0 30px;
+}
+
+/* ---------- About: timeline de experiencia ---------- */
+
+.es-timeline {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	max-width: 720px;
+}
+
+.es-timeline__item {
+	position: relative;
+	padding: 0 0 clamp(28px, 3vw, 36px) 28px;
+	border-left: 1px solid var(--es-line-strong);
+	margin-left: 4px;
+}
+
+.es-timeline__item:last-child {
+	padding-bottom: 0;
+}
+
+.es-timeline__item::before {
+	content: '';
+	position: absolute;
+	left: -5px;
+	top: 4px;
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	background: var(--es-accent);
+}
+
+.es-timeline__year {
+	display: block;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	color: var(--es-ink-4);
+	margin-bottom: 6px;
+}
+
+.es-timeline__title {
+	margin: 0 0 4px;
+	font-family: var(--es-serif);
+	font-size: 19px;
+	font-weight: 500;
+	color: var(--es-ink);
+}
+
+.es-timeline__text {
+	margin: 0;
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+	max-width: 56ch;
+}
+
+/* ---------- About: educación / certificados ---------- */
+
+.es-cred {
+	padding: 20px 0;
+	border-top: 1px solid var(--es-line);
+}
+
+.es-cred__title {
+	font-family: var(--es-serif);
+	font-size: 17px;
+	font-weight: 500;
+	color: var(--es-ink);
+	margin-bottom: 6px;
+}
+
+.es-cred__meta {
+	font-family: var(--es-mono);
+	font-size: 11.5px;
+	letter-spacing: 0.04em;
+	color: var(--es-ink-4);
+}
+
+/* ---------- About: hobbies / intereses (reusa .es-pill, sin CSS propio) ---------- */
+
+.es-hobbies__list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+/* ---------- Contact: grilla de email / ubicación / redes ---------- */
+
+.es-contact-page__grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: clamp(28px, 4vw, 48px);
+	margin-top: clamp(40px, 5vw, 56px);
+	padding-top: clamp(32px, 4vw, 44px);
+	border-top: 1px solid var(--es-line);
+}
+
+.es-contact-page__block {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.es-contact-page__social {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	align-items: flex-start;
+}
+
+@media (max-width: 767px) {
+	.es-contact-page__grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ---------- Work: separación visual clara entre selected work y archive
+   (mismo tratamiento de "bloque de contraste" que Featured Case en Home —
+   .es-section--block, reusado acá vía selector propio para no acoplar
+   la página Work a una clase pensada para Home) ---------- */
+
+.es-work-archive {
+	background: var(--es-block);
+	border-bottom-color: var(--es-block-line);
+}

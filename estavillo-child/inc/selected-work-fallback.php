@@ -73,3 +73,24 @@ function es_home_selected_work_source() {
 	$cases = apply_filters( 'es_portfolio_case_studies_for_home', array() );
 	return $cases ? $cases : es_home_selected_work_fallback_cases();
 }
+
+/**
+ * Imprime el marco placeholder o la imagen de un caso (card de Selected
+ * Work). Compartido entre el teaser de Home (template-parts/selected-work.php)
+ * y la página Work (template-parts/work-cases.php) — antes vivía duplicado/
+ * guardado con function_exists() solo en el teaser de Home; ahora es una
+ * única función del tema.
+ *
+ * @param array $case Datos del caso (shape de es_home_selected_work_source()).
+ */
+function es_work_media( $case ) {
+	if ( ! empty( $case['image'] ) ) {
+		printf( '<img src="%s" alt="" loading="lazy" />', esc_url( $case['image'] ) );
+	} else {
+		$es_tag = ! empty( $case['placeholder_label'] ) ? $case['placeholder_label'] : sanitize_title( $case['title'] );
+		printf(
+			'<span class="es-placeholder__tag">{asset: %s}</span>',
+			esc_html( $es_tag )
+		);
+	}
+}

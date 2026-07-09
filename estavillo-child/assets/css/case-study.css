@@ -1,29 +1,89 @@
 /* =========================================================================
    ESTAVILLO — Single Case Study
    -------------------------------------------------------------------------
-   Sprint 4B + 4C + 4D. Solo se carga en single-es_case_study.php. Reusa el
-   chrome de site.css y los tokens de tokens.css — ningún color ni
-   tipografía nuevos acá, solo nuevos selectores aplicando las mismas
-   variables --es-*.
+   Sprint 4B + 4C + 4D + mega sprint (hero options + breadcrumbs). Solo se
+   carga en single-es_case_study.php. Reusa el chrome de site.css y los
+   tokens de tokens.css — ningún color ni tipografía nuevos acá, solo
+   nuevos selectores aplicando las mismas variables --es-*.
 
    Estructura del archivo:
-   1. Índice sticky (.es-case-index)          — fuera de the_content()
-   2. Hero del caso (.es-case__*)              — fuera de the_content()
+   0. Breadcrumbs (.es-breadcrumbs)            — fuera de the_content()
+   1. Índice sticky (.es-case-index)           — fuera de the_content()
+   2. Hero del caso (.es-case__*)               — fuera de the_content()
       Sprint 4D: grilla editorial de 2 columnas en desktop
       (.es-case__hero-content izquierda / .es-case__hero-media derecha),
       1 columna apilada en mobile (<1000px). Texto siempre alineado a la
-      izquierda, nunca centrado.
+      izquierda, nunca centrado. Mega sprint: 3 variantes opt-in vía clase
+      modificadora (.es-case__hero--split-left / --compact / --stacked),
+      seleccionables por caso ("Hero layout" en el meta box) — el default
+      'split-right' es exactamente el markup/CSS de Sprint 4D sin cambios.
    3. Prose por defecto (.es-case__body h2...) — dentro de the_content()
    4. Librería de clases .es-case-* (sección, stats, timeline, decisiones,
       quote, status, details, browser chrome, etc.) — para USAR dentro del
       editor nativo de WordPress. Ver README para instrucciones y ejemplos.
-      Sin cambios en esta librería en Sprint 4D (solo se tocó el hero).
+      Suma en esta sprint: aspect-ratio para placeholders de figura sin
+      imagen todavía (.es-case-figure .es-placeholder) — resto sin cambios.
 
    Inspirado visualmente en el case study de referencia REstimator (Dark) —
    reimplementado desde cero acá como CSS propio del design system
    ESTAVILLO, no copiado. El runtime de la referencia (support.js) nunca se
    usa ni se enqueuea en el sitio.
    ========================================================================= */
+
+/* ---------- breadcrumbs (Home / Work / título del caso) ---------- */
+
+.es-breadcrumbs {
+	padding: 14px 0;
+	border-bottom: 1px solid var(--es-line);
+}
+
+.es-breadcrumbs__list {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.04em;
+}
+
+.es-breadcrumbs__item {
+	display: flex;
+	align-items: center;
+}
+
+.es-breadcrumbs__item:not(:first-child)::before {
+	content: '/';
+	margin: 0 9px;
+	color: var(--es-ink-4);
+}
+
+.es-breadcrumbs__link {
+	color: var(--es-ink-3) !important;
+	text-decoration: none;
+	transition: color var(--es-dur-fast) ease;
+}
+
+.es-breadcrumbs__link:hover,
+.es-breadcrumbs__link:focus-visible,
+.es-breadcrumbs__link:active {
+	color: var(--es-accent) !important;
+}
+
+.es-breadcrumbs__link:visited {
+	color: var(--es-ink-3) !important;
+}
+
+.es-breadcrumbs__current {
+	color: var(--es-ink-4);
+	max-width: 40ch;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
 
 /* ---------- índice sticky en-página (opcional, manual) ---------- */
 
@@ -97,7 +157,11 @@
 .es-case__hero {
 	display: grid;
 	grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-	align-items: start;
+	/* center (no 'start'): con un extracto largo, el texto queda más alto
+	   que el marco de imagen (aspect-ratio fijo) — centrar reparte el
+	   espacio sobrante arriba/abajo de la imagen en vez de amontonarlo
+	   todo debajo, que es lo que se leía "raro". Aplica a las 4 variantes. */
+	align-items: center;
 	gap: clamp(40px, 6vw, 88px);
 	text-align: left;
 }
@@ -192,6 +256,59 @@
 @media (max-width: 999px) {
 	.es-case__hero-media .es-case__media {
 		aspect-ratio: 4 / 3;
+	}
+}
+
+/* ---------- variantes de hero (opt-in, "Hero layout" en el meta box) ----------
+   'split-right' (default) no tiene clase — es el bloque de arriba, sin
+   cambios. TODO lo de acá abajo vive adentro de min-width:1000px a
+   propósito (no solo el reorder): un modificador de una sola clase tiene
+   la MISMA especificidad que la regla mobile de .es-case__hero de arriba,
+   así que si viviera sin media query terminaría ganando por orden de
+   aparición en el archivo y rompiendo el apilado mobile. Adentro del
+   min-width la colisión no puede pasar — mobile SIEMPRE queda
+   texto-primero-imagen-después sin importar la variante, estructuralmente,
+   no por especificidad. */
+
+@media (min-width: 1000px) {
+	/* imagen a la izquierda, texto a la derecha */
+	.es-case__hero--split-left {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+	}
+
+	.es-case__hero--split-left .es-case__hero-content {
+		order: 2;
+	}
+
+	.es-case__hero--split-left .es-case__hero-media {
+		order: 1;
+	}
+
+	/* imagen horizontal compacta (más corta, no intenta igualar la altura
+	   de un extracto largo) — sirve tanto de variante propia como de
+	   opción para casos con mucho texto en el hero */
+	.es-case__hero--compact .es-case__hero-media .es-case__media {
+		aspect-ratio: 16 / 10;
+	}
+
+	/* apilado a ancho completo en desktop también: texto primero, imagen
+	   ancha debajo — mismo criterio visual que mobile pero elegido a
+	   propósito, no por falta de espacio */
+	.es-case__hero--stacked {
+		grid-template-columns: 1fr;
+	}
+
+	.es-case__hero--stacked .es-case__hero-content {
+		order: 1;
+		max-width: none;
+	}
+
+	.es-case__hero--stacked .es-case__hero-media {
+		order: 2;
+	}
+
+	.es-case__hero--stacked .es-case__hero-media .es-case__media {
+		aspect-ratio: 21 / 9;
 	}
 }
 
@@ -365,6 +482,13 @@
 	border-radius: var(--es-radius);
 }
 
+/* placeholder de imagen todavía no subida, usado dentro de una figura del
+   editor: sin este aspect-ratio el marco quedaría colapsado a la altura
+   del tag "{asset: ...}" en vez de leerse como un espacio reservado. */
+.es-case__body .es-case-figure .es-placeholder {
+	aspect-ratio: 16 / 9;
+}
+
 .es-case__body .es-case-caption {
 	display: flex;
 	gap: 12px;
@@ -418,6 +542,14 @@
 .es-case__body .es-case-browser img {
 	border: 0;
 	border-radius: 0;
+}
+
+/* placeholder dentro de un marco browser chrome, cuando la captura todavía
+   no está subida — mismo motivo que .es-case-figure .es-placeholder de
+   arriba: sin esto el marco colapsa a la altura del tag de texto. */
+.es-case__body .es-case-browser .es-placeholder {
+	aspect-ratio: 16 / 10;
+	border: 0;
 }
 
 /* ---------- grilla de stats ---------- */

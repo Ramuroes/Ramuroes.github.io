@@ -55,6 +55,12 @@ $es_steps = apply_filters(
 );
 
 $es_process_url = apply_filters( 'es_home_process_url', '#process' );
+
+// En Home este CTA lleva a la sección completa (ancla #process en la misma
+// página de una sola scroll). En la página dedicada How I Work ya ESTAMOS
+// ahí, así que templates/page-how-i-work.php pasa 'hide_cta' para no
+// mostrar un link que apunte a sí mismo.
+$es_hide_cta = ! empty( $args['hide_cta'] );
 ?>
 
 <section class="es-section es-process" id="process">
@@ -64,10 +70,12 @@ $es_process_url = apply_filters( 'es_home_process_url', '#process' );
 				<span class="es-section-head__num"><?php echo esc_html( $es_num ); ?></span>
 				<h2 class="es-label"><?php echo esc_html( es__( 'process_label' ) ); ?></h2>
 			</div>
-			<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_process_url ); ?>">
-				<?php echo esc_html( es__( 'process_cta' ) ); ?>
-				<span class="es-link-arrow__icon" aria-hidden="true">&rarr;</span>
-			</a>
+			<?php if ( ! $es_hide_cta ) : ?>
+				<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_process_url ); ?>">
+					<?php echo esc_html( es__( 'process_cta' ) ); ?>
+					<span class="es-link-arrow__icon" aria-hidden="true">&rarr;</span>
+				</a>
+			<?php endif; ?>
 		</div>
 
 		<ol class="es-process__grid">
@@ -76,13 +84,51 @@ $es_process_url = apply_filters( 'es_home_process_url', '#process' );
 					<div class="es-process__head">
 						<span class="es-process__num"><?php echo esc_html( sprintf( '%02d', $es_i + 1 ) ); ?></span>
 						<?php
-						// Slot reservado para ícono/motion/ilustración futura. Si no hay
-						// ícono, queda un marcador sutil que no altera el layout.
-						$es_has_icon = ! empty( $es_step['icon'] );
+						// Ícono: primero la librería curada (clave whitelisted, elegida
+						// desde Home Content en wp-admin), si no la clave 'icon' legacy
+						// (HTML libre, wp_kses_post) por compatibilidad hacia atrás. Sin
+						// ninguno de los dos, queda el marcador vacío de siempre — el
+						// layout no cambia en ningún caso.
+						$es_icon_key  = ! empty( $es_step['icon_key'] ) ? $es_step['icon_key'] : '';
+						$es_icon_svg  = $es_icon_key && function_exists( 'es_process_icon_svg' ) ? es_process_icon_svg( $es_icon_key ) : '';
+						$es_has_icon  = '' !== $es_icon_svg || ! empty( $es_step['icon'] );
 						?>
 						<span class="es-process__icon<?php echo $es_has_icon ? '' : ' es-process__icon--empty'; ?>" aria-hidden="true">
 							<?php
-							if ( $es_has_icon ) {
+							if ( '' !== $es_icon_svg ) {
+								echo wp_kses(
+									$es_icon_svg,
+									array(
+										'svg'    => array(
+											'width'   => true,
+											'height'  => true,
+											'viewbox' => true,
+											'fill'    => true,
+											'stroke'  => true,
+											'stroke-width' => true,
+											'stroke-linecap' => true,
+											'stroke-linejoin' => true,
+										),
+										'circle' => array(
+											'cx' => true,
+											'cy' => true,
+											'r'  => true,
+											'fill' => true,
+										),
+										'path'   => array(
+											'd'    => true,
+											'fill' => true,
+										),
+										'rect'   => array(
+											'x'      => true,
+											'y'      => true,
+											'width'  => true,
+											'height' => true,
+											'rx'     => true,
+										),
+									)
+								);
+							} elseif ( ! empty( $es_step['icon'] ) ) {
 								echo wp_kses_post( $es_step['icon'] );
 							}
 							?>

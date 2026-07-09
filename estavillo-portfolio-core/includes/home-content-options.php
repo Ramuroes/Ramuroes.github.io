@@ -72,16 +72,58 @@ function es_portfolio_home_content_save() {
 	if ( isset( $_POST['es_about_portrait'] ) ) {
 		$data['about_portrait'] = esc_url_raw( wp_unslash( $_POST['es_about_portrait'] ) );
 	}
+	if ( isset( $_POST['es_about_cv_url'] ) ) {
+		$data['about_cv_url'] = esc_url_raw( wp_unslash( $_POST['es_about_cv_url'] ) );
+	}
+	if ( isset( $_POST['es_about_hobbies'] ) ) {
+		$data['about_hobbies'] = sanitize_text_field( wp_unslash( $_POST['es_about_hobbies'] ) );
+	}
+
+	// Timeline / education: mismo patrón de merge por-fila que How I Work y
+	// Header abajo — una fila con título vacío no pisa nada.
+	if ( isset( $_POST['es_about_timeline_title'] ) && is_array( $_POST['es_about_timeline_title'] ) ) {
+		$es_tl_titles = wp_unslash( $_POST['es_about_timeline_title'] );
+		$es_tl_years  = isset( $_POST['es_about_timeline_year'] ) && is_array( $_POST['es_about_timeline_year'] ) ? wp_unslash( $_POST['es_about_timeline_year'] ) : array();
+		$es_tl_texts  = isset( $_POST['es_about_timeline_text'] ) && is_array( $_POST['es_about_timeline_text'] ) ? wp_unslash( $_POST['es_about_timeline_text'] ) : array();
+		$es_timeline  = array();
+		foreach ( $es_tl_titles as $i => $es_tl_title ) {
+			$es_timeline[ $i ] = array(
+				'year'  => sanitize_text_field( $es_tl_years[ $i ] ?? '' ),
+				'title' => sanitize_text_field( $es_tl_title ),
+				'text'  => sanitize_text_field( $es_tl_texts[ $i ] ?? '' ),
+			);
+		}
+		$data['about_timeline'] = $es_timeline;
+	}
+
+	if ( isset( $_POST['es_about_edu_title'] ) && is_array( $_POST['es_about_edu_title'] ) ) {
+		$es_edu_titles = wp_unslash( $_POST['es_about_edu_title'] );
+		$es_edu_orgs   = isset( $_POST['es_about_edu_org'] ) && is_array( $_POST['es_about_edu_org'] ) ? wp_unslash( $_POST['es_about_edu_org'] ) : array();
+		$es_edu_years  = isset( $_POST['es_about_edu_year'] ) && is_array( $_POST['es_about_edu_year'] ) ? wp_unslash( $_POST['es_about_edu_year'] ) : array();
+		$es_education  = array();
+		foreach ( $es_edu_titles as $i => $es_edu_title ) {
+			$es_education[ $i ] = array(
+				'title' => sanitize_text_field( $es_edu_title ),
+				'org'   => sanitize_text_field( $es_edu_orgs[ $i ] ?? '' ),
+				'year'  => sanitize_text_field( $es_edu_years[ $i ] ?? '' ),
+			);
+		}
+		$data['about_education'] = $es_education;
+	}
 
 	// ---- How I Work ----
 	if ( isset( $_POST['es_process_step_title'] ) && is_array( $_POST['es_process_step_title'] ) ) {
-		$titles = wp_unslash( $_POST['es_process_step_title'] );
-		$texts  = isset( $_POST['es_process_step_text'] ) && is_array( $_POST['es_process_step_text'] ) ? wp_unslash( $_POST['es_process_step_text'] ) : array();
-		$steps  = array();
+		$titles      = wp_unslash( $_POST['es_process_step_title'] );
+		$texts       = isset( $_POST['es_process_step_text'] ) && is_array( $_POST['es_process_step_text'] ) ? wp_unslash( $_POST['es_process_step_text'] ) : array();
+		$icons_raw   = isset( $_POST['es_process_step_icon'] ) && is_array( $_POST['es_process_step_icon'] ) ? wp_unslash( $_POST['es_process_step_icon'] ) : array();
+		$valid_icons = function_exists( 'es_process_icon_choices' ) ? array_keys( es_process_icon_choices() ) : array();
+		$steps       = array();
 		foreach ( $titles as $i => $title ) {
+			$icon_choice = isset( $icons_raw[ $i ] ) ? sanitize_key( $icons_raw[ $i ] ) : '';
 			$steps[ $i ] = array(
-				'title' => sanitize_text_field( $title ),
-				'text'  => sanitize_text_field( $texts[ $i ] ?? '' ),
+				'title'    => sanitize_text_field( $title ),
+				'text'     => sanitize_text_field( $texts[ $i ] ?? '' ),
+				'icon_key' => in_array( $icon_choice, $valid_icons, true ) ? $icon_choice : '',
 			);
 		}
 		$data['process_steps'] = $steps;
@@ -177,22 +219,87 @@ function es_portfolio_home_content_page() {
 					<th scope="row"><label for="es_about_portrait"><?php esc_html_e( 'Portrait image URL', 'estavillo-portfolio-core' ); ?></label></th>
 					<td><input type="url" id="es_about_portrait" name="es_about_portrait" class="regular-text" value="<?php echo esc_attr( $data['about_portrait'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Leave blank to keep the placeholder frame', 'estavillo-portfolio-core' ); ?>"></td>
 				</tr>
+				<tr>
+					<th scope="row"><label for="es_about_cv_url"><?php esc_html_e( 'CV / résumé URL', 'estavillo-portfolio-core' ); ?></label></th>
+					<td>
+						<input type="url" id="es_about_cv_url" name="es_about_cv_url" class="regular-text" value="<?php echo esc_attr( $data['about_cv_url'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Link to a PDF (e.g. from Media Library) — leave blank to hide the download button on the About page', 'estavillo-portfolio-core' ); ?>">
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_about_hobbies"><?php esc_html_e( 'Hobbies / interests', 'estavillo-portfolio-core' ); ?></label></th>
+					<td>
+						<input type="text" id="es_about_hobbies" name="es_about_hobbies" class="large-text" value="<?php echo esc_attr( $data['about_hobbies'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Comma-separated, e.g. Analog photography, Woodworking, Chess', 'estavillo-portfolio-core' ); ?>">
+					</td>
+				</tr>
+			</table>
+
+			<h3><?php esc_html_e( 'Career timeline (About page)', 'estavillo-portfolio-core' ); ?></h3>
+			<p class="description"><?php esc_html_e( 'Leave a row\'s title blank to keep it out of the timeline. Shown on the About page only, most recent first (order them as you want them displayed).', 'estavillo-portfolio-core' ); ?></p>
+			<table class="form-table" role="presentation">
+				<?php
+				$es_timeline = $data['about_timeline'] ?? array();
+				for ( $i = 0; $i < 4; $i++ ) :
+					$es_tl_year  = $es_timeline[ $i ]['year'] ?? '';
+					$es_tl_title = $es_timeline[ $i ]['title'] ?? '';
+					$es_tl_text  = $es_timeline[ $i ]['text'] ?? '';
+					?>
+					<tr>
+						<th scope="row"><?php echo esc_html( sprintf( __( 'Entry %d', 'estavillo-portfolio-core' ), $i + 1 ) ); ?></th>
+						<td>
+							<input type="text" name="es_about_timeline_year[<?php echo esc_attr( $i ); ?>]" class="small-text" value="<?php echo esc_attr( $es_tl_year ); ?>" placeholder="<?php esc_attr_e( 'Year(s)', 'estavillo-portfolio-core' ); ?>">
+							<input type="text" name="es_about_timeline_title[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_tl_title ); ?>" placeholder="<?php esc_attr_e( 'Role / title', 'estavillo-portfolio-core' ); ?>"><br>
+							<input type="text" name="es_about_timeline_text[<?php echo esc_attr( $i ); ?>]" class="large-text" value="<?php echo esc_attr( $es_tl_text ); ?>" placeholder="<?php esc_attr_e( 'Short description', 'estavillo-portfolio-core' ); ?>">
+						</td>
+					</tr>
+				<?php endfor; ?>
+			</table>
+
+			<h3><?php esc_html_e( 'Education & certificates (About page)', 'estavillo-portfolio-core' ); ?></h3>
+			<p class="description"><?php esc_html_e( 'Leave a row\'s title blank to keep it out of the list.', 'estavillo-portfolio-core' ); ?></p>
+			<table class="form-table" role="presentation">
+				<?php
+				$es_education = $data['about_education'] ?? array();
+				for ( $i = 0; $i < 4; $i++ ) :
+					$es_edu_title = $es_education[ $i ]['title'] ?? '';
+					$es_edu_org   = $es_education[ $i ]['org'] ?? '';
+					$es_edu_year  = $es_education[ $i ]['year'] ?? '';
+					?>
+					<tr>
+						<th scope="row"><?php echo esc_html( sprintf( __( 'Entry %d', 'estavillo-portfolio-core' ), $i + 1 ) ); ?></th>
+						<td>
+							<input type="text" name="es_about_edu_title[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_edu_title ); ?>" placeholder="<?php esc_attr_e( 'Degree / certificate', 'estavillo-portfolio-core' ); ?>">
+							<input type="text" name="es_about_edu_org[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_edu_org ); ?>" placeholder="<?php esc_attr_e( 'Institution', 'estavillo-portfolio-core' ); ?>">
+							<input type="text" name="es_about_edu_year[<?php echo esc_attr( $i ); ?>]" class="small-text" value="<?php echo esc_attr( $es_edu_year ); ?>" placeholder="<?php esc_attr_e( 'Year', 'estavillo-portfolio-core' ); ?>">
+						</td>
+					</tr>
+				<?php endfor; ?>
 			</table>
 
 			<h2><?php esc_html_e( 'How I Work', 'estavillo-portfolio-core' ); ?></h2>
 			<p class="description"><?php esc_html_e( 'Leave a step blank (both title and text) to keep its current placeholder — you can edit just one step without filling in all six.', 'estavillo-portfolio-core' ); ?></p>
 			<table class="form-table" role="presentation">
 				<?php
-				$es_steps = $data['process_steps'] ?? array();
+				$es_steps        = $data['process_steps'] ?? array();
+				$es_icon_choices = function_exists( 'es_process_icon_choices' ) ? es_process_icon_choices() : array();
 				for ( $i = 0; $i < 6; $i++ ) :
 					$es_step_title = $es_steps[ $i ]['title'] ?? '';
 					$es_step_text  = $es_steps[ $i ]['text'] ?? '';
+					$es_step_icon  = $es_steps[ $i ]['icon_key'] ?? '';
 					?>
 					<tr>
 						<th scope="row"><?php echo esc_html( sprintf( __( 'Step %d', 'estavillo-portfolio-core' ), $i + 1 ) ); ?></th>
 						<td>
 							<input type="text" name="es_process_step_title[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_step_title ); ?>" placeholder="<?php esc_attr_e( 'Step title', 'estavillo-portfolio-core' ); ?>"><br>
 							<input type="text" name="es_process_step_text[<?php echo esc_attr( $i ); ?>]" class="large-text" value="<?php echo esc_attr( $es_step_text ); ?>" placeholder="<?php esc_attr_e( 'Step description', 'estavillo-portfolio-core' ); ?>">
+							<?php if ( ! empty( $es_icon_choices ) ) : ?>
+								<br>
+								<select name="es_process_step_icon[<?php echo esc_attr( $i ); ?>]">
+									<option value=""><?php esc_html_e( '— No icon —', 'estavillo-portfolio-core' ); ?></option>
+									<?php foreach ( $es_icon_choices as $es_icon_key => $es_icon_label ) : ?>
+										<option value="<?php echo esc_attr( $es_icon_key ); ?>" <?php selected( $es_step_icon, $es_icon_key ); ?>><?php echo esc_html( $es_icon_label ); ?></option>
+									<?php endforeach; ?>
+								</select>
+							<?php endif; ?>
 						</td>
 					</tr>
 				<?php endfor; ?>
@@ -291,11 +398,60 @@ function es_portfolio_filter_about_portrait( $default ) {
 add_filter( 'es_home_about_portrait', 'es_portfolio_filter_about_portrait' );
 
 /**
+ * Puentes para las secciones nuevas de la página About (CV, hobbies,
+ * timeline, educación). Mismo principio "vacío no pisa nada" que el resto
+ * de este archivo — si el campo nunca se llenó, la página About usa sus
+ * propios defaults/placeholders (ver template-parts/about-content.php).
+ */
+function es_portfolio_filter_about_cv_url( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['about_cv_url'] ) ? $data['about_cv_url'] : $default;
+}
+add_filter( 'es_about_cv_url', 'es_portfolio_filter_about_cv_url' );
+
+function es_portfolio_filter_about_hobbies( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['about_hobbies'] ) ? $data['about_hobbies'] : $default;
+}
+add_filter( 'es_about_hobbies', 'es_portfolio_filter_about_hobbies' );
+
+function es_portfolio_filter_about_timeline( $default ) {
+	$data = es_portfolio_get_home_content();
+	if ( empty( $data['about_timeline'] ) || ! is_array( $data['about_timeline'] ) ) {
+		return $default;
+	}
+	$entries = array_filter(
+		$data['about_timeline'],
+		function ( $entry ) {
+			return ! empty( $entry['title'] );
+		}
+	);
+	return $entries ? array_values( $entries ) : $default;
+}
+add_filter( 'es_about_timeline', 'es_portfolio_filter_about_timeline' );
+
+function es_portfolio_filter_about_education( $default ) {
+	$data = es_portfolio_get_home_content();
+	if ( empty( $data['about_education'] ) || ! is_array( $data['about_education'] ) ) {
+		return $default;
+	}
+	$entries = array_filter(
+		$data['about_education'],
+		function ( $entry ) {
+			return ! empty( $entry['title'] );
+		}
+	);
+	return $entries ? array_values( $entries ) : $default;
+}
+add_filter( 'es_about_education', 'es_portfolio_filter_about_education' );
+
+/**
  * Puente para How I Work. A diferencia de About (campos sueltos), acá se
  * mergea PASO A PASO contra el default: un paso sin título editado en
  * Home Content no pisa nada y sigue mostrando el placeholder de ESE paso
  * puntual — así el editor puede tocar un solo paso sin tener que llenar
- * los 6. 'icon' nunca se toca (slot reservado a futuro, fuera de alcance).
+ * los 6. 'icon_key' selecciona de la librería curada del tema
+ * (es_process_icon_choices() / es_process_icon_svg()) — nunca HTML libre.
  */
 function es_portfolio_filter_process_steps( $default ) {
 	$data = es_portfolio_get_home_content();
@@ -313,6 +469,9 @@ function es_portfolio_filter_process_steps( $default ) {
 		}
 		$merged[ $i ]['title'] = $custom_step['title'];
 		$merged[ $i ]['text']  = $custom_step['text'] ?? '';
+		if ( ! empty( $custom_step['icon_key'] ) ) {
+			$merged[ $i ]['icon_key'] = $custom_step['icon_key'];
+		}
 	}
 	return $merged;
 }

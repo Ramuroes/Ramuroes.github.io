@@ -4,6 +4,25 @@ Foundation técnica del nuevo portfolio ESTAVILLO. **No toca el sitio en vivo**:
 child theme que se instala aparte y un page template que se asigna a una página en
 borrador para previsualizar.
 
+## V1 / V2
+
+Este repo es explícitamente **V1: un sistema rápido y publicable**, no la
+versión final de la arquitectura. Todo el contenido nuevo (páginas fijas,
+timeline/educación de About, hero variants) se edita hoy vía page
+templates + PHP/CSS del tema y campos/filtros del plugin (meta boxes,
+options page) — el mecanismo más rápido y seguro disponible con el stack
+actual (sin ACF, sin builder de terceros).
+
+**V2** (futuro, no planeado en detalle todavía) es la migración de estas
+mismas secciones a **bloques/patrones de Gutenberg nativos**, para que
+editar dentro de wp-admin se sienta como editar cualquier página de
+WordPress en vez de llenar campos en una options page. Nada de lo
+construido en V1 es descartable: los datos (post meta, el option
+`es_portfolio_home_content`) y los filtros (`es_home_*`, `es_about_*`,
+`es_case_*`) son el contrato estable que un V2 basado en bloques puede
+seguir leyendo — ver `docs/EDITABILITY-PLAN.md` para el detalle de esta
+estrategia de migración.
+
 ## Qué incluye
 
 ```
@@ -17,10 +36,11 @@ estavillo-child/
 │   │   ├── base.css               → tipografía y utilidades bajo .es-page
 │   │   ├── layout.css             → contenedores, secciones, grillas
 │   │   ├── components.css         → botones, pills, cards (+ wide), status pill, reveal
-│   │   ├── site.css               → chrome: header sticky + menú mobile + footer (Home Y single Case Study)
-│   │   ├── hero.css               → hero: visual detrás/al costado del copy (desktop y mobile)
-│   │   ├── pages-home.css         → secciones de la home (featured, process, work, about, connect)
-│   │   └── case-study.css         → single de Case Study: índice sticky + meta row + prose + librería .es-case-*
+│   │   ├── site.css               → chrome: header sticky + menú mobile + footer (Home, Case Study Y páginas fijas)
+│   │   ├── hero.css               → hero: visual detrás/al costado del copy (desktop y mobile, solo Home)
+│   │   ├── pages-home.css         → secciones de la home (featured, process, work, about, connect) — Home Y páginas fijas
+│   │   ├── pages.css              → page-head, timeline/educación/hobbies de About, grilla de Contact (solo páginas fijas)
+│   │   └── case-study.css         → single de Case Study: breadcrumbs + índice sticky + hero (4 variantes) + prose + librería .es-case-*
 │   └── js/
 │       ├── hero-system-map.js     → motores de hero (registry, SVG + rAF, 0 librerías)
 │       ├── motion.js              → reveal on-scroll (IntersectionObserver)
@@ -29,19 +49,29 @@ estavillo-child/
 │   ├── site-header.php            → nav sticky ESTAVILLO + menú mobile + switcher de idioma (Polylang)
 │   ├── hero-home.php              → hero (copy placeholder, editable por filtros)
 │   ├── featured-case.php          → 01 Main case (filtro es_home_featured)
-│   ├── how-i-work.php             → 02 How I work · 6 pasos (filtro es_home_process_steps)
-│   ├── selected-work.php          → 03 Selected work: card ancha + 2-up (es_home_selected_work)
-│   ├── about-teaser.php           → 04 About (filtros es_home_about_*)
-│   ├── footer-cta.php             → 05 Connect · "Let's talk" (es_home_cta_*, es_contact_email)
-│   └── site-footer.php            → footer ESTAVILLO
+│   ├── how-i-work.php             → 02 How I work · 6 pasos (filtro es_home_process_steps), reusado en la página fija
+│   ├── selected-work.php          → 03 Selected work: card ancha + 2-up (es_home_selected_work) — teaser de Home
+│   ├── about-teaser.php           → 04 About (filtros es_home_about_*) — teaser de Home
+│   ├── footer-cta.php             → 05 Connect · "Let's talk" (es_home_cta_*, es_contact_email) — teaser de Home
+│   ├── site-footer.php            → footer ESTAVILLO
+│   ├── breadcrumbs.php            → Home / Work / título — genérico, hoy solo en Case Study
+│   ├── page-head.php              → cabecera compartida (eyebrow + h1 + lead) de las 4 páginas fijas
+│   ├── work-cases.php             → listado completo de Work: selected + archive
+│   ├── about-content.php          → intro + timeline + educación + hobbies + CV de la página About
+│   └── contact-content.php        → email + ubicación + redes de la página Contact
 ├── templates/
-│   └── page-home-estavillo.php    → Template Name: "Estavillo — Home (Draft)" (standalone)
+│   ├── page-home-estavillo.php    → Template Name: "Estavillo — Home (Draft)" (standalone)
+│   ├── page-work.php              → Template Name: "Estavillo — Work" (standalone)
+│   ├── page-about.php             → Template Name: "Estavillo — About" (standalone)
+│   ├── page-how-i-work.php        → Template Name: "Estavillo — How I Work" (standalone)
+│   └── page-contact.php           → Template Name: "Estavillo — Contact" (standalone)
 ├── single-es_case_study.php       → single de Case Study (standalone, reusa el chrome ESTAVILLO)
 └── inc/
-    ├── enqueue.php                  → carga condicional de assets (Home + single Case Study) + config localizada
+    ├── enqueue.php                  → carga condicional de assets (Home + Case Study + páginas fijas) + config localizada
     ├── theme-options.php            → Customizer: acento + variantes de hero + font preset
-    ├── selected-work-fallback.php   → Selected Work: placeholders + puente por filtro hacia el plugin
-    └── featured-case-fallback.php   → Featured Case: placeholder + puente por filtro hacia el plugin
+    ├── selected-work-fallback.php   → Selected Work: placeholders + puente por filtro hacia el plugin + es_work_media()
+    ├── featured-case-fallback.php   → Featured Case: placeholder + puente por filtro hacia el plugin
+    └── work-page-fallback.php       → Work: placeholders (selected/archive) + puente por filtro hacia el plugin
 ```
 
 > El **Case Study CPT** (registro, meta box, queries) vive en el plugin
@@ -404,6 +434,104 @@ anclas/labels distintas si hace falta.
 `single-es_case_study.php` (ver `inc/enqueue.php`) — nunca afecta Home ni
 ninguna otra página del sitio.
 
+### Hero layout options (mega sprint)
+
+El hero del Case Study admite 4 layouts, elegibles por caso desde el campo
+**"Hero layout"** del meta box (Case details), sin tocar código:
+
+| Opción (label en el select)                  | Clase modificadora            | Cuándo usarla |
+|-----------------------------------------------|--------------------------------|---------------|
+| Split — image right (default)                  | *(ninguna — es el default)*    | El caso normal: texto a la izquierda, imagen 4:5 a la derecha. |
+| Split — image left                             | `es-case__hero--split-left`    | Variedad visual entre casos consecutivos, o cuando la imagen "lee" mejor primero. |
+| Compact — horizontal image, shorter frame       | `es-case__hero--compact`       | Cuando el extracto es largo — el marco de imagen es más corto (16:10) en vez de un retrato alto, así no queda un hueco raro al lado de mucho texto. |
+| Stacked — text first, image below (full width) | `es-case__hero--stacked`       | Cuando la imagen destacada es un screenshot ancho (no un retrato) — pasa a ancho completo debajo del texto, incluso en desktop. |
+
+En **mobile (<1000px) las 4 opciones se ven exactamente igual**: apiladas,
+texto primero, imagen después — la variante solo cambia el desktop. Esto es
+intencional (ver "Fix" del ticket original) y está reforzado en CSS para
+que ninguna variante pueda romper el apilado mobile por accidente.
+
+También se corrigió la alineación vertical del hero para los 4 layouts:
+antes el bloque de texto y la imagen se alineaban por arriba
+(`align-items: start`), así que un extracto largo dejaba un hueco vacío
+abajo de la imagen. Ahora se centran (`align-items: center`), repartiendo
+ese espacio arriba y abajo — se ve mejor con cualquier largo de extracto.
+
+### Breadcrumbs (mega sprint)
+
+Cada Case Study muestra una tira de breadcrumbs sutil arriba del índice
+sticky: **Home / Work / título del caso**. Es automática, no requiere
+ningún campo nuevo:
+
+- El link **"Home"** usa `home_url()`.
+- El link **"Work"** reusa el primer nav link cuya etiqueta coincide con
+  "Work" (mismo array que ya alimenta el header, el menú mobile y el
+  footer — `es_nav_links()`). Si repuntás ese nav link a una página Work
+  real desde **Case Studies → Home Content → Header**, el breadcrumb la
+  sigue automáticamente.
+- El último elemento (el título del caso) no es un link.
+- Con Polylang activo, `home_url()` y los permalinks ya resuelven al
+  idioma actual de forma nativa — no hace falta código extra acá.
+
+Template part: `template-parts/breadcrumbs.php` (genérico — recibe un
+`trail` de `{label, url}`, así que puede reusarse en otras páginas más
+adelante sin cambiar el archivo).
+
+### Páginas fijas — Work / About / How I Work / Contact (mega sprint)
+
+Cuatro páginas nuevas, seleccionables como **Template** al crear/editar una
+Página en wp-admin (**Páginas → Agregar nueva → panel "Página" → Plantilla
+de página**):
+
+| Template (nombre visible en wp-admin) | Archivo                              | Qué muestra |
+|----------------------------------------|---------------------------------------|-------------|
+| Estavillo — Work                      | `templates/page-work.php`            | Todos los Case Studies publicados, separados en "Selected work" (card ancha + grilla — los mismos marcados "Show this case in Home") y "Archive / older work" (los marcados explícitamente "no mostrar en Home"), en un bloque con fondo distinto para que la separación sea clara. Sin Case Studies reales, usa el mismo fallback de siempre. |
+| Estavillo — About                     | `templates/page-about.php`           | Intro grande (retrato + texto — mismos campos que el teaser de Home) + botón de descarga de CV + experiencia (timeline) + educación/certificados + hobbies. Las 4 secciones nuevas son opcionales: si no cargaste nada todavía, esa sección no se imprime — la página nunca se ve rota. |
+| Estavillo — How I Work                | `templates/page-how-i-work.php`      | Los mismos 6 pasos de Home (reusa el template part), con soporte de ícono por paso. |
+| Estavillo — Contact                   | `templates/page-contact.php`         | Los mismos datos "Connect" de Home (título, lead, email) + los de Footer (redes, ubicación), en una presentación más grande y dedicada. |
+
+**Todas son standalone** (imprimen su propio `wp_head()`/`wp_footer()` y
+reusan el chrome ESTAVILLO — header sticky + footer — igual que Home y el
+single de Case Study). Ninguna toca Home ni cambia su template.
+
+**De dónde sale el contenido — todo editable desde wp-admin, nada nuevo
+que aprender:**
+
+- **Work**: mismo dato que ya alimentaba Home → Selected Work (el checkbox
+  "Show this case in Home → Selected Work" de cada Case Study). Sin campo
+  nuevo: casos marcados sí = "Selected work" en esta página; casos
+  marcados explícitamente que no = "Archive".
+- **About**: los campos "About text" / "Portrait image URL" de siempre
+  (Sprint 3) más 4 campos nuevos en la misma página **Case Studies → Home
+  Content → About**: "CV / résumé URL" y las tablas "Career timeline" (4
+  filas: año, rol, texto) y "Education & certificates" (4 filas: título,
+  institución, año) y "Hobbies / interests" (una lista separada por
+  comas). Dejar una fila con el título vacío la excluye — no hace falta
+  llenar las 4.
+- **How I Work**: los mismos 6 pasos de siempre (**Home Content → How I
+  Work**), ahora con un selector de ícono opcional por paso (librería
+  curada de 8 íconos — ver siguiente sección).
+- **Contact**: los mismos campos "Connect" y "Footer" de siempre (**Home
+  Content → Connect** y **→ Footer**) — ningún campo nuevo.
+
+**Íconos de "How I Work" (mega sprint):** cada paso tiene ahora un select
+opcional ("— No icon —" por defecto) con 8 íconos de línea fina
+(brújula, flujo, blanco, capas, check, documento, foco/bombilla, cohete).
+Es una librería **curada y cerrada**, no un uploader — el admin solo
+guarda la CLAVE elegida (whitelist), nunca HTML/SVG libre, así que no hay
+superficie de XSS nueva. El SVG real vive en
+`functions.php` → `es_process_icon_svg()`. Sin ícono elegido, el paso se
+ve exactamente igual que antes (el marcador vacío reservado desde Home
+v1).
+
+**CSS de estas páginas:** `assets/css/pages.css`, encolado solo en estas 4
+plantillas (ver `inc/enqueue.php` → `es_is_estavillo_static_page()`).
+Reusa la mayoría de sus estilos de `pages-home.css` (cards, process grid,
+about grid, footer CTA — las mismas reglas que ya usaba Home), así que
+`pages.css` solo tiene lo genuinamente nuevo: la cabecera compartida
+(`.es-page-head`), el timeline/educación/hobbies de About, y la grilla de
+Contact.
+
 ### Polylang (Sprint 4A)
 
 El sitio soporta EN/ES real vía [Polylang](https://wordpress.org/plugins/polylang/)
@@ -439,6 +567,38 @@ El sitio soporta EN/ES real vía [Polylang](https://wordpress.org/plugins/polyla
 3. Creá una segunda página, asignale el mismo template, y usá la caja de
    idioma de Polylang para vincularla como traducción de la primera.
 4. Repetí para cada Case Study que quieras en los dos idiomas.
+
+**Cómo armar las 5 páginas fijas (Home / Work / About / How I Work /
+Contact) en los dos idiomas — mismos pasos para las 5, una a la vez:**
+
+1. **Páginas → Agregar nueva.** Escribí el título en el idioma que
+   corresponda (p. ej. "Work" o "Trabajo").
+2. En el panel lateral **Página → Plantilla**, elegí el template fijo
+   (**Estavillo — Home (Draft)** / **Work** / **About** / **How I Work**
+   / **Contact**, según cuál estés armando).
+3. Arriba a la derecha (o en el panel lateral, según tu versión de
+   Polylang), elegí el **idioma** de esta página en el selector de
+   Polylang, y publicá.
+4. Repetí los pasos 1–3 para el segundo idioma — mismo template, título e
+   idioma distintos.
+5. En cualquiera de las dos páginas, usá el ícono **"+" ("Add
+   translation")** de la caja de idioma de Polylang para vincularlas
+   entre sí como traducciones una de la otra (si todavía no quedaron
+   vinculadas automáticamente al crearlas).
+6. El contenido de cada página (About: texto/timeline/educación/hobbies,
+   How I Work: los 6 pasos, Contact/Work: los mismos datos de Home
+   Content) sale de los filtros documentados arriba — **hoy son
+   compartidos entre EN y ES** (mismo alcance que el resto de Home
+   Content, ver nota más abajo), así que cargalos en el idioma que
+   prefieras por ahora. El texto propio de cada página (`the_content()`,
+   si le agregás bloques extra en el editor) sí es 100% independiente por
+   idioma, como cualquier página de WordPress.
+
+No hace falta ningún paso de configuración adicional en Polylang para que
+esto funcione — el template seleccionado es un meta del post
+(`_wp_page_template`), y cada traducción (cada idioma) es su propio post
+de WordPress con su propio meta, así que cada versión de idioma puede
+usar el mismo template de forma completamente independiente.
 
 ### Home Content — About, How I Work, Connect, Header, Footer (Sprint 3)
 

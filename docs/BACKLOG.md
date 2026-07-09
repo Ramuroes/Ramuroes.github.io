@@ -77,11 +77,19 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   converted to editable content: a "Case Study" custom post type, editable
   in wp-admin, with a hardcoded-placeholder fallback so Home never breaks
   if no case studies exist yet. See `EDITABILITY-PLAN.md` for exact usage.
-- **P1** — Add real case content for Presupuestador and Trazur, now that
-  the Case Study CPT **and its single template** exist (Sprint 4B) — enter
-  them as Case Study posts (title, excerpt, tags, featured image, Role/
-  Tools/Period, and full body via the standard editor), not template
-  edits.
+- **P1** — Enter Presupuestador and Trazur as real, published Case Study
+  posts. **Presupuestador's body content is ready** — a complete,
+  paste-ready `.es-case-*` HTML deliverable exists at
+  `docs/content/presupuestador-case-study.html` (Sprint 4G/mega sprint),
+  covering context/problem/discovery/architecture/MVP/App Alpha/AI
+  role/limitations/reflection/next steps. What's still needed: pasting it
+  into a Custom HTML block on a real Case Study post (wp-admin step, not
+  done by this ticket — no wp-admin access from this environment), the
+  native fields (title/excerpt/tags/Role/Tools/Period — values suggested
+  in that file's header comment), real screenshots/photos replacing the
+  `.es-placeholder` figures, and picking a "Hero layout" once a real
+  featured image exists. **Trazur's content still needs to be written**
+  (no HTML deliverable yet — this ticket only covered Presupuestador).
 - **Done (Sprint 3)** — **Featured Case** is editable: reuses the Case
   Study CPT with a "Feature this case on Home" checkbox instead of a
   separate mechanism. See `EDITABILITY-PLAN.md`.
@@ -129,6 +137,25 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   decision cards, pullquote, status grid, native accordion) usable inside
   the standard editor via `the_content()` — no case builder, no ACF. See
   `estavillo-child/README.md` for the full reference and example.
+- **Done (Sprint 4G / mega sprint)** — 4 new fixed pages (Work, About, How
+  I Work, Contact), all standalone page templates sharing the ESTAVILLO
+  chrome. Work reuses the existing "Show on Home" flag to split Selected
+  vs. Archive (no new field). About gained 4 new Phase-1 fields on Home
+  Content (CV URL, career timeline, education/certificates, hobbies). How
+  I Work and Contact reuse existing data with zero new fields. Case Study
+  gained breadcrumbs and 3 new opt-in hero layout variants. See
+  `estavillo-child/README.md` → "Páginas fijas", "Hero layout options",
+  "Breadcrumbs".
+- **P3** — Work's Selected/Archive split is binary (reuses the existing
+  "Show on Home" checkbox — one flag serves two purposes now). This is
+  fine while there's no real content, but if a case ever needs to be
+  "hidden from the Home teaser but still current work, not archive" the
+  one flag can't express that 3-way distinction. Revisit only if that
+  scenario actually comes up — don't add a second flag speculatively.
+- **P3** — About's career timeline and education/certificates are capped
+  at 4 fixed rows each (same pattern as How I Work's 6 fixed steps). If
+  a real timeline ever needs more than 4 entries, this becomes a proper
+  repeater — not urgent, most careers fit in 4 rows for a portfolio.
 - **P2** — Convert **Hero** to editable content (copy/CTAs are already
   filterable; coordinate with the Hero block/layout ticket above so
   editability doesn't get built on top of a layout that's about to
@@ -165,9 +192,16 @@ Editability priority order (for reference, full detail in
   current acceptable state — see `BACKLOG.md` header alignment note
   below).
 - **P2** — Optional "back to top" interaction.
-- **P2** — Breadcrumbs / accessibility strategy for internal case-study
-  pages — relevant once single Case Study pages are actually built (see
-  the Case Study CPT above; no single-case template exists yet).
+- **Done (Sprint 4G / mega sprint)** — Breadcrumbs (Home / Work / case
+  title) on the Case Study single page, accessible
+  (`<nav aria-label="Breadcrumb">`, `aria-current="page"`), Polylang-aware
+  automatically (native `home_url()`/permalink behavior, no extra code).
+  See `template-parts/breadcrumbs.php`.
+- **P3** — Breadcrumbs only exist on the Case Study page today
+  (`template-parts/breadcrumbs.php` is generic/reusable by design). Extend
+  to the 4 new fixed pages (e.g. "Home / Work" on the Work page) only if a
+  real navigation need shows up — not urgent, those pages are one level
+  deep already and reachable from the main nav.
 
 ## Hero variants
 

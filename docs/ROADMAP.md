@@ -198,11 +198,69 @@ Polylang translations. Add real images. Refine EN/ES copy for all Home
 sections (within the single-language-global constraint of Home Content
 options — see Sprint 3 notes above).
 
+**Sprint 4G — V1 publishable structure (mega sprint) — done.** Backup
+branch/tag `backup-before-mega-sprint-case-pages` created first, from a
+confirmed-clean working tree. Built the rest of what a publishable V1
+needs beyond the single Case Study page:
+
+- **Presupuestador case content** — a complete, paste-ready `.es-case-*`
+  HTML deliverable (`docs/content/presupuestador-case-study.html`)
+  covering context/problem/discovery/architecture/MVP/App Alpha/AI
+  role/limitations/reflection/next steps, ready to paste into a Custom
+  HTML block. Entering it as an actual published Case Study post is a
+  manual wp-admin step (see that file's own instructions) — not done by
+  this ticket, since it requires wp-admin access this environment doesn't
+  have.
+- **Case Study hero layout options** — 3 new opt-in variants
+  (`split-left`, `compact`, `stacked`) alongside the Sprint 4D default,
+  selectable per case from a "Hero layout" field on the meta box. Mobile
+  is identical across all 4 (text-first, stacked) — enforced structurally
+  via `@media (min-width: 1000px)` after a real bug was caught in testing
+  (a naive `@media (max-width: 999px)` override lost a CSS specificity
+  fight against the `split-left` variant, breaking mobile stacking for
+  that one variant — see `estavillo-child/assets/css/case-study.css`).
+  Also fixed the hero's vertical alignment (`start` → `center`) so a long
+  excerpt no longer strands the image with a lopsided empty gap.
+- **Breadcrumbs** — Home / Work / case title, on the Case Study page only,
+  reusing `es_nav_links()` for the "Work" link (repoint it once a real
+  Work page exists and every breadcrumb follows).
+- **4 new fixed pages** — Work, About, How I Work, Contact
+  (`templates/page-*.php`), all standalone and sharing the ESTAVILLO
+  chrome (sticky header + footer) with Home and Case Study. Work splits
+  Case Studies into "Selected" and "Archive" by reusing the existing
+  "Show on Home" flag (no new field). About gained 4 new Phase-1 fields
+  (CV URL, timeline, education, hobbies) on the Home Content options
+  page. How I Work and Contact add zero new fields — they just give
+  existing Home data (process steps, Connect/Footer fields) their own
+  dedicated pages.
+- **How I Work icons** — a curated, whitelisted library of 8 inline SVG
+  icons (`es_process_icon_choices()` / `es_process_icon_svg()` in
+  `functions.php`), selectable per step from Home Content. Never
+  arbitrary HTML — the admin only ever stores a whitelisted key.
+- **Polylang page strategy** — documented, not built: `home_url()` and
+  WordPress permalinks already resolve per-language natively once
+  Polylang is active, so breadcrumbs and nav links need no extra code.
+  Exact wp-admin steps for translating all 5 fixed pages are in
+  `estavillo-child/README.md` → "Polylang".
+- **V1/V2 framing** — added to `README.md`, `EDITABILITY-PLAN.md`: V1 is
+  this fast, options-page-and-filters system; V2 (unplanned in detail) is
+  a future migration of the same sections to Gutenberg blocks/patterns,
+  reading the same underlying data/filters.
+
+No Home sections, global typography, or global colors were touched.
+`dist/estavillo-child.zip` and `dist/estavillo-portfolio-core.zip` both
+rebuilt (the plugin changed this sprint — new hero-layout field, Work
+query, About fields, icon choices in `home-content-options.php`).
+
 ---
 
 ## Sprint 5 — Hero variants
 
 **Goal:** expand hero variety only once the above is stable — not before.
+This is the **Home animated hero** (the `network_constellation` /
+`blueprint_flow` motion engines in `hero-system-map.js`) — a different
+system from the Case Study hero *layout* variants added in Sprint 4G
+above (those are static content arrangement, no motion/canvas involved).
 
 - Add only 2–3 curated additional hero variants.
 - `network_constellation` remains the default; this does not change.

@@ -28,6 +28,14 @@
  * mismos campos de siempre, solo cambia el markup/CSS del hero. En mobile
  * sigue apilado (imagen debajo del texto). No toca .es-case-* del cuerpo.
  *
+ * Mega sprint (hero options + breadcrumbs): el hero ahora admite 4 layouts
+ * seleccionables por caso (campo "Hero layout" del meta box — ver
+ * es_case_hero_layout_choices() en el plugin), vía una clase modificadora
+ * sobre .es-case__hero; el default 'split-right' es exactamente el markup/
+ * CSS de Sprint 4D, sin clase extra, cero riesgo para casos existentes.
+ * Suma también una tira de breadcrumbs (Home / Work / título del caso)
+ * arriba del índice sticky.
+ *
  * @package estavillo-child
  */
 
@@ -75,6 +83,28 @@ if ( function_exists( 'wp_body_open' ) ) {
 				)
 			);
 
+			// Layout del hero: 'split-right' (default histórico, Sprint 4D) no
+			// suma clase modificadora — cero riesgo para casos ya publicados.
+			$es_hero_layout       = get_post_meta( $es_case_id, '_es_case_hero_layout', true );
+			$es_hero_layout_class = ( $es_hero_layout && 'split-right' !== $es_hero_layout ) ? ' es-case__hero--' . sanitize_html_class( $es_hero_layout ) : '';
+
+			// Breadcrumbs: Home / Work / título del caso. El link "Work" reusa
+			// es_nav_links() (mismo array que header/mobile/footer) — si se
+			// repunta a una página real, el breadcrumb la sigue automáticamente.
+			$es_breadcrumb_trail = array(
+				array(
+					'label' => __( 'Home', 'estavillo-child' ),
+					'url'   => home_url( '/' ),
+				),
+			);
+			foreach ( es_nav_links() as $es_bc_link ) {
+				if ( es__( 'nav_work' ) === $es_bc_link['label'] ) {
+					$es_breadcrumb_trail[] = $es_bc_link;
+					break;
+				}
+			}
+			$es_breadcrumb_trail[] = array( 'label' => get_the_title() );
+
 			// Índice sticky: manual, "Label|#anchor" por línea (campo "Case
 			// index" del meta box). Si está vacío, el índice no se imprime.
 			$es_case_index_raw = get_post_meta( $es_case_id, '_es_case_index', true );
@@ -95,6 +125,7 @@ if ( function_exists( 'wp_body_open' ) ) {
 				}
 			}
 			?>
+			<?php get_template_part( 'template-parts/breadcrumbs', null, array( 'trail' => $es_breadcrumb_trail ) ); ?>
 			<?php if ( ! empty( $es_case_index ) ) : ?>
 				<nav class="es-case-index" aria-label="<?php esc_attr_e( 'Case sections', 'estavillo-child' ); ?>">
 					<div class="es-case-index__inner">
@@ -105,7 +136,7 @@ if ( function_exists( 'wp_body_open' ) ) {
 				</nav>
 			<?php endif; ?>
 			<article class="es-section es-case">
-				<div class="es-container es-case__hero" data-es-reveal>
+				<div class="es-container es-case__hero<?php echo esc_attr( $es_hero_layout_class ); ?>" data-es-reveal>
 					<div class="es-case__hero-content">
 						<?php if ( ! empty( $es_case_kicker ) ) : ?>
 							<p class="es-eyebrow es-case__kicker"><?php echo esc_html( $es_case_kicker ); ?></p>
