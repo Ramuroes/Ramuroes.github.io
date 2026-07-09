@@ -1,8 +1,17 @@
 /* =========================================================================
    ESTAVILLO — Site chrome (header + footer)
-   Scopeado al template standalone de la home. Dark premium, mobile-first.
-   Estados interactivos: solo verde --es-accent, tintas --es-ink* y opacidad.
-   Nunca azul.
+   Compartido por Home y el single de Case Study (ambos reusan este chrome).
+   Dark premium, mobile-first. Estados interactivos: solo verde --es-accent,
+   tintas --es-ink* y opacidad. Nunca azul.
+
+   Todos los links/botones interactivos de este archivo declaran rest/hover/
+   focus-visible/active/visited explícitamente con !important (logo, nav
+   desktop, botón Menu, mobile menu link, nav del footer, meta del footer).
+   No es paranoia por cada uno: un test adversarial con una hoja de estilos
+   externa agresiva (simulando el peor caso de Kadence/Customizer) mostró que
+   cualquier regla SIN !important podía perder — !important nunca depende de
+   ganar por especificidad contra un origen externo que no controlamos desde
+   este repo.
    ========================================================================= */
 
 /* ---------- header sticky ---------- */
@@ -40,15 +49,23 @@
 	font-size: 14px;
 	font-weight: 700;
 	letter-spacing: 0.22em;
-	color: var(--es-ink);
+	color: var(--es-ink) !important;
 	text-decoration: none;
 	transition: color 0.15s ease;
 }
 
-/* logo hover/focus: cue verde de identidad — nunca azul */
+/* logo: verde de identidad en hover/foco, tinta neutra en todo el resto —
+   incl. :active/:visited con !important. Mismo motivo que .es-mobile-menu__link
+   (ver más abajo): un color de link/visited externo con su propio !important
+   podía ganar sin esto. Nunca azul, en ningún estado. */
 .es-nav__brand:hover,
-.es-nav__brand:focus-visible {
-	color: var(--es-accent);
+.es-nav__brand:focus-visible,
+.es-nav__brand:active {
+	color: var(--es-accent) !important;
+}
+
+.es-nav__brand:visited {
+	color: var(--es-ink) !important;
 }
 
 /* cluster derecho: links + language + toggle slot + botón menu */
@@ -67,17 +84,25 @@
 .es-nav__link {
 	font-size: 14px;
 	font-weight: 500;
-	color: var(--es-ink-2);
+	color: var(--es-ink-2) !important;
 	text-decoration: none;
 	padding: 6px 0;
 	background: linear-gradient(var(--es-accent), var(--es-accent)) left bottom / 0 1px no-repeat;
 	transition: background-size 0.2s ease, color 0.15s ease;
 }
 
+/* desktop nav links: nunca azul en ningún estado, incl. :active/:visited
+   (mismo refuerzo !important que el resto del chrome — ver nota en
+   .es-mobile-menu__link más abajo). */
 .es-nav__link:hover,
-.es-nav__link:focus-visible {
-	color: var(--es-ink);
+.es-nav__link:focus-visible,
+.es-nav__link:active {
+	color: var(--es-ink) !important;
 	background-size: 100% 1px;
+}
+
+.es-nav__link:visited {
+	color: var(--es-ink-2) !important;
 }
 
 .es-nav__lang {
@@ -119,18 +144,19 @@
 	background: none;
 	border: 0;
 	cursor: pointer;
-	color: var(--es-ink);
+	color: var(--es-ink) !important;
 	transition: color 0.15s ease;
 }
 
 /* estados del botón Menu: cue verde, fondo/borde transparentes en TODOS los
    estados para que un `button:hover`/`button:focus` de Kadence no lo pinte
-   (nunca azul). El anillo verde de foco lo da :focus-visible (base.css). */
+   (nunca azul). El anillo verde de foco lo da :focus-visible (base.css).
+   !important en todos los estados — mismo refuerzo que el resto del chrome. */
 .es-nav__menu-btn:hover,
 .es-nav__menu-btn:focus,
 .es-nav__menu-btn:focus-visible,
 .es-nav__menu-btn:active {
-	color: var(--es-accent);
+	color: var(--es-accent) !important;
 	background: none;
 	border: 0;
 	box-shadow: none;
@@ -252,8 +278,9 @@
 	font-weight: 500;
 	letter-spacing: -0.01em;
 	/* !important: este color viene regresando en azul por reglas de Kadence
-	   fuera de nuestro control (link/visited color del Customizer). Es el
-	   único :visited/:active del theme que lo necesita — ver nota abajo. */
+	   fuera de nuestro control (link/visited color del Customizer). Este fue
+	   el primer link donde se detectó (ver nota abajo) — Sprint 4C extendió
+	   el mismo refuerzo !important a todo el chrome desktop/footer, no solo acá. */
 	color: var(--es-ink) !important;
 	text-decoration: none;
 	border-bottom: 1px solid var(--es-line);
@@ -372,14 +399,19 @@
 .es-site-footer__nav a {
 	font-size: 13px;
 	font-weight: 500;
-	color: var(--es-ink-3);
+	color: var(--es-ink-3) !important;
 	text-decoration: none;
 	transition: color 0.15s ease;
 }
 
 .es-site-footer__nav a:hover,
-.es-site-footer__nav a:focus-visible {
-	color: var(--es-ink);
+.es-site-footer__nav a:focus-visible,
+.es-site-footer__nav a:active {
+	color: var(--es-ink) !important;
+}
+
+.es-site-footer__nav a:visited {
+	color: var(--es-ink-3) !important;
 }
 
 .es-site-footer__meta {
@@ -394,12 +426,17 @@
 }
 
 .es-site-footer__meta a {
-	color: var(--es-ink-4);
+	color: var(--es-ink-4) !important;
 	text-decoration: none;
 	transition: color 0.15s ease;
 }
 
 .es-site-footer__meta a:hover,
-.es-site-footer__meta a:focus-visible {
-	color: var(--es-accent);
+.es-site-footer__meta a:focus-visible,
+.es-site-footer__meta a:active {
+	color: var(--es-accent) !important;
+}
+
+.es-site-footer__meta a:visited {
+	color: var(--es-ink-4) !important;
 }

@@ -20,7 +20,7 @@ estavillo-child/
 │   │   ├── site.css               → chrome: header sticky + menú mobile + footer (Home Y single Case Study)
 │   │   ├── hero.css               → hero: visual detrás/al costado del copy (desktop y mobile)
 │   │   ├── pages-home.css         → secciones de la home (featured, process, work, about, connect)
-│   │   └── case-study.css         → single de Case Study: meta row + prose de the_content()
+│   │   └── case-study.css         → single de Case Study: índice sticky + meta row + prose + librería .es-case-*
 │   └── js/
 │       ├── hero-system-map.js     → motores de hero (registry, SVG + rAF, 0 librerías)
 │       ├── motion.js              → reveal on-scroll (IntersectionObserver)
@@ -255,6 +255,146 @@ la resuelve solo (`single-es_case_study.php`), no hace falta activar nada.
 4. **Publicar.** La URL del caso (visible arriba del editor, o en **Case
    link (URL)** si lo dejaste vacío) ya es una página real con el chrome
    ESTAVILLO completo — header, menú mobile, footer, todo igual que Home.
+
+### Sistema de formato de Case Study — índice sticky + librería `.es-case-*` (Sprint 4C)
+
+Sprint 4C suma dos cosas sobre la página individual de Sprint 4B: un
+**índice sticky opcional** y una **librería de clases CSS** para dar
+estructura visual (secciones, stats, timeline, decisiones, quote, status,
+accordion, marco tipo browser…) al contenido que ya escribís en el editor
+estándar. Nada de esto es un campo nuevo de contenido ni un page builder —
+seguís escribiendo todo en el mismo cuadro grande del editor; estas clases
+solo le dan estilo a lo que ya está ahí.
+
+> Inspirado visualmente en un case study de referencia (formato "REstimator
+> Dark") que se usó únicamente como guía de composición — el CSS de acá es
+> 100% propio del design system ESTAVILLO, reimplementado con los tokens
+> `--es-*` existentes (cero colores/tipografías nuevos). El runtime de esa
+> referencia (`support.js`) nunca se copió, encoló ni ejecutó en el sitio.
+
+**Cómo usar el editor nativo con estas clases:**
+
+Con el editor de bloques, cada bloque (Group, Paragraph, Image, Heading…)
+tiene un panel **Avanzado → "Clases CSS adicionales"** donde pegás el
+nombre de la clase (p. ej. `es-case-section`). Para estructuras con varios
+elementos anidados (stats, decision cards, status grid) es más simple usar
+un bloque **HTML personalizado** y pegar el fragmento directo — ver el
+ejemplo completo más abajo. El editor clásico también sirve: son clases
+CSS comunes, no bloques especiales.
+
+**Clases disponibles** (todas se aplican dentro del cuerpo del post, o sea
+dentro de lo que imprime `the_content()`):
+
+| Clase | Para qué |
+|---|---|
+| `es-case-section` | Envuelve un "capítulo" del caso. Agrega una línea divisoria arriba y espaciado generoso — **excepto la primera** de la página, que no lleva línea. Ponele `id="loquesea"` si querés que el índice sticky pueda linkear a esta sección. |
+| `es-case-label` | Eyebrow mono chico arriba de un heading de sección (p. ej. "Fig. 01 — Contexto"). |
+| `es-case-heading` | Título de sección (serif, grande). Va después de `es-case-label`. |
+| `es-case-lead` | Párrafo grande de apertura de una sección (serif, más grande que el body normal). |
+| `es-case-cols` | Grilla de 2 columnas (texto/imagen, texto/texto). Se apila a 1 columna en mobile automáticamente. |
+| `es-case-figure` (en un `<figure>`) + `es-case-caption` / `es-case-caption__tag` (en el `<figcaption>`) | Imagen con marco y caption mono con un "tag" de acento (p. ej. "FIG. 1.1"). |
+| `es-case-browser` / `es-case-browser__bar` / `es-case-browser__dot` / `es-case-browser__label` | Marco tipo ventana de navegador (barra falsa con 3 puntos + label) para encuadrar screenshots de producto. |
+| `es-case-stats` (contenedor) + `es-case-stat` / `es-case-stat__num` / `es-case-stat__label` (cada celda) | Grilla de estadísticas, 4 columnas en desktop → 2 en mobile. |
+| `es-case-timeline` (`<ul>`) + `es-case-timeline__item` / `__title` / `__text` | Timeline vertical con puntos de acento, para procesos/evolución en fases. |
+| `es-case-decisions` (contenedor) + `es-case-decision` / `__num` / `__title` / `__row` (`<dl>` con `dt`/`dd`) | Cards de decisiones numeradas (evidencia → resultado), 3 columnas → 1 en mobile. |
+| `es-case-quote` (en un `<blockquote>`) + `<cite>` adentro | Pullquote grande con borde de acento. |
+| `es-case-status` (contenedor) + `es-case-status__col` (agregale `--done` o `--attention`) + `__head` / `__list` | Grilla de status (4 → 2 en mobile). `--done` pinta el punto en verde (`--es-accent`), `--attention` en naranja (`--es-decision`) — mismos dos colores que ya usa el resto del sistema, ninguno nuevo. |
+| `es-case-details` (en un `<details>`) + `<summary>` + `es-case-details__body` | Accordion nativo del navegador — **sin JavaScript**, con un `+` que rota a 45° al abrirse. |
+
+**Ejemplo completo para pegar en un bloque HTML personalizado:**
+
+```html
+<div class="es-case-section" id="context">
+  <div class="es-case-label">Fig. 01 — El contexto</div>
+  <h2 class="es-case-heading">Todo empieza en un taller real.</h2>
+  <p class="es-case-lead">Un párrafo grande que abre la sección y resume la idea central del capítulo.</p>
+
+  <div class="es-case-cols">
+    <div><p>Columna de texto uno.</p></div>
+    <div><p>Columna de texto dos, o una imagen normal de WordPress.</p></div>
+  </div>
+
+  <figure class="es-case-figure">
+    <img src="https://tu-sitio.com/wp-content/uploads/imagen.jpg" alt="Descripción de la imagen">
+    <figcaption class="es-case-caption">
+      <span class="es-case-caption__tag">FIG. 1.1</span>
+      <span>Texto de caption explicando la imagen.</span>
+    </figcaption>
+  </figure>
+
+  <div class="es-case-stats">
+    <div class="es-case-stat"><div class="es-case-stat__num">~650</div><div class="es-case-stat__label">archivos leídos</div></div>
+    <div class="es-case-stat"><div class="es-case-stat__num">1,600+</div><div class="es-case-stat__label">registros</div></div>
+  </div>
+</div>
+
+<div class="es-case-section" id="decisions">
+  <h2 class="es-case-heading">Decisiones clave.</h2>
+
+  <blockquote class="es-case-quote">
+    <p>La pregunta nunca fue calcular un precio.</p>
+    <cite>Un hallazgo del proceso</cite>
+  </blockquote>
+
+  <div class="es-case-decisions">
+    <article class="es-case-decision">
+      <span class="es-case-decision__num">01</span>
+      <h3 class="es-case-decision__title">Capturar el conocimiento como taxonomía</h3>
+      <dl class="es-case-decision__row">
+        <dt>Evidencia</dt><dd>Texto de evidencia.</dd>
+        <dt>Resultado</dt><dd>Texto de resultado.</dd>
+      </dl>
+    </article>
+  </div>
+
+  <details class="es-case-details">
+    <summary>Detalle técnico</summary>
+    <div class="es-case-details__body"><p>Texto extendido opcional.</p></div>
+  </details>
+</div>
+```
+
+**Cómo subir imágenes:** igual que cualquier imagen de WordPress — bloque
+Imagen normal, o `<img src="…">` dentro de un bloque HTML apuntando a una
+URL de la Biblioteca de medios (Añadir nuevo → subís el archivo → copiás la
+URL). No hace falta ningún campo especial; `es-case-figure`/`es-case-browser`
+solo agregan el marco visual alrededor de la imagen que ya subiste.
+
+**Índice sticky (opcional, manual para V1):**
+
+1. wp-admin → **Case Studies** → abrí el caso → meta box **"Case details"**
+   → campo **"Case index (optional)"**.
+2. Un renglón por entrada, formato `Label|#ancla` — p. ej.:
+   ```
+   Context|#context
+   Problem|#problem
+   Decisions|#decisions
+   ```
+3. Cada `#ancla` tiene que coincidir con un `id="ancla"` que le pusiste a un
+   `es-case-section` (o a cualquier elemento) dentro del contenido — es el
+   mismo `id` del ejemplo HTML de arriba (`id="context"`, `id="decisions"`).
+4. Si dejás el campo vacío, el índice **no se muestra** — no es un
+   requisito, es 100% opcional. No hay repeater ni ACF: es una sola
+   textarea, deliberadamente simple para V1 (si a futuro hace falta
+   generarlo automáticamente desde los headings, es un cambio contenido a
+   ese único campo).
+5. En desktop el índice queda pegado (sticky) debajo del header al hacer
+   scroll. En mobile es una tira horizontal scrolleable, sin scrollbar
+   visible — no ocupa una fila completa de la pantalla.
+6. Los links del índice (como cualquier link del template de Case Study)
+   nunca cambian a azul en ningún estado — hover/focus/active/visited usan
+   siempre los tokens de tinta/acento del sistema.
+
+**Cómo traducir un caso con Polylang:** el campo "Case index" y el
+contenido con estas clases se traducen exactamente igual que el resto del
+Case Study (ver "Polylang" más abajo) — son campos nativos del post
+(meta box + `the_content()`), así que "Add translation" los copia como
+punto de partida y los editás en el otro idioma con libertad, incluyendo
+anclas/labels distintas si hace falta.
+
+**Alcance de este archivo:** `case-study.css` solo se encola en
+`single-es_case_study.php` (ver `inc/enqueue.php`) — nunca afecta Home ni
+ninguna otra página del sitio.
 
 ### Polylang (Sprint 4A)
 

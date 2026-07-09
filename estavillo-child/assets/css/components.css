@@ -16,7 +16,7 @@
 	font-family: var(--es-sans);
 	font-size: 15px;
 	font-weight: 600;
-	color: var(--es-ink);
+	color: var(--es-ink) !important;
 	text-decoration: none;
 	cursor: pointer;
 	transition: background var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease,
@@ -26,10 +26,13 @@
 /* hover y focus-visible: texto claro, borde verde, fondo verde translúcido.
    Nunca texto azul (antes el texto heredaba el a:hover azul de Kadene).
    Se declara el borde completo + box-shadow:none para que Kadence no meta
-   otro borde/anillo en a:hover / a:focus. */
+   otro borde/anillo en a:hover / a:focus. !important en todos los estados
+   de link (incl. :active) — un test adversarial mostró que sin esto una
+   hoja externa agresiva podía ganar igual con especificidad clase+pseudo. */
 .es-btn:hover,
-.es-btn:focus-visible {
-	color: var(--es-ink);
+.es-btn:focus-visible,
+.es-btn:active {
+	color: var(--es-ink) !important;
 	background: var(--es-accent-soft);
 	border: 1px solid var(--es-accent);
 	box-shadow: none;
@@ -42,9 +45,8 @@
 
 /* el CTA conserva texto claro en todos los estados de link */
 .es-btn:link,
-.es-btn:visited,
-.es-btn:active {
-	color: var(--es-ink);
+.es-btn:visited {
+	color: var(--es-ink) !important;
 }
 
 .es-btn__arrow {
@@ -59,7 +61,7 @@
 	gap: 10px;
 	font-size: 15px;
 	font-weight: 600;
-	color: var(--es-accent);
+	color: var(--es-accent) !important;
 	text-decoration: none;
 	transition: gap 0.2s var(--es-ease);
 }
@@ -69,24 +71,31 @@
 }
 
 /* verde de identidad en todos los estados interactivos (aplica a plain y quiet;
-   el REST de cada variante lo definen las reglas base). Nunca azul. */
+   el REST de cada variante lo definen las reglas base). Nunca azul. Usado en
+   toda la Home (hero secundario, About, Selected Work "All work", Connect,
+   How I Work) y en el single de Case Study — !important en todos los estados
+   de link, mismo motivo que el resto del chrome (ver site.css). */
 .es-link-arrow:hover,
 .es-link-arrow:focus,
 .es-link-arrow:active {
-	color: var(--es-accent);
+	color: var(--es-accent) !important;
+}
+
+.es-link-arrow:visited {
+	color: var(--es-accent) !important;
 }
 
 .es-link-arrow--quiet {
 	font-weight: 500;
 	font-size: 14.5px;
-	color: var(--es-ink-2);
+	color: var(--es-ink-2) !important;
 	transition: color var(--es-dur-fast) ease, gap 0.2s var(--es-ease);
 }
 
 .es-link-arrow--quiet:hover,
 .es-link-arrow--quiet:focus,
 .es-link-arrow--quiet:active {
-	color: var(--es-accent);
+	color: var(--es-accent) !important;
 }
 
 /* El link con flecha (primario secundario "See how I work", CTAs de sección,
@@ -105,7 +114,7 @@
 }
 
 .es-link-arrow--quiet:visited {
-	color: var(--es-ink-2);
+	color: var(--es-ink-2) !important;
 }
 
 /* Featured Case CTA ("Read the case study"): usa el markup existente
@@ -128,10 +137,6 @@
 
 .es-featured__cta:visited {
 	color: var(--es-ink-2) !important;
-}
-
-.es-featured__cta:visited {
-	color: var(--es-ink-2);
 }
 
 /* ---------- pill de skill/tag ---------- */
@@ -196,12 +201,19 @@
 .es-card {
 	display: block;
 	text-decoration: none;
-	color: var(--es-ink); /* evita que el ancla herede el azul de link de Kadene */
+	color: var(--es-ink) !important; /* evita que el ancla herede el azul de link de Kadence, incl. :active/:visited */
 	background: var(--es-paper-2);
 	border: 1px solid var(--es-line);
 	border-radius: var(--es-radius);
 	overflow: hidden;
 	transition: transform var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease;
+}
+
+.es-card:hover,
+.es-card:focus-visible,
+.es-card:active,
+.es-card:visited {
+	color: var(--es-ink) !important;
 }
 
 .es-card:hover {

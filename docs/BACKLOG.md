@@ -17,8 +17,16 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
 
 ## Bugs / fixes
 
-- **P0** — Mobile menu active/pressed state still turns blue on some links,
-  especially "Work". Must never show blue anywhere.
+- **Done (Sprint 4C)** — Blue interaction states (was: mobile menu
+  active/pressed, especially "Work"). Fixed globally, not just on the
+  mobile menu: desktop nav brand/links, the menu button, footer nav/meta
+  links, buttons, arrow links, cards, and the new case-study index/body
+  links all now carry explicit rest/hover/focus-visible/active/visited
+  color rules reinforced with `!important` (the reinforcement is scoped to
+  defending against external/adversarial CSS — e.g. Kadence or a caching
+  plugin re-injecting a blue `a:visited` — never used for the theme's own
+  internal cascade). Verified with a fake-Kadence adversarial-CSS-injection
+  Playwright test across desktop and mobile.
 - **P0** — Selected Work / case CTA links should be white/neutral by
   default and turn green **on hover only**, not permanently green.
   (`.es-card__cta` currently sets a base `color: var(--es-accent)` — this
@@ -114,6 +122,13 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   indicators are now a real Polylang switcher (`pll_the_languages()`),
   guarded by `function_exists()` so the site is unaffected if Polylang is
   inactive.
+- **Done (Sprint 4C)** — Case Study format system: an optional sticky
+  in-page index (manual `Label|#anchor` field, new `_es_case_index` post
+  meta) and a 14-class `.es-case-*` library (section, label, heading, lead,
+  two-column, figure+caption, browser-chrome frame, stats grid, timeline,
+  decision cards, pullquote, status grid, native accordion) usable inside
+  the standard editor via `the_content()` — no case builder, no ACF. See
+  `estavillo-child/README.md` for the full reference and example.
 - **P2** — Convert **Hero** to editable content (copy/CTAs are already
   filterable; coordinate with the Hero block/layout ticket above so
   editability doesn't get built on top of a layout that's about to

@@ -1,10 +1,90 @@
 /* =========================================================================
    ESTAVILLO — Single Case Study
    -------------------------------------------------------------------------
-   Sprint 4B. Solo se carga en single-es_case_study.php. Reusa el chrome de
-   site.css y los tokens de tokens.css — ningún color ni tipografía nuevos
-   acá, solo nuevos selectores aplicando las mismas variables --es-*.
+   Sprint 4B + 4C. Solo se carga en single-es_case_study.php. Reusa el
+   chrome de site.css y los tokens de tokens.css — ningún color ni
+   tipografía nuevos acá, solo nuevos selectores aplicando las mismas
+   variables --es-*.
+
+   Estructura del archivo:
+   1. Índice sticky (.es-case-index)          — fuera de the_content()
+   2. Hero del caso (.es-case__*)              — fuera de the_content()
+   3. Prose por defecto (.es-case__body h2...) — dentro de the_content()
+   4. Librería de clases .es-case-* (sección, stats, timeline, decisiones,
+      quote, status, details, browser chrome, etc.) — para USAR dentro del
+      editor nativo de WordPress. Ver README para instrucciones y ejemplos.
+
+   Inspirado visualmente en el case study de referencia REstimator (Dark) —
+   reimplementado desde cero acá como CSS propio del design system
+   ESTAVILLO, no copiado. El runtime de la referencia (support.js) nunca se
+   usa ni se enqueuea en el sitio.
    ========================================================================= */
+
+/* ---------- índice sticky en-página (opcional, manual) ---------- */
+
+.es-case-index {
+	position: sticky;
+	top: 66px;
+	z-index: 40; /* por debajo del header (80) y del overlay del menú (70) */
+	background: color-mix(in srgb, var(--es-paper) 90%, transparent);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+	border-bottom: 1px solid var(--es-line);
+}
+
+.admin-bar .es-case-index {
+	top: 98px;
+}
+
+@media (max-width: 782px) {
+	.admin-bar .es-case-index {
+		top: 112px;
+	}
+}
+
+.es-case-index__inner {
+	max-width: var(--es-max-w);
+	margin: 0 auto;
+	padding: 0 var(--es-pad-x);
+	display: flex;
+	gap: 2px;
+	overflow-x: auto;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+/* mobile: tira horizontal scrolleable, liviana — sin scrollbar visible */
+.es-case-index__inner::-webkit-scrollbar {
+	display: none;
+	height: 0;
+}
+
+.es-case-index__link {
+	flex: none;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.04em;
+	white-space: nowrap;
+	color: var(--es-ink-3) !important;
+	text-decoration: none;
+	padding: 12px 11px;
+	border-bottom: 2px solid transparent;
+	transition: color var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease;
+}
+
+/* nunca azul — mismo refuerzo !important que el resto del chrome (site.css) */
+.es-case-index__link:hover,
+.es-case-index__link:focus-visible,
+.es-case-index__link:active {
+	color: var(--es-ink) !important;
+	border-bottom-color: var(--es-accent);
+}
+
+.es-case-index__link:visited {
+	color: var(--es-ink-3) !important;
+}
+
+/* ---------- hero del caso ---------- */
 
 .es-case__head {
 	max-width: 760px;
@@ -34,6 +114,8 @@
 	flex-wrap: wrap;
 	gap: 20px 32px;
 	margin: 0;
+	border-top: 1px solid var(--es-line);
+	padding-top: 26px;
 }
 
 .es-case__meta-item dt {
@@ -119,12 +201,24 @@
 	margin-top: 0.5em;
 }
 
-/* verde de identidad, subrayado — nunca azul (misma red de seguridad
-   :where() de base.css cubre hover/focus/active/visited de este link). */
+/* verde de identidad, subrayado — nunca azul en ningún estado, incl.
+   :active/:visited (!important, mismo refuerzo que el resto del chrome —
+   ver site.css). Cubre cualquier link que el editor cree dentro del body,
+   incluidos los que vengan de .es-case-quote, tablas, etc. */
 .es-case__body a {
-	color: var(--es-accent);
+	color: var(--es-accent) !important;
 	text-decoration: underline;
 	text-underline-offset: 2px;
+}
+
+.es-case__body a:hover,
+.es-case__body a:focus-visible,
+.es-case__body a:active {
+	color: var(--es-accent) !important;
+}
+
+.es-case__body a:visited {
+	color: var(--es-accent) !important;
 }
 
 .es-case__body blockquote {
@@ -147,4 +241,441 @@
 	font-family: var(--es-mono);
 	font-size: 11px;
 	color: var(--es-ink-4);
+}
+
+/* =========================================================================
+   Librería de clases para estructurar contenido DENTRO del editor nativo
+   -------------------------------------------------------------------------
+   Todo lo de acá abajo se usa agregando la clase CSS al bloque/elemento
+   correspondiente en el editor (bloque Group/Paragraph/Image → panel
+   Avanzado → "Clases CSS adicionales", o directo en HTML si usás el editor
+   clásico / un bloque HTML personalizado). Ver README para el detalle
+   completo y un ejemplo de caso armado con estas clases.
+   ========================================================================= */
+
+/* ---------- sección / capítulo ---------- */
+
+.es-case__body .es-case-section {
+	border-top: 1px solid var(--es-line);
+	padding-top: clamp(48px, 6vw, 88px);
+	margin-top: clamp(48px, 6vw, 88px);
+}
+
+.es-case__body .es-case-section:first-child {
+	border-top: 0;
+	padding-top: 0;
+	margin-top: 0;
+}
+
+.es-case__body .es-case-label {
+	display: block;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--es-accent);
+	margin: 0 0 16px;
+}
+
+.es-case__body .es-case-heading {
+	font-family: var(--es-serif);
+	font-weight: 500;
+	font-size: clamp(26px, 3.6vw, 42px);
+	line-height: 1.08;
+	letter-spacing: -0.015em;
+	color: var(--es-ink);
+	margin: 0 0 20px;
+	max-width: 20ch;
+}
+
+.es-case__body .es-case-lead {
+	font-family: var(--es-serif);
+	font-weight: 400;
+	font-size: clamp(18px, 2vw, 23px);
+	line-height: 1.5;
+	color: var(--es-ink-2);
+	max-width: 58ch;
+	margin: 0 0 clamp(28px, 3.5vw, 40px);
+}
+
+/* ---------- bloque de dos columnas (texto/imagen) ---------- */
+
+.es-case__body .es-case-cols {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: clamp(28px, 4vw, 56px);
+	align-items: start;
+	margin: clamp(28px, 3.5vw, 40px) 0;
+}
+
+@media (max-width: 767px) {
+	.es-case__body .es-case-cols {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ---------- figura + caption ---------- */
+
+.es-case__body .es-case-figure {
+	margin: clamp(28px, 3.5vw, 40px) 0;
+}
+
+.es-case__body .es-case-figure img {
+	border: 1px solid var(--es-line);
+	border-radius: var(--es-radius);
+}
+
+.es-case__body .es-case-caption {
+	display: flex;
+	gap: 12px;
+	align-items: baseline;
+	margin-top: 12px;
+	font-family: var(--es-mono);
+	font-size: 11.5px;
+	line-height: 1.55;
+	color: var(--es-ink-3);
+}
+
+.es-case__body .es-case-caption__tag {
+	flex: none;
+	color: var(--es-accent);
+}
+
+/* ---------- marco tipo browser chrome (screenshot con barra de título) ---------- */
+
+.es-case__body .es-case-browser {
+	border: 1px solid var(--es-line);
+	border-radius: var(--es-radius);
+	overflow: hidden;
+	background: var(--es-surface);
+}
+
+.es-case__body .es-case-browser__bar {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	height: 36px;
+	padding: 0 14px;
+	background: var(--es-surface-2);
+	border-bottom: 1px solid var(--es-line-strong);
+}
+
+.es-case__body .es-case-browser__dot {
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	background: var(--es-line-strong);
+	display: block;
+}
+
+.es-case__body .es-case-browser__label {
+	margin-left: 10px;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	color: var(--es-ink-3);
+}
+
+.es-case__body .es-case-browser img {
+	border: 0;
+	border-radius: 0;
+}
+
+/* ---------- grilla de stats ---------- */
+
+.es-case__body .es-case-stats {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 1px;
+	background: var(--es-line);
+	border: 1px solid var(--es-line);
+	margin: clamp(28px, 3.5vw, 40px) 0;
+}
+
+.es-case__body .es-case-stat {
+	background: var(--es-paper-2);
+	padding: 22px 20px;
+}
+
+.es-case__body .es-case-stat__num {
+	font-family: var(--es-mono);
+	font-size: clamp(24px, 3vw, 32px);
+	font-weight: 500;
+	letter-spacing: -0.02em;
+	color: var(--es-ink);
+	line-height: 1;
+}
+
+.es-case__body .es-case-stat__label {
+	font-size: 12.5px;
+	line-height: 1.45;
+	color: var(--es-ink-3);
+	margin-top: 10px;
+}
+
+@media (max-width: 767px) {
+	.es-case__body .es-case-stats {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+/* ---------- timeline vertical ---------- */
+
+.es-case__body .es-case-timeline {
+	list-style: none;
+	margin: clamp(28px, 3.5vw, 40px) 0;
+	padding: 0;
+}
+
+.es-case__body .es-case-timeline__item {
+	position: relative;
+	padding: 0 0 22px 28px;
+	border-left: 1px solid var(--es-line-strong);
+	margin-left: 4px;
+}
+
+.es-case__body .es-case-timeline__item:last-child {
+	padding-bottom: 0;
+}
+
+.es-case__body .es-case-timeline__item::before {
+	content: '';
+	position: absolute;
+	left: -5px;
+	top: 4px;
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	background: var(--es-accent);
+}
+
+.es-case__body .es-case-timeline__title {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--es-ink);
+}
+
+.es-case__body .es-case-timeline__text {
+	font-size: 13.5px;
+	color: var(--es-ink-3);
+	margin-top: 3px;
+}
+
+/* ---------- decision cards (evidencia / trade-off / resultado) ---------- */
+
+.es-case__body .es-case-decisions {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 1px;
+	background: var(--es-line);
+	border: 1px solid var(--es-line);
+	margin: clamp(28px, 3.5vw, 40px) 0;
+}
+
+.es-case__body .es-case-decision {
+	background: var(--es-paper-2);
+	padding: clamp(22px, 2.4vw, 28px);
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.es-case__body .es-case-decision__num {
+	font-family: var(--es-mono);
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--es-accent);
+}
+
+.es-case__body .es-case-decision__title {
+	font-family: var(--es-serif);
+	font-weight: 500;
+	font-size: 18px;
+	line-height: 1.25;
+	color: var(--es-ink);
+	margin: 0;
+}
+
+.es-case__body .es-case-decision__row {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 6px 12px;
+	margin: 0;
+	font-size: 13.5px;
+	line-height: 1.5;
+}
+
+.es-case__body .es-case-decision__row dt {
+	font-family: var(--es-mono);
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+	padding-top: 2px;
+}
+
+.es-case__body .es-case-decision__row dd {
+	margin: 0;
+	color: var(--es-ink-2);
+}
+
+@media (max-width: 767px) {
+	.es-case__body .es-case-decisions {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ---------- quote / pullquote ---------- */
+
+.es-case__body .es-case-quote {
+	margin: clamp(28px, 3.5vw, 40px) 0;
+	padding: clamp(24px, 3vw, 32px) clamp(26px, 3.5vw, 40px);
+	border-left: 3px solid var(--es-accent);
+	background: var(--es-paper-2);
+}
+
+.es-case__body .es-case-quote p {
+	font-family: var(--es-serif);
+	font-weight: 400;
+	font-size: clamp(19px, 2.2vw, 25px);
+	line-height: 1.4;
+	color: var(--es-ink);
+	margin: 0;
+	max-width: 42ch;
+}
+
+.es-case__body .es-case-quote cite {
+	display: block;
+	margin-top: 14px;
+	font-style: normal;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	color: var(--es-ink-4);
+}
+
+/* ---------- grilla de status (verde = resuelto, naranja = atención —
+   mismos dos tokens semánticos que el resto del sistema, ningún color
+   nuevo: --es-accent y --es-decision) ---------- */
+
+.es-case__body .es-case-status {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 1px;
+	background: var(--es-line);
+	border: 1px solid var(--es-line);
+	margin: clamp(28px, 3.5vw, 40px) 0;
+}
+
+.es-case__body .es-case-status__col {
+	background: var(--es-paper-2);
+}
+
+.es-case__body .es-case-status__head {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	padding: 15px 18px;
+	border-bottom: 1px solid var(--es-line);
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--es-ink);
+}
+
+.es-case__body .es-case-status__head::before {
+	content: '';
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	background: var(--es-ink-4);
+	flex: none;
+}
+
+.es-case__body .es-case-status__col--done .es-case-status__head::before {
+	background: var(--es-accent);
+}
+
+.es-case__body .es-case-status__col--attention .es-case-status__head::before {
+	background: var(--es-decision);
+}
+
+.es-case__body .es-case-status__list {
+	list-style: none;
+	margin: 0;
+	padding: 16px 18px;
+	display: grid;
+	gap: 12px;
+}
+
+.es-case__body .es-case-status__list li {
+	position: relative;
+	padding-left: 16px;
+	font-size: 13.5px;
+	line-height: 1.5;
+	color: var(--es-ink-2);
+}
+
+.es-case__body .es-case-status__list li::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 8px;
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: var(--es-ink-4);
+}
+
+@media (max-width: 767px) {
+	.es-case__body .es-case-status {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+/* ---------- details / accordion (nativo, sin JS) ---------- */
+
+.es-case__body .es-case-details {
+	margin: clamp(24px, 3vw, 32px) 0;
+	border: 1px solid var(--es-line);
+	background: var(--es-paper-2);
+}
+
+.es-case__body .es-case-details summary {
+	list-style: none;
+	cursor: pointer;
+	padding: 18px 22px;
+	font-family: var(--es-mono);
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--es-ink-2);
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	letter-spacing: 0.02em;
+}
+
+.es-case__body .es-case-details summary::-webkit-details-marker {
+	display: none;
+}
+
+.es-case__body .es-case-details summary::before {
+	content: '+';
+	color: var(--es-accent);
+	font-size: 16px;
+	width: 14px;
+	flex: none;
+	transition: transform 0.2s ease;
+}
+
+.es-case__body .es-case-details[open] summary::before {
+	transform: rotate(45deg);
+}
+
+.es-case__body .es-case-details__body {
+	padding: 6px 22px 24px;
+	border-top: 1px solid var(--es-line);
+}
+
+.es-case__body .es-case-details__body > * + * {
+	margin-top: 1.2em;
 }

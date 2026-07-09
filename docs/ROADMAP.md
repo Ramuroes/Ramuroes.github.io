@@ -150,18 +150,41 @@ alignment bug — see `BACKLOG.md` "Bugs / fixes" for the root cause and
 fix. Scoped narrowly to that one bug; the broader Hero block/layout ticket
 flagged in Sprint 3 is still open and unstarted.
 
-**Sprint 4C — EN/ES Home strategy — next.** Create the Home (ES) page as
+**Sprint 4C — Case Study format system + global blue-state fix — done.**
+Built the reusable Case Study formatting layer on top of the Sprint 4B
+template: an optional sticky in-page index (manual `Label|#anchor` textarea
+field, new `_es_case_index` post meta — empty by default, renders nothing
+when unset) and a 14-class `.es-case-*` library
+(section/label/heading/lead/two-column/figure+caption/browser-chrome
+frame/stats grid/timeline/decision cards/pullquote/status grid/native
+`<details>` accordion) usable directly inside the standard editor via
+`the_content()` — no case builder, no ACF, no new repeaters. Visually
+informed by a reference case-study mockup (studied for layout/composition
+only — reimplemented from scratch with existing `--es-*` tokens, zero new
+colors/type, and its JS runtime was never shipped). Also closed out the
+long-flagged **global blue interaction-state bug**: every interactive
+element under the ESTAVILLO scope (desktop nav brand/links, mobile menu
+button, footer nav/meta links, buttons, arrow links, cards, and the two new
+case-study elements) now has explicit rest/hover/focus-visible/active/
+visited rules reinforced with `!important`, verified via an adversarial
+fake-Kadence-CSS-injection test to survive a worst-case external override —
+supersedes the narrower mobile-menu-only fix from Sprint 1's backlog item.
+See `estavillo-child/README.md` ("Sistema de formato de Case Study") for
+the full class reference and a copy-paste editor example.
+
+**Sprint 4D — EN/ES Home strategy — next.** Create the Home (ES) page as
 a Polylang translation of the existing Home page (same template, no new
 code) once real Spanish copy exists. Verify hero copy / UI strings
 resolve correctly per language through the existing `es__()` /
 `pll_register_string()` wiring.
 
-**Sprint 4D — Real content loading — next.** Enter real Presupuestador and
+**Sprint 4E — Real content loading — next.** Enter real Presupuestador and
 Trazur case studies as Case Study posts (now that the single template
-exists to display them properly), in both languages via their Polylang
-translations. Add real images. Refine EN/ES copy for all Home sections
-(within the single-language-global constraint of Home Content options —
-see Sprint 3 notes above).
+exists to display them properly, including the new `.es-case-*` formatting
+library), in both languages via their Polylang translations. Add real
+images. Refine EN/ES copy for all Home sections (within the
+single-language-global constraint of Home Content options — see Sprint 3
+notes above).
 
 ---
 

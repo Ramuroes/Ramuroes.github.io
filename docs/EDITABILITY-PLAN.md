@@ -228,6 +228,31 @@ See `estavillo-child/README.md` → "Selected Work — editable vía Case
 Studies", "Featured Case — editable vía Case Studies", and "Single Case
 Study page" for exact wp-admin usage instructions.
 
+**Case Study format system — done (Sprint 4C).** Two additions on top of
+the Sprint 4B template, both deliberately minimal:
+
+1. **Sticky in-page index** — one new plain-text field, `_es_case_index`
+   (a textarea, `Label|#anchor` per line), on the same "Case details" meta
+   box. Explicitly **not** a repeater and **not** ACF — approved V1
+   decision, same reasoning as the rest of this plan (native fields only,
+   simplest mechanism that works). Anchors are matched manually against
+   `id="…"` attributes the author adds inside the editor content; nothing
+   is auto-generated from headings. Empty field = index doesn't render, so
+   existing/older Case Studies are unaffected.
+2. **`.es-case-*` CSS class library** (`case-study.css`) — a fixed set of
+   ~14 classes (section, label, heading, lead, two-column, figure+caption,
+   browser-chrome frame, stats grid, timeline, decision cards, pullquote,
+   status grid, native `<details>` accordion) applied directly inside
+   `the_content()`. This is styling only, not a new content model — the
+   post body is still one `the_content()` field, edited in the standard
+   editor; the classes just give the author a documented vocabulary for
+   structuring that HTML. No new post type, no new meta fields, no block
+   registration, no page-builder abstraction.
+
+See `estavillo-child/README.md` → "Sistema de formato de Case Study" for
+the full class reference, the index field format, and a copy-paste
+example.
+
 ### Polylang — done (Sprint 4A)
 
 Approved V1 decisions (see the architecture decision conversation this

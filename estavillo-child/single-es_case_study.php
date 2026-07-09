@@ -18,6 +18,11 @@
  * el contenido del editor estándar de WordPress vía the_content() — nada
  * de campos custom para el cuerpo. No hay case builder acá.
  *
+ * Sprint 4C suma: un índice sticky opcional (campo "Case index" del meta
+ * box — manual, "Label|#anchor" por línea, ver docs) y la librería de
+ * clases .es-case-* (case-study.css) para estructurar contenido dentro del
+ * editor nativo — ver README para el listado completo con ejemplos.
+ *
  * @package estavillo-child
  */
 
@@ -64,7 +69,36 @@ if ( function_exists( 'wp_body_open' ) ) {
 					'period' => get_post_meta( $es_case_id, '_es_case_period', true ),
 				)
 			);
+
+			// Índice sticky: manual, "Label|#anchor" por línea (campo "Case
+			// index" del meta box). Si está vacío, el índice no se imprime.
+			$es_case_index_raw = get_post_meta( $es_case_id, '_es_case_index', true );
+			$es_case_index     = array();
+			if ( ! empty( $es_case_index_raw ) ) {
+				foreach ( preg_split( '/\r\n|\r|\n/', $es_case_index_raw ) as $es_index_line ) {
+					$es_index_line = trim( $es_index_line );
+					if ( '' === $es_index_line || false === strpos( $es_index_line, '|' ) ) {
+						continue;
+					}
+					list( $es_index_label, $es_index_href ) = array_map( 'trim', explode( '|', $es_index_line, 2 ) );
+					if ( '' !== $es_index_label && '' !== $es_index_href ) {
+						$es_case_index[] = array(
+							'label' => $es_index_label,
+							'href'  => $es_index_href,
+						);
+					}
+				}
+			}
 			?>
+			<?php if ( ! empty( $es_case_index ) ) : ?>
+				<nav class="es-case-index" aria-label="<?php esc_attr_e( 'Case sections', 'estavillo-child' ); ?>">
+					<div class="es-case-index__inner">
+						<?php foreach ( $es_case_index as $es_index_item ) : ?>
+							<a class="es-case-index__link" href="<?php echo esc_url( $es_index_item['href'] ); ?>"><?php echo esc_html( $es_index_item['label'] ); ?></a>
+						<?php endforeach; ?>
+					</div>
+				</nav>
+			<?php endif; ?>
 			<article class="es-section es-case">
 				<div class="es-container es-case__head" data-es-reveal>
 					<?php if ( ! empty( $es_case_kicker ) ) : ?>

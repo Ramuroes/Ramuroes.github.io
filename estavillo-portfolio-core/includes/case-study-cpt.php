@@ -106,6 +106,7 @@ function es_case_study_render_meta_box( $post ) {
 	$role              = get_post_meta( $post->ID, '_es_case_role', true );
 	$tools             = get_post_meta( $post->ID, '_es_case_tools', true );
 	$period            = get_post_meta( $post->ID, '_es_case_period', true );
+	$index             = get_post_meta( $post->ID, '_es_case_index', true );
 	$show_on_home_raw  = get_post_meta( $post->ID, '_es_case_show_on_home', true );
 	$show_on_home      = ( '' === $show_on_home_raw ) ? true : ( '1' === $show_on_home_raw );
 	$featured          = '1' === get_post_meta( $post->ID, '_es_case_featured', true );
@@ -141,6 +142,11 @@ function es_case_study_render_meta_box( $post ) {
 	<p>
 		<label for="es_case_period"><strong><?php esc_html_e( 'Period (optional)', 'estavillo-portfolio-core' ); ?></strong></label><br>
 		<input type="text" id="es_case_period" name="es_case_period" class="widefat" value="<?php echo esc_attr( $period ); ?>" placeholder="<?php esc_attr_e( 'e.g. 2024–2025', 'estavillo-portfolio-core' ); ?>">
+	</p>
+	<p>
+		<label for="es_case_index"><strong><?php esc_html_e( 'Case index (optional)', 'estavillo-portfolio-core' ); ?></strong></label><br>
+		<textarea id="es_case_index" name="es_case_index" class="widefat" rows="5" placeholder="<?php esc_attr_e( "One entry per line: Label|#anchor-id — e.g. Context|#context. Requires matching id=\"context\" attributes inside the body content. Leave empty to hide the sticky index entirely.", 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( $index ); ?></textarea>
+		<span class="description"><?php esc_html_e( 'Powers the sticky in-page index on this case\'s single page. One line per entry, format Label|#anchor-id.', 'estavillo-portfolio-core' ); ?></span>
 	</p>
 	<p>
 		<label>
@@ -185,6 +191,13 @@ function es_save_case_study_meta( $post_id ) {
 
 	if ( isset( $_POST['es_case_url'] ) ) {
 		update_post_meta( $post_id, '_es_case_url', esc_url_raw( wp_unslash( $_POST['es_case_url'] ) ) );
+	}
+
+	// Textarea multilinea: sanitize_text_field() colapsaría los saltos de
+	// línea (formato "Label|#anchor" por línea), así que usa
+	// sanitize_textarea_field() (nativo de WP) en vez del loop de arriba.
+	if ( isset( $_POST['es_case_index'] ) ) {
+		update_post_meta( $post_id, '_es_case_index', sanitize_textarea_field( wp_unslash( $_POST['es_case_index'] ) ) );
 	}
 
 	update_post_meta( $post_id, '_es_case_show_on_home', isset( $_POST['es_case_show_on_home'] ) ? '1' : '0' );
