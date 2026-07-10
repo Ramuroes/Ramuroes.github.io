@@ -1,6 +1,7 @@
 /* =========================================================================
-   ESTAVILLO — Site chrome (header + footer)
-   Compartido por Home y el single de Case Study (ambos reusan este chrome).
+   ESTAVILLO — Site chrome (header + breadcrumbs + footer)
+   Compartido por Home, el single de Case Study y las 4 páginas fijas
+   (Work/About/How I Work/Contact) — todas reusan este chrome.
    Dark premium, mobile-first. Estados interactivos: solo verde --es-accent,
    tintas --es-ink* y opacidad. Nunca azul.
 
@@ -35,6 +36,67 @@
 	.admin-bar .es-site-header {
 		top: 46px;
 	}
+}
+
+/* ---------- breadcrumbs (Home / [sección] / página o caso actual) ----------
+   Usados en Case Study, Work, About, How I Work y Contact — nunca en Home
+   (template-parts/breadcrumbs.php simplemente no se llama ahí). Movidos
+   acá desde case-study.css (sprint de infra/polish): eran invisibles en
+   4 de las 5 páginas que los necesitan porque case-study.css solo se
+   encola en el single de Case Study — ahora viven en el chrome
+   compartido, así que cargan en cualquier página que los use. */
+
+.es-breadcrumbs {
+	padding: 14px 0;
+	border-bottom: 1px solid var(--es-line);
+}
+
+.es-breadcrumbs__list {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.04em;
+}
+
+.es-breadcrumbs__item {
+	display: flex;
+	align-items: center;
+}
+
+.es-breadcrumbs__item:not(:first-child)::before {
+	content: '/';
+	margin: 0 9px;
+	color: var(--es-ink-4);
+}
+
+.es-breadcrumbs__link {
+	color: var(--es-ink-3) !important;
+	text-decoration: none;
+	transition: color var(--es-dur-fast) ease;
+}
+
+.es-breadcrumbs__link:hover,
+.es-breadcrumbs__link:focus-visible,
+.es-breadcrumbs__link:active {
+	color: var(--es-accent) !important;
+}
+
+.es-breadcrumbs__link:visited {
+	color: var(--es-ink-3) !important;
+}
+
+.es-breadcrumbs__current {
+	color: var(--es-ink-4);
+	max-width: 40ch;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .es-nav {

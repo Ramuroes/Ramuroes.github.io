@@ -7,7 +7,6 @@
    nuevos selectores aplicando las mismas variables --es-*.
 
    Estructura del archivo:
-   0. Breadcrumbs (.es-breadcrumbs)            — fuera de the_content()
    1. Índice sticky (.es-case-index)           — fuera de the_content()
    2. Hero del caso (.es-case__*)               — fuera de the_content()
       Sprint 4D: grilla editorial de 2 columnas en desktop
@@ -30,60 +29,10 @@
    usa ni se enqueuea en el sitio.
    ========================================================================= */
 
-/* ---------- breadcrumbs (Home / Work / título del caso) ---------- */
-
-.es-breadcrumbs {
-	padding: 14px 0;
-	border-bottom: 1px solid var(--es-line);
-}
-
-.es-breadcrumbs__list {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 0;
-	margin: 0;
-	padding: 0;
-	list-style: none;
-	font-family: var(--es-mono);
-	font-size: 11px;
-	letter-spacing: 0.04em;
-}
-
-.es-breadcrumbs__item {
-	display: flex;
-	align-items: center;
-}
-
-.es-breadcrumbs__item:not(:first-child)::before {
-	content: '/';
-	margin: 0 9px;
-	color: var(--es-ink-4);
-}
-
-.es-breadcrumbs__link {
-	color: var(--es-ink-3) !important;
-	text-decoration: none;
-	transition: color var(--es-dur-fast) ease;
-}
-
-.es-breadcrumbs__link:hover,
-.es-breadcrumbs__link:focus-visible,
-.es-breadcrumbs__link:active {
-	color: var(--es-accent) !important;
-}
-
-.es-breadcrumbs__link:visited {
-	color: var(--es-ink-3) !important;
-}
-
-.es-breadcrumbs__current {
-	color: var(--es-ink-4);
-	max-width: 40ch;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
+/* Breadcrumbs (.es-breadcrumbs) — movidos a site.css en el sprint de
+   infra/polish: se usan en 5 templates (Case Study + Work/About/How I
+   Work/Contact), no solo acá, así que viven en el CSS de chrome
+   compartido en vez de en este archivo Case-Study-only. Ver site.css. */
 
 /* ---------- índice sticky en-página (opcional, manual) ---------- */
 

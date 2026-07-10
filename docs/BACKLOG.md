@@ -156,6 +156,24 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   at 4 fixed rows each (same pattern as How I Work's 6 fixed steps). If
   a real timeline ever needs more than 4 entries, this becomes a proper
   repeater — not urgent, most careers fit in 4 rows for a portfolio.
+- **Done (Sprint 4H)** — How I Work dedicated page rebuilt as a real
+  editorial page (`template-parts/how-i-work-detail.php`), not a reused
+  copy of the Home teaser: same 6 steps, plus 3 new optional per-step
+  fields (Why it matters / Example / Tools) shown only there. Contact
+  page's heading hierarchy fixed (two competing giant headings → one H1
+  from page-head, one smaller supporting statement below) and gained 2
+  optional fields (secondary note, availability/status line). About's
+  hobbies/interests rebuilt from a single comma-separated field into 8
+  structured rows (label, icon, optional text, show/hide) with a new
+  7-icon curated library and CSS-only hover/focus micro-interactions.
+  "Home Content" renamed to **"Portfolio Content"** in wp-admin (label
+  only — option key/slug unchanged, no data lost). See
+  `estavillo-child/README.md` → "Where to edit each part of the
+  portfolio" for the full field reference.
+- **P3** — Hobbies' "order" is row position (same convention as every
+  other repeater in this codebase — Nav Links, Process Steps, Timeline,
+  Education), not a separate numeric field. If that ever feels
+  insufficient in practice, add one then — not speculatively now.
 - **P2** — Convert **Hero** to editable content (copy/CTAs are already
   filterable; coordinate with the Hero block/layout ticket above so
   editability doesn't get built on top of a layout that's about to
@@ -188,20 +206,28 @@ Editability priority order (for reference, full detail in
   `.es-case__body`), while mobile keeps today's horizontal/compact strip
   unchanged. Not built now — do not overbuild the index ahead of real
   content.
-- **P2** — Sticky header refinement (behavior/visual polish beyond the
-  current acceptable state — see `BACKLOG.md` header alignment note
-  below).
+- **Done (Sprint 4H)** — Sticky header was silently broken in real
+  WordPress (visibly not sticking on scroll) despite `position: sticky`
+  being present in the CSS — root cause was `.es-page { overflow-x: hidden }`
+  (base.css) turning `.es-page` into its own scroll-clipping ancestor,
+  which breaks `position: sticky` for any descendant per the CSS Overflow
+  spec. Fixed by removing that rule (the one real horizontal-bleed source,
+  the mobile hero SVG, was already self-contained by its own
+  `.es-hero { overflow: hidden }`). No admin toggle — sticky is automatic
+  on every ESTAVILLO template. Supersedes the "behavior/visual polish"
+  framing this item used to have below — the bug was functional, not
+  cosmetic.
 - **P2** — Optional "back to top" interaction.
-- **Done (Sprint 4G / mega sprint)** — Breadcrumbs (Home / Work / case
-  title) on the Case Study single page, accessible
+- **Done (Sprint 4G / mega sprint, then Sprint 4H)** — Breadcrumbs (Home /
+  Work / case title) on the Case Study single page, accessible
   (`<nav aria-label="Breadcrumb">`, `aria-current="page"`), Polylang-aware
   automatically (native `home_url()`/permalink behavior, no extra code).
-  See `template-parts/breadcrumbs.php`.
-- **P3** — Breadcrumbs only exist on the Case Study page today
-  (`template-parts/breadcrumbs.php` is generic/reusable by design). Extend
-  to the 4 new fixed pages (e.g. "Home / Work" on the Work page) only if a
-  real navigation need shows up — not urgent, those pages are one level
-  deep already and reachable from the main nav.
+  Sprint 4H extended them to Work/About/How I Work/Contact (they render
+  everywhere the ticket asked, never on Home) and fixed a second bug: the
+  breadcrumb CSS lived only in `case-study.css` (Case-Study-only), so it
+  would have rendered unstyled on the other 4 pages even once wired in —
+  moved to `site.css` (shared chrome). See `template-parts/breadcrumbs.php`
+  and `functions.php` → `es_breadcrumb_trail()`.
 
 ## Hero variants
 

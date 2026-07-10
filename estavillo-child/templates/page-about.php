@@ -34,6 +34,7 @@ if ( function_exists( 'wp_body_open' ) ) {
 <div id="es-page" class="es-page">
 
 	<?php get_template_part( 'template-parts/site-header' ); ?>
+	<?php get_template_part( 'template-parts/breadcrumbs', null, array( 'trail' => es_breadcrumb_trail( 'nav_about' ) ) ); ?>
 
 	<main id="top" class="es-main">
 		<?php

@@ -10,7 +10,22 @@
 	color: var(--es-ink);
 	font-family: var(--es-sans);
 	-webkit-font-smoothing: antialiased;
-	overflow-x: hidden;
+	/* NO overflow-x acá (bug real, encontrado en el sprint de infra/polish):
+	   .es-page es ancestro de .es-site-header y .es-case-index
+	   (position: sticky) en TODOS los templates. Por spec, poner overflow-x
+	   en un valor distinto de 'visible' sin tocar overflow-y hace que el
+	   navegador calcule overflow-y como 'auto' igual — .es-page pasaba a
+	   ser su propio contenedor de scroll, y eso rompe position:sticky de
+	   sus descendientes (quedan "sticky" dentro de .es-page, no respecto al
+	   viewport, así que visualmente nunca se sentían pegados al hacer
+	   scroll real). El único bleed horizontal real conocido (el SVG del
+	   hero en mobile, right:-10%/width:120%) ya se contiene solo con
+	   .es-hero { overflow: hidden } (hero.css) — ese contenedor está
+	   DESPUÉS del header en el DOM, así que no afecta su sticky. Si aparece
+	   un bleed horizontal nuevo en el futuro, conténé ESE elemento
+	   puntualmente (como ya hace .es-hero) — no vuelvas a poner overflow-x
+	   acá arriba.
+	*/
 }
 
 .es-page *,

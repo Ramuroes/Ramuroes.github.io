@@ -3,13 +3,18 @@
  * About — contenido completo de templates/page-about.php.
  *
  * Reusa los mismos filtros que ya alimentan el teaser de About en Home
- * (es_home_about_text / es_home_about_portrait — Sprint 3) más 4 filtros
- * nuevos de esta página (es_about_cv_url, es_about_hobbies,
- * es_about_timeline, es_about_education), todos con UI en Home Content
- * (wp-admin). Cada sección nueva es opcional: si no hay filas cargadas
- * todavía, esa sección entera no se imprime — mismo principio "vacío no
- * rompe nada" que el resto del tema, acá aplicado sección por sección en
- * vez de campo por campo.
+ * (es_home_about_text / es_home_about_portrait — Sprint 3) más los
+ * filtros nuevos de esta página (es_about_cv_url, es_about_timeline,
+ * es_about_education), todos con UI en Home Content (wp-admin). Cada
+ * sección nueva es opcional: si no hay filas cargadas todavía, esa
+ * sección entera no se imprime — mismo principio "vacío no rompe nada"
+ * que el resto del tema, acá aplicado sección por sección en vez de
+ * campo por campo.
+ *
+ * Hobbies & interests (sprint de infra/polish) es la excepción: sale de
+ * es_about_hobbies_visible() (functions.php), que YA aplica sus propios
+ * defaults (7 intereses sugeridos) — así que a diferencia de
+ * timeline/educación, esta sección SÍ tiene contenido real de entrada.
  *
  * @package estavillo-child
  */
@@ -24,19 +29,9 @@ $es_about_text     = apply_filters(
 );
 $es_about_portrait = apply_filters( 'es_home_about_portrait', '' );
 $es_cv_url         = apply_filters( 'es_about_cv_url', '' );
-$es_hobbies_raw    = apply_filters( 'es_about_hobbies', '' );
 $es_timeline       = apply_filters( 'es_about_timeline', array() );
 $es_education      = apply_filters( 'es_about_education', array() );
-
-$es_hobbies = array();
-if ( ! empty( $es_hobbies_raw ) ) {
-	foreach ( explode( ',', $es_hobbies_raw ) as $es_hobby ) {
-		$es_hobby = trim( $es_hobby );
-		if ( '' !== $es_hobby ) {
-			$es_hobbies[] = $es_hobby;
-		}
-	}
-}
+$es_hobbies        = es_about_hobbies_visible();
 ?>
 
 <section class="es-section es-about-page__intro" id="about">
@@ -129,11 +124,33 @@ if ( ! empty( $es_hobbies_raw ) ) {
 				<h2 class="es-label"><?php esc_html_e( 'Hobbies & interests', 'estavillo-child' ); ?></h2>
 			</div>
 		</div>
-		<div class="es-hobbies__list" data-es-reveal>
-			<?php foreach ( $es_hobbies as $es_hobby ) : ?>
-				<span class="es-pill"><?php echo esc_html( $es_hobby ); ?></span>
+		<ul class="es-hobbies__list" data-es-reveal>
+			<?php foreach ( $es_hobbies as $es_i => $es_hobby ) : ?>
+				<?php
+				$es_hobby_icon_key = ! empty( $es_hobby['icon'] ) ? $es_hobby['icon'] : '';
+				$es_hobby_icon_svg = $es_hobby_icon_key && function_exists( 'es_hobby_icon_svg' ) ? es_hobby_icon_svg( $es_hobby_icon_key ) : '';
+				?>
+				<li
+					class="es-hobby-item"
+					tabindex="0"
+					data-icon="<?php echo esc_attr( $es_hobby_icon_key ? $es_hobby_icon_key : 'none' ); ?>"
+					data-es-reveal
+					style="--es-reveal-delay: <?php echo esc_attr( $es_i * 50 ); ?>ms"
+				>
+					<span class="es-hobby-item__icon<?php echo '' === $es_hobby_icon_svg ? ' es-hobby-item__icon--empty' : ''; ?>" aria-hidden="true">
+						<?php
+						if ( '' !== $es_hobby_icon_svg ) {
+							echo wp_kses( $es_hobby_icon_svg, es_icon_svg_kses_rules() ); // phpcs:ignore -- whitelisted SVG, wp_kses aplicado acá mismo.
+						}
+						?>
+					</span>
+					<span class="es-hobby-item__label"><?php echo esc_html( $es_hobby['label'] ); ?></span>
+					<?php if ( ! empty( $es_hobby['text'] ) ) : ?>
+						<span class="es-hobby-item__text"><?php echo esc_html( $es_hobby['text'] ); ?></span>
+					<?php endif; ?>
+				</li>
 			<?php endforeach; ?>
-		</div>
+		</ul>
 	</div>
 </section>
 <?php endif; ?>

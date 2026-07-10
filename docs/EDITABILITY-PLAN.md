@@ -345,6 +345,20 @@ mechanism. See the README's "V1 / V2" note for what a Gutenberg-based V2
 would look like for these same sections, and "Páginas fijas" in
 `estavillo-child/README.md` for the full field reference.
 
+**Infra/polish follow-up (Sprint 4H):** the fixed pages above shipped
+with two real bugs (sticky header not sticking, breadcrumbs missing/
+unstyled on 4 of 5 pages that needed them) — both root-caused and fixed,
+see `ROADMAP.md` → Sprint 4H for the diagnosis. Also in that sprint: How
+I Work's dedicated page became a genuinely richer editorial page (not a
+reused Home teaser) with 3 new optional per-step fields; Contact's
+heading hierarchy was fixed and gained 2 optional fields; About's hobbies
+field was rebuilt from one text field into a structured, iconed,
+show/hide-able list of up to 8 items. The options page itself was
+renamed **"Portfolio Content"** in wp-admin (cosmetic only — same option
+key, same menu slug, same filters). This closes out the "infrastructure"
+phase of V1 — from here, work shifts to loading real content (Sprint 4F)
+rather than building more structure.
+
 ---
 
 ## Editability priority order

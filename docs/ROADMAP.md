@@ -252,6 +252,70 @@ No Home sections, global typography, or global colors were touched.
 rebuilt (the plugin changed this sprint — new hero-layout field, Work
 query, About fields, icon choices in `home-content-options.php`).
 
+**Sprint 4H — Infra/polish: sticky header + breadcrumbs fixes, richer How
+I Work / Contact pages, hobbies system — done.** Backup branch confirmed
+intact, working tree clean before starting.
+
+- **Sticky header, root cause found and fixed.** `.es-page` had
+  `overflow-x: hidden` (base.css) — an ancestor of `.es-site-header` and
+  `.es-case-index` on every single template. Per the CSS Overflow spec,
+  setting only `overflow-x` (not `overflow-y`) makes the browser compute
+  `overflow-y: auto` too, turning `.es-page` into its own scroll-clipping
+  container — which breaks `position: sticky` for any descendant (it
+  sticks relative to `.es-page`, not the viewport). Verified with a real
+  scroll test (not just checking the computed `position` value, which is
+  what let this ship undetected — the header's `getBoundingClientRect().top`
+  went to -387px after scrolling with the old CSS, confirmed pinned at 0
+  with the fix). The one real horizontal-bleed source (the mobile hero
+  SVG, `right:-10%`/`width:120%`) was already self-contained by
+  `.es-hero { overflow: hidden }`, so removing the redundant rule was
+  safe. No new admin control — sticky is automatic, always was meant to
+  be.
+- **Breadcrumbs, root cause found and fixed.** Two separate bugs: (1)
+  `template-parts/breadcrumbs.php` was only ever called from
+  `single-es_case_study.php` — never wired into Work/About/How I
+  Work/Contact. (2) Its CSS lived in `case-study.css`, which only loads on
+  the Case Study template — so even wiring it in elsewhere would have
+  rendered unstyled text. Fixed both: moved the CSS to `site.css` (shared
+  chrome, loads everywhere the header does) and added a reusable
+  `es_breadcrumb_trail()` helper (`functions.php`), now called from all 5
+  interior pages. Home deliberately has none.
+- **How I Work dedicated page rebuilt.** New
+  `template-parts/how-i-work-detail.php` — an editorial vertical sequence
+  (numbered marker column + connecting line, not a SaaS icon-circle
+  timeline), showing 3 new optional per-step fields ("Why it matters",
+  "Example", "Tools" — rendered as pills) that the compact Home teaser
+  never shows. Extracted the shared step-defaults and icon-rendering logic
+  into `functions.php` (`es_home_process_steps()`,
+  `es_process_step_icon_markup()`) so the teaser and detail page can't
+  drift out of sync. Icon library grew from 8 to 10 (added `map` and
+  `tool`, the two the ticket named explicitly that weren't covered yet).
+- **Contact page hierarchy fixed.** Root cause: `page-head.php` printed
+  "Contact." at H1 scale, then `contact-content.php` immediately printed
+  "Let's talk." at `.es-footer-cta__title` scale — bigger than the H1
+  above it. Now "Let's talk." renders at a deliberately smaller,
+  supporting scale (`.es-contact-page__statement`, between H2 and lead).
+  Added 2 new optional fields: a secondary note and an availability/status
+  line (rendered as the same status-pill component Featured Case already
+  uses).
+- **About hobbies/interests, rebuilt as a real structured system.**
+  Replaced the single comma-separated text field with up to 8 rows (label,
+  icon, optional short text, Show/hide checkbox) — ships with the 7
+  suggested interests pre-filled as real default content (not empty
+  scaffolding). New curated icon library (taekwondo, music, coffee, horse,
+  drawing, travel, cinema), each with a single CSS hover/focus
+  micro-interaction (transform/opacity only, triggered by
+  `:hover`/`:focus-visible`, never a loop) — covered automatically by the
+  sitewide `prefers-reduced-motion` rule. Keyboard-focusable
+  (`tabindex="0"`) for interaction parity; the label is always visible so
+  touch users never depend on hover to understand an item.
+- **"Home Content" renamed to "Portfolio Content"** (visible label only —
+  menu slug, option key, and every function/filter name unchanged, so no
+  saved data or bookmarked URL breaks).
+- New README section, "Where to edit each part of the portfolio" — maps
+  every field above to its exact wp-admin location, plus what's not
+  editable yet and what V2 will change.
+
 ---
 
 ## Sprint 5 — Hero variants

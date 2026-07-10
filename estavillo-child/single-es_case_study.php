@@ -88,22 +88,10 @@ if ( function_exists( 'wp_body_open' ) ) {
 			$es_hero_layout       = get_post_meta( $es_case_id, '_es_case_hero_layout', true );
 			$es_hero_layout_class = ( $es_hero_layout && 'split-right' !== $es_hero_layout ) ? ' es-case__hero--' . sanitize_html_class( $es_hero_layout ) : '';
 
-			// Breadcrumbs: Home / Work / título del caso. El link "Work" reusa
-			// es_nav_links() (mismo array que header/mobile/footer) — si se
-			// repunta a una página real, el breadcrumb la sigue automáticamente.
-			$es_breadcrumb_trail = array(
-				array(
-					'label' => __( 'Home', 'estavillo-child' ),
-					'url'   => home_url( '/' ),
-				),
-			);
-			foreach ( es_nav_links() as $es_bc_link ) {
-				if ( es__( 'nav_work' ) === $es_bc_link['label'] ) {
-					$es_breadcrumb_trail[] = $es_bc_link;
-					break;
-				}
-			}
-			$es_breadcrumb_trail[] = array( 'label' => get_the_title() );
+			// Breadcrumbs: Home / Work / título del caso (helper compartido,
+			// ver functions.php → es_breadcrumb_trail() — también usado por
+			// las 4 páginas fijas).
+			$es_breadcrumb_trail = es_breadcrumb_trail( 'nav_work', get_the_title() );
 
 			// Índice sticky: manual, "Label|#anchor" por línea (campo "Case
 			// index" del meta box). Si está vacío, el índice no se imprime.

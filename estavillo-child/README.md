@@ -23,6 +23,110 @@ construido en V1 es descartable: los datos (post meta, el option
 seguir leyendo — ver `docs/EDITABILITY-PLAN.md` para el detalle de esta
 estrategia de migración.
 
+## Where to edit each part of the portfolio
+
+Everything below is in **English on purpose** — it's the practical
+"where do I click" reference, meant to be read directly in wp-admin
+without needing to know the codebase. Three places, total:
+
+### 1. WordPress → Case Studies
+
+Each individual case (**Case Studies → All Case Studies → [open a case]**):
+
+| Field | Where |
+|---|---|
+| Case title | Native "Title" field (top of the editor) |
+| Case body content | Native block editor content area (`the_content()` — this is where the `.es-case-*` formatting classes go, see "Sistema de formato de Case Study" below) |
+| Excerpt | Native "Excerpt" panel (sidebar) |
+| Featured image | Native "Featured image" panel (sidebar) |
+| Tags | Native "Case Tags" panel (sidebar) |
+| Status / label (e.g. "In progress") | Meta box "Case details" → **Label / status** |
+| Role | Meta box "Case details" → **Role** |
+| Tools | Meta box "Case details" → **Tools** |
+| Period | Meta box "Case details" → **Period** |
+| Hero layout (split-right / split-left / compact / stacked) | Meta box "Case details" → **Hero layout** |
+| Show on Home / Work "Selected" vs. "Archive" | Meta box "Case details" → **Show this case in Home → Selected Work** checkbox (same flag drives both) |
+| Featured on Home | Meta box "Case details" → **Feature this case on Home** checkbox |
+| Case index (sticky in-page nav) | Meta box "Case details" → **Case index** textarea (`Label\|#anchor` per line) |
+| Eyebrow / category | Meta box "Case details" → **Eyebrow / category** |
+
+### 2. WordPress → Estavillo Portfolio Core → Portfolio Content
+
+One page (**Case Studies → Portfolio Content** in the wp-admin sidebar —
+named "Home Content" before this sprint; renamed because it now feeds
+more than Home, see the note in the code). Everything on it is grouped
+by section, top to bottom:
+
+| Section | Fields |
+|---|---|
+| **About** | About text, About link, Portrait image URL, CV / résumé URL |
+| **Hobbies & interests** (About page) | Up to 8 rows: label, icon, optional short text, Show/hide checkbox — ships with 7 suggested interests pre-filled |
+| **Career timeline** (About page) | Up to 4 rows: year, role/title, short description |
+| **Education & certificates** (About page) | Up to 4 rows: degree/certificate, institution, year |
+| **How I Work** | 6 steps: title, description, icon, plus optional "Why it matters" / "Example" / "Tools" (those 3 are shown only on the dedicated How I Work page, never on the Home teaser) |
+| **Connect** | Connect title, Connect lead text, Contact email, Connect link, optional Secondary note, optional Availability/status line (the last 2 are shown only on the dedicated Contact page) |
+| **Header** | 4 navigation link labels + URLs (shared by the header nav, the mobile menu, the footer nav, and every breadcrumb trail) |
+| **Footer** | LinkedIn URL, Behance URL, Location |
+
+Every field follows the same rule: **leave it blank and the site keeps
+its current placeholder** — nothing here can put a page into a broken or
+half-empty state.
+
+### 3. Appearance → Customize → Estavillo
+
+The WordPress Customizer (**Appearance → Customize → Estavillo**), for
+site-wide visual options that aren't page content:
+
+| Control | What it does |
+|---|---|
+| Accent color | Green (default) or orange — the one accent color used everywhere |
+| Desktop hero variant | Which animated hero motion engine runs on desktop (Home only) |
+| Mobile hero variant | Same, for mobile |
+| Font preset | "Design system" (Newsreader/Instrument Sans/Spline Sans Mono) or "Classic mockup" (system fonts, no web fonts loaded) |
+
+### Automatic — nothing to configure
+
+These work on their own, on every template that needs them (Home, the 4
+fixed pages, and the single Case Study page — see the table in "Qué
+incluye" below for exactly which assets load where):
+
+- **Sticky header.** Always on, no toggle exists anywhere. (It shipped
+  broken in the previous sprint — see "Root cause" further down in this
+  README's changelog notes, or the commit that fixed it — a CSS
+  ancestor-overflow bug, not a missing feature. If you ever see it not
+  sticking again, that's a bug to fix, not a setting to find.)
+- **Breadcrumbs.** Automatic on Case Study, Work, About, How I Work and
+  Contact; intentionally absent on Home. The "Work"/"About"/etc. link in
+  each trail always follows whatever you've set that nav link's label/URL
+  to in Portfolio Content → Header.
+- **Responsive menu.** The mobile hamburger menu — always on below the
+  919px breakpoint, no configuration.
+- **Polylang language switcher.** Automatically becomes a real EN/ES
+  switcher the moment Polylang is installed and active with 2+ languages;
+  falls back to static "EN / ES" text otherwise. Nothing to turn on.
+
+### What is NOT editable yet (and where it's headed)
+
+- **Home's hero copy/CTAs** are filterable (`es_home_hero_title`, etc.)
+  but have no wp-admin UI yet — still Code Snippets-only. Flagged in
+  `docs/BACKLOG.md` as deliberately deferred until the Hero block/layout
+  ticket lands (editability shouldn't be built on a layout that's about
+  to change).
+- **Global typography and brand colors** are Customizer-level only
+  (accent color, font preset) — there's no per-section color/type
+  override anywhere, by design (see "Do not change global typography or
+  brand colors" in every ticket so far).
+- **Light mode** doesn't exist yet — the toggle in the header is a
+  reserved, non-functional slot.
+- **Home Content/Portfolio Content is single-language.** With Polylang
+  active, all of it (About text, How I Work steps, hobbies, Connect copy,
+  nav labels) is shared EN/ES, not per-language — approved V1 decision,
+  see `docs/EDITABILITY-PLAN.md` → "Polylang".
+- **V2** (see "V1 / V2" above) replaces all of this — the fixed page
+  templates, the meta boxes, the Portfolio Content options page — with
+  Gutenberg blocks/patterns, so editing feels native to WordPress instead
+  of "fill in this options page." Not started, not scheduled in detail.
+
 ## Qué incluye
 
 ```

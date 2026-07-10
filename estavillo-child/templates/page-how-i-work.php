@@ -1,12 +1,14 @@
 <?php
 /**
  * Template Name: Estavillo — How I Work
- * Description: Página dedicada al proceso — reusa el mismo template-part
- * de 6 pasos que ya existía en Home (template-parts/how-i-work.php,
- * editable desde Home Content), con soporte de ícono por paso (librería
- * curada, ver functions.php → es_process_icon_choices()) y el mismo
- * scroll-reveal sutil de siempre ([data-es-reveal], sin dependencias
- * nuevas — motion.js ya se comparte con Home y Case Study).
+ * Description: Página dedicada al proceso — versión editorial completa
+ * (template-parts/how-i-work-detail.php) de los mismos 6 pasos que Home
+ * (mismo dato, es_home_process_steps() en functions.php), con "Why it
+ * matters" / "Example" / "Tools" opcionales por paso, ícono por paso
+ * (librería curada — functions.php → es_process_icon_choices()), y el
+ * mismo scroll-reveal sutil de siempre ([data-es-reveal], sin
+ * dependencias nuevas). Distinto del teaser compacto de Home a propósito
+ * — ver how-i-work-detail.php.
  *
  * Standalone igual que templates/page-home-estavillo.php: imprime su
  * propio wp_head()/wp_footer() y reusa el chrome ESTAVILLO.
@@ -35,6 +37,7 @@ if ( function_exists( 'wp_body_open' ) ) {
 <div id="es-page" class="es-page">
 
 	<?php get_template_part( 'template-parts/site-header' ); ?>
+	<?php get_template_part( 'template-parts/breadcrumbs', null, array( 'trail' => es_breadcrumb_trail( 'nav_how' ) ) ); ?>
 
 	<main id="top" class="es-main">
 		<?php
@@ -48,14 +51,7 @@ if ( function_exists( 'wp_body_open' ) ) {
 			)
 		);
 
-		get_template_part(
-			'template-parts/how-i-work',
-			null,
-			array(
-				'num'      => '02',
-				'hide_cta' => true,
-			)
-		);
+		get_template_part( 'template-parts/how-i-work-detail' );
 
 		while ( have_posts() ) :
 			the_post();
