@@ -6,8 +6,8 @@
   1. In wp-admin, create/open the Case Study post for this case (Case
      Studies → Add New).
   2. In the block editor, add a "Custom HTML" block and paste EVERYTHING
-     below the closing "-->" of this comment (do not paste this comment
-     block itself — it's instructions, not content).
+     below the end of this instructional comment (do not paste this
+     comment block itself — it's instructions, not content).
   3. Fill in the native fields separately (this HTML is only the body —
      WordPress meta fields are not part of post content):
        Title            Presupuestador
@@ -61,19 +61,19 @@
 	<div class="es-case-stats">
 		<div class="es-case-stat">
 			<div class="es-case-stat__num">1</div>
-			<div class="es-case-stat__label">person held the entire pricing model</div>
+			<div class="es-case-stat__label">person holds the pricing judgment today</div>
 		</div>
 		<div class="es-case-stat">
-			<div class="es-case-stat__num">3–5</div>
-			<div class="es-case-stat__label">days average turnaround for a formal quote</div>
+			<div class="es-case-stat__num">Days</div>
+			<div class="es-case-stat__label">not minutes — how long a formal quote can take today, without a formally measured average yet</div>
 		</div>
 		<div class="es-case-stat">
 			<div class="es-case-stat__num">0</div>
 			<div class="es-case-stat__label">written criteria — everything was tacit</div>
 		</div>
 		<div class="es-case-stat">
-			<div class="es-case-stat__num">2</div>
-			<div class="es-case-stat__label">new hires unable to estimate independently</div>
+			<div class="es-case-stat__num">Team</div>
+			<div class="es-case-stat__label">estimating independently, team-wide, is the goal — not yet the case beyond the original estimator</div>
 		</div>
 	</div>
 </div>
@@ -100,7 +100,7 @@
 
 <div class="es-case-section" id="architecture">
 	<div class="es-case-label">Fig. 04 — System architecture</div>
-	<h2 class="es-case-heading">One pricing model, three surfaces.</h2>
+	<h2 class="es-case-heading">One pricing model, two surfaces.</h2>
 	<p class="es-case-lead">Rather than building a single monolithic app up front, the system separates the <em>pricing logic</em> (versioned, inspectable, owned by the workshop) from the <em>surfaces</em> that read it — so the estimator could keep working day one, and the interface could evolve independently of the math underneath.</p>
 
 	<div class="es-case-cols">
@@ -116,7 +116,7 @@
 			</div>
 		</div>
 		<div>
-			<p>Inputs (material, dimensions, finish, urgency) feed a single pricing model. That model outputs both a fast orientative range and, once confirmed, a full itemized quote. The same model is queried from the Sheets MVP and, later, from the Alpha app — so switching surfaces never means re-deriving the logic.</p>
+			<p>Inputs (material, dimensions, finish, urgency) feed a single pricing model. That model is designed to return both a fast orientative range and, once confirmed, a full itemized quote. The Sheets MVP validated this logic first; App Alpha is built to evolve the same pricing logic into a guided interface, rather than starting the reasoning over from scratch.</p>
 			<p>[Replace the placeholder diagram with the real input → pricing model → output flow once redrawn as a final asset.]</p>
 		</div>
 	</div>
@@ -144,7 +144,7 @@
 
 <div class="es-case-section" id="app-alpha">
 	<div class="es-case-label">Fig. 06 — App Alpha</div>
-	<h2 class="es-case-heading">From a spreadsheet only one person could drive to a tool the team can use.</h2>
+	<h2 class="es-case-heading">From a spreadsheet only one person could drive, toward a tool designed for the wider team.</h2>
 
 	<div class="es-case-browser">
 		<div class="es-case-browser__bar">
@@ -160,12 +160,12 @@
 
 	<ol class="es-case-timeline">
 		<li class="es-case-timeline__item">
-			<div class="es-case-timeline__title">Same model, new front door</div>
-			<div class="es-case-timeline__text">The Alpha app reads the same pricing model validated in Sheets — no logic was rewritten, only re-surfaced.</div>
+			<div class="es-case-timeline__title">Same logic, new front door</div>
+			<div class="es-case-timeline__text">App Alpha builds on the same pricing logic validated in Sheets, evolving it into a guided interface rather than starting the reasoning over.</div>
 		</li>
 		<li class="es-case-timeline__item">
 			<div class="es-case-timeline__title">Guided input instead of a blank spreadsheet</div>
-			<div class="es-case-timeline__text">A short structured form replaces free-form cells, so anyone on the team — not just the original estimator — can produce a consistent quote.</div>
+			<div class="es-case-timeline__text">A short structured form replaces free-form cells, with the goal that, over time, anyone on the team — not just the original estimator — can produce a consistent quote.</div>
 		</li>
 		<li class="es-case-timeline__item">
 			<div class="es-case-timeline__title">Fast range first, precise quote second</div>
@@ -177,7 +177,7 @@
 <div class="es-case-section" id="ai-role">
 	<div class="es-case-label">Fig. 07 — The role of AI</div>
 	<h2 class="es-case-heading">AI assists the estimate. It never silently sets the price.</h2>
-	<p class="es-case-lead">AI is used in three narrow, inspectable places — each one assistive, each one overridable by the person running the quote.</p>
+	<p class="es-case-lead">AI is explored in three narrow, inspectable places in the flow — each one meant to assist, and each one meant to stay overridable by the person running the quote.</p>
 
 	<div class="es-case-decisions">
 		<div class="es-case-decision">
@@ -185,7 +185,7 @@
 			<h3 class="es-case-decision__title">Reading raw input</h3>
 			<dl class="es-case-decision__row">
 				<dt>Task</dt>
-				<dd>Extract dimensions/material notes from a photo or a client's free-text description.</dd>
+				<dd>Extracting dimensions or material notes from a photo or a client's free-text description.</dd>
 				<dt>Guardrail</dt>
 				<dd>Always shown back to the estimator as editable fields before pricing runs.</dd>
 			</dl>
@@ -195,7 +195,7 @@
 			<h3 class="es-case-decision__title">Suggesting a range</h3>
 			<dl class="es-case-decision__row">
 				<dt>Task</dt>
-				<dd>Propose an orientative price range from historical quotes with similar inputs.</dd>
+				<dd>Proposing an orientative price range from historical quotes with similar inputs.</dd>
 				<dt>Guardrail</dt>
 				<dd>Labeled explicitly as a suggestion; the pricing model's own logic is the final number.</dd>
 			</dl>
@@ -205,9 +205,9 @@
 			<h3 class="es-case-decision__title">Flagging anomalies</h3>
 			<dl class="es-case-decision__row">
 				<dt>Task</dt>
-				<dd>Flag a quote that falls far outside the historical pattern for review before sending.</dd>
+				<dd>A future direction being explored: flagging a quote that falls far outside the historical pattern, so someone reviews it before sending.</dd>
 				<dt>Guardrail</dt>
-				<dd>Advisory only — never blocks sending a quote, only asks for a second look.</dd>
+				<dd>If built, this stays advisory only — never blocking a quote, only asking for a second look.</dd>
 			</dl>
 		</div>
 	</div>
@@ -221,9 +221,9 @@
 		<div class="es-case-status__col es-case-status__col--done">
 			<div class="es-case-status__head">Working today</div>
 			<ul class="es-case-status__list">
-				<li>Fast orientative range for common job types</li>
-				<li>Shared, versioned pricing model (no longer one person's memory)</li>
-				<li>Full quote history logged for every job</li>
+				<li>An orientative range for common job types, working in the Sheets MVP</li>
+				<li>A versioned pricing model — no longer only in one person's memory</li>
+				<li>Quotes run through the system are logged, building a working history</li>
 			</ul>
 		</div>
 		<div class="es-case-status__col es-case-status__col--attention">
@@ -231,7 +231,7 @@
 			<ul class="es-case-status__list">
 				<li>Unusual/one-off jobs still fall back to manual judgment</li>
 				<li>No mobile-first flow yet for quoting on the shop floor</li>
-				<li>AI-suggested ranges need more historical data to stay accurate as material costs shift</li>
+				<li>AI-assisted ranges are an early exploration — accuracy will depend on building enough historical data over time</li>
 			</ul>
 		</div>
 	</div>
@@ -241,7 +241,7 @@
 	<div class="es-case-label">Fig. 09 — Reflection</div>
 	<h2 class="es-case-heading">The hard part was never the interface.</h2>
 	<div class="es-case-quote">
-		<p>The real design work was making one estimator's tacit judgment explicit enough to write down, disagree with, and improve — the app was just the last, easiest step once that was done.</p>
+		<p>The real design work has been making one estimator's tacit judgment explicit enough to write down, disagree with, and improve — the interface is turning out to be a smaller part of the effort than expected, once that judgment is written down clearly enough to build on.</p>
 		<cite>Ramiro Estavillo, Product Designer</cite>
 	</div>
 	<p>[Replace with a longer personal reflection once the case is further along — what surprised you, what you'd do differently, what this project changed about how you approach similar operational systems.]</p>
