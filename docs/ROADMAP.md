@@ -316,6 +316,47 @@ intact, working tree clean before starting.
   every field above to its exact wp-admin location, plus what's not
   editable yet and what V2 will change.
 
+**Sprint 4I — Presupuestador × REstimator design-reference adaptation —
+done.** A Claude Design handoff bundle (a separate design-exploration
+repo, "REstimator (Dark)" case-study mockup) was reviewed as visual,
+interaction, and narrative *reference only* — not copied, not used as a
+content source, and its runtime (`support.js`) was never touched. Three
+small tickets:
+
+- **CSS (additive only).** Two new opt-in `.es-case-*` components in
+  `case-study.css`: `.es-case-ladder` (horizontal stage/phase chip
+  sequence, `--active` marks the current stage using the existing
+  `--es-accent` green — never `--es-decision` orange, which stays reserved
+  for a single decision/focus moment) and `.es-case-taxonomy` (root label +
+  variable/category grid + an optional "adjusted by…" modifier row). Same
+  rules as every existing class here: only `--es-*` tokens, no new
+  colors/fonts, no JS, invisible to every case that doesn't use them.
+- **Content (Presupuestador masters only).** Enriched
+  `presupuestador-case-study-{es,en}.html` in place: a `.es-case-ladder` in
+  `#overview` showing the real evolution (diagnosis → documented criteria →
+  Sheets MVP → calibration → App Alpha *(marked active — true today per
+  `#results`)* → team-wide adoption *(explicitly the unproven goal, not a
+  claim)*), and a `.es-case-taxonomy` in `#system` visualizing the pricing
+  variables already named in `#discovery`'s prose (material/thickness, cut
+  complexity, finishing, machine availability, adjusted by client
+  relationship and urgency). All 13 anchors, their order, and the Case
+  Index untouched. No numbers were introduced — the reference mockup's
+  illustrative stats (file counts, record counts, override ratios) were
+  deliberately **not** reintroduced; that content-integrity call was
+  already made once (see the editorial note at the top of both HTML
+  files) and stands.
+- **Docs.** `estavillo-child/README.md`'s class table and copy-paste
+  example gained the two new classes; the example's `es-case-stat` values
+  (previously `~650` / `1,600+` — traceable to the same reference mockup)
+  were replaced with an obviously generic `N` placeholder plus an explicit
+  "don't invent this number" note, so the illustrative figures no longer
+  live anywhere in this repo as something that reads like real data.
+
+No template, CPT, or JS changes; no new fields; no dark/light theme
+toggle added (theme stays dark-first per `DECISIONS.md`). Publishing
+Presupuestador to wp-admin is still the open step described in Sprint 4G's
+entry above and `BACKLOG.md`.
+
 ---
 
 ## Sprint 5 — Hero variants

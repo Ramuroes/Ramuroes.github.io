@@ -442,6 +442,8 @@ dentro de lo que imprime `the_content()`):
 | `es-case-quote` (en un `<blockquote>`) + `<cite>` adentro | Pullquote grande con borde de acento. |
 | `es-case-status` (contenedor) + `es-case-status__col` (agregale `--done` o `--attention`) + `__head` / `__list` | Grilla de status (4 → 2 en mobile). `--done` pinta el punto en verde (`--es-accent`), `--attention` en naranja (`--es-decision`) — mismos dos colores que ya usa el resto del sistema, ninguno nuevo. |
 | `es-case-details` (en un `<details>`) + `<summary>` + `es-case-details__body` | Accordion nativo del navegador — **sin JavaScript**, con un `+` que rota a 45° al abrirse. |
+| `es-case-ladder` (`<ol>`) + `es-case-ladder__step` (`<li>`, agregale `--active` a la etapa actual) | Secuencia horizontal de etapas/fases en chips (p. ej. "Diagnóstico → Criterios → MVP → … → Adopción"). Se envuelve en varias líneas en mobile. Usado por primera vez en el caso Presupuestador (ver `docs/content/presupuestador-case-study-{es,en}.html`, sección Resumen). |
+| `es-case-taxonomy` (contenedor) + `__root` + `__grid`/`__item`/`__item-title`/`__item-meta` + `__mods`/`__mods-label`/`__mods-tags`/`__tag` | Diagrama de raíz + grilla de variables/categorías + fila opcional de "se ajusta según…" con tags. 4 columnas en desktop → 2 en mobile. Usado por primera vez en Presupuestador, sección Sistema, para visualizar las variables reales que alimentan el modelo de precios. |
 
 **Ejemplo completo para pegar en un bloque HTML personalizado:**
 
@@ -465,8 +467,8 @@ dentro de lo que imprime `the_content()`):
   </figure>
 
   <div class="es-case-stats">
-    <div class="es-case-stat"><div class="es-case-stat__num">~650</div><div class="es-case-stat__label">archivos leídos</div></div>
-    <div class="es-case-stat"><div class="es-case-stat__num">1,600+</div><div class="es-case-stat__label">registros</div></div>
+    <div class="es-case-stat"><div class="es-case-stat__num">N</div><div class="es-case-stat__label">reemplazá por una métrica real y verificada del caso — nunca inventada</div></div>
+    <div class="es-case-stat"><div class="es-case-stat__num">N</div><div class="es-case-stat__label">si no tenés el número todavía, describilo en prosa en vez de poner una cifra de ejemplo acá</div></div>
   </div>
 </div>
 
@@ -495,6 +497,48 @@ dentro de lo que imprime `the_content()`):
   </details>
 </div>
 ```
+
+**Ejemplo de `es-case-ladder` y `es-case-taxonomy`** (sumados para el caso
+Presupuestador — ver `docs/content/presupuestador-case-study-{es,en}.html`
+para el uso real):
+
+```html
+<ol class="es-case-ladder">
+  <li class="es-case-ladder__step">Etapa uno</li>
+  <li class="es-case-ladder__step">Etapa dos</li>
+  <li class="es-case-ladder__step es-case-ladder__step--active">Etapa actual</li>
+  <li class="es-case-ladder__step">Etapa futura</li>
+</ol>
+
+<div class="es-case-taxonomy">
+  <div class="es-case-taxonomy__root">Lo que se está mapeando</div>
+  <div class="es-case-taxonomy__grid">
+    <div class="es-case-taxonomy__item">
+      <div class="es-case-taxonomy__item-title">Variable uno</div>
+      <div class="es-case-taxonomy__item-meta">qué mueve</div>
+    </div>
+    <div class="es-case-taxonomy__item">
+      <div class="es-case-taxonomy__item-title">Variable dos</div>
+      <div class="es-case-taxonomy__item-meta">qué mueve</div>
+    </div>
+  </div>
+  <div class="es-case-taxonomy__mods">
+    <div class="es-case-taxonomy__mods-label">Se ajusta<br>según…</div>
+    <div class="es-case-taxonomy__mods-tags">
+      <span class="es-case-taxonomy__tag">Modificador uno</span>
+      <span class="es-case-taxonomy__tag">Modificador dos</span>
+    </div>
+  </div>
+</div>
+```
+
+Nota editorial: `--active` en `es-case-ladder__step` marca la etapa vigente
+hoy (verde/`--es-accent`, mismo criterio "activo/en curso" que el resto del
+sistema) — no una etapa terminada por decreto ni una proyección a futuro.
+No inventes números en `es-case-stat` ni en ningún otro lado de esta
+librería: si no hay una cifra real y verificable, describilo en prosa o
+dejá un placeholder explícito (ver la nota editorial al inicio de
+`docs/content/presupuestador-case-study-{es,en}.html`).
 
 **Cómo subir imágenes:** igual que cualquier imagen de WordPress — bloque
 Imagen normal, o `<img src="…">` dentro de un bloque HTML apuntando a una

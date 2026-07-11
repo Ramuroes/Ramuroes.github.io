@@ -35,6 +35,16 @@
 	<div class="es-case-label">Fig. 00 — Resumen</div>
 	<h2 class="es-case-heading">Un presupuesto que dependía de una sola cabeza, convertido en un criterio que se puede escribir, discutir y mejorar.</h2>
 	<p class="es-case-lead">Presupuestador es un sistema de apoyo a la decisión para un taller de fabricación metálica en Montevideo. El objetivo no fue construir una app de presupuestos genérica, sino hacer explícito el criterio de precios que hasta ahora vivía en la cabeza de una sola persona — y ponerlo a disposición del resto del equipo sin perder el juicio experto que lo sostiene.</p>
+
+	<ol class="es-case-ladder">
+		<li class="es-case-ladder__step">Diagnóstico operativo</li>
+		<li class="es-case-ladder__step">Criterios documentados</li>
+		<li class="es-case-ladder__step">MVP en Google Sheets</li>
+		<li class="es-case-ladder__step">Calibración contra el presupuestador</li>
+		<li class="es-case-ladder__step es-case-ladder__step--active">App Alpha</li>
+		<li class="es-case-ladder__step">Adopción en todo el equipo</li>
+	</ol>
+	<p class="es-case-caption">Dónde está hoy el proyecto: App Alpha está construida y responde presupuestos reales; el paso siguiente —que todo el equipo presupueste de forma independiente— es el objetivo, todavía no un resultado medido (más en Resultados y Limitaciones, más abajo).</p>
 </div>
 
 <div class="es-case-section" id="context">
@@ -98,6 +108,36 @@
 			<p>[DIAGRAMA PENDIENTE — reemplazar el placeholder por el flujo real de entradas → modelo de precios → salidas una vez que exista como asset final.]</p>
 		</div>
 	</div>
+
+	<div class="es-case-taxonomy">
+		<div class="es-case-taxonomy__root">Modelo de precios — las entradas que lee</div>
+		<div class="es-case-taxonomy__grid">
+			<div class="es-case-taxonomy__item">
+				<div class="es-case-taxonomy__item-title">Material y espesor</div>
+				<div class="es-case-taxonomy__item-meta">mueve el costo</div>
+			</div>
+			<div class="es-case-taxonomy__item">
+				<div class="es-case-taxonomy__item-title">Complejidad del corte</div>
+				<div class="es-case-taxonomy__item-meta">mueve la mano de obra</div>
+			</div>
+			<div class="es-case-taxonomy__item">
+				<div class="es-case-taxonomy__item-title">Terminaciones</div>
+				<div class="es-case-taxonomy__item-meta">mueve la mano de obra</div>
+			</div>
+			<div class="es-case-taxonomy__item">
+				<div class="es-case-taxonomy__item-title">Disponibilidad de máquina esa semana</div>
+				<div class="es-case-taxonomy__item-meta">capacidad, no precio</div>
+			</div>
+		</div>
+		<div class="es-case-taxonomy__mods">
+			<div class="es-case-taxonomy__mods-label">Se ajusta<br>según…</div>
+			<div class="es-case-taxonomy__mods-tags">
+				<span class="es-case-taxonomy__tag">Relación con el cliente</span>
+				<span class="es-case-taxonomy__tag">Urgencia</span>
+			</div>
+		</div>
+	</div>
+	<p class="es-case-caption">Las mismas variables que aparecieron en el descubrimiento — material y espesor, complejidad de corte, terminaciones y tiempo de máquina definen costo y mano de obra; la relación con el cliente y la urgencia ajustan desde ahí.</p>
 
 	<div class="es-case-stats">
 		<div class="es-case-stat">

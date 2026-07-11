@@ -34,6 +34,16 @@
 	<div class="es-case-label">Fig. 00 — Overview</div>
 	<h2 class="es-case-heading">A quote that depended on one person's head, turned into criteria that can be written down, questioned, and improved.</h2>
 	<p class="es-case-lead">Presupuestador is a decision-support system for a metal fabrication workshop in Montevideo. The goal was never a generic quoting app — it was making explicit a pricing judgment that had only ever lived in one person's head, and putting it within reach of the rest of the team without losing the expert judgment behind it.</p>
+
+	<ol class="es-case-ladder">
+		<li class="es-case-ladder__step">Operational diagnosis</li>
+		<li class="es-case-ladder__step">Documented criteria</li>
+		<li class="es-case-ladder__step">Google Sheets MVP</li>
+		<li class="es-case-ladder__step">Calibration against the estimator</li>
+		<li class="es-case-ladder__step es-case-ladder__step--active">App Alpha</li>
+		<li class="es-case-ladder__step">Team-wide adoption</li>
+	</ol>
+	<p class="es-case-caption">Where the project actually stands: App Alpha is built and answering real quotes today; the step after it — the whole team quoting independently — is the goal, not yet a measured result (more in Results and Limitations below).</p>
 </div>
 
 <div class="es-case-section" id="context">
@@ -97,6 +107,36 @@
 			<p>[DIAGRAM PENDING — replace the placeholder with the real input → pricing model → output flow once it exists as a final asset.]</p>
 		</div>
 	</div>
+
+	<div class="es-case-taxonomy">
+		<div class="es-case-taxonomy__root">Pricing model — the inputs it reads</div>
+		<div class="es-case-taxonomy__grid">
+			<div class="es-case-taxonomy__item">
+				<div class="es-case-taxonomy__item-title">Material &amp; thickness</div>
+				<div class="es-case-taxonomy__item-meta">cost driver</div>
+			</div>
+			<div class="es-case-taxonomy__item">
+				<div class="es-case-taxonomy__item-title">Cut complexity</div>
+				<div class="es-case-taxonomy__item-meta">labor driver</div>
+			</div>
+			<div class="es-case-taxonomy__item">
+				<div class="es-case-taxonomy__item-title">Finishing steps</div>
+				<div class="es-case-taxonomy__item-meta">labor driver</div>
+			</div>
+			<div class="es-case-taxonomy__item">
+				<div class="es-case-taxonomy__item-title">Machine availability that week</div>
+				<div class="es-case-taxonomy__item-meta">capacity, not price</div>
+			</div>
+		</div>
+		<div class="es-case-taxonomy__mods">
+			<div class="es-case-taxonomy__mods-label">Adjusted<br>by…</div>
+			<div class="es-case-taxonomy__mods-tags">
+				<span class="es-case-taxonomy__tag">Client relationship</span>
+				<span class="es-case-taxonomy__tag">Urgency</span>
+			</div>
+		</div>
+	</div>
+	<p class="es-case-caption">The same variables surfaced during discovery — material and thickness, cut complexity, finishing, and machine time set the cost and labor pull; client relationship and urgency adjust it from there.</p>
 
 	<div class="es-case-stats">
 		<div class="es-case-stat">

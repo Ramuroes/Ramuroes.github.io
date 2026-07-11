@@ -78,18 +78,22 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   in wp-admin, with a hardcoded-placeholder fallback so Home never breaks
   if no case studies exist yet. See `EDITABILITY-PLAN.md` for exact usage.
 - **P1** — Enter Presupuestador and Trazur as real, published Case Study
-  posts. **Presupuestador's body content is ready** — a complete,
-  paste-ready `.es-case-*` HTML deliverable exists at
-  `docs/content/presupuestador-case-study.html` (Sprint 4G/mega sprint),
-  covering context/problem/discovery/architecture/MVP/App Alpha/AI
-  role/limitations/reflection/next steps. What's still needed: pasting it
-  into a Custom HTML block on a real Case Study post (wp-admin step, not
-  done by this ticket — no wp-admin access from this environment), the
-  native fields (title/excerpt/tags/Role/Tools/Period — values suggested
-  in that file's header comment), real screenshots/photos replacing the
-  `.es-placeholder` figures, and picking a "Hero layout" once a real
-  featured image exists. **Trazur's content still needs to be written**
-  (no HTML deliverable yet — this ticket only covered Presupuestador).
+  posts. **Presupuestador's body content is ready**, now as two paste-ready
+  masters — `docs/content/presupuestador-case-study-es.html` and `-en.html`
+  (13 sections each, `#overview` → `#next`), with `-fields.md` (exact native
+  field values per language) and `-wordpress-publish.md` (step-by-step
+  publish order incl. Polylang linking). Sprint 4I (see `ROADMAP.md`) added
+  two real diagrams to both language masters using the new `.es-case-ladder`
+  and `.es-case-taxonomy` components (Overview's stage sequence, System's
+  pricing-variable map) — content-only, no new anchors, no invented
+  numbers. What's still needed: pasting either file into a Custom HTML
+  block on a real Case Study post (wp-admin step, not done by this
+  ticket — no wp-admin access from this environment), the native fields
+  from the field sheet, real screenshots/photos replacing the
+  `.es-placeholder` figures (see `presupuestador-assets-plan.md`), and
+  picking a "Hero layout" once a real featured image exists. **Trazur's
+  content still needs to be written** (no HTML deliverable yet — this
+  ticket only covered Presupuestador).
 - **Done (Sprint 3)** — **Featured Case** is editable: reuses the Case
   Study CPT with a "Feature this case on Home" checkbox instead of a
   separate mechanism. See `EDITABILITY-PLAN.md`.
