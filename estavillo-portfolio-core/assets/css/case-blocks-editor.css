@@ -1,0 +1,108 @@
+/* =========================================================================
+   Estavillo Case Study blocks — estilos SOLO del editor
+   -------------------------------------------------------------------------
+   Nunca se encola en el frontend (ver case-blocks.php). Dos trabajos:
+
+   1. Scope visual: cada edit.js envuelve su preview en
+      .es-caseb-scope.es-case__body. Con los estilos del theme puenteados al
+      iframe del editor, los selectores ".es-case__body .es-case-*" matchean
+      igual que en el front — acá solo se da el fondo de papel oscuro (el
+      front lo pone .es-page) y se neutraliza el margin-top que
+      .es-case__body trae del layout del single.
+
+   2. Afordances del editor: toolbar de ítems repetibles, botón de agregar,
+      placeholders de campos vacíos. Todo bajo .es-caseb-* — clases que no
+      existen en el frontend.
+
+   Si el child theme no está activo, el preview cae a esto solo: legible,
+   estructural, sin pretender ser el diseño final.
+   ========================================================================= */
+
+.editor-styles-wrapper .es-caseb-scope {
+	background: var(--es-paper, #131211);
+	color: var(--es-ink-2, #c8c2b8);
+	margin-top: 0;
+	padding: 22px 24px;
+	border-radius: 6px;
+	font-size: 15.5px;
+	line-height: 1.75;
+}
+
+/* dentro del scope, la primera sección no necesita el aire gigante que
+   tiene en la página real */
+.editor-styles-wrapper .es-caseb-scope .es-case-section {
+	border-top: 0;
+	padding-top: 0;
+	margin-top: 0;
+}
+
+/* placeholders de RichText vacíos, legibles sobre papel oscuro */
+.editor-styles-wrapper .es-caseb-scope [data-rich-text-placeholder]::after {
+	color: var(--es-ink-4, #6f6961);
+	opacity: 1;
+}
+
+/* inputs simples (stats, ladder, taxonomy, status…) heredan el fondo del
+   scope: campo oscuro con borde de línea, mismo lenguaje que el theme */
+.editor-styles-wrapper .es-caseb-scope input.es-caseb-input,
+.editor-styles-wrapper .es-caseb-scope textarea.es-caseb-input {
+	width: 100%;
+	background: var(--es-surface, #1d1b18);
+	color: var(--es-ink, #ebe7df);
+	border: 1px solid var(--es-line, #2b2825);
+	border-radius: 3px;
+	padding: 6px 9px;
+	font: inherit;
+	font-size: 13px;
+}
+
+/* ---------- ítems repetibles ---------- */
+
+.es-caseb-item {
+	position: relative;
+	border: 1px dashed var(--es-line-strong, #403c37);
+	border-radius: 4px;
+	padding: 12px;
+	margin: 10px 0;
+	display: grid;
+	gap: 8px;
+}
+
+.es-caseb-itembar {
+	display: flex;
+	gap: 2px;
+	justify-content: flex-end;
+}
+
+.es-caseb-itembar .components-button {
+	color: var(--es-ink-3, #9a948b);
+}
+
+.es-caseb-itembar .components-button:hover {
+	color: var(--es-ink, #ebe7df);
+}
+
+.es-caseb-add.components-button {
+	margin-top: 10px;
+}
+
+/* fila de dos campos lado a lado (num + label, title + meta…) */
+.es-caseb-row {
+	display: grid;
+	grid-template-columns: 1fr 2fr;
+	gap: 8px;
+	align-items: start;
+}
+
+.es-caseb-row--even {
+	grid-template-columns: 1fr 1fr;
+}
+
+/* etiqueta chica de grupo de controles dentro del preview */
+.es-caseb-mini {
+	font-family: var(--es-mono, ui-monospace, monospace);
+	font-size: 10px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--es-ink-4, #6f6961);
+}

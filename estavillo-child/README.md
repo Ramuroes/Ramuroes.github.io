@@ -429,20 +429,20 @@ dentro de lo que imprime `the_content()`):
 
 | Clase | Para qué |
 |---|---|
-| `es-case-section` | Envuelve un "capítulo" del caso. Agrega una línea divisoria arriba y espaciado generoso — **excepto la primera** de la página, que no lleva línea. Ponele `id="loquesea"` si querés que el índice sticky pueda linkear a esta sección. |
+| `es-case-section` | Envuelve un "capítulo" del caso. Agrega una línea divisoria arriba y espaciado generoso — **excepto la primera** de la página, que no lleva línea. Ponele `id="loquesea"` si querés que el índice sticky pueda linkear a esta sección. Modificador opcional `es-case-section--reading`: limita la sección ENTERA (componentes incluidos) a la medida de lectura en vez del ancho completo. |
 | `es-case-label` | Eyebrow mono chico arriba de un heading de sección (p. ej. "Fig. 01 — Contexto"). |
 | `es-case-heading` | Título de sección (serif, grande). Va después de `es-case-label`. |
 | `es-case-lead` | Párrafo grande de apertura de una sección (serif, más grande que el body normal). |
 | `es-case-cols` | Grilla de 2 columnas (texto/imagen, texto/texto). Se apila a 1 columna en mobile automáticamente. |
-| `es-case-figure` (en un `<figure>`) + `es-case-caption` / `es-case-caption__tag` (en el `<figcaption>`) | Imagen con marco y caption mono con un "tag" de acento (p. ej. "FIG. 1.1"). |
+| `es-case-figure` (en un `<figure>`) + `es-case-caption` / `es-case-caption__tag` (en el `<figcaption>`) | Imagen con marco y caption mono con un "tag" de acento (p. ej. "FIG. 1.1"). Por defecto usa el ancho completo del container; agregale `es-case-figure--standard` para limitarla a la medida de lectura (figura que acompaña al texto). |
 | `es-case-browser` / `es-case-browser__bar` / `es-case-browser__dot` / `es-case-browser__label` | Marco tipo ventana de navegador (barra falsa con 3 puntos + label) para encuadrar screenshots de producto. |
-| `es-case-stats` (contenedor) + `es-case-stat` / `es-case-stat__num` / `es-case-stat__label` (cada celda) | Grilla de estadísticas, 4 columnas en desktop → 2 en mobile. |
+| `es-case-stats` (contenedor) + `es-case-stat` / `es-case-stat__num` / `es-case-stat__label` (cada celda) | Grilla de estadísticas — `auto-fit`: cualquier cantidad de stats llena la fila completa en desktop (antes un `repeat(4)` fijo dejaba un panel vacío con 3 stats), 2 columnas en mobile. |
 | `es-case-timeline` (`<ul>`) + `es-case-timeline__item` / `__title` / `__text` | Timeline vertical con puntos de acento, para procesos/evolución en fases. |
-| `es-case-decisions` (contenedor) + `es-case-decision` / `__num` / `__title` / `__row` (`<dl>` con `dt`/`dd`) | Cards de decisiones numeradas (evidencia → resultado), 3 columnas → 1 en mobile. |
+| `es-case-decisions` (contenedor) + `es-case-decision` / `__num` / `__title` / `__row` (`<dl>` con `dt`/`dd`) | Cards de decisiones numeradas (evidencia → resultado) — `auto-fit`: 2, 3 o 4 cards llenan la fila; 1 columna en mobile. |
 | `es-case-quote` (en un `<blockquote>`) + `<cite>` adentro | Pullquote grande con borde de acento. |
-| `es-case-status` (contenedor) + `es-case-status__col` (agregale `--done` o `--attention`) + `__head` / `__list` | Grilla de status (4 → 2 en mobile). `--done` pinta el punto en verde (`--es-accent`), `--attention` en naranja (`--es-decision`) — mismos dos colores que ya usa el resto del sistema, ninguno nuevo. |
+| `es-case-status` (contenedor) + `es-case-status__col` (agregale `--done` o `--attention`) + `__head` / `__list` | Par de columnas de status (2 en desktop → apiladas en mobile; antes un `repeat(4)` fijo dejaba media grilla vacía). `--done` pinta el punto en verde (`--es-accent`), `--attention` en naranja (`--es-decision`) — mismos dos colores que ya usa el resto del sistema, ninguno nuevo. |
 | `es-case-details` (en un `<details>`) + `<summary>` + `es-case-details__body` | Accordion nativo del navegador — **sin JavaScript**, con un `+` que rota a 45° al abrirse. |
-| `es-case-ladder` (`<ol>`) + `es-case-ladder__step` (`<li>`, agregale `--active` a la etapa actual) | Secuencia horizontal de etapas/fases en chips (p. ej. "Diagnóstico → Criterios → MVP → … → Adopción"). Se envuelve en varias líneas en mobile. Usado por primera vez en el caso Presupuestador (ver `docs/content/presupuestador-case-study-{es,en}.html`, sección Resumen). |
+| `es-case-ladder` (`<ol>`) + `es-case-ladder__step` (`<li>`, agregale `--active` a la etapa actual o `--done` a una completada, que suma un tilde verde) | Secuencia horizontal de etapas/fases en chips (p. ej. "Diagnóstico → Criterios → MVP → … → Adopción"). Se envuelve en varias líneas en mobile. Usado por primera vez en el caso Presupuestador (ver `docs/content/presupuestador-case-study-{es,en}.html`, sección Resumen). |
 | `es-case-taxonomy` (contenedor) + `__root` + `__grid`/`__item`/`__item-title`/`__item-meta` + `__mods`/`__mods-label`/`__mods-tags`/`__tag` | Diagrama de raíz + grilla de variables/categorías + fila opcional de "se ajusta según…" con tags. 4 columnas en desktop → 2 en mobile. Usado por primera vez en Presupuestador, sección Sistema, para visualizar las variables reales que alimentan el modelo de precios. |
 
 **Ejemplo completo para pegar en un bloque HTML personalizado:**
@@ -581,6 +581,54 @@ anclas/labels distintas si hace falta.
 **Alcance de este archivo:** `case-study.css` solo se encola en
 `single-es_case_study.php` (ver `inc/enqueue.php`) — nunca afecta Home ni
 ninguna otra página del sitio.
+
+### Bloques Gutenberg de Case Study + sistema de anchos + fix de visibilidad (sprint Gutenberg)
+
+Tres cambios de este sprint sobre la página de Case Study:
+
+**1. Bloques Gutenberg (la forma preferida de armar un caso, de acá en
+adelante).** El plugin **Estavillo Portfolio Core** ahora registra 10
+bloques bajo la categoría **"Estavillo Case Study"** del inserter:
+`case-section` (capítulo con anchor/label/heading/lead + contenido libre),
+`case-figure` (imagen de la Biblioteca de medios o placeholder `{asset: …}`,
+variantes standard/browser/wide), `case-stats`, `case-ladder`,
+`case-taxonomy`, `case-timeline`, `case-decisions`, `case-status`,
+`case-quote` y `case-details`. Todos renderizan server-side con LAS MISMAS
+clases `.es-case-*` de esta librería — cero CSS nuevo en el frontend, cero
+JS en el frontend, sin ACF, sin librerías remotas. En el editor, el plugin
+puentea `tokens.css` + `case-study.css` del theme al iframe para que el
+preview se vea como la página real. También registra dos **patterns**
+("Estavillo — Presupuestador Case Structure (ES)" y "(EN)") que insertan
+las 13 secciones completas del caso Presupuestador con un click — mismos
+anchors, mismos textos honestos y placeholders que los maestros de
+`docs/content/`. El flujo viejo (bloque HTML personalizado con la librería
+de clases) **sigue funcionando igual** — es el formato de fallback/import;
+los posts existentes no necesitan migrarse.
+
+**2. Sistema editorial de anchos.** El body del caso (`.es-case__body`) ya
+no tiene el `max-width: 720px` que lo dejaba angosto y volcado a la
+izquierda respecto del hero: ahora ocupa el ancho completo del
+`.es-container` (mismos bordes que el hero), el texto de lectura (párrafos,
+listas, headings, captions, quotes, details) se limita a una medida legible
+(`--es-case-measure`, 820px) y los componentes anchos (figuras, browser
+frames, stats, ladder, taxonomy, decisions, status, timeline) pueden usar
+el container completo. El texto de la timeline se corta a 66ch aunque el
+riel sea ancho. Opt-outs: `es-case-section--reading` (sección entera a
+medida) y `es-case-figure--standard` (figura a medida).
+
+**3. Fix permanente del bug "case study invisible" de producción.** Causa
+raíz: el template ponía `data-es-reveal` sobre `.es-case__body` entero (un
+solo elemento de miles de px) y `motion.js` observaba con
+`threshold: 0.12` — un elemento más alto que el viewport nunca alcanza 12%
+de intersección, así que `.es-in` no llegaba nunca y el body quedaba en
+`opacity: 0` para siempre. Fix en tres capas: (a) el body ya no participa
+del sistema de reveal; (b) `motion.js` observa con `threshold: 0` y además
+agrega la clase-gate `es-motion` al `<html>` justo antes de observar;
+(c) el estado oculto de `.es-reveal` en `components.css` solo aplica bajo
+`html.es-motion` — sin JS (bloqueado, con error, diferido por un
+optimizador) **nada se oculta nunca**, y `prefers-reduced-motion` muestra
+todo sin animar. El override temporal de "CSS adicional" del Customizer ya
+no hace falta: **borralo** al actualizar el theme.
 
 ### Hero layout options (mega sprint)
 

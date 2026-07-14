@@ -170,7 +170,16 @@ if ( function_exists( 'wp_body_open' ) ) {
 				</div>
 
 				<div class="es-container">
-					<div class="es-case__body" data-es-reveal>
+					<?php
+					// Sin data-es-reveal acá, a propósito: el body es UN solo
+					// elemento de miles de px de alto, y un IntersectionObserver
+					// con threshold > 0 puede no dispararse nunca para un
+					// elemento más alto que el viewport (ratio máx = viewport /
+					// alto total < threshold) — el contenido quedaba invisible
+					// en producción. El contenido del caso nunca depende del
+					// sistema de reveal; el hero (elemento chico) sí anima.
+					?>
+					<div class="es-case__body">
 						<?php the_content(); ?>
 					</div>
 				</div>

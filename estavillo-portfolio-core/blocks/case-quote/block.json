@@ -1,0 +1,22 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/case-quote",
+	"title": "Case Quote",
+	"category": "estavillo-case",
+	"icon": "format-quote",
+	"description": "Pullquote del Case Study (.es-case-quote) con atribución opcional. Regla editorial: solo citas verificadas palabra por palabra llevan atribución.",
+	"keywords": [ "estavillo", "case", "quote", "cita" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"quote": { "type": "string", "default": "" },
+		"cite": { "type": "string", "default": "" }
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-case-block-case-quote",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}

@@ -361,6 +361,37 @@ rather than building more structure.
 
 ---
 
+### Case Study bodies — Gutenberg block library (Sprint 4J) — **done**
+
+This is Phase 2 + C landing for the Case Study **body** (until now the one
+part of a case that still required raw HTML): the plugin registers 10
+dynamic blocks under the inserter category **"Estavillo Case Study"** —
+case-section, case-figure, case-stats, case-ladder, case-taxonomy,
+case-timeline, case-decisions, case-status, case-quote, case-details — one
+folder per block under `estavillo-portfolio-core/blocks/`, registered via
+`block.json`, rendered server-side (`render.php`) with the theme's existing
+`.es-case-*` classes, edited with no-build plain-JS editor scripts
+(`edit.js` + shared `assets/js/case-blocks-ui.js`). No ACF, no remote
+libraries, no frontend JS. Repeatable items (stats, ladder steps, taxonomy
+variables/tags, timeline steps, decision cards, status bullets) get
+add/remove/reorder controls; Case Figure uses MediaUpload/MediaUploadCheck
+so images are picked/replaced from the Media Library — no HTML editing.
+
+Two patterns — **"Estavillo — Presupuestador Case Structure (ES)"/"(EN)"**
+(`patterns/presupuestador-{es,en}.php`) — insert the full 13-section case
+with the real (honest) copy as starter content. Editing a case now means:
+insert pattern → edit copy inline → replace figure placeholders from the
+Media Library → reorder sections by moving blocks.
+
+Deliberately additive: the Custom-HTML workflow and the class library stay
+as the fallback/import format; existing posts render unchanged; no
+migration is performed on any existing post (to move a post to blocks,
+insert the pattern alongside the old Custom HTML block, then delete the
+HTML block once the block version matches). No CPT/meta-key/Polylang
+changes.
+
+---
+
 ## Editability priority order
 
 As given by the project owner, highest priority first:

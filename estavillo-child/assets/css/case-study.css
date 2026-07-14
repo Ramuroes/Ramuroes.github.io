@@ -266,14 +266,42 @@
 	}
 }
 
-/* ---------- prose: contenido del editor estándar (the_content()) ---------- */
+/* ---------- prose: contenido del editor estándar (the_content()) ----------
+
+   Sistema editorial de anchos (sprint Gutenberg):
+   - El body ocupa TODO el ancho del .es-container (--es-max-w, 1140px) —
+     mismos bordes izquierdo/derecho que el hero de arriba. Antes había un
+     max-width: 720px acá que dejaba el caso angosto y volcado a la
+     izquierda respecto del hero.
+   - El texto de lectura (párrafos, listas, blockquotes, headings sueltos,
+     captions, quotes, details) se limita a una medida legible:
+     --es-case-measure (820px ≈ 75–80 caracteres a 15.5px).
+   - Los componentes anchos (figura, browser frame, stats, ladder,
+     taxonomy, decisions, status, timeline) pueden usar el ancho completo
+     del container.
+   - .es-case-section--reading (opt-in, usado por el bloque case-section
+     con layout "reading") limita la sección ENTERA a la medida de lectura,
+     componentes incluidos. */
 
 .es-case__body {
-	max-width: 720px;
+	--es-case-measure: 820px;
 	margin-top: clamp(48px, 6vw, 88px);
 	font-size: 15.5px;
 	line-height: 1.75;
 	color: var(--es-ink-2);
+}
+
+/* texto de lectura a medida legible: hijos directos del body (posts de
+   Gutenberg "planos", compat hacia atrás) y de cada sección */
+.es-case__body > p,
+.es-case__body > ul,
+.es-case__body > ol,
+.es-case__body > blockquote,
+.es-case__body .es-case-section > p,
+.es-case__body .es-case-section > ul,
+.es-case__body .es-case-section > ol,
+.es-case__body .es-case-section > blockquote {
+	max-width: var(--es-case-measure);
 }
 
 .es-case__body > * + * {
@@ -287,6 +315,9 @@
 	letter-spacing: -0.012em;
 	color: var(--es-ink);
 	margin-top: 2em;
+	/* headings genéricos también a medida de lectura; .es-case-heading
+	   tiene su propio 20ch (regla más específica, gana sobre esta) */
+	max-width: var(--es-case-measure);
 }
 
 .es-case__body h2 {
@@ -377,6 +408,12 @@
 	margin-top: 0;
 }
 
+/* layout "reading" (bloque case-section): la sección ENTERA — componentes
+   incluidos — se limita a la medida de lectura */
+.es-case__body .es-case-section--reading {
+	max-width: var(--es-case-measure);
+}
+
 .es-case__body .es-case-label {
 	display: block;
 	font-family: var(--es-mono);
@@ -431,6 +468,13 @@
 	margin: clamp(28px, 3.5vw, 40px) 0;
 }
 
+/* variante "standard" del bloque case-figure: figura que acompaña al texto,
+   limitada a la medida de lectura. Sin la clase (o con --wide), la figura
+   usa el ancho completo del container — igual que siempre. */
+.es-case__body .es-case-figure--standard {
+	max-width: var(--es-case-measure);
+}
+
 .es-case__body .es-case-figure img {
 	border: 1px solid var(--es-line);
 	border-radius: var(--es-radius);
@@ -452,6 +496,7 @@
 	font-size: 11.5px;
 	line-height: 1.55;
 	color: var(--es-ink-3);
+	max-width: var(--es-case-measure);
 }
 
 .es-case__body .es-case-caption__tag {
@@ -510,7 +555,9 @@
 
 .es-case__body .es-case-stats {
 	display: grid;
-	grid-template-columns: repeat(4, 1fr);
+	/* auto-fit: cualquier cantidad de stats llena la fila completa — con el
+	   viejo repeat(4, 1fr) fijo, 3 stats dejaban un panel vacío a la derecha */
+	grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
 	gap: 1px;
 	background: var(--es-line);
 	border: 1px solid var(--es-line);
@@ -578,19 +625,24 @@
 	font-size: 15px;
 	font-weight: 600;
 	color: var(--es-ink);
+	max-width: 66ch;
 }
 
 .es-case__body .es-case-timeline__text {
 	font-size: 13.5px;
 	color: var(--es-ink-3);
 	margin-top: 3px;
+	/* el riel de la timeline puede ocupar el container completo, pero las
+	   líneas de texto se cortan a medida legible */
+	max-width: 66ch;
 }
 
 /* ---------- decision cards (evidencia / trade-off / resultado) ---------- */
 
 .es-case__body .es-case-decisions {
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
+	/* auto-fit: 2, 3 o 4 cards llenan la fila — mismo criterio que stats */
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 	gap: 1px;
 	background: var(--es-line);
 	border: 1px solid var(--es-line);
@@ -658,6 +710,8 @@
 	padding: clamp(24px, 3vw, 32px) clamp(26px, 3.5vw, 40px);
 	border-left: 3px solid var(--es-accent);
 	background: var(--es-paper-2);
+	/* contenido de lectura: a medida, no a container completo */
+	max-width: var(--es-case-measure);
 }
 
 .es-case__body .es-case-quote p {
@@ -685,7 +739,10 @@
 
 .es-case__body .es-case-status {
 	display: grid;
-	grid-template-columns: repeat(4, 1fr);
+	/* 2 columnas (el componente es un par done/attention): con el viejo
+	   repeat(4, 1fr), dos columnas ocupaban solo la mitad izquierda del
+	   marco y la otra mitad quedaba como panel vacío */
+	grid-template-columns: repeat(2, 1fr);
 	gap: 1px;
 	background: var(--es-line);
 	border: 1px solid var(--es-line);
@@ -753,7 +810,7 @@
 
 @media (max-width: 767px) {
 	.es-case__body .es-case-status {
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: 1fr;
 	}
 }
 
@@ -763,6 +820,8 @@
 	margin: clamp(24px, 3vw, 32px) 0;
 	border: 1px solid var(--es-line);
 	background: var(--es-paper-2);
+	/* contenido de lectura: a medida, no a container completo */
+	max-width: var(--es-case-measure);
 }
 
 .es-case__body .es-case-details summary {
@@ -855,6 +914,16 @@
 	background: var(--es-accent-soft);
 	border-color: var(--es-accent-dim);
 	font-weight: 500;
+}
+
+/* completed stage (bloque case-ladder, estado "completed"): tilde con el
+   mismo token de acento — sin colores nuevos. El estado "future" es el
+   chip base, sin modificador. */
+.es-case__body .es-case-ladder__step--done::before {
+	content: '✓';
+	display: inline-block;
+	margin-right: 8px;
+	color: var(--es-accent);
 }
 
 @media (max-width: 767px) {

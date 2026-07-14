@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/case-ladder",
+	"title": "Case Ladder",
+	"category": "estavillo-case",
+	"icon": "editor-ol",
+	"description": "Escalera de etapas del proyecto (.es-case-ladder): secuencia horizontal de chips con estado completed / active / future. Verde solo para lo activo/completado — nunca azul, nunca naranja acá.",
+	"keywords": [ "estavillo", "case", "ladder", "etapas", "roadmap" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"steps": {
+			"type": "array",
+			"default": [],
+			"items": { "type": "object" }
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-case-block-case-ladder",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}

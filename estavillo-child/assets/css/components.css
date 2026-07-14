@@ -429,30 +429,39 @@
 	padding: 6px 10px;
 }
 
-/* ---------- reveal on scroll (motion.js agrega .es-in) ---------- */
+/* ---------- reveal on scroll (motion.js agrega .es-in) ----------
+   Visible por defecto: el estado oculto SOLO se activa bajo html.es-motion,
+   una clase que motion.js agrega inmediatamente antes de empezar a observar.
+   Si el JS nunca corre (bloqueado, error, optimizador que lo difiere), nada
+   se oculta — el contenido jamás depende de JS para leerse. Este gate es el
+   fix permanente del bug "case study invisible" de producción (antes,
+   .es-reveal ocultaba incondicionalmente y el reveal podía no llegar). */
 
-.es-reveal {
+html.es-motion .es-reveal {
 	opacity: 0;
 	transform: translateY(14px);
 	transition: opacity var(--es-dur) ease-out, transform var(--es-dur) ease-out;
 	transition-delay: var(--es-reveal-delay, 0ms);
 }
 
-.es-reveal.es-in {
+html.es-motion .es-reveal.es-in {
 	opacity: 1;
 	transform: none;
 }
 
-/* sin JS o con reduced motion, todo visible */
+/* refuerzos explícitos (redundantes con el gate, a propósito — cinturón y
+   tirantes): sin JS, con motion apagado, o con reduced motion, todo visible */
 .no-js .es-reveal,
-.es-motion-off .es-reveal {
-	opacity: 1;
-	transform: none;
+html.es-motion-off .es-reveal {
+	opacity: 1 !important;
+	transform: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
+	html.es-motion .es-reveal,
 	.es-reveal {
-		opacity: 1;
-		transform: none;
+		opacity: 1 !important;
+		transform: none !important;
+		transition: none;
 	}
 }

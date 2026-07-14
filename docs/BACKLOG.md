@@ -78,22 +78,24 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   in wp-admin, with a hardcoded-placeholder fallback so Home never breaks
   if no case studies exist yet. See `EDITABILITY-PLAN.md` for exact usage.
 - **P1** — Enter Presupuestador and Trazur as real, published Case Study
-  posts. **Presupuestador's body content is ready**, now as two paste-ready
-  masters — `docs/content/presupuestador-case-study-es.html` and `-en.html`
-  (13 sections each, `#overview` → `#next`), with `-fields.md` (exact native
-  field values per language) and `-wordpress-publish.md` (step-by-step
-  publish order incl. Polylang linking). Sprint 4I (see `ROADMAP.md`) added
-  two real diagrams to both language masters using the new `.es-case-ladder`
-  and `.es-case-taxonomy` components (Overview's stage sequence, System's
-  pricing-variable map) — content-only, no new anchors, no invented
-  numbers. What's still needed: pasting either file into a Custom HTML
-  block on a real Case Study post (wp-admin step, not done by this
-  ticket — no wp-admin access from this environment), the native fields
-  from the field sheet, real screenshots/photos replacing the
-  `.es-placeholder` figures (see `presupuestador-assets-plan.md`), and
-  picking a "Hero layout" once a real featured image exists. **Trazur's
-  content still needs to be written** (no HTML deliverable yet — this
-  ticket only covered Presupuestador).
+  posts. **Presupuestador's body content is ready two ways** since Sprint
+  4J: (a) the preferred path — insert the Gutenberg pattern **"Estavillo —
+  Presupuestador Case Structure (ES)"** (or "(EN)") from the inserter's
+  Patterns tab into the Case Study post: the full 13-section case lands as
+  editable blocks (plugin ≥ 1.1.0 + theme update required); or (b) the
+  fallback path — paste the masters
+  `docs/content/presupuestador-case-study-{es,en}.html` into a Custom HTML
+  block, exactly as before. Native fields per `-fields.md`, publish order
+  per `-wordpress-publish.md`, both unchanged. What's still needed: doing
+  the wp-admin step itself (no wp-admin access from this environment), the
+  native fields from the field sheet, real screenshots/photos replacing the
+  `{asset: …}` placeholders — with the block path these are replaced from
+  the Media Library via each Case Figure block, no HTML editing — and
+  picking a "Hero layout" once a real featured image exists. Also delete
+  the temporary Customizer "Additional CSS" visibility override after
+  updating the theme (Sprint 4J fixed the root cause). **Trazur's content
+  still needs to be written** (no HTML deliverable yet — earlier tickets
+  only covered Presupuestador).
 - **Done (Sprint 3)** — **Featured Case** is editable: reuses the Case
   Study CPT with a "Feature this case on Home" checkbox instead of a
   separate mechanism. See `EDITABILITY-PLAN.md`.

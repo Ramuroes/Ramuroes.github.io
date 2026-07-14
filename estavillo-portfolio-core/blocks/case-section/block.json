@@ -1,0 +1,26 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/case-section",
+	"title": "Case Section",
+	"category": "estavillo-case",
+	"icon": "excerpt-view",
+	"description": "Capítulo de un Case Study: anchor para el Case Index, etiqueta Fig., heading, lead opcional y contenido libre adentro (párrafos, listas y bloques Estavillo).",
+	"keywords": [ "estavillo", "case", "section", "capítulo" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"anchor": { "type": "string", "default": "" },
+		"label": { "type": "string", "default": "" },
+		"heading": { "type": "string", "default": "" },
+		"lead": { "type": "string", "default": "" },
+		"layout": { "type": "string", "default": "wide", "enum": [ "wide", "reading" ] }
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true,
+		"anchor": false
+	},
+	"editorScript": "es-case-block-case-section",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}

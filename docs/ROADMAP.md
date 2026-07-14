@@ -359,6 +359,57 @@ entry above and `BACKLOG.md`.
 
 ---
 
+## Sprint 4J — Gutenberg migration for Case Studies (visibility fix + width system + block library) — done
+
+**Goal:** make Case Studies editable from Gutenberg without raw HTML, and
+fix the two production problems found when publishing Presupuestador (body
+invisible; body too narrow vs. the hero).
+
+- **Visibility root cause (confirmed empirically in Chromium).** The single
+  template put `data-es-reveal` on the entire `.es-case__body` (one element
+  thousands of px tall) and `motion.js` observed it with an
+  IntersectionObserver `threshold: 0.12`. An element taller than ~8× the
+  viewport can never reach a 12% intersection ratio, so `.es-in` never
+  arrived and the body stayed at `opacity: 0` forever. Fix in three layers:
+  the body no longer participates in the reveal system; `motion.js` now
+  observes with `threshold: 0` and adds an `es-motion` gate class on
+  `<html>` right before observing; the hidden state in `components.css`
+  only applies under `html.es-motion`, so with JS blocked/broken/delayed
+  nothing is ever hidden, and `prefers-reduced-motion` shows everything
+  without animating. The temporary Customizer "Additional CSS" override is
+  obsolete — delete it after updating the theme.
+- **Editorial width system.** `.es-case__body` lost its old
+  `max-width: 720px` and now spans the full `.es-container` (same edges as
+  the hero). Reading content (paragraphs, lists, headings, captions,
+  quotes, details) caps at `--es-case-measure` (820px); wide components
+  (figure, browser, stats, ladder, taxonomy, decisions, status, timeline)
+  may use the full container. Grid fixes folded in: `.es-case-status` is
+  now a true 2-column pair (the old fixed `repeat(4,1fr)` left half the
+  frame as a dead panel), stats/decisions use `auto-fit` so any item count
+  fills the row. Opt-ins: `es-case-section--reading`,
+  `es-case-figure--standard`, `es-case-ladder__step--done`.
+- **Block library (plugin, v1.1.0).** 10 dynamic blocks under the new
+  "Estavillo Case Study" inserter category, one folder per block with
+  `block.json` + server `render.php` + no-build plain-JS editor:
+  case-section, case-figure (MediaUpload + placeholder + browser frame),
+  case-stats, case-ladder, case-taxonomy, case-timeline, case-decisions,
+  case-status, case-quote, case-details. Frontend markup reuses the theme's
+  `.es-case-*` classes 1:1 (no duplicated CSS, no frontend JS, no ACF, no
+  remote libraries); the plugin bridges the theme's tokens + case CSS into
+  the editor iframe so previews look like the real page.
+- **Patterns.** "Estavillo — Presupuestador Case Structure (ES)" and
+  "(EN)": the full 13-section case built from the new blocks, same anchors,
+  honest copy and [DATA PENDING VALIDATION] / `{asset: …}` placeholders as
+  the masters. Two patterns (one per language) instead of auto-detection —
+  Polylang defines the post's language, not the pattern inserter's. The
+  masters' two-column `.es-case-cols` groups became sequential text →
+  figure flow (more editable, identical on mobile).
+- **Backward compatible.** The existing Custom-HTML workflow and the
+  `.es-case-*` library are untouched; existing posts keep rendering; no
+  CPT/meta/Polylang changes.
+
+---
+
 ## Sprint 5 — Hero variants
 
 **Goal:** expand hero variety only once the above is stable — not before.
