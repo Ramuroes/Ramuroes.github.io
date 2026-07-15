@@ -172,6 +172,10 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   hobbies/interests rebuilt from a single comma-separated field into 8
   structured rows (label, icon, optional text, show/hide) with a new
   7-icon curated library and CSS-only hover/focus micro-interactions.
+  (Sprint 4K replaced that placeholder library with the 8 approved
+  hand-drawn artworks in `estavillo-child/assets/icons/` — old saved
+  keys `music`/`horse` resolve automatically to `guitar`/`horse-head`,
+  nothing to reconfigure.)
   "Home Content" renamed to **"Portfolio Content"** in wp-admin (label
   only — option key/slug unchanged, no data lost). See
   `estavillo-child/README.md` → "Where to edit each part of the

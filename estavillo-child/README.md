@@ -60,7 +60,7 @@ by section, top to bottom:
 | Section | Fields |
 |---|---|
 | **About** | About text, About link, Portrait image URL, CV / résumé URL |
-| **Hobbies & interests** (About page) | Up to 8 rows: label, icon, optional short text, Show/hide checkbox — ships with 7 suggested interests pre-filled |
+| **Hobbies & interests** (About page) | Up to 8 rows: label, icon (8 approved hand-drawn artworks: Taekwondo, Guitar / Rock Music, Coffee, Horse Head, Horse Running, Drawing, Travel, Cinema), optional short text, Show/hide checkbox — ships with 7 suggested interests pre-filled |
 | **Career timeline** (About page) | Up to 4 rows: year, role/title, short description |
 | **Education & certificates** (About page) | Up to 4 rows: degree/certificate, institution, year |
 | **How I Work** | 6 steps: title, description, icon, plus optional "Why it matters" / "Example" / "Tools" (those 3 are shown only on the dedicated How I Work page, never on the Home teaser) |
@@ -135,6 +135,7 @@ estavillo-child/
 ├── functions.php                  → constantes, includes, helpers Polylang (es__, es_nav_links)
 ├── screenshot.png                 → miniatura en Apariencia → Temas
 ├── assets/
+│   ├── icons/                     → hobby-icons: artwork final APROBADO (8 SVG dibujados a mano, fill + currentColor) — NO redibujar ni optimizar
 │   ├── css/
 │   │   ├── tokens.css             → design tokens --es-* (dark-first, light, acento, font preset)
 │   │   ├── base.css               → tipografía y utilidades bajo .es-page
@@ -727,6 +728,48 @@ about grid, footer CTA — las mismas reglas que ya usaba Home), así que
 `pages.css` solo tiene lo genuinamente nuevo: la cabecera compartida
 (`.es-page-head`), el timeline/educación/hobbies de About, y la grilla de
 Contact.
+
+### Hobby icons — artwork final aprobado (sprint hobby-icons)
+
+Los 8 íconos de "Hobbies & interests" de About ahora son el **artwork
+final aprobado** (dibujo a mano en paths rellenos), instalado como
+archivos en `assets/icons/{clave}.svg`:
+
+| Clave | Opción en wp-admin |
+|---|---|
+| `taekwondo` | Taekwondo |
+| `guitar` | Guitar / Rock Music |
+| `coffee` | Coffee |
+| `horse-head` | Horse Head |
+| `horse-run` | Horse Running |
+| `drawing` | Drawing |
+| `travel` | Travel |
+| `cinema` | Cinema |
+
+Reglas del asset (importante para el futuro):
+
+- **No redibujar, no simplificar paths, no pasar por SVGO** — el artwork
+  está aprobado tal cual. En la integración solo se normalizó metadata:
+  viewBox cuadrado centrado (framing, no geometría), `fill="black"` →
+  `currentColor`, y `aria-hidden="true"`/`focusable="false"` en la raíz.
+- El color SIEMPRE llega por `currentColor` desde CSS (reposo: tinta
+  secundaria; hover/focus: acento verde). Ningún color hardcodeado.
+- `functions.php` → `es_hobby_icon_library()` lee los archivos (cache por
+  request); `es_hobby_icon_svg()` imprime pasando por `wp_kses` con la
+  whitelist `es_icon_svg_kses_rules()`. Sigue siendo librería **curada y
+  cerrada**: el admin guarda solo la CLAVE del select, nunca SVG libre.
+- **Claves legacy**: los valores guardados con la librería anterior se
+  resuelven solos — `music` → `guitar` y `horse` → `horse-head`
+  (`es_hobby_icon_resolve_key()`), tanto al renderizar About como al
+  marcar la opción en el select de wp-admin. No hace falta reconfigurar
+  hobbies existentes.
+- **Layout** (pages.css): lista editorial compacta en grilla con
+  hairlines (`--es-line`), ícono 28px (horse-run 34px por ser apaisado —
+  ajuste de caja, no del vector), label siempre visible. Interacción V1:
+  translateY(-2px) + acento en hover/:focus-visible (el movimiento va
+  dentro de `prefers-reduced-motion: no-preference`); los wrappers
+  `.es-hobby-icon--{clave}` quedan listos para animaciones por-ícono en
+  una V2 sin tocar la estructura del contenido en WordPress.
 
 ### Polylang (Sprint 4A)
 

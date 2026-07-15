@@ -302,6 +302,13 @@ function es_portfolio_home_content_page() {
 						$es_hobby_text  = $es_hobby_defaults[ $i ]['text'] ?? '';
 						$es_hobby_show  = true;
 					}
+					// Claves legacy ('music', 'horse') → clave canónica del
+					// artwork aprobado, para que el <select> muestre la opción
+					// equivalente marcada (y el próximo guardado ya persista
+					// la clave nueva) en vez de caer en "— None —".
+					if ( '' !== $es_hobby_icon && function_exists( 'es_hobby_icon_resolve_key' ) ) {
+						$es_hobby_icon = es_hobby_icon_resolve_key( $es_hobby_icon );
+					}
 					?>
 					<tr>
 						<th scope="row"><?php echo esc_html( sprintf( __( 'Interest %d', 'estavillo-portfolio-core' ), $i + 1 ) ); ?></th>

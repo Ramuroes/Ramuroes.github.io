@@ -127,8 +127,21 @@ $es_hobbies        = es_about_hobbies_visible();
 		<ul class="es-hobbies__list" data-es-reveal>
 			<?php foreach ( $es_hobbies as $es_i => $es_hobby ) : ?>
 				<?php
+				// La clave guardada puede ser legacy ('music', 'horse'):
+				// se resuelve al alias canónico del artwork aprobado para
+				// data-icon y para la clase semántica .es-hobby-icon--*,
+				// así el CSS solo necesita conocer las claves nuevas.
 				$es_hobby_icon_key = ! empty( $es_hobby['icon'] ) ? $es_hobby['icon'] : '';
-				$es_hobby_icon_svg = $es_hobby_icon_key && function_exists( 'es_hobby_icon_svg' ) ? es_hobby_icon_svg( $es_hobby_icon_key ) : '';
+				if ( $es_hobby_icon_key && function_exists( 'es_hobby_icon_resolve_key' ) ) {
+					$es_hobby_icon_key = es_hobby_icon_resolve_key( $es_hobby_icon_key );
+				}
+				$es_hobby_icon_svg   = $es_hobby_icon_key && function_exists( 'es_hobby_icon_svg' ) ? es_hobby_icon_svg( $es_hobby_icon_key ) : '';
+				$es_hobby_icon_class = 'es-hobby-item__icon es-hobby-icon';
+				if ( '' === $es_hobby_icon_svg ) {
+					$es_hobby_icon_class .= ' es-hobby-item__icon--empty';
+				} else {
+					$es_hobby_icon_class .= ' es-hobby-icon--' . $es_hobby_icon_key;
+				}
 				?>
 				<li
 					class="es-hobby-item"
@@ -137,7 +150,7 @@ $es_hobbies        = es_about_hobbies_visible();
 					data-es-reveal
 					style="--es-reveal-delay: <?php echo esc_attr( $es_i * 50 ); ?>ms"
 				>
-					<span class="es-hobby-item__icon<?php echo '' === $es_hobby_icon_svg ? ' es-hobby-item__icon--empty' : ''; ?>" aria-hidden="true">
+					<span class="<?php echo esc_attr( $es_hobby_icon_class ); ?>" aria-hidden="true">
 						<?php
 						if ( '' !== $es_hobby_icon_svg ) {
 							echo wp_kses( $es_hobby_icon_svg, es_icon_svg_kses_rules() ); // phpcs:ignore -- whitelisted SVG, wp_kses aplicado acá mismo.

@@ -324,6 +324,7 @@ function es_home_process_steps() {
 function es_icon_svg_kses_rules() {
 	return array(
 		'svg'    => array(
+			'xmlns'           => true,
 			'width'           => true,
 			'height'          => true,
 			'viewbox'         => true,
@@ -332,6 +333,8 @@ function es_icon_svg_kses_rules() {
 			'stroke-width'    => true,
 			'stroke-linecap'  => true,
 			'stroke-linejoin' => true,
+			'aria-hidden'     => true,
+			'focusable'       => true,
 		),
 		'g'      => array(
 			'class' => true,
@@ -343,9 +346,11 @@ function es_icon_svg_kses_rules() {
 			'fill' => true,
 		),
 		'path'   => array(
-			'd'     => true,
-			'fill'  => true,
-			'class' => true,
+			'd'         => true,
+			'fill'      => true,
+			'fill-rule' => true,
+			'clip-rule' => true,
+			'class'     => true,
 		),
 		'rect'   => array(
 			'x'      => true,
@@ -381,58 +386,99 @@ function es_process_step_icon_markup( $step ) {
 }
 
 /**
- * Librería curada de íconos para "Hobbies & interests" (About). Registro
- * separado de es_process_icon_library() — dominio distinto (intereses
- * personales, no pasos de proceso) — pero mismo principio de whitelist:
- * el admin solo guarda la CLAVE en un <select>, nunca HTML libre.
+ * Claves canónicas de la librería de hobby-icons: el artwork final
+ * APROBADO (estavillo-hobby-icons.zip), instalado como archivos en
+ * assets/icons/{clave}.svg. Los archivos son la fuente de verdad —
+ * dibujo a mano en paths RELLENOS (fill-rule evenodd), no la línea
+ * 1.4px de los process icons — y NO deben redibujarse ni pasarse por
+ * optimizadores: en la integración solo se normalizó metadata (viewBox
+ * cuadrado centrado, fill="black" → currentColor, aria-hidden) sin
+ * tocar un solo punto de la geometría.
  *
- * Cada ícono termina en un <g> o <path> "animado": ver
- * assets/css/pages.css → ".es-hobby-item[data-icon=...]" para la
- * micro-interacción de hover/focus de CADA uno (siempre un único
- * transform/opacity en respuesta a :hover/:focus-visible — nunca
- * autoplay/loop, y ya cubierto por la regla global de
- * prefers-reduced-motion en base.css).
+ * @return string[] claves en el orden canónico del set.
+ */
+function es_hobby_icon_keys() {
+	return array( 'taekwondo', 'guitar', 'coffee', 'horse-head', 'horse-run', 'drawing', 'travel', 'cinema' );
+}
+
+/**
+ * Alias de claves legacy (la librería inline 20×20 de la sprint de
+ * infra/polish) → clave del artwork aprobado. Un hobby guardado en la
+ * base con la clave vieja sigue renderizando sin reconfigurar nada;
+ * el <select> de wp-admin también resuelve el alias antes de marcar
+ * la opción seleccionada.
+ *
+ * @param string $key Clave guardada (vieja o nueva).
+ * @return string Clave canónica dentro de es_hobby_icon_keys().
+ */
+function es_hobby_icon_resolve_key( $key ) {
+	$aliases = array(
+		'music' => 'guitar',
+		'horse' => 'horse-head',
+	);
+	return isset( $aliases[ $key ] ) ? $aliases[ $key ] : $key;
+}
+
+/**
+ * Librería de hobby-icons: clave => markup SVG completo, leído de
+ * assets/icons/{clave}.svg con cache estática por request (8 lecturas
+ * chicas como máximo, una sola vez). Si un archivo falta, la clave
+ * simplemente no aparece — la plantilla ya maneja el ícono vacío.
+ *
+ * La micro-interacción de hover/focus vive en assets/css/pages.css
+ * (".es-hobby-icon", V1: translateY + acento — nunca autoplay/loop, y
+ * cubierta por la regla global de prefers-reduced-motion en base.css).
  *
  * @return array<string,string> clave => markup SVG completo.
  */
 function es_hobby_icon_library() {
-	$stroke = 'fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"';
-	return array(
-		'taekwondo' => '<svg width="20" height="20" viewBox="0 0 20 20" ' . $stroke . '><circle cx="10" cy="4.2" r="1.6"/><path d="M10 5.8v5.4"/><path d="M10 7.6 7.3 9.4"/><path d="M10 11.2 7.6 16.2"/><g><path d="M10 11.2 14.4 13"/></g></svg>',
-		'music'     => '<svg width="20" height="20" viewBox="0 0 20 20" ' . $stroke . '><circle cx="6" cy="15" r="1.6" fill="currentColor" stroke="none"/><path d="M7.6 15V6.2L14 4.6"/><g><circle cx="14" cy="8.4" r="1.6" fill="currentColor" stroke="none"/><path d="M15.6 8.4V4.6"/></g></svg>',
-		'coffee'    => '<svg width="20" height="20" viewBox="0 0 20 20" ' . $stroke . '><path d="M4.5 8h9v4.2a3 3 0 0 1-3 3h-3a3 3 0 0 1-3-3z"/><path d="M13.5 9h1.2a1.8 1.8 0 0 1 0 3.6h-1.2"/><path d="M4.5 15.2h9"/><g><path d="M7.4 6.4c0-1 .8-1 .8-2s-.8-1-.8-2"/><path d="M10.6 6.4c0-1 .8-1 .8-2s-.8-1-.8-2"/></g></svg>',
-		'horse'     => '<svg width="20" height="20" viewBox="0 0 20 20" ' . $stroke . '><path d="M5.5 13V9a4.5 4.5 0 0 1 9 0v4"/><g><path d="M5.5 13v1.8M14.5 13v1.8"/></g></svg>',
-		'drawing'   => '<svg width="20" height="20" viewBox="0 0 20 20" ' . $stroke . '><path d="M5 15 12.3 7.7"/><path d="M12.3 7.7 14.3 5.7 15.3 6.7 13.3 8.7Z"/><path d="M4.6 15.4 5 14"/><g><path d="M4 16.6c1.2-.35 2.3-.15 3.3.4"/></g></svg>',
-		'travel'    => '<svg width="20" height="20" viewBox="0 0 20 20" ' . $stroke . '><path d="M17 3 3 9.4l5.6 1.6M17 3 11.4 17l-2.8-6M17 3 8.6 11"/><g><path d="M8.6 11v3.4"/></g></svg>',
-		'cinema'    => '<svg width="20" height="20" viewBox="0 0 20 20" ' . $stroke . '><rect x="3.5" y="7.5" width="13" height="9" rx="1"/><path d="M3.5 10.5h13"/><g><path d="M4.2 7.5 6.4 4M8.2 7.5 10.4 4M12.2 7.5 14.4 4"/></g></svg>',
-	);
+	static $library = null;
+	if ( null !== $library ) {
+		return $library;
+	}
+	$library = array();
+	$dir     = get_stylesheet_directory() . '/assets/icons/';
+	foreach ( es_hobby_icon_keys() as $key ) {
+		$file = $dir . $key . '.svg';
+		if ( is_readable( $file ) ) {
+			$svg = file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- archivo local del propio tema, no remoto.
+			if ( is_string( $svg ) && '' !== $svg ) {
+				$library[ $key ] = trim( $svg );
+			}
+		}
+	}
+	return $library;
 }
 
 /**
  * Choices para el <select> de ícono por hobby en Home Content (wp-admin).
+ * Solo las claves canónicas del artwork aprobado — los alias legacy no
+ * se ofrecen como opción nueva, solo se resuelven al leer.
  *
  * @return array<string,string> clave => label legible.
  */
 function es_hobby_icon_choices() {
 	return array(
-		'taekwondo' => __( 'Taekwondo / martial arts', 'estavillo-child' ),
-		'music'     => __( 'Music', 'estavillo-child' ),
-		'coffee'    => __( 'Coffee', 'estavillo-child' ),
-		'horse'     => __( 'Horse riding', 'estavillo-child' ),
-		'drawing'   => __( 'Drawing', 'estavillo-child' ),
-		'travel'    => __( 'Travel', 'estavillo-child' ),
-		'cinema'    => __( 'Cinema / film', 'estavillo-child' ),
+		'taekwondo'  => __( 'Taekwondo', 'estavillo-child' ),
+		'guitar'     => __( 'Guitar / Rock Music', 'estavillo-child' ),
+		'coffee'     => __( 'Coffee', 'estavillo-child' ),
+		'horse-head' => __( 'Horse Head', 'estavillo-child' ),
+		'horse-run'  => __( 'Horse Running', 'estavillo-child' ),
+		'drawing'    => __( 'Drawing', 'estavillo-child' ),
+		'travel'     => __( 'Travel', 'estavillo-child' ),
+		'cinema'     => __( 'Cinema', 'estavillo-child' ),
 	);
 }
 
 /**
- * Markup SVG de un hobby-icon por clave, o cadena vacía si no existe en la
- * librería.
+ * Markup SVG de un hobby-icon por clave (resolviendo alias legacy), o
+ * cadena vacía si no existe en la librería.
  *
- * @param string $key Clave dentro de es_hobby_icon_library().
+ * @param string $key Clave dentro de es_hobby_icon_keys() o un alias.
  * @return string
  */
 function es_hobby_icon_svg( $key ) {
+	$key     = es_hobby_icon_resolve_key( $key );
 	$library = es_hobby_icon_library();
 	return isset( $library[ $key ] ) ? $library[ $key ] : '';
 }
@@ -458,7 +504,7 @@ function es_home_about_hobbies_defaults() {
 		),
 		array(
 			'label' => 'Music',
-			'icon'  => 'music',
+			'icon'  => 'guitar',
 			'text'  => '',
 			'show'  => true,
 		),
@@ -470,7 +516,7 @@ function es_home_about_hobbies_defaults() {
 		),
 		array(
 			'label' => 'Horse riding',
-			'icon'  => 'horse',
+			'icon'  => 'horse-head',
 			'text'  => '',
 			'show'  => true,
 		),

@@ -302,122 +302,105 @@
 }
 
 /* ---------- About: hobbies / intereses ----------
-   Reposo: label + ícono de línea restrained, editorial (no emoji, no
-   badges de colores). :hover/:focus-visible disparan una única
-   micro-animación por ícono (transform/opacity, ver más abajo) — nunca
-   @keyframes en loop, nunca autoplay. tabindex="0" en cada item para que
-   la animación también dispare por teclado; el label es SIEMPRE visible
-   (no depende del hover para entenderse), así que touch queda cubierto
-   sin fallback especial. prefers-reduced-motion ya desactiva transiciones
-   en todo .es-page (base.css) — no hace falta repetir la regla acá. */
+   Artwork final aprobado (assets/icons/*.svg, dibujo a mano en paths
+   rellenos) sobre un layout editorial compacto: grilla con hairlines de
+   token (--es-line), sin pills ni cards — el ícono es secundario (28px),
+   el label siempre visible. Interacción V1, deliberadamente contenida:
+   translateY(-2px) + acento en el ícono y tinta plena en el label, solo
+   en :hover/:focus-visible del item (tabindex="0" cubre teclado; touch
+   no depende del hover para entender nada). Nada de loops/autoplay; el
+   movimiento va dentro de prefers-reduced-motion: no-preference (los
+   usuarios con reduced motion ven solo el cambio de color). Los wrappers
+   .es-hobby-icon--{clave} existen para colgar animaciones por-ícono en
+   una V2 sin tocar la estructura del contenido en WordPress. */
 
 .es-hobbies__list {
 	list-style: none;
 	margin: 0;
 	padding: 0;
-	display: flex;
-	flex-wrap: wrap;
-	gap: 12px;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	column-gap: clamp(24px, 4vw, 56px);
+	border-top: 1px solid var(--es-line);
 }
 
 .es-hobby-item {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
-	gap: 10px;
-	padding: 11px 18px;
-	border: 1px solid var(--es-line);
-	border-radius: 30px;
-	background: var(--es-paper-2);
-	transition: border-color var(--es-dur-fast) ease;
-}
-
-.es-hobby-item:hover,
-.es-hobby-item:focus-visible {
-	border-color: var(--es-line-strong);
-	outline: none;
+	gap: 16px;
+	padding: 15px 4px;
+	border-bottom: 1px solid var(--es-line);
 }
 
 .es-hobby-item:focus-visible {
 	outline: 2px solid var(--es-accent);
-	outline-offset: 3px;
+	outline-offset: 2px;
+	border-radius: var(--es-radius-sm);
 }
 
-.es-hobby-item__icon {
-	width: 20px;
-	height: 20px;
+/* Caja del ícono: neutral en reposo (tinta secundaria, nunca acento ni
+   azul), acento verde recién en hover/focus. El SVG hereda por
+   currentColor — ningún color hardcodeado en los archivos. */
+.es-hobby-icon {
+	width: 28px;
+	height: 28px;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	color: var(--es-accent);
+	color: var(--es-ink-2);
 	flex: none;
+	transition: color var(--es-dur) var(--es-ease), transform var(--es-dur) var(--es-ease);
 }
 
-.es-hobby-item__icon svg {
-	width: 20px;
-	height: 20px;
-	overflow: visible;
+.es-hobby-icon svg {
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+
+/* El caballo al galope es artwork apaisado dentro de su caja cuadrada:
+   una caja apenas mayor lo empareja ópticamente con el resto del set
+   (ajuste de presentación — el vector no se toca). */
+.es-hobby-icon--horse-run {
+	width: 34px;
+	height: 34px;
+	margin: -3px;
 }
 
 .es-hobby-item__icon--empty {
 	opacity: 0.35;
 }
 
+.es-hobby-item:hover .es-hobby-icon,
+.es-hobby-item:focus-visible .es-hobby-icon {
+	color: var(--es-accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.es-hobby-item:hover .es-hobby-icon,
+	.es-hobby-item:focus-visible .es-hobby-icon {
+		transform: translateY(-2px);
+	}
+}
+
 .es-hobby-item__label {
-	font-size: 13.5px;
+	font-size: 14px;
 	font-weight: 500;
 	color: var(--es-ink-2);
+	transition: color var(--es-dur) var(--es-ease);
+}
+
+.es-hobby-item:hover .es-hobby-item__label,
+.es-hobby-item:focus-visible .es-hobby-item__label {
+	color: var(--es-ink);
 }
 
 .es-hobby-item__text {
 	font-size: 12px;
 	color: var(--es-ink-4);
-}
-
-/* micro-interacción por ícono: siempre un único transform/opacity sobre el
-   último elemento del SVG (la parte "animada" de cada dibujo — steam,
-   nota, pierna, etc.), disparado solo por :hover/:focus-visible. */
-
-.es-hobby-item__icon svg > * {
-	transform-box: view-box;
-	transition: transform var(--es-dur) var(--es-ease), opacity var(--es-dur) var(--es-ease);
-}
-
-.es-hobby-item[data-icon='taekwondo']:hover .es-hobby-item__icon svg > *:last-child,
-.es-hobby-item[data-icon='taekwondo']:focus-visible .es-hobby-item__icon svg > *:last-child {
-	transform: rotate(-16deg);
-	transform-origin: 10px 11.2px;
-}
-
-.es-hobby-item[data-icon='music']:hover .es-hobby-item__icon svg > *:last-child,
-.es-hobby-item[data-icon='music']:focus-visible .es-hobby-item__icon svg > *:last-child {
-	transform: translate(1.5px, -2px);
-}
-
-.es-hobby-item[data-icon='coffee']:hover .es-hobby-item__icon svg > *:last-child,
-.es-hobby-item[data-icon='coffee']:focus-visible .es-hobby-item__icon svg > *:last-child {
-	transform: translateY(-2.5px);
-	opacity: 0.55;
-}
-
-.es-hobby-item[data-icon='horse']:hover .es-hobby-item__icon svg > *:last-child,
-.es-hobby-item[data-icon='horse']:focus-visible .es-hobby-item__icon svg > *:last-child {
-	transform: translateY(1.5px);
-}
-
-.es-hobby-item[data-icon='drawing']:hover .es-hobby-item__icon svg > *:last-child,
-.es-hobby-item[data-icon='drawing']:focus-visible .es-hobby-item__icon svg > *:last-child {
-	transform: translate(1.5px, 1px);
-}
-
-.es-hobby-item[data-icon='travel']:hover .es-hobby-item__icon svg > *:last-child,
-.es-hobby-item[data-icon='travel']:focus-visible .es-hobby-item__icon svg > *:last-child {
-	transform: translate(2px, -2px);
-}
-
-.es-hobby-item[data-icon='cinema']:hover .es-hobby-item__icon svg > *:last-child,
-.es-hobby-item[data-icon='cinema']:focus-visible .es-hobby-item__icon svg > *:last-child {
-	transform: translateY(-1.5px) rotate(-4deg);
-	transform-origin: 4px 7.5px;
+	margin-left: auto;
+	padding-left: 12px;
+	text-align: right;
 }
 
 /* ---------- Contact: jerarquía de cabecera ----------

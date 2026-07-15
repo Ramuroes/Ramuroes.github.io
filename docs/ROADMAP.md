@@ -410,6 +410,37 @@ invisible; body too narrow vs. the hero).
 
 ---
 
+## Sprint 4K — Approved hobby-icons artwork (About) — done
+
+**Goal:** replace the placeholder 20×20 inline hobby icons with the
+final APPROVED hand-drawn artwork (estavillo-hobby-icons.zip) and give
+the About "Hobbies & interests" section a premium compact layout —
+without redrawing the artwork, redesigning the page, or touching the
+editability model.
+
+- **Assets.** 8 approved SVGs installed as `estavillo-child/assets/icons/`
+  (`taekwondo`, `guitar`, `coffee`, `horse-head`, `horse-run`, `drawing`,
+  `travel`, `cinema`). Metadata-only normalization (square centered
+  viewBox, `fill="black"` → `currentColor`, `aria-hidden`) — path data
+  byte-identical to the upload, asserted by the integration script.
+- **Registry.** `es_hobby_icon_library()` now reads the files (static
+  per-request cache) instead of holding inline strings; the wp-admin
+  select offers the 8 approved choices; legacy saved keys keep working
+  via `es_hobby_icon_resolve_key()` (`music` → `guitar`, `horse` →
+  `horse-head`) on both the frontend and the admin select.
+- **Layout.** Pill chips → compact editorial grid with `--es-line`
+  hairlines; 28px icons (34px box for the landscape horse-run), neutral
+  ink at rest, accent green + 2px lift on hover/:focus-visible (V1 only —
+  per-icon animations reserved for a V2 via `.es-hobby-icon--{key}`
+  wrappers). Motion respects `prefers-reduced-motion`; reveal reuses the
+  existing fail-safe system.
+- **Validated** with the mock-WP PHP harness (real functions.php + real
+  about-content.php render, kses whitelist proof, alias proof) and
+  Chromium (desktop/mobile/hover/focus/light/reduced-motion/JS-off, no
+  overflow, no blue states).
+
+---
+
 ## Sprint 5 — Hero variants
 
 **Goal:** expand hero variety only once the above is stable — not before.
