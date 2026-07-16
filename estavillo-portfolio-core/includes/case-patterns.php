@@ -59,5 +59,31 @@ function es_case_patterns_register() {
 			'content'     => require ES_PORTFOLIO_CORE_DIR . 'patterns/presupuestador-en.php',
 		)
 	);
+
+	// Sistema editorial v2 (spec "Grid System v1"): una página de
+	// laboratorio con los cinco layouts en el orden canónico + un arranque
+	// corto para casos nuevos. Copy ficticio/andamiaje — nunca contenido
+	// real de un caso.
+	register_block_pattern(
+		'estavillo/case-editorial-demo',
+		array(
+			'title'       => __( 'Case Study — Editorial System Demo', 'estavillo-portfolio-core' ),
+			'description' => __( 'Demo del sistema editorial: Reading, Split 5/7, Wide (figura), Wide (Stats+Ladder), Split 7/5, Split balanceado 6/6 y cierre en Reading con cita y detalle. Contenido 100% ficticio para explorar los presets.', 'estavillo-portfolio-core' ),
+			'categories'  => array( 'estavillo-case' ),
+			'postTypes'   => array( 'es_case_study' ),
+			'content'     => require ES_PORTFOLIO_CORE_DIR . 'patterns/editorial-demo.php',
+		)
+	);
+
+	register_block_pattern(
+		'estavillo/case-canonical-starter',
+		array(
+			'title'       => __( 'Case Study — Canonical Starter', 'estavillo-portfolio-core' ),
+			'description' => __( 'Arranque limpio para un caso nuevo: Reading → Split → Wide → Reading de cierre, con copy de andamiaje entre {llaves} para reemplazar.', 'estavillo-portfolio-core' ),
+			'categories'  => array( 'estavillo-case' ),
+			'postTypes'   => array( 'es_case_study' ),
+			'content'     => require ES_PORTFOLIO_CORE_DIR . 'patterns/canonical-starter.php',
+		)
+	);
 }
 add_action( 'init', 'es_case_patterns_register', 20 );

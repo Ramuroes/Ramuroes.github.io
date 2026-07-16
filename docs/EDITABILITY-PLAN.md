@@ -390,6 +390,39 @@ insert the pattern alongside the old Custom HTML block, then delete the
 HTML block once the block version matches). No CPT/meta-key/Polylang
 changes.
 
+### Case Study editorial composition system (Sprint 4L, spec "Grid System v1") — **done**
+
+The Case Section block became the composition chassis for case bodies:
+the case body container widened to **1320px** (`es-container--case` —
+body only; header/footer/nav/hero stay at 1140) over a **12-col / 32px**
+grid (6/24 tablet, 1-col mobile), and the block gained three LOCKED
+preset controls with human-readable labels — no columns, no px, no
+freeform builder:
+
+- **Layout**: Reading (cols 3–10, hard 72ch cap) · Split — text left
+  (5/7) · Split — image left (7/5) · Balanced split (6/6, for
+  before/after) · Wide artifact (cols 1–12; a text-only Wide shows an
+  editor warning — use Reading).
+- **Mobile order** (splits only): Desktop order (default) / Content
+  first / Media first. No drag reordering.
+- **Chapter spacing**: Compact 96 / Standard 120 (default) / Spacious
+  144 — total space between chapters, hairline in the middle.
+
+Splits use two locked internal region blocks (`case-split-content` /
+`case-split-media`, parent-restricted + hidden from the inserter,
+templateLock "all"). Switching a chapter into a split moves its blocks
+into the Content region automatically (undoable); switching out unwraps
+them. Editor preview shares the exact same grid wrapper as the frontend
+(`useInnerBlocksProps`), plus an editor-only variant chip.
+
+How to use each layout: insert **"Case Study — Editorial System Demo"**
+(all five layouts, fictional copy — a lab page to explore) or
+**"Case Study — Canonical Starter"** (Reading → Split → Wide → Reading
+close, scaffolding copy in {braces}) from the pattern inserter, or set
+the Layout select on any Case Section. Backward compatible: "wide"
+sections keep the old flat markup; legacy Custom-HTML bodies and the
+Presupuestador patterns render unchanged; no automatic migration.
+
 ---
 
 ## Editability priority order

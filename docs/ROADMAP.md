@@ -441,6 +441,46 @@ editability model.
 
 ---
 
+## Sprint 4L — Case Study editorial composition system (spec "Grid System v1") — done
+
+**Goal:** implement the approved editorial grid inside the existing
+Gutenberg Case Study blocks — native to Gutenberg, safe for
+non-technical editing, reusable by Presupuestador, Trazur, French
+Bakery and Samic. No redesign of anything else; no page builder.
+
+- **Container.** Case body only: `.es-container--case` at 1320px.
+  Header/footer/nav and the case hero stay at 1140 untouched.
+- **Grid.** 12 col / 32px gutter desktop (≥1024), 6 col / 24px tablet
+  (768–1023, splits stack), 1 col mobile (<768). The same
+  `.es-case-section__grid` wrapper exists in frontend (render.php) and
+  editor (useInnerBlocksProps) — identical composition both sides.
+- **Case Section presets (locked).** `layout`:
+  reading (cols 3–10 + 72ch hard cap) / split-left 5-7 / split-right 7-5
+  (media first visually via order, DOM unchanged) / split-balanced 6-6 /
+  wide (cols 1–12, flat legacy markup — zero regression). `mobileOrder`:
+  desktop order default / content-first / media-first (stacked only).
+  `spacing`: compact 96 / standard 120 / spacious 144 (total chapter
+  gap, hairline in the middle). No px, no column numbers, no arbitrary
+  margins in the UI.
+- **Split regions.** Two new internal blocks (case-split-content /
+  case-split-media), parent-locked + inserter-hidden, template locked;
+  switching layouts restructures children automatically and undoably;
+  text-only Wide shows an editor notice; editor-only variant chip.
+- **Patterns.** "Case Study — Editorial System Demo" (canonical order:
+  Reading → Split 5/7 → Wide figure → Wide Stats+Ladder → Split 7/5 →
+  Balanced → Reading close with Quote/Details; 100% fictional copy) and
+  "Case Study — Canonical Starter" (Reading → Split → Wide → Reading
+  close, scaffolding copy). Presupuestador content untouched — migration
+  is a later ticket by design.
+- **Validated**: render harness through the real render.php files
+  (incl. Presupuestador ES/EN regression), mock-wp editor harness
+  (conversions, guardrails, template locks), Chromium at
+  320/375/390/768/1024/1440 (container 1320, 12/32 + 6/24 grids, exact
+  5/7-7/5-6/6 ratios, 72ch reading, 96/120/144 spacing, 4 mobile-order
+  combinations, dark/light, JS-off, reduced-motion, zero overflow).
+
+---
+
 ## Sprint 5 — Hero variants
 
 **Goal:** expand hero variety only once the above is stable — not before.

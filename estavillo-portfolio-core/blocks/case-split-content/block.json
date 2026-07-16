@@ -1,0 +1,22 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/case-split-content",
+	"title": "Split — Contenido",
+	"category": "estavillo-case",
+	"icon": "align-pull-left",
+	"description": "Región de texto de un Case Section en layout Split. Se crea sola al elegir un layout Split — no se inserta a mano.",
+	"keywords": [ "estavillo", "case", "split", "contenido" ],
+	"textdomain": "estavillo-portfolio-core",
+	"parent": [ "estavillo/case-section" ],
+	"attributes": {},
+	"supports": {
+		"html": false,
+		"customClassName": false,
+		"inserter": false,
+		"anchor": false
+	},
+	"editorScript": "es-case-block-case-split-content",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}

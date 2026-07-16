@@ -106,3 +106,33 @@
 	text-transform: uppercase;
 	color: var(--es-ink-4, #6f6961);
 }
+
+/* ---------- sistema editorial v2 (solo editor) ---------- */
+
+/* chip de variante del case-section: layout + spacing actuales, visible
+   solo al editar — nunca llega al frontend (vive en edit.js, no en save) */
+.editor-styles-wrapper .es-caseb-variant {
+	display: inline-block;
+	font-family: var(--es-mono, ui-monospace, monospace);
+	font-size: 9.5px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--es-ink-4, #6f6961);
+	border: 1px solid var(--es-line, #2b2825);
+	border-radius: 20px;
+	padding: 4px 10px;
+	margin: 0 0 14px;
+}
+
+/* aviso "Wide es para artefactos" dentro del preview */
+.editor-styles-wrapper .es-caseb-notice {
+	margin: 0 0 16px;
+}
+
+/* regiones de split: contorno sutil para ver los límites al editar */
+.editor-styles-wrapper .es-caseb-region {
+	min-height: 56px;
+	outline: 1px dashed var(--es-line-strong, #403c37);
+	outline-offset: 6px;
+	border-radius: 2px;
+}

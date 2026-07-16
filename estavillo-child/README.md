@@ -430,7 +430,7 @@ dentro de lo que imprime `the_content()`):
 
 | Clase | Para qué |
 |---|---|
-| `es-case-section` | Envuelve un "capítulo" del caso. Agrega una línea divisoria arriba y espaciado generoso — **excepto la primera** de la página, que no lleva línea. Ponele `id="loquesea"` si querés que el índice sticky pueda linkear a esta sección. Modificador opcional `es-case-section--reading`: limita la sección ENTERA (componentes incluidos) a la medida de lectura en vez del ancho completo. |
+| `es-case-section` | Envuelve un "capítulo" del caso. Agrega una línea divisoria arriba y espaciado generoso — **excepto la primera** de la página, que no lleva línea. Ponele `id="loquesea"` si querés que el índice sticky pueda linkear a esta sección. El modificador `es-case-section--reading` hoy es parte del sistema editorial v2 del BLOQUE case-section (banda de lectura en grilla) — en HTML manual no hace falta usarlo: la prosa ya se limita sola a la medida de lectura. |
 | `es-case-label` | Eyebrow mono chico arriba de un heading de sección (p. ej. "Fig. 01 — Contexto"). |
 | `es-case-heading` | Título de sección (serif, grande). Va después de `es-case-label`. |
 | `es-case-lead` | Párrafo grande de apertura de una sección (serif, más grande que el body normal). |
@@ -630,6 +630,48 @@ agrega la clase-gate `es-motion` al `<html>` justo antes de observar;
 optimizador) **nada se oculta nunca**, y `prefers-reduced-motion` muestra
 todo sin animar. El override temporal de "CSS adicional" del Customizer ya
 no hace falta: **borralo** al actualizar el theme.
+
+### Sistema editorial v2 del Case Study (spec "Grid System v1")
+
+El bloque **Case Section** ahora es el chasis de composición del caso. El
+container del body subió a **1320px** (`es-container--case` — solo el body:
+header/footer/nav/hero siguen en 1140) con una grilla de **12 columnas /
+32px de gutter** en desktop, 6/24 en tablet y 1 columna en mobile. El
+editor elige **presets bloqueados** en el inspector — nunca columnas ni px:
+
+| Layout (inspector) | Qué hace |
+|---|---|
+| Reading | Narrativa larga: banda de lectura (cols 3–10) con tope duro de 72ch. Nunca de borde a borde. |
+| Split — texto a la izquierda | Texto 5/12 + media 7/12. Dos regiones fijas (Contenido / Media). |
+| Split — imagen a la izquierda | Espejo 7/12 + 5/12 — el media va primero visualmente (el DOM y el orden de lectura no cambian). |
+| Split balanceado | 6/6, para antes/después y comparaciones de igual peso. Sin ratios custom. |
+| Wide artifact | Cols 1–12 (los 1320 completos). Solo para artefactos — si el capítulo es solo texto, el editor muestra un aviso y corresponde Reading. |
+
+Más dos presets extra en el mismo panel:
+
+- **Orden en mobile** (solo splits): "Orden de desktop" (default — sigue el
+  orden narrativo), "Contenido primero" o "Media primero". Sin drag ni
+  reordenamiento libre.
+- **Espaciado del capítulo**: Compact (96px) / Standard (120px, default) /
+  Spacious (144px) — el espacio total entre capítulos, con la hairline al
+  medio.
+
+Al elegir un Split, los bloques existentes del capítulo se mueven solos a
+la región **Contenido** y aparece una región **Media** vacía (deshacible
+con Ctrl+Z); al volver a Reading/Wide las regiones se desenvuelven. Las
+regiones son bloques internos (`case-split-content` / `case-split-media`)
+con template bloqueado — no se pueden insertar a mano ni romper la grilla.
+El preview del editor usa el MISMO wrapper de grilla que el frontend, más
+un chip de variante (solo editor) que dice layout y spacing actuales.
+
+Patterns nuevos del inserter: **"Case Study — Editorial System Demo"**
+(los 5 layouts en el orden canónico, con copy 100% ficticio para
+explorar) y **"Case Study — Canonical Starter"** (Reading → Split → Wide →
+Reading de cierre, con copy de andamiaje `{entre llaves}` para un caso
+nuevo — Trazur, French Bakery, Samic). Los patterns del Presupuestador y
+los bodies Custom HTML existentes siguen renderizando igual (las
+secciones "wide" conservan el flujo plano de siempre); ningún post
+necesita migración.
 
 ### Hero layout options (mega sprint)
 

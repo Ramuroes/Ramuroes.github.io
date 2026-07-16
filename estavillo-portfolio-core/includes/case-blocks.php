@@ -2,9 +2,12 @@
 /**
  * Librería de bloques Gutenberg "Estavillo Case Study".
  *
- * Sprint Gutenberg. 10 bloques dinámicos (render.php server-side, save nulo
- * o solo InnerBlocks.Content) registrados vía block.json, uno por carpeta en
- * blocks/. La presentación frontend reusa 1:1 la librería de clases
+ * Sprint Gutenberg (+ sistema editorial v2). 12 bloques dinámicos
+ * (render.php server-side, save nulo o solo InnerBlocks.Content)
+ * registrados vía block.json, uno por carpeta en blocks/ — los dos
+ * case-split-* son regiones internas del case-section en layout Split
+ * (parent + inserter:false: nunca se insertan a mano).
+ * La presentación frontend reusa 1:1 la librería de clases
  * .es-case-* de case-study.css del CHILD THEME — el plugin no duplica esos
  * estilos: en el front los sirve el theme (solo carga en el single del CPT),
  * y en el editor este archivo puentea las mismas hojas del theme hacia el
@@ -37,6 +40,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 function es_case_blocks_list() {
 	return array(
 		'case-section',
+		'case-split-content',
+		'case-split-media',
 		'case-figure',
 		'case-stats',
 		'case-ladder',

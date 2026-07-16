@@ -169,7 +169,12 @@ if ( function_exists( 'wp_body_open' ) ) {
 					</div>
 				</div>
 
-				<div class="es-container">
+				<?php
+				// es-container--case: el body del caso usa el container ancho
+				// del sistema editorial (1320px, spec Grid System v1). El hero
+				// de arriba y el chrome del sitio quedan en 1140 a propósito.
+				?>
+				<div class="es-container es-container--case">
 					<?php
 					// Sin data-es-reveal acá, a propósito: el body es UN solo
 					// elemento de miles de px de alto, y un IntersectionObserver

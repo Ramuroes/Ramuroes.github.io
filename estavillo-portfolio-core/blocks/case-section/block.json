@@ -13,7 +13,9 @@
 		"label": { "type": "string", "default": "" },
 		"heading": { "type": "string", "default": "" },
 		"lead": { "type": "string", "default": "" },
-		"layout": { "type": "string", "default": "wide", "enum": [ "wide", "reading" ] }
+		"layout": { "type": "string", "default": "wide", "enum": [ "wide", "reading", "split-left", "split-right", "split-balanced" ] },
+		"mobileOrder": { "type": "string", "default": "", "enum": [ "", "content-first", "media-first" ] },
+		"spacing": { "type": "string", "default": "standard", "enum": [ "compact", "standard", "spacious" ] }
 	},
 	"supports": {
 		"html": false,

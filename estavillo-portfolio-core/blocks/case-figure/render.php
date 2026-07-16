@@ -61,6 +61,10 @@ if ( 'browser' === $es_variant ) {
 $es_figure_class = 'es-case-figure';
 if ( 'standard' === $es_variant ) {
 	$es_figure_class .= ' es-case-figure--standard';
+} elseif ( 'wide' === $es_variant ) {
+	// Gancho de estilo para el sistema editorial v2 (sangrado al borde en
+	// mobile). Ningún HTML legacy usa esta clase — solo el bloque.
+	$es_figure_class .= ' es-case-figure--wide';
 }
 
 $es_caption_html = '';

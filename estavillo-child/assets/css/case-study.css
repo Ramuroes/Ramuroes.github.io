@@ -268,27 +268,41 @@
 
 /* ---------- prose: contenido del editor estándar (the_content()) ----------
 
-   Sistema editorial de anchos (sprint Gutenberg):
-   - El body ocupa TODO el ancho del .es-container (--es-max-w, 1140px) —
-     mismos bordes izquierdo/derecho que el hero de arriba. Antes había un
-     max-width: 720px acá que dejaba el caso angosto y volcado a la
-     izquierda respecto del hero.
-   - El texto de lectura (párrafos, listas, blockquotes, headings sueltos,
+   Sistema editorial de anchos (sprint Gutenberg + spec "Grid System v1"):
+   - El body del caso vive en un container PROPIO más ancho que el resto
+     del sitio: .es-container--case (1320px). Header/footer/nav/hero
+     siguen en 1140 (--es-max-w) — no se tocan.
+   - El texto de lectura suelto (párrafos, listas, blockquotes, headings,
      captions, quotes, details) se limita a una medida legible:
-     --es-case-measure (820px ≈ 75–80 caracteres a 15.5px).
+     --es-case-measure (820px ≈ 75–80 caracteres a 15.5px) — compat con
+     los bodies Custom HTML existentes.
    - Los componentes anchos (figura, browser frame, stats, ladder,
      taxonomy, decisions, status, timeline) pueden usar el ancho completo
      del container.
-   - .es-case-section--reading (opt-in, usado por el bloque case-section
-     con layout "reading") limita la sección ENTERA a la medida de lectura,
-     componentes incluidos. */
+   - El bloque case-section suma las variantes de composición v2 (grilla
+     de 12 columnas, splits, spacing presets) — ver el bloque de reglas
+     "Sistema editorial v2" más abajo. */
+
+/* Container del body del caso: 1320px máx (borde a borde con el mismo
+   padding lateral que el resto del sitio). El hero del caso queda a 1140
+   a propósito — spec: "do not alter the 1140px header/footer measure". */
+.es-container--case {
+	max-width: 1320px;
+}
 
 .es-case__body {
 	--es-case-measure: 820px;
+	--es-case-gutter: 32px;
 	margin-top: clamp(48px, 6vw, 88px);
 	font-size: 15.5px;
 	line-height: 1.75;
 	color: var(--es-ink-2);
+}
+
+@media (max-width: 1023px) {
+	.es-case__body {
+		--es-case-gutter: 24px;
+	}
 }
 
 /* texto de lectura a medida legible: hijos directos del body (posts de
@@ -408,10 +422,165 @@
 	margin-top: 0;
 }
 
-/* layout "reading" (bloque case-section): la sección ENTERA — componentes
-   incluidos — se limita a la medida de lectura */
-.es-case__body .es-case-section--reading {
-	max-width: var(--es-case-measure);
+/* =========================================================================
+   Sistema editorial v2 — spec "Estavillo · Case Study Grid System v1"
+   -------------------------------------------------------------------------
+   El bloque case-section emite estas clases según sus presets BLOQUEADOS
+   (el editor elige variante con nombre humano, nunca columnas ni px):
+
+   - layout:  --reading | --split + --split-left/--split-right/--split-balanced
+              ("wide" no emite clase de grilla: mantiene el flujo plano de
+              siempre — compat total con el contenido existente)
+   - spacing: --sp-compact (96px) | --sp-standard (120px) | --sp-spacious (144px)
+   - mobile:  --m-content-first | --m-media-first (solo splits, solo apilado)
+
+   Grilla: 12 col / 32px gutter en desktop (≥1024), 6 col / 24px en tablet
+   (768–1023, splits apilados), 1 col en mobile (<768). El wrapper
+   .es-case-section__grid existe idéntico en el frontend (render.php) y en
+   el editor (useInnerBlocksProps) — mismo DOM, misma composición.
+   ========================================================================= */
+
+.es-case__body .es-case-section__grid {
+	display: grid;
+	grid-template-columns: repeat(12, 1fr);
+	column-gap: var(--es-case-gutter);
+	align-items: start;
+}
+
+/* ---------- reading: cols 3–10 + tope duro de 72ch ---------- */
+
+.es-case__body .es-case-section--reading .es-case-section__grid > * {
+	grid-column: 3 / 11;
+}
+
+.es-case__body .es-case-section--reading .es-case-section__grid > p,
+.es-case__body .es-case-section--reading .es-case-section__grid > ul,
+.es-case__body .es-case-section--reading .es-case-section__grid > ol,
+.es-case__body .es-case-section--reading .es-case-section__grid > blockquote {
+	max-width: 72ch;
+}
+
+/* ---------- splits: 5/7, 7/5, 6/6 — ratios fijos, sin custom ---------- */
+
+.es-case__body .es-case-section--split .es-case-section__grid {
+	align-items: center;
+	row-gap: clamp(28px, 3.5vw, 44px);
+}
+
+/* header del capítulo (label/heading/lead) a ancho completo de la grilla */
+.es-case__body .es-case-section--split .es-case-section__grid > * {
+	grid-column: 1 / -1;
+}
+
+.es-case__body .es-case-section--split-left .es-case-section__grid > .es-case-split__content {
+	grid-column: 1 / 6;
+}
+
+.es-case__body .es-case-section--split-left .es-case-section__grid > .es-case-split__media {
+	grid-column: 6 / 13;
+}
+
+/* split-right: el media va primero VISUALMENTE vía order:-1 — el DOM queda
+   siempre contenido→media (mismo orden de lectura/tab en los tres splits) */
+.es-case__body .es-case-section--split-right .es-case-section__grid > .es-case-split__media {
+	grid-column: 1 / 8;
+	order: -1;
+}
+
+.es-case__body .es-case-section--split-right .es-case-section__grid > .es-case-split__content {
+	grid-column: 8 / 13;
+}
+
+.es-case__body .es-case-section--split-balanced .es-case-section__grid > .es-case-split__content {
+	grid-column: 1 / 7;
+}
+
+.es-case__body .es-case-section--split-balanced .es-case-section__grid > .es-case-split__media {
+	grid-column: 7 / 13;
+}
+
+.es-case__body .es-case-split__content > :first-child,
+.es-case__body .es-case-split__media > :first-child {
+	margin-top: 0;
+}
+
+.es-case__body .es-case-split__content > :last-child,
+.es-case__body .es-case-split__media > :last-child {
+	margin-bottom: 0;
+}
+
+/* el texto del split nunca pasa la medida de lectura (importa al apilarse) */
+.es-case__body .es-case-split__content p {
+	max-width: 72ch;
+}
+
+/* ---------- spacing presets: espacio TOTAL entre capítulos ---------- */
+
+.es-case__body .es-case-section--sp-compact {
+	--es-case-chapter: 96px;
+}
+
+.es-case__body .es-case-section--sp-standard {
+	--es-case-chapter: 120px;
+}
+
+.es-case__body .es-case-section--sp-spacious {
+	--es-case-chapter: 144px;
+}
+
+.es-case__body .es-case-section--sp-compact,
+.es-case__body .es-case-section--sp-standard,
+.es-case__body .es-case-section--sp-spacious {
+	margin-top: calc(var(--es-case-chapter) / 2);
+	padding-top: calc(var(--es-case-chapter) / 2);
+}
+
+/* ---------- tablet (≤1023): 6 col / 24px; splits apilados ---------- */
+
+@media (max-width: 1023px) {
+	.es-case__body .es-case-section__grid {
+		grid-template-columns: repeat(6, 1fr);
+	}
+
+	.es-case__body .es-case-section--reading .es-case-section__grid > *,
+	.es-case__body .es-case-section--split .es-case-section__grid > .es-case-split__content,
+	.es-case__body .es-case-section--split .es-case-section__grid > .es-case-split__media {
+		grid-column: 1 / -1;
+	}
+
+	/* orden apilado: sin preset sigue el orden narrativo de desktop
+	   (split-right ya trae order:-1 en el media); los dos presets del
+	   editor lo pisan explícitamente */
+	.es-case__body .es-case-section--m-media-first .es-case-section__grid > .es-case-split__media {
+		order: -1;
+	}
+
+	.es-case__body .es-case-section--m-content-first .es-case-section__grid > .es-case-split__media {
+		order: 1;
+	}
+}
+
+/* ---------- mobile (<768): 1 col; figuras wide sangran al borde ---------- */
+
+@media (max-width: 767px) {
+	.es-case__body .es-case-section__grid {
+		grid-template-columns: 1fr;
+	}
+
+	.es-case__body .es-case-figure--wide {
+		margin-left: calc(-1 * var(--es-pad-x));
+		margin-right: calc(-1 * var(--es-pad-x));
+	}
+
+	.es-case__body .es-case-figure--wide .es-placeholder,
+	.es-case__body .es-case-figure--wide img {
+		border-radius: 0;
+	}
+
+	.es-case__body .es-case-figure--wide figcaption {
+		padding-left: var(--es-pad-x);
+		padding-right: var(--es-pad-x);
+	}
 }
 
 .es-case__body .es-case-label {
