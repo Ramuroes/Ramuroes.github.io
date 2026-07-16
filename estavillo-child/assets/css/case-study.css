@@ -445,8 +445,10 @@
    Esta versión no tiene grilla propia. case-section solo controla tres
    cosas a nivel CAPÍTULO — la composición interna (texto+figura lado a
    lado, comparaciones, etc.) es 100% bloques Columns/Column NATIVOS de
-   Gutenberg, con su propio stacking responsive nativo (no se reimplementa
-   acá, a propósito):
+   Gutenberg. Su comportamiento responsive imita el de WordPress core
+   (mismo breakpoint, 782px) pero SÍ está reimplementado acá — ver el
+   bloque "Columns/Column nativos de Gutenberg" más abajo para el porqué
+   (el template standalone no encola wp-block-library):
 
    - es-case-section--content (default): ancho completo del padre, SIN
      tope de medida — el override de abajo cancela el cap heredado para
@@ -527,12 +529,51 @@
 }
 
 /* ---------- Columns/Column nativos de Gutenberg dentro de un capítulo ----------
-   Gap consistente con el resto del sistema (mismo token que el gutter de
-   página); el stacking responsive es 100% de WordPress core (no se toca:
-   .wp-block-columns ya se apila solo por debajo de 782px). */
+   Fallback de compatibilidad (sprint de auditoría de CSS de columnas):
+   el template standalone de Case Study encola solo tokens/base/layout/
+   components/site/case-study — NUNCA wp-block-library — así que estas
+   reglas NO pueden asumir que el CSS de Columns de WordPress core esté
+   presente en el front. Confirmado con computed styles reales (sin
+   ningún CSS inyectado a mano): sin este bloque, .wp-block-columns
+   calcula display:block y las columnas quedan apiladas siempre, con o
+   sin ratio, incluso en desktop — el `gap` que ya existía acá era inerte
+   porque nunca hubo display:flex/grid para activarlo.
+
+   Este bloque reimplementa SOLO lo esencial de Columns/Column, scopeado
+   a .es-case__body para no tocar Kadence ni ningún otro Columns del
+   sitio: flex en dos ejes, min-width:0 para que las columnas puedan
+   achicarse sin forzar overflow/wrap, y el breakpoint de apilado de
+   core (782px) reproducido con el mismo número. flex-grow queda en 1
+   (no en 0) a propósito: así una columna SIN ratio explícito (ningún
+   atributo "width" en el bloque Column) sigue repartiéndose el espacio
+   50/50 con su vecina — exactamente el comportamiento nativo de
+   Gutenberg — mientras que una columna CON flex-basis inline (40%, 60%,
+   etc., emitido por el editor) conserva ese ratio intacto: flex-grow no
+   pisa un flex-basis ya explícito en el mismo elemento, solo decide
+   cómo repartir el espacio SOBRANTE cuando el total de bases no llena
+   el contenedor. */
 
 .es-case__body .wp-block-columns {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: normal;
 	gap: var(--es-case-gutter);
+}
+
+.es-case__body .wp-block-column {
+	flex-grow: 1;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+@media (max-width: 781px) {
+	.es-case__body .wp-block-columns {
+		flex-wrap: wrap;
+	}
+
+	.es-case__body .wp-block-column {
+		flex-basis: 100% !important;
+	}
 }
 
 .es-case__body .wp-block-column :is(p, ul, ol, blockquote, h2, h3) {
