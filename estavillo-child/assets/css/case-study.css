@@ -279,9 +279,16 @@
    - Los componentes anchos (figura, browser frame, stats, ladder,
      taxonomy, decisions, status, timeline) pueden usar el ancho completo
      del container.
-   - El bloque case-section suma las variantes de composición v2 (grilla
-     de 12 columnas, splits, spacing presets) — ver el bloque de reglas
-     "Sistema editorial v2" más abajo. */
+   - El bloque case-section suma tres controles de capítulo (Width:
+     Content/Reading/Wide, Chapter spacing, Chapter divider) — ver el
+     bloque de reglas "Sistema editorial del bloque Case Section" más
+     abajo. Content y Wide son el mismo ancho completo (sin tope de
+     medida); solo Reading limita el CAPÍTULO ENTERO a ~72ch. La
+     composición interna (texto+figura lado a lado, comparaciones, etc.)
+     es responsabilidad de los bloques Columns/Column NATIVOS de
+     Gutenberg — este archivo no define ninguna grilla propia para eso,
+     a propósito (corrección de arquitectura: una grilla de 12 columnas
+     con regiones fijas resultó demasiado rígida en uso real). */
 
 /* Container del body del caso: 1320px máx (borde a borde con el mismo
    padding lateral que el resto del sitio). El hero del caso queda a 1140
@@ -299,7 +306,7 @@
 	color: var(--es-ink-2);
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 781px) {
 	.es-case__body {
 		--es-case-gutter: 24px;
 	}
@@ -423,95 +430,51 @@
 }
 
 /* =========================================================================
-   Sistema editorial v2 — spec "Estavillo · Case Study Grid System v1"
+   Sistema editorial del bloque Case Section (corrección de arquitectura)
    -------------------------------------------------------------------------
-   El bloque case-section emite estas clases según sus presets BLOQUEADOS
-   (el editor elige variante con nombre humano, nunca columnas ni px):
+   Historia: una versión anterior envolvía reading/split en una grilla CSS
+   propia de 12 columnas con regiones fijas Contenido/Media. En uso real
+   sobre WordPress resultó demasiado rígida (forzaba el contenido a áreas
+   angostas predefinidas) y — el bug real — un selector heredado de la
+   librería de prosa de más abajo (`.es-case-section > p`, sin restricción
+   de modificador) le ponía max-width:820px a CUALQUIER párrafo hijo
+   directo de la sección sin importar el layout elegido: un capítulo
+   "Content" con un párrafo suelto a ancho completo quedaba angosto contra
+   el borde izquierdo con un hueco vacío a la derecha.
 
-   - layout:  --reading | --split + --split-left/--split-right/--split-balanced
-              ("wide" no emite clase de grilla: mantiene el flujo plano de
-              siempre — compat total con el contenido existente)
-   - spacing: --sp-compact (96px) | --sp-standard (120px) | --sp-spacious (144px)
-   - mobile:  --m-content-first | --m-media-first (solo splits, solo apilado)
+   Esta versión no tiene grilla propia. case-section solo controla tres
+   cosas a nivel CAPÍTULO — la composición interna (texto+figura lado a
+   lado, comparaciones, etc.) es 100% bloques Columns/Column NATIVOS de
+   Gutenberg, con su propio stacking responsive nativo (no se reimplementa
+   acá, a propósito):
 
-   Grilla: 12 col / 32px gutter en desktop (≥1024), 6 col / 24px en tablet
-   (768–1023, splits apilados), 1 col en mobile (<768). El wrapper
-   .es-case-section__grid existe idéntico en el frontend (render.php) y en
-   el editor (useInnerBlocksProps) — mismo DOM, misma composición.
+   - es-case-section--content (default): ancho completo del container
+     editorial (1320px), SIN tope de medida — el override de abajo cancela
+     el cap heredado para hijos directos.
+   - es-case-section--wide: idéntico a --content — mismo ancho completo; la
+     distinción es de intención/documentación (Wide = artefactos).
+   - es-case-section--reading: el CAPÍTULO ENTERO (label/heading/lead +
+     contenido) se limita a 72ch — la única variante que angosta prosa.
+   - es-case-section--sp-{compact,standard,spacious}: espacio total entre
+     capítulos (96/120/144px), sin cambios respecto de la versión anterior.
+   - es-case-section--no-divider: oculta la línea divisoria de arriba (el
+     spacing no cambia, solo la línea).
    ========================================================================= */
 
-.es-case__body .es-case-section__grid {
-	display: grid;
-	grid-template-columns: repeat(12, 1fr);
-	column-gap: var(--es-case-gutter);
-	align-items: start;
-}
-
-/* ---------- reading: cols 3–10 + tope duro de 72ch ---------- */
-
-.es-case__body .es-case-section--reading .es-case-section__grid > * {
-	grid-column: 3 / 11;
-}
-
-.es-case__body .es-case-section--reading .es-case-section__grid > p,
-.es-case__body .es-case-section--reading .es-case-section__grid > ul,
-.es-case__body .es-case-section--reading .es-case-section__grid > ol,
-.es-case__body .es-case-section--reading .es-case-section__grid > blockquote {
+.es-case__body .es-case-section--reading {
 	max-width: 72ch;
 }
 
-/* ---------- splits: 5/7, 7/5, 6/6 — ratios fijos, sin custom ---------- */
-
-.es-case__body .es-case-section--split .es-case-section__grid {
-	align-items: center;
-	row-gap: clamp(28px, 3.5vw, 44px);
-}
-
-/* header del capítulo (label/heading/lead) a ancho completo de la grilla */
-.es-case__body .es-case-section--split .es-case-section__grid > * {
-	grid-column: 1 / -1;
-}
-
-.es-case__body .es-case-section--split-left .es-case-section__grid > .es-case-split__content {
-	grid-column: 1 / 6;
-}
-
-.es-case__body .es-case-section--split-left .es-case-section__grid > .es-case-split__media {
-	grid-column: 6 / 13;
-}
-
-/* split-right: el media va primero VISUALMENTE vía order:-1 — el DOM queda
-   siempre contenido→media (mismo orden de lectura/tab en los tres splits) */
-.es-case__body .es-case-section--split-right .es-case-section__grid > .es-case-split__media {
-	grid-column: 1 / 8;
-	order: -1;
-}
-
-.es-case__body .es-case-section--split-right .es-case-section__grid > .es-case-split__content {
-	grid-column: 8 / 13;
-}
-
-.es-case__body .es-case-section--split-balanced .es-case-section__grid > .es-case-split__content {
-	grid-column: 1 / 7;
-}
-
-.es-case__body .es-case-section--split-balanced .es-case-section__grid > .es-case-split__media {
-	grid-column: 7 / 13;
-}
-
-.es-case__body .es-case-split__content > :first-child,
-.es-case__body .es-case-split__media > :first-child {
-	margin-top: 0;
-}
-
-.es-case__body .es-case-split__content > :last-child,
-.es-case__body .es-case-split__media > :last-child {
-	margin-bottom: 0;
-}
-
-/* el texto del split nunca pasa la medida de lectura (importa al apilarse) */
-.es-case__body .es-case-split__content p {
-	max-width: 72ch;
+/* el fix: cancela el cap de 820px de la librería de prosa (más arriba en
+   este archivo) para hijos directos de un capítulo Content/Wide — ese cap
+   sigue aplicando tal cual a HTML manual/Custom HTML (sin esta clase) y a
+   los capítulos Reading (ya limitados por el max-width del punto anterior,
+   más angosto). Mismo nivel de especificidad que la regla original
+   (2 clases + 1 elemento): gana por orden de aparición, más tarde en el
+   archivo — se repite acá con :is() por prolijidad/robustez ante reordenamientos. */
+.es-case__body .es-case-section--content > :is(p, ul, ol, blockquote, h2, h3),
+.es-case__body .es-case-section--wide > :is(p, ul, ol, blockquote, h2, h3) {
+	max-width: none;
 }
 
 /* ---------- spacing presets: espacio TOTAL entre capítulos ---------- */
@@ -535,38 +498,26 @@
 	padding-top: calc(var(--es-case-chapter) / 2);
 }
 
-/* ---------- tablet (≤1023): 6 col / 24px; splits apilados ---------- */
-
-@media (max-width: 1023px) {
-	.es-case__body .es-case-section__grid {
-		grid-template-columns: repeat(6, 1fr);
-	}
-
-	.es-case__body .es-case-section--reading .es-case-section__grid > *,
-	.es-case__body .es-case-section--split .es-case-section__grid > .es-case-split__content,
-	.es-case__body .es-case-section--split .es-case-section__grid > .es-case-split__media {
-		grid-column: 1 / -1;
-	}
-
-	/* orden apilado: sin preset sigue el orden narrativo de desktop
-	   (split-right ya trae order:-1 en el media); los dos presets del
-	   editor lo pisan explícitamente */
-	.es-case__body .es-case-section--m-media-first .es-case-section__grid > .es-case-split__media {
-		order: -1;
-	}
-
-	.es-case__body .es-case-section--m-content-first .es-case-section__grid > .es-case-split__media {
-		order: 1;
-	}
+.es-case__body .es-case-section--no-divider {
+	border-top: 0;
 }
 
-/* ---------- mobile (<768): 1 col; figuras wide sangran al borde ---------- */
+/* ---------- Columns/Column nativos de Gutenberg dentro de un capítulo ----------
+   Gap consistente con el resto del sistema (mismo token que el gutter de
+   página); el stacking responsive es 100% de WordPress core (no se toca:
+   .wp-block-columns ya se apila solo por debajo de 782px). */
 
+.es-case__body .wp-block-columns {
+	gap: var(--es-case-gutter);
+}
+
+.es-case__body .wp-block-column :is(p, ul, ol, blockquote, h2, h3) {
+	max-width: none;
+}
+
+/* figuras Wide: sangran al borde del viewport en mobile (independiente del
+   ancho del capítulo que las contiene) */
 @media (max-width: 767px) {
-	.es-case__body .es-case-section__grid {
-		grid-template-columns: 1fr;
-	}
-
 	.es-case__body .es-case-figure--wide {
 		margin-left: calc(-1 * var(--es-pad-x));
 		margin-right: calc(-1 * var(--es-pad-x));

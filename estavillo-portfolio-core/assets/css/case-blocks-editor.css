@@ -107,9 +107,9 @@
 	color: var(--es-ink-4, #6f6961);
 }
 
-/* ---------- sistema editorial v2 (solo editor) ---------- */
+/* ---------- case-section: chapter chip (solo editor) ---------- */
 
-/* chip de variante del case-section: layout + spacing actuales, visible
+/* chip de variante del case-section: width + spacing actuales, visible
    solo al editar — nunca llega al frontend (vive en edit.js, no en save) */
 .editor-styles-wrapper .es-caseb-variant {
 	display: inline-block;
@@ -124,12 +124,9 @@
 	margin: 0 0 14px;
 }
 
-/* aviso "Wide es para artefactos" dentro del preview */
-.editor-styles-wrapper .es-caseb-notice {
-	margin: 0 0 16px;
-}
-
-/* regiones de split: contorno sutil para ver los límites al editar */
+/* regiones de case-split-content/media: LEGACY (ver case-blocks.php) —
+   contorno sutil para que un post viejo con estos bloques siga siendo
+   reconocible/editable al abrir en el editor. Contenido nuevo no los usa. */
 .editor-styles-wrapper .es-caseb-region {
 	min-height: 56px;
 	outline: 1px dashed var(--es-line-strong, #403c37);

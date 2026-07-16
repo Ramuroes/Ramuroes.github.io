@@ -1,18 +1,22 @@
 /**
  * estavillo/case-section — editor.
  *
- * Sistema editorial v2: el editor elige PRESETS con nombre humano (layout /
- * spacing de capítulo / orden mobile), nunca columnas ni px. El preview usa
- * el MISMO wrapper .es-case-section__grid que el frontend (via
- * useInnerBlocksProps, así los bloques hijos son hijos directos de la
- * grilla) — misma composición en editor y frontend.
+ * Contenedor de capítulo FLEXIBLE: label/heading/lead (RichText dedicados)
+ * + InnerBlocks totalmente libre — sin allowedBlocks, sin template, sin
+ * templateLock. El editor inserta y reordena lo que necesite (Heading,
+ * Paragraph, List, Image, Gallery, Group, Row, Stack, Columns/Column
+ * nativos de Gutenberg, y los bloques Estavillo Case Study existentes)
+ * con los controles normales de bloques — este archivo no interviene en
+ * esa composición interna en absoluto.
  *
- * Guardrails:
- * - splits: template bloqueado [contenido, media] — al elegir un split los
- *   bloques existentes se mueven a la región Contenido (reversible con
- *   deshacer); al salir del split las regiones se desenvuelven.
- * - wide de solo texto: aviso en el preview (Wide es para artefactos).
- * - chip de variante (solo editor, nunca en el frontend).
+ * Corrección (sprint de corrección arquitectónica): la versión anterior
+ * imponía regiones fijas Contenido/Media con templateLock y reestructuraba
+ * los hijos automáticamente al cambiar de layout. Eso resultó demasiado
+ * rígido en uso real y — combinado con un bug de CSS heredado — dejaba un
+ * hueco vacío a la derecha. Esta versión solo controla tres cosas a nivel
+ * capítulo (Width / Chapter spacing / Chapter divider), con nombres
+ * humanos, nunca columnas ni píxeles; la composición interna es 100%
+ * Gutenberg nativo.
  */
 (function (wp, ui) {
 	'use strict';
@@ -28,59 +32,24 @@
 	var PanelBody = wp.components.PanelBody;
 	var TextControl = wp.components.TextControl;
 	var SelectControl = wp.components.SelectControl;
-	var Notice = wp.components.Notice;
+	var ToggleControl = wp.components.ToggleControl;
 
-	var SPLIT_CONTENT = 'estavillo/case-split-content';
-	var SPLIT_MEDIA = 'estavillo/case-split-media';
-
-	// Bloques que "ganan" el ancho completo de un layout Wide. Un Wide sin
-	// ninguno de estos es solo texto estirado — para eso está Reading.
-	var ARTIFACT_BLOCKS = [
-		'estavillo/case-figure',
-		'estavillo/case-stats',
-		'estavillo/case-ladder',
-		'estavillo/case-taxonomy',
-		'estavillo/case-timeline',
-		'estavillo/case-decisions',
-		'estavillo/case-status',
-		'core/image',
-		'core/video',
-		'core/embed',
-		'core/gallery',
-		'core/table',
-	];
-
-	var LAYOUT_LABELS = {
-		'reading': __('Reading', 'estavillo-portfolio-core'),
-		'split-left': __('Split — texto a la izquierda', 'estavillo-portfolio-core'),
-		'split-right': __('Split — imagen a la izquierda', 'estavillo-portfolio-core'),
-		'split-balanced': __('Split balanceado', 'estavillo-portfolio-core'),
-		'wide': __('Wide artifact', 'estavillo-portfolio-core'),
+	var WIDTH_LABELS = {
+		content: __('Content', 'estavillo-portfolio-core'),
+		reading: __('Reading', 'estavillo-portfolio-core'),
+		wide: __('Wide', 'estavillo-portfolio-core'),
 	};
-
 	var SPACING_LABELS = {
-		'compact': __('Compact', 'estavillo-portfolio-core'),
-		'standard': __('Standard', 'estavillo-portfolio-core'),
-		'spacious': __('Spacious', 'estavillo-portfolio-core'),
+		compact: __('Compact', 'estavillo-portfolio-core'),
+		standard: __('Standard', 'estavillo-portfolio-core'),
+		spacious: __('Spacious', 'estavillo-portfolio-core'),
 	};
-
-	function isSplitLayout(layout) {
-		return layout.indexOf('split-') === 0;
-	}
-
-	function isRegionBlock(block) {
-		return block.name === SPLIT_CONTENT || block.name === SPLIT_MEDIA;
-	}
 
 	function sectionClasses(a) {
-		var c = 'es-case-section es-case-section--sp-' + (a.spacing || 'standard');
-		if (a.layout === 'reading') {
-			c += ' es-case-section--reading';
-		} else if (isSplitLayout(a.layout)) {
-			c += ' es-case-section--split es-case-section--' + a.layout;
-			if (a.mobileOrder) {
-				c += ' es-case-section--m-' + a.mobileOrder;
-			}
+		var layout = WIDTH_LABELS[a.layout] ? a.layout : 'content';
+		var c = 'es-case-section es-case-section--' + layout + ' es-case-section--sp-' + (a.spacing || 'standard');
+		if (false === a.divider) {
+			c += ' es-case-section--no-divider';
 		}
 		return c;
 	}
@@ -89,118 +58,15 @@
 		edit: function (props) {
 			var a = props.attributes;
 			var set = props.setAttributes;
-			var isSplit = isSplitLayout(a.layout);
-
-			var innerBlocks = wp.data.useSelect(
-				function (select) {
-					return select('core/block-editor').getBlocks(props.clientId);
-				},
-				[props.clientId]
-			);
-			var replaceInnerBlocks = wp.data.useDispatch('core/block-editor').replaceInnerBlocks;
-
 			var blockProps = useBlockProps({ className: ui.scopeClass('') });
-
-			// La grilla del editor = la grilla del frontend: useInnerBlocksProps
-			// hace que los wrappers de los bloques hijos sean hijos DIRECTOS del
-			// div .es-case-section__grid (en wide no hay grilla — div neutro).
-			var innerProps = useInnerBlocksProps(
-				{ className: a.layout === 'wide' ? 'es-caseb-flat' : 'es-case-section__grid' },
-				isSplit
-					? {
-						template: [[SPLIT_CONTENT], [SPLIT_MEDIA]],
-						templateLock: 'all',
-					}
-					: {}
-			);
-
-			// Cambio de layout con reestructuración segura (y deshacible):
-			// hacia split → los hijos actuales se mueven a la región Contenido;
-			// desde split → las regiones se desenvuelven en flujo plano.
-			function onLayoutChange(v) {
-				var toSplit = isSplitLayout(v);
-				var fromSplit = isSplitLayout(a.layout);
-				var alreadyRegions =
-					innerBlocks.length === 2 &&
-					innerBlocks[0].name === SPLIT_CONTENT &&
-					innerBlocks[1].name === SPLIT_MEDIA;
-
-				if (toSplit && !fromSplit && !alreadyRegions) {
-					var moved = innerBlocks.map(function (b) {
-						return wp.blocks.cloneBlock(b);
-					});
-					replaceInnerBlocks(
-						props.clientId,
-						[
-							wp.blocks.createBlock(SPLIT_CONTENT, {}, moved),
-							wp.blocks.createBlock(SPLIT_MEDIA, {}, []),
-						],
-						false
-					);
-				} else if (!toSplit && fromSplit) {
-					var flat = [];
-					innerBlocks.forEach(function (b) {
-						if (isRegionBlock(b)) {
-							b.innerBlocks.forEach(function (c) {
-								flat.push(wp.blocks.cloneBlock(c));
-							});
-						} else {
-							flat.push(wp.blocks.cloneBlock(b));
-						}
-					});
-					replaceInnerBlocks(props.clientId, flat, false);
-				}
-				set({ layout: v });
-			}
-
-			var wideTextOnly =
-				a.layout === 'wide' &&
-				innerBlocks.length > 0 &&
-				!innerBlocks.some(function (b) {
-					return ARTIFACT_BLOCKS.indexOf(b.name) !== -1;
-				});
-
-			var header = [
-				a.anchor ? el('div', { className: 'es-caseb-mini', key: 'anchor' }, '#' + a.anchor) : null,
-				el(RichText, {
-					key: 'label',
-					tagName: 'div',
-					className: 'es-case-label',
-					placeholder: __('Fig. 00 — Etiqueta', 'estavillo-portfolio-core'),
-					value: a.label,
-					allowedFormats: [],
-					onChange: function (v) {
-						set({ label: v });
-					},
-				}),
-				el(RichText, {
-					key: 'heading',
-					tagName: 'h2',
-					className: 'es-case-heading',
-					placeholder: __('Heading de la sección', 'estavillo-portfolio-core'),
-					value: a.heading,
-					allowedFormats: ['core/italic'],
-					onChange: function (v) {
-						set({ heading: v });
-					},
-				}),
-				el(RichText, {
-					key: 'lead',
-					tagName: 'p',
-					className: 'es-case-lead',
-					placeholder: __('Lead opcional…', 'estavillo-portfolio-core'),
-					value: a.lead,
-					allowedFormats: ['core/bold', 'core/italic', 'core/link'],
-					onChange: function (v) {
-						set({ lead: v });
-					},
-				}),
-			];
+			// Sin allowedBlocks/template/templateLock: cualquier bloque puede
+			// insertarse acá, incluidos Columns/Column nativos.
+			var innerProps = useInnerBlocksProps({ className: 'es-caseb-flat' });
 
 			var variantChip = el(
 				'div',
 				{ className: 'es-caseb-variant' },
-				LAYOUT_LABELS[a.layout] + ' · ' + SPACING_LABELS[a.spacing || 'standard']
+				(WIDTH_LABELS[a.layout] || WIDTH_LABELS.content) + ' · ' + (SPACING_LABELS[a.spacing] || SPACING_LABELS.standard)
 			);
 
 			return el(
@@ -223,44 +89,38 @@
 					),
 					el(
 						PanelBody,
-						{ title: __('Composición', 'estavillo-portfolio-core'), initialOpen: true },
+						{ title: __('Chapter', 'estavillo-portfolio-core'), initialOpen: true },
 						el(SelectControl, {
-							label: __('Layout', 'estavillo-portfolio-core'),
+							label: __('Width', 'estavillo-portfolio-core'),
+							help: __('Content: ancho completo, flexible (default). Reading: todo el capítulo a medida de lectura (~68–72ch) para prosa larga. Wide: ancho completo para artefactos (capturas, diagramas, componentes estructurados).', 'estavillo-portfolio-core'),
 							value: a.layout,
 							options: [
-								{ label: __('Reading — narrativa larga, medida de lectura', 'estavillo-portfolio-core'), value: 'reading' },
-								{ label: __('Split — texto a la izquierda, media a la derecha (5/7)', 'estavillo-portfolio-core'), value: 'split-left' },
-								{ label: __('Split — imagen a la izquierda, texto a la derecha (7/5)', 'estavillo-portfolio-core'), value: 'split-right' },
-								{ label: __('Split balanceado — antes/después, comparaciones (6/6)', 'estavillo-portfolio-core'), value: 'split-balanced' },
-								{ label: __('Wide artifact — figura/stats/diagrama a ancho completo', 'estavillo-portfolio-core'), value: 'wide' },
+								{ label: WIDTH_LABELS.content, value: 'content' },
+								{ label: WIDTH_LABELS.reading, value: 'reading' },
+								{ label: WIDTH_LABELS.wide, value: 'wide' },
 							],
-							onChange: onLayoutChange,
+							onChange: function (v) {
+								set({ layout: v });
+							},
 						}),
-						isSplit
-							? el(SelectControl, {
-								label: __('Orden en mobile', 'estavillo-portfolio-core'),
-								help: __('Cómo se apilan las dos regiones en pantallas chicas.', 'estavillo-portfolio-core'),
-								value: a.mobileOrder,
-								options: [
-									{ label: __('Orden de desktop (default)', 'estavillo-portfolio-core'), value: '' },
-									{ label: __('Contenido primero', 'estavillo-portfolio-core'), value: 'content-first' },
-									{ label: __('Media primero', 'estavillo-portfolio-core'), value: 'media-first' },
-								],
-								onChange: function (v) {
-									set({ mobileOrder: v });
-								},
-							})
-							: null,
 						el(SelectControl, {
-							label: __('Espaciado del capítulo', 'estavillo-portfolio-core'),
+							label: __('Chapter spacing', 'estavillo-portfolio-core'),
 							value: a.spacing || 'standard',
 							options: [
-								{ label: __('Compact', 'estavillo-portfolio-core'), value: 'compact' },
-								{ label: __('Standard', 'estavillo-portfolio-core'), value: 'standard' },
-								{ label: __('Spacious', 'estavillo-portfolio-core'), value: 'spacious' },
+								{ label: SPACING_LABELS.compact, value: 'compact' },
+								{ label: SPACING_LABELS.standard, value: 'standard' },
+								{ label: SPACING_LABELS.spacious, value: 'spacious' },
 							],
 							onChange: function (v) {
 								set({ spacing: v });
+							},
+						}),
+						el(ToggleControl, {
+							label: __('Chapter divider', 'estavillo-portfolio-core'),
+							help: __('Línea divisoria arriba del capítulo (nunca aparece en el primero de la página).', 'estavillo-portfolio-core'),
+							checked: a.divider !== false,
+							onChange: function (v) {
+								set({ divider: v });
 							},
 						})
 					)
@@ -272,16 +132,36 @@
 						'div',
 						{ className: sectionClasses(a) },
 						variantChip,
-						wideTextOnly
-							? el(
-								Notice,
-								{ status: 'warning', isDismissible: false, className: 'es-caseb-notice' },
-								__('Wide es para artefactos (Figure, Stats, Ladder, Taxonomy…). Para un capítulo de solo texto usá el layout Reading.', 'estavillo-portfolio-core')
-							)
-							: null,
-						a.layout === 'reading'
-							? el('div', { className: 'es-case-section__grid es-caseb-headgrid' }, header)
-							: header,
+						el(RichText, {
+							tagName: 'div',
+							className: 'es-case-label',
+							placeholder: __('Fig. 00 — Etiqueta', 'estavillo-portfolio-core'),
+							value: a.label,
+							allowedFormats: [],
+							onChange: function (v) {
+								set({ label: v });
+							},
+						}),
+						el(RichText, {
+							tagName: 'h2',
+							className: 'es-case-heading',
+							placeholder: __('Heading de la sección', 'estavillo-portfolio-core'),
+							value: a.heading,
+							allowedFormats: ['core/italic'],
+							onChange: function (v) {
+								set({ heading: v });
+							},
+						}),
+						el(RichText, {
+							tagName: 'p',
+							className: 'es-case-lead',
+							placeholder: __('Lead opcional…', 'estavillo-portfolio-core'),
+							value: a.lead,
+							allowedFormats: ['core/bold', 'core/italic', 'core/link'],
+							onChange: function (v) {
+								set({ lead: v });
+							},
+						}),
 						el('div', innerProps)
 					)
 				)

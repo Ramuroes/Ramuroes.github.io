@@ -481,6 +481,71 @@ Bakery and Samic. No redesign of anything else; no page builder.
 
 ---
 
+## Sprint 4M — Case Study editorial system: architecture correction — done
+
+**Goal:** correct the Case Section composition model based on real
+WordPress testing of Sprint 4L. Not a redesign — a narrowly scoped fix
+to a rigid architecture that produced a bad editing experience.
+
+**Problem confirmed in real WordPress:** Sprint 4L's locked Split
+architecture (fixed Content/Media regions on a custom 12-column CSS
+grid) forced content into narrow predefined areas and could leave a
+large, unintended empty area on the right. Root cause: a CSS rule
+inherited from the original width system (Sprint B) applied
+`max-width: 820px` to any paragraph that was a direct child of a Case
+Section, regardless of the section's chosen width — so a "Content"
+chapter's full-width paragraph was silently capped, leaving unused
+space beside it.
+
+**Fix:**
+- Case Section is now a genuinely flexible chapter container: label/
+  heading/lead (unchanged) + **unrestricted InnerBlocks** — no
+  allowedBlocks, no template, no templateLock. Editors insert and
+  reorder anything (Heading, Paragraph, List, Image, Gallery, Group,
+  Row, Stack, native Columns/Column, existing Estavillo blocks) with
+  normal Gutenberg controls.
+- Three chapter-level attributes only: `layout` — **Content** (default,
+  full 1320px container, no measure cap), **Reading** (whole chapter
+  ~72ch, the only width that constrains prose), **Wide** (same width as
+  Content; distinction is documentation-only); `spacing` (compact 96 /
+  standard 120 / spacious 144, unchanged); new `divider` boolean
+  (chapter hairline on/off).
+- Removed entirely: split-left/split-right/split-balanced, mobileOrder,
+  the locked Content/Media region blocks' use in new content, the
+  custom 12-column CSS grid, and all automatic block-wrapping/
+  unwrapping on layout change.
+- The actual bug fix: `.es-case-section--content`/`--wide` now
+  explicitly cancel the inherited measure cap on direct-child
+  paragraphs/lists/headings; only `--reading` constrains width, and it
+  does so on the whole section (not per-child).
+- Column-left/image-right compositions are built with **native
+  Gutenberg Columns/Column** (33/66, 40/60, 50/50, 60/40, 66/33) inside
+  a Content chapter — Case Section adds a consistent gap token and
+  otherwise does not touch this composition or its responsive stacking
+  (core's own, not reimplemented).
+- Both patterns rewritten: "Case Study — Editorial System Demo" (7
+  chapters: Content w/ full-width paragraph, Columns 40/60, Columns
+  60/40, Wide figure+Stats+Ladder, Reading, Columns 50/50, Reading close
+  w/ Quote+Details) and "Case Study — Canonical Starter" (Content →
+  Content w/ Columns 40/60 → Wide → Reading close).
+- Backward compatible: `case-split-content`/`case-split-media` block
+  types stay registered (parent-locked, inserter-hidden) purely so any
+  already-saved post using the old architecture keeps rendering (now as
+  a flat, unstyled sequence rather than a styled split — recommended to
+  recreate from the corrected pattern rather than edit in place).
+  Presupuestador patterns, Custom-HTML bodies, Polylang, hero, header,
+  footer, breadcrumbs: untouched.
+- Validated: render harness (both new patterns + Presupuestador ES/EN
+  regression + a synthetic old-architecture post proving no fatal error
+  and no content loss), mock-wp editor harness (free InnerBlocks, no
+  auto-restructuring, simplified Inspector), Chromium at
+  320/375/390/768/1024/1440 (exact 40/60/60/40/50/50 ratios via native
+  Columns, 72ch Reading, full-width Content paragraph confirmed
+  uncapped, native core stacking on tablet/mobile, dark/light, JS-off,
+  reduced-motion, zero overflow).
+
+---
+
 ## Sprint 5 — Hero variants
 
 **Goal:** expand hero variety only once the above is stable — not before.

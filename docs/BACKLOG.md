@@ -96,13 +96,14 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   updating the theme (Sprint 4J fixed the root cause). **Trazur's content
   still needs to be written** (no HTML deliverable yet — earlier tickets
   only covered Presupuestador).
-- **P1 (new, after Sprint 4L)** — Migrate the Presupuestador body to the
-  editorial composition system (Reading/Split/Wide presets on each Case
-  Section) — deliberately NOT done in Sprint 4L ("this ticket ends when
-  the editorial system and demo/starter patterns work correctly"). For
-  new cases (Trazur, French Bakery, Samic) start from the **"Case Study —
-  Canonical Starter"** pattern; use **"Case Study — Editorial System
-  Demo"** as the reference lab page for what each layout does.
+- **P1 (new, after Sprint 4M)** — Migrate the Presupuestador body to the
+  corrected editorial composition system: Case Section's Content/Reading/
+  Wide width control + native Gutenberg Columns for side-by-side text/
+  figure compositions — deliberately NOT done in Sprint 4M ("do not
+  migrate Presupuestador yet"). For new cases (Trazur, French Bakery,
+  Samic) start from the **"Case Study — Canonical Starter"** pattern; use
+  **"Case Study — Editorial System Demo"** as the reference lab page for
+  what each width does and how to compose columns.
 - **Done (Sprint 3)** — **Featured Case** is editable: reuses the Case
   Study CPT with a "Feature this case on Home" checkbox instead of a
   separate mechanism. See `EDITABILITY-PLAN.md`.

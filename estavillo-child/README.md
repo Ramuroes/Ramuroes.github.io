@@ -631,47 +631,67 @@ optimizador) **nada se oculta nunca**, y `prefers-reduced-motion` muestra
 todo sin animar. El override temporal de "CSS adicional" del Customizer ya
 no hace falta: **borralo** al actualizar el theme.
 
-### Sistema editorial v2 del Case Study (spec "Grid System v1")
+### Sistema editorial del Case Study (Case Section flexible + Columns nativos)
 
-El bloque **Case Section** ahora es el chasis de composición del caso. El
-container del body subió a **1320px** (`es-container--case` — solo el body:
-header/footer/nav/hero siguen en 1140) con una grilla de **12 columnas /
-32px de gutter** en desktop, 6/24 en tablet y 1 columna en mobile. El
-editor elige **presets bloqueados** en el inspector — nunca columnas ni px:
+El bloque **Case Section** es un contenedor de capítulo FLEXIBLE: label/
+heading/lead (RichText dedicados, siempre a ancho completo) + InnerBlocks
+sin ninguna restricción — insertá y reordená lo que necesites (Heading,
+Paragraph, List, Image, Gallery, Group, Row, Stack, **Columns/Column
+nativos de Gutenberg**, y los bloques Estavillo Case Study existentes) con
+los controles normales de bloques. El container del body del caso es
+**1320px** (`es-container--case` — solo el body: header/footer/nav/hero
+siguen en 1140). Case Section solo controla tres cosas a nivel CAPÍTULO,
+con nombres humanos, nunca columnas ni px:
 
-| Layout (inspector) | Qué hace |
+| Width (inspector) | Qué hace |
 |---|---|
-| Reading | Narrativa larga: banda de lectura (cols 3–10) con tope duro de 72ch. Nunca de borde a borde. |
-| Split — texto a la izquierda | Texto 5/12 + media 7/12. Dos regiones fijas (Contenido / Media). |
-| Split — imagen a la izquierda | Espejo 7/12 + 5/12 — el media va primero visualmente (el DOM y el orden de lectura no cambian). |
-| Split balanceado | 6/6, para antes/después y comparaciones de igual peso. Sin ratios custom. |
-| Wide artifact | Cols 1–12 (los 1320 completos). Solo para artefactos — si el capítulo es solo texto, el editor muestra un aviso y corresponde Reading. |
+| Content (default) | Ancho completo del container editorial (1320px), sin tope de medida. El heading, un párrafo suelto, o cualquier bloque que pongas directo en el capítulo usa el ancho entero — nada lo achica. |
+| Reading | El CAPÍTULO ENTERO (label/heading/lead + contenido) se limita a ~72ch. La única variante pensada para angostar prosa larga. |
+| Wide | Ancho completo, igual que Content — la distinción es de intención/documentación: Wide es para artefactos (capturas, diagramas, Stats/Ladder/Taxonomy), Content es el default mixto. No hay restricción técnica sobre texto en Wide, pero para prosa larga corresponde Reading. |
 
-Más dos presets extra en el mismo panel:
+Más dos controles en el mismo panel:
 
-- **Orden en mobile** (solo splits): "Orden de desktop" (default — sigue el
-  orden narrativo), "Contenido primero" o "Media primero". Sin drag ni
-  reordenamiento libre.
-- **Espaciado del capítulo**: Compact (96px) / Standard (120px, default) /
-  Spacious (144px) — el espacio total entre capítulos, con la hairline al
-  medio.
+- **Chapter spacing**: Compact (96px) / Standard (120px, default) /
+  Spacious (144px) — espacio total entre capítulos, hairline al medio.
+- **Chapter divider**: on/off — oculta la línea divisoria de arriba sin
+  afectar el spacing (el primer capítulo de la página nunca la muestra,
+  tenga o no este toggle activado).
 
-Al elegir un Split, los bloques existentes del capítulo se mueven solos a
-la región **Contenido** y aparece una región **Media** vacía (deshacible
-con Ctrl+Z); al volver a Reading/Wide las regiones se desenvuelven. Las
-regiones son bloques internos (`case-split-content` / `case-split-media`)
-con template bloqueado — no se pueden insertar a mano ni romper la grilla.
-El preview del editor usa el MISMO wrapper de grilla que el frontend, más
-un chip de variante (solo editor) que dice layout y spacing actuales.
+**Cómo armar texto-izquierda/imagen-derecha (o al revés):** dentro del
+capítulo, insertá un bloque **Columns** nativo de Gutenberg (`/columns` o
+desde el inserter), elegí la proporción que ya ofrece Gutenberg — 33/66,
+40/60, 50/50, 60/40, 66/33 — y poné el texto en una columna y un bloque
+**Case Figure** (u otra imagen) en la otra. Para imagen-izquierda/texto-
+derecha simplemente invertí qué columna lleva qué bloque, o usá "Move
+right"/"Move left" en la barra del bloque Columns. Mover bloques entre
+columnas, duplicar, cambiar la proporción o reordenar es 100% Gutenberg
+nativo — Case Section no interviene en absoluto en esa composición
+interna, y el stacking responsive en tablet/mobile es el de core (no hay
+grilla propia).
 
-Patterns nuevos del inserter: **"Case Study — Editorial System Demo"**
-(los 5 layouts en el orden canónico, con copy 100% ficticio para
-explorar) y **"Case Study — Canonical Starter"** (Reading → Split → Wide →
-Reading de cierre, con copy de andamiaje `{entre llaves}` para un caso
-nuevo — Trazur, French Bakery, Samic). Los patterns del Presupuestador y
-los bodies Custom HTML existentes siguen renderizando igual (las
-secciones "wide" conservan el flujo plano de siempre); ningún post
-necesita migración.
+*(Corrección de arquitectura: una versión anterior de este sistema
+imponía regiones fijas "Contenido"/"Media" con una grilla CSS propia de 12
+columnas. Resultó demasiado rígida en uso real sobre WordPress —forzaba
+el contenido a áreas angostas predefinidas— y un bug de CSS heredado
+angostaba cualquier párrafo suelto a ~820px sin importar el ancho elegido,
+dejando un hueco vacío a la derecha. Esta versión la reemplaza por completo:
+sin regiones fijas, sin grilla propia, composición 100% Columns nativos.)*
+
+Patterns del inserter: **"Case Study — Editorial System Demo"** (los tres
+Width en secuencia, con Columns 40/60, 60/40 y 50/50, copy 100% ficticio
+para explorar) y **"Case Study — Canonical Starter"** (Content → Content
+con Columns 40/60 → Wide → Reading de cierre, con copy de andamiaje
+`{entre llaves}` para un caso nuevo — Trazur, French Bakery, Samic). Los
+patterns del Presupuestador y los bodies Custom HTML existentes siguen
+renderizando igual; ningún post necesita migración.
+
+Los bloques `case-split-content`/`case-split-media` de la arquitectura
+anterior siguen registrados solo para que un post YA GUARDADO con ellos
+no rompa (no se insertan a mano, `inserter:false`). Si tenías un post de
+prueba armado con esa arquitectura, sus bloques van a seguir mostrando su
+contenido al reabrir el editor, pero sin el diseño en columnas de antes
+(ahora es un bloque más en flujo plano) — te conviene borrarlo y rehacerlo
+desde el pattern corregido en vez de editarlo.
 
 ### Hero layout options (mega sprint)
 

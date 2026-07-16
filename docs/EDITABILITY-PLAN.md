@@ -390,38 +390,59 @@ insert the pattern alongside the old Custom HTML block, then delete the
 HTML block once the block version matches). No CPT/meta-key/Polylang
 changes.
 
-### Case Study editorial composition system (Sprint 4L, spec "Grid System v1") — **done**
+### Case Study editorial composition system (Sprint 4L→4M, corrected) — **done**
 
-The Case Section block became the composition chassis for case bodies:
-the case body container widened to **1320px** (`es-container--case` —
-body only; header/footer/nav/hero stay at 1140) over a **12-col / 32px**
-grid (6/24 tablet, 1-col mobile), and the block gained three LOCKED
-preset controls with human-readable labels — no columns, no px, no
-freeform builder:
+The Case Section block is the composition chassis for case bodies. The
+case body container is **1320px** (`es-container--case` — body only;
+header/footer/nav/hero stay at 1140). Case Section is a genuinely
+**flexible chapter container**: label/heading/lead (dedicated RichText,
+always full width) + **unrestricted InnerBlocks** — no allowedBlocks, no
+template, no templateLock. Insert and reorder anything (Heading,
+Paragraph, List, Image, Gallery, Group, Row, Stack, native Gutenberg
+Columns/Column, the existing Estavillo Case Study blocks) with normal
+block controls. Case Section itself controls only three chapter-level
+things, human-labeled, never columns or px:
 
-- **Layout**: Reading (cols 3–10, hard 72ch cap) · Split — text left
-  (5/7) · Split — image left (7/5) · Balanced split (6/6, for
-  before/after) · Wide artifact (cols 1–12; a text-only Wide shows an
-  editor warning — use Reading).
-- **Mobile order** (splits only): Desktop order (default) / Content
-  first / Media first. No drag reordering.
+- **Width**: Content (default — full 1320px container, no measure cap on
+  direct-child text) · Reading (whole chapter ~72ch — the only width
+  that constrains prose) · Wide (same width as Content; the distinction
+  is documentation-only — Wide is for artifacts, no technical
+  restriction on text).
 - **Chapter spacing**: Compact 96 / Standard 120 (default) / Spacious
   144 — total space between chapters, hairline in the middle.
+- **Chapter divider**: on/off toggle for the hairline itself (spacing
+  unaffected; the page's first chapter never shows it regardless).
 
-Splits use two locked internal region blocks (`case-split-content` /
-`case-split-media`, parent-restricted + hidden from the inserter,
-templateLock "all"). Switching a chapter into a split moves its blocks
-into the Content region automatically (undoable); switching out unwraps
-them. Editor preview shares the exact same grid wrapper as the frontend
-(`useInnerBlocksProps`), plus an editor-only variant chip.
+Text-left/image-right (or the reverse) compositions are built with
+**native Gutenberg Columns/Column** inside a chapter — any of core's
+ratios (33/66, 40/60, 50/50, 60/40, 66/33), moving blocks between
+columns, reordering, duplicating: all standard Gutenberg, untouched by
+this block. Responsive stacking on tablet/mobile is core's own.
 
-How to use each layout: insert **"Case Study — Editorial System Demo"**
-(all five layouts, fictional copy — a lab page to explore) or
-**"Case Study — Canonical Starter"** (Reading → Split → Wide → Reading
-close, scaffolding copy in {braces}) from the pattern inserter, or set
-the Layout select on any Case Section. Backward compatible: "wide"
-sections keep the old flat markup; legacy Custom-HTML bodies and the
-Presupuestador patterns render unchanged; no automatic migration.
+*(Correction, Sprint 4M: an earlier version of this system locked
+Case Section into fixed Content/Media regions over a custom 12-column CSS
+grid with Split-left/right/balanced presets and a "mobile order" control.
+Real WordPress testing showed it too rigid — content forced into narrow
+predefined areas, sometimes leaving a large empty area on the right,
+caused by a legacy CSS rule that capped any direct-child paragraph to
+~820px regardless of the chosen width. That architecture was removed
+entirely and replaced with the flexible model described above. The two
+region block types (`case-split-content`/`case-split-media`) stay
+registered, parent-locked and hidden from the inserter, only so a post
+already saved with them keeps rendering — as a flat, unstyled sequence,
+not the old grid. Recreate such a post from the corrected pattern rather
+than editing it in place.)*
+
+How to use each width: insert **"Case Study — Editorial System Demo"**
+(all three widths in sequence, with Columns 40/60, 60/40 and 50/50,
+fictional copy — a lab page to explore) or **"Case Study — Canonical
+Starter"** (Content → Content with Columns 40/60 → Wide → Reading close,
+scaffolding copy in {braces}) from the pattern inserter, or set the
+Width select on any Case Section. Backward compatible: sections with no
+saved width attribute (all pre-4M content, including the Presupuestador
+patterns) fall back to Content — full width, no cap, functionally the
+same or better than before; legacy Custom-HTML bodies render unchanged;
+no automatic migration of any post.
 
 ---
 
