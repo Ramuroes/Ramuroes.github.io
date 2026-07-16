@@ -448,32 +448,56 @@
    Gutenberg, con su propio stacking responsive nativo (no se reimplementa
    acá, a propósito):
 
-   - es-case-section--content (default): ancho completo del container
-     editorial (1320px), SIN tope de medida — el override de abajo cancela
-     el cap heredado para hijos directos.
-   - es-case-section--wide: idéntico a --content — mismo ancho completo; la
-     distinción es de intención/documentación (Wide = artefactos).
+   - es-case-section--content (default): ancho completo del padre, SIN
+     tope de medida — el override de abajo cancela el cap heredado para
+     hijos directos. "Wide" (valor legacy, ver más abajo) renderiza
+     idéntico: render.php lo normaliza a --content, así que esta es la
+     ÚNICA clase de ancho completo que este archivo necesita conocer.
    - es-case-section--reading: el CAPÍTULO ENTERO (label/heading/lead +
-     contenido) se limita a 72ch — la única variante que angosta prosa.
+     contenido) se limita a ~72ch — la única variante que angosta prosa.
    - es-case-section--sp-{compact,standard,spacious}: espacio total entre
      capítulos (96/120/144px), sin cambios respecto de la versión anterior.
    - es-case-section--no-divider: oculta la línea divisoria de arriba (el
      spacing no cambia, solo la línea).
-   ========================================================================= */
 
-.es-case__body .es-case-section--reading {
-	max-width: 72ch;
+   Anidamiento (corrección de compatibilidad): un Case Section puede vivir
+   directo en el body del caso O adentro de un Column/Group/Row/Stack
+   nativo de Gutenberg (p. ej. Columns 40/60 con Case Section en una
+   columna y Case Figure/Decisions en la otra). "ancho completo" siempre
+   significa el ancho completo del PADRE INMEDIATO, nunca del viewport ni
+   del container de 1320px — por eso NINGUNA regla de acá usa vw, %
+   absoluto a la página, ni auto-margins de re-posicionamiento. La regla
+   base de abajo (width/max-width/min-width) es lo que hace que "ancho
+   completo del padre" sea cierto tanto en el body como adentro de una
+   columna angosta: sin min-width:0 un hijo con contenido intrínsecamente
+   ancho (p. ej. la grilla de Case Decisions) puede forzar a la columna
+   flex a crecer más de lo asignado — eso es lo que se veía en WordPress
+   real como "las columnas se apilan" o "Case Section se escapa de su
+   columna". */
+
+.es-case__body .es-case-section {
+	width: 100%;
+	max-width: 100%;
+	min-width: 0;
 }
 
-/* el fix: cancela el cap de 820px de la librería de prosa (más arriba en
-   este archivo) para hijos directos de un capítulo Content/Wide — ese cap
-   sigue aplicando tal cual a HTML manual/Custom HTML (sin esta clase) y a
-   los capítulos Reading (ya limitados por el max-width del punto anterior,
-   más angosto). Mismo nivel de especificidad que la regla original
-   (2 clases + 1 elemento): gana por orden de aparición, más tarde en el
-   archivo — se repite acá con :is() por prolijidad/robustez ante reordenamientos. */
-.es-case__body .es-case-section--content > :is(p, ul, ol, blockquote, h2, h3),
-.es-case__body .es-case-section--wide > :is(p, ul, ol, blockquote, h2, h3) {
+.es-case__body .es-case-section--reading {
+	/* min(): 72ch directo en el body (ancho de sobra), pero nunca más
+	   ancho que el padre cuando ese padre es una columna angosta — sin
+	   esto, un Case Section Reading en una columna de 33% pediría 72ch
+	   igual, empujando el layout de columnas. */
+	max-width: min(72ch, 100%);
+}
+
+/* el fix original (sprint de corrección de ancho): cancela el cap de
+   820px de la librería de prosa (más arriba en este archivo) para hijos
+   directos de un capítulo Content — ese cap sigue aplicando tal cual a
+   HTML manual/Custom HTML (sin esta clase) y a los capítulos Reading (ya
+   limitados por el max-width del punto anterior, más angosto). Mismo
+   nivel de especificidad que la regla original (2 clases + 1 elemento):
+   gana por orden de aparición, más tarde en el archivo — se repite acá
+   con :is() por prolijidad/robustez ante reordenamientos. */
+.es-case__body .es-case-section--content > :is(p, ul, ol, blockquote, h2, h3) {
 	max-width: none;
 }
 

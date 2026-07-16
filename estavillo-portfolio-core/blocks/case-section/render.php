@@ -9,26 +9,39 @@
  * con los bloques Columns/Column NATIVOS de Gutenberg; este bloque solo
  * decide tres cosas a nivel capítulo:
  *
- * - layout ("Width" en el inspector): content (default, ancho completo del
- *   container editorial de 1320px, sin tope de medida) | reading (el
- *   CAPÍTULO ENTERO se limita a ~72ch, pensado para prosa larga
- *   autocontenida) | wide (idéntico a content — mismo ancho completo — la
- *   distinción es de intención/documentación: Wide es para artefactos,
- *   Content es el default mixto).
+ * - layout ("Width" en el inspector — solo ofrece Content/Reading; ver
+ *   nota de compatibilidad más abajo): content (default, ancho completo
+ *   del padre inmediato — el body del caso O una columna/Group/Row/Stack
+ *   nativo si está anidado, sin tope de medida) | reading (el CAPÍTULO
+ *   ENTERO se limita a ~72ch, nunca más ancho que el padre, pensado para
+ *   prosa larga autocontenida).
  * - spacing: espacio total entre capítulos (compact/standard/spacious).
  * - divider: si se ve la línea divisoria de arriba (aparte de spacing).
  *
- * Corrección (sprint de corrección arquitectónica, sobre WordPress real):
- * la versión anterior envolvía reading/split en un grid de 12 columnas y
- * — el bug real — un selector heredado de la librería de prosa
+ * Compatibilidad "wide": el valor legacy "wide" (ancho completo, mismo
+ * resultado visual que "content", distinción solo de documentación) ya
+ * NO se ofrece en el inspector para selecciones nuevas — se NORMALIZA acá
+ * a "content" antes de armar la clase, así que ningún bloque emite
+ * `es-case-section--wide` nunca más. Los bloques YA GUARDADOS con
+ * "layout":"wide" siguen aceptándose tal cual (el atributo no se
+ * reescribe ni se invalida) y renderizan IDÉNTICO a Content.
+ *
+ * Corrección de ancho (sprint de corrección arquitectónica, sobre
+ * WordPress real): un selector heredado de la librería de prosa
  * (`.es-case-section > p`) le ponía max-width:820px a CUALQUIER párrafo
  * hijo directo de la sección sin importar el layout, angostando el
  * contenido "Content" contra el borde izquierdo y dejando un hueco vacío
- * a la derecha. Esta versión no envuelve nada: layouts viejos
- * (split-left/split-right/split-balanced, ya no soportados como opción)
- * caen a "content" — siguen renderizando, ya sin la grilla rígida — y el
- * cap de medida ahora es opt-in real vía la clase --reading, con un
- * override explícito para --content/--wide en case-study.css.
+ * a la derecha — corregido con un override explícito en case-study.css.
+ *
+ * Corrección de anidamiento (sprint de compatibilidad, sobre WordPress
+ * real): Case Section ahora puede vivir directo en el body del caso O
+ * anidado adentro de un Column/Group/Row/Stack nativo de Gutenberg (p.
+ * ej. Columns 40/60 con Case Section en una columna). "Ancho completo"
+ * siempre es relativo al padre inmediato — la única responsabilidad de
+ * Case Section es su presentación INTERNA (label/heading/lead,
+ * InnerBlocks, medida de lectura, spacing, divisor); la composición
+ * externa (proporciones de columnas, mobile stacking) es 100% de los
+ * bloques Columns/Column nativos, nunca de este bloque.
  *
  * El anchor alimenta el Case Index del meta box ("Label|#anchor" por
  * línea) — mismo contrato que el HTML manual.
@@ -49,8 +62,14 @@ $es_heading = isset( $attributes['heading'] ) ? trim( (string) $attributes['head
 $es_lead    = isset( $attributes['lead'] ) ? trim( (string) $attributes['lead'] ) : '';
 
 $es_layout = isset( $attributes['layout'] ) ? (string) $attributes['layout'] : 'content';
-if ( ! in_array( $es_layout, array( 'content', 'reading', 'wide' ), true ) ) {
-	// Valor legacy (split-left / split-right / split-balanced de la
+if ( 'wide' === $es_layout ) {
+	// "Wide" consolidado en "Content": mismo resultado visual, ya no se
+	// ofrece como opción nueva. El atributo guardado NO se reescribe —
+	// solo se normaliza acá, en cada render, para la clase de salida.
+	$es_layout = 'content';
+}
+if ( ! in_array( $es_layout, array( 'content', 'reading' ), true ) ) {
+	// Valor legacy (split-left / split-right / split-balanced de una
 	// corrección anterior) u otro desconocido: cae a "content" — sigue
 	// mostrando todo el contenido, ya sin la grilla que causaba el bug.
 	$es_layout = 'content';

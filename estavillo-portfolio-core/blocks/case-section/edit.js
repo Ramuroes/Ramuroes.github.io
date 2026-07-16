@@ -17,6 +17,17 @@
  * capítulo (Width / Chapter spacing / Chapter divider), con nombres
  * humanos, nunca columnas ni píxeles; la composición interna es 100%
  * Gutenberg nativo.
+ *
+ * Corrección de compatibilidad (sprint de anidamiento): el inspector solo
+ * ofrece Content/Reading — Wide se consolidó en Content (mismo resultado
+ * visual siempre) y se sacó de la UI. Un bloque YA GUARDADO con
+ * "layout":"wide" sigue abriendo sin error: WIDTH_LABELS ya no tiene la
+ * clave "wide", así que sectionClasses()/el chip de variante caen solos
+ * al fallback "content" (mismo mecanismo ya probado con los valores
+ * legacy split-* de la corrección anterior). Case Section además ahora
+ * respeta el ancho de su padre inmediato cuando está anidado adentro de
+ * un Column/Group/Row/Stack nativo (fix en case-study.css) — este archivo
+ * no necesita saber si está anidado o no.
  */
 (function (wp, ui) {
 	'use strict';
@@ -34,10 +45,12 @@
 	var SelectControl = wp.components.SelectControl;
 	var ToggleControl = wp.components.ToggleControl;
 
+	// Sin "wide": consolidado en "content" (mismo resultado visual). Un
+	// bloque guardado con layout:"wide" no tiene match acá — sectionClasses()
+	// y el chip de variante caen solos al fallback 'content' más abajo.
 	var WIDTH_LABELS = {
 		content: __('Content', 'estavillo-portfolio-core'),
 		reading: __('Reading', 'estavillo-portfolio-core'),
-		wide: __('Wide', 'estavillo-portfolio-core'),
 	};
 	var SPACING_LABELS = {
 		compact: __('Compact', 'estavillo-portfolio-core'),
@@ -92,12 +105,11 @@
 						{ title: __('Chapter', 'estavillo-portfolio-core'), initialOpen: true },
 						el(SelectControl, {
 							label: __('Width', 'estavillo-portfolio-core'),
-							help: __('Content: ancho completo, flexible (default). Reading: todo el capítulo a medida de lectura (~68–72ch) para prosa larga. Wide: ancho completo para artefactos (capturas, diagramas, componentes estructurados).', 'estavillo-portfolio-core'),
+							help: __('Content: ancho completo del padre inmediato (el body del caso, o su columna si está anidado en Columns/Group/Row/Stack) — flexible, default. Reading: todo el capítulo a medida de lectura (~68–72ch), nunca más ancho que el padre. Para un artefacto ancho (captura, diagrama), usá Content — directo en el body o adentro de un Column — no hace falta una opción aparte.', 'estavillo-portfolio-core'),
 							value: a.layout,
 							options: [
 								{ label: WIDTH_LABELS.content, value: 'content' },
 								{ label: WIDTH_LABELS.reading, value: 'reading' },
-								{ label: WIDTH_LABELS.wide, value: 'wide' },
 							],
 							onChange: function (v) {
 								set({ layout: v });

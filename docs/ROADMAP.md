@@ -546,6 +546,56 @@ space beside it.
 
 ---
 
+## Sprint 4N — Case Section nested-in-Columns compatibility fix — done
+
+**Goal:** narrow compatibility fix found in real WordPress testing of
+Sprint 4M. Case Section worked correctly at the page level but did not
+respect the width of a native Gutenberg Column when nested inside one
+(`Columns → Column → Case Section` next to `Column → Case Decisions/
+Figure`) — it behaved like a page-level container regardless of its
+parent, sometimes forcing the sibling column to wrap/stack or letting
+the section escape its assigned width.
+
+**Root CSS cause:** `.es-case-section` had no explicit sizing rules of
+its own — it relied entirely on default block flow. That's normally
+fine, but a Reading section's `max-width: 72ch` was an unconditional
+value with no upper bound tied to the parent, and — combined with no
+`min-width: 0` — a section with intrinsically wide content could refuse
+to shrink below its content's minimum size once nested in a flex column,
+which is what forced the sibling column to wrap on desktop.
+
+**Fix (case-study.css):**
+- New base rule: `.es-case-section { width: 100%; max-width: 100%;
+  min-width: 0; }` — always fills the immediate parent (page body or a
+  nested Column/Group/Row/Stack), never escapes it, never blocks flex
+  shrinking.
+- `.es-case-section--reading` changed to `max-width: min(72ch, 100%)` —
+  caps at 72ch directly in the page (plenty of room) but never exceeds a
+  narrow column's actual width.
+- Confirmed (and left untouched): case-study.css does not set `display`
+  or `flex-wrap` on `.wp-block-columns`/`.wp-block-column` anywhere —
+  core's own flex/stacking behavior (nowrap ≥782px, wrap + 100%
+  flex-basis below) was never being overridden.
+
+**Content/Wide consolidated:** Content and Wide always produced the same
+visual width, so Wide is removed from the Inspector's Width select for
+new selections — only Content and Reading are offered. `render.php`
+normalizes any saved `layout: "wide"` (and any other unrecognized value)
+to `content` before computing the output class, so `es-case-section--wide`
+is never emitted again; already-saved blocks with `"layout":"wide"` are
+not migrated or invalidated — they keep loading and now render (and are
+labeled, via the same fallback mechanism) identically to Content.
+
+**Validated:** render harness (wide→content normalization, 4 nested
+scenarios A–D built from real core/columns markup through the real
+render.php files), Chromium at 1440/1024/768/390/320 for each scenario
+(Case Section width == its column's width to the pixel, Reading capped
+at min(72ch,100%) in narrow columns, no forced desktop stacking, native
+mobile stacking below core's 782px breakpoint, zero overflow), plus a
+full re-run of every Sprint 4L/4M harness with zero regressions.
+
+---
+
 ## Sprint 5 — Hero variants
 
 **Goal:** expand hero variety only once the above is stable — not before.

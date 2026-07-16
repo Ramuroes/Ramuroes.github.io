@@ -390,7 +390,7 @@ insert the pattern alongside the old Custom HTML block, then delete the
 HTML block once the block version matches). No CPT/meta-key/Polylang
 changes.
 
-### Case Study editorial composition system (Sprint 4L→4M, corrected) — **done**
+### Case Study editorial composition system (Sprint 4L→4N, corrected) — **done**
 
 The Case Section block is the composition chassis for case bodies. The
 case body container is **1320px** (`es-container--case` — body only;
@@ -403,11 +403,11 @@ Columns/Column, the existing Estavillo Case Study blocks) with normal
 block controls. Case Section itself controls only three chapter-level
 things, human-labeled, never columns or px:
 
-- **Width**: Content (default — full 1320px container, no measure cap on
-  direct-child text) · Reading (whole chapter ~72ch — the only width
-  that constrains prose) · Wide (same width as Content; the distinction
-  is documentation-only — Wide is for artifacts, no technical
-  restriction on text).
+- **Width**: Content (default — full width of the immediate parent, no
+  measure cap on direct-child text) · Reading (whole chapter ~72ch,
+  never wider than the parent — the only width that constrains prose).
+  Wide was consolidated into Content (Sprint 4N — see below) and no
+  longer appears as a choice.
 - **Chapter spacing**: Compact 96 / Standard 120 (default) / Spacious
   144 — total space between chapters, hairline in the middle.
 - **Chapter divider**: on/off toggle for the hairline itself (spacing
@@ -417,7 +417,13 @@ Text-left/image-right (or the reverse) compositions are built with
 **native Gutenberg Columns/Column** inside a chapter — any of core's
 ratios (33/66, 40/60, 50/50, 60/40, 66/33), moving blocks between
 columns, reordering, duplicating: all standard Gutenberg, untouched by
-this block. Responsive stacking on tablet/mobile is core's own.
+this block. Responsive stacking on tablet/mobile is core's own. A Case
+Section can go *in* a column too — put one Case Section in each column
+for two chapters side by side, or a Case Section next to a Case Figure/
+Case Decisions/plain image. "Content" width always means the full width
+of whichever element the section actually lives in — the page body, or
+its column — never the viewport or the 1320px case container regardless
+of nesting depth (Sprint 4N, see below).
 
 *(Correction, Sprint 4M: an earlier version of this system locked
 Case Section into fixed Content/Media regions over a custom 12-column CSS
@@ -433,16 +439,31 @@ already saved with them keeps rendering — as a flat, unstyled sequence,
 not the old grid. Recreate such a post from the corrected pattern rather
 than editing it in place.)*
 
+*(Correction, Sprint 4N: Case Section worked correctly at the page level
+but did not respect a native Gutenberg Column's width when nested inside
+one — it behaved like a page-level container regardless of its parent,
+which could force a sibling column to wrap or let the section escape its
+assigned width. Root cause: the block had no explicit sizing rules of its
+own (relying entirely on default block flow) and Reading's `max-width:
+72ch` had no upper bound tied to the parent. Fixed with a base rule —
+`width: 100%; max-width: 100%; min-width: 0` on every Case Section — and
+`max-width: min(72ch, 100%)` on Reading, so "full width" is always
+relative to the immediate parent, at any nesting depth, and Reading never
+exceeds a narrow column. Confirmed core's own Columns CSS was never being
+overridden. Content and Wide always looked identical, so Wide was dropped
+from the Inspector; a block already saved with `"layout":"wide"` keeps
+loading and renders exactly like Content — no migration, no invalidation.)*
+
 How to use each width: insert **"Case Study — Editorial System Demo"**
-(all three widths in sequence, with Columns 40/60, 60/40 and 50/50,
+(Content and Reading in sequence, with Columns 40/60, 60/40 and 50/50,
 fictional copy — a lab page to explore) or **"Case Study — Canonical
-Starter"** (Content → Content with Columns 40/60 → Wide → Reading close,
-scaffolding copy in {braces}) from the pattern inserter, or set the
-Width select on any Case Section. Backward compatible: sections with no
-saved width attribute (all pre-4M content, including the Presupuestador
-patterns) fall back to Content — full width, no cap, functionally the
-same or better than before; legacy Custom-HTML bodies render unchanged;
-no automatic migration of any post.
+Starter"** (Content → Content with Columns 40/60 → Content with a wide
+artifact → Reading close, scaffolding copy in {braces}) from the pattern
+inserter, or set the Width select on any Case Section. Backward
+compatible: sections with no saved width attribute (all pre-4M content,
+including the Presupuestador patterns) fall back to Content — full
+width, no cap, functionally the same or better than before; legacy
+Custom-HTML bodies render unchanged; no automatic migration of any post.
 
 ---
 

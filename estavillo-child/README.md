@@ -638,16 +638,14 @@ heading/lead (RichText dedicados, siempre a ancho completo) + InnerBlocks
 sin ninguna restricción — insertá y reordená lo que necesites (Heading,
 Paragraph, List, Image, Gallery, Group, Row, Stack, **Columns/Column
 nativos de Gutenberg**, y los bloques Estavillo Case Study existentes) con
-los controles normales de bloques. El container del body del caso es
-**1320px** (`es-container--case` — solo el body: header/footer/nav/hero
-siguen en 1140). Case Section solo controla tres cosas a nivel CAPÍTULO,
-con nombres humanos, nunca columnas ni px:
+los controles normales de bloques. Case Section solo controla su
+presentación INTERNA — nunca el layout externo (eso es 100% de Columns
+nativo, ver más abajo) — con nombres humanos, nunca columnas ni px:
 
 | Width (inspector) | Qué hace |
 |---|---|
-| Content (default) | Ancho completo del container editorial (1320px), sin tope de medida. El heading, un párrafo suelto, o cualquier bloque que pongas directo en el capítulo usa el ancho entero — nada lo achica. |
-| Reading | El CAPÍTULO ENTERO (label/heading/lead + contenido) se limita a ~72ch. La única variante pensada para angostar prosa larga. |
-| Wide | Ancho completo, igual que Content — la distinción es de intención/documentación: Wide es para artefactos (capturas, diagramas, Stats/Ladder/Taxonomy), Content es el default mixto. No hay restricción técnica sobre texto en Wide, pero para prosa larga corresponde Reading. |
+| Content (default) | Ancho completo del PADRE INMEDIATO — el body del caso (1320px, `es-container--case`) si el capítulo vive directo en la página, o el ancho de su columna si está anidado adentro de un Columns/Group/Row/Stack nativo — sin tope de medida. El heading, un párrafo suelto, o cualquier bloque que pongas directo en el capítulo usa ese ancho entero — nada lo achica. Para un artefacto ancho (captura, diagrama, Stats/Ladder/Taxonomy) usá Content directo en el body: no hace falta una opción aparte. |
+| Reading | El CAPÍTULO ENTERO (label/heading/lead + contenido) se limita a ~72ch — pero nunca más ancho que el padre: adentro de una columna angosta ocupa esa columna entera, sin escaparse ni dejar un hueco de auto-centrado. La única variante pensada para angostar prosa larga. |
 
 Más dos controles en el mismo panel:
 
@@ -657,30 +655,49 @@ Más dos controles en el mismo panel:
   afectar el spacing (el primer capítulo de la página nunca la muestra,
   tenga o no este toggle activado).
 
-**Cómo armar texto-izquierda/imagen-derecha (o al revés):** dentro del
-capítulo, insertá un bloque **Columns** nativo de Gutenberg (`/columns` o
-desde el inserter), elegí la proporción que ya ofrece Gutenberg — 33/66,
-40/60, 50/50, 60/40, 66/33 — y poné el texto en una columna y un bloque
-**Case Figure** (u otra imagen) en la otra. Para imagen-izquierda/texto-
-derecha simplemente invertí qué columna lleva qué bloque, o usá "Move
-right"/"Move left" en la barra del bloque Columns. Mover bloques entre
-columnas, duplicar, cambiar la proporción o reordenar es 100% Gutenberg
-nativo — Case Section no interviene en absoluto en esa composición
-interna, y el stacking responsive en tablet/mobile es el de core (no hay
-grilla propia).
+**Cómo armar texto-izquierda/imagen-derecha (o al revés):** insertá un
+bloque **Columns** nativo de Gutenberg (`/columns` o desde el inserter),
+elegí la proporción que ya ofrece Gutenberg — 33/66, 40/60, 50/50, 60/40,
+66/33 — y poné un **Case Section** en una columna (o directo el texto) y
+un bloque **Case Figure**/Case Decisions/imagen en la otra — o **Case
+Section** en las dos, para dos capítulos lado a lado. Para imagen-
+izquierda/texto-derecha simplemente invertí qué columna lleva qué bloque,
+o usá "Move right"/"Move left" en la barra del bloque Columns. Mover
+bloques entre columnas, duplicar, cambiar la proporción o reordenar es
+100% Gutenberg nativo — Case Section no interviene en absoluto en esa
+composición externa, y el stacking responsive en tablet/mobile es el de
+core (no hay grilla propia).
 
-*(Corrección de arquitectura: una versión anterior de este sistema
-imponía regiones fijas "Contenido"/"Media" con una grilla CSS propia de 12
-columnas. Resultó demasiado rígida en uso real sobre WordPress —forzaba
-el contenido a áreas angostas predefinidas— y un bug de CSS heredado
-angostaba cualquier párrafo suelto a ~820px sin importar el ancho elegido,
-dejando un hueco vacío a la derecha. Esta versión la reemplaza por completo:
-sin regiones fijas, sin grilla propia, composición 100% Columns nativos.)*
+**Anidamiento (Case Section adentro de Columns/Group/Row/Stack):** Case
+Section siempre ocupa el 100% del ancho de su padre inmediato — nunca se
+expande más allá de su columna, nunca fuerza el apilado de las columnas
+vecinas, nunca queda centrado con un hueco vacío alrededor. Funciona
+igual directo en el body del caso o anidado en cualquier profundidad.
 
-Patterns del inserter: **"Case Study — Editorial System Demo"** (los tres
-Width en secuencia, con Columns 40/60, 60/40 y 50/50, copy 100% ficticio
-para explorar) y **"Case Study — Canonical Starter"** (Content → Content
-con Columns 40/60 → Wide → Reading de cierre, con copy de andamiaje
+*(Correcciones de arquitectura, en dos pasos: (1) una versión anterior de
+este sistema imponía regiones fijas "Contenido"/"Media" con una grilla
+CSS propia de 12 columnas — demasiado rígida en uso real, reemplazada por
+completo por composición 100% Columns nativos; (2) al probar esa versión
+anidando un Case Section adentro de una columna nativa, un bug de CSS
+heredado (el mismo cap de ~820px de la librería de prosa, sin invalidar
+por ancho de padre) hacía que la sección no respetara el ancho de su
+columna — corregido con una regla base `width:100%; max-width:100%;
+min-width:0` en Case Section y `max-width: min(72ch, 100%)` en Reading, así
+"ancho completo" siempre es relativo al padre inmediato, nunca al
+viewport ni al container de 1320px.)*
+
+**Content y Wide, consolidados:** el inspector ya solo ofrece **Content**
+y **Reading** — Wide se sacó de la UI porque producía el mismo resultado
+visual que Content (ancho completo, sin distinción real). Un capítulo
+guardado con Width "Wide" antes de este cambio sigue abriendo y
+renderizando sin ningún error ni migración: se trata exactamente igual
+que Content, tanto en el editor como en el frontend.
+
+Patterns del inserter: **"Case Study — Editorial System Demo"** (Content
+y Reading en secuencia, con Columns 40/60, 60/40 y 50/50, copy 100%
+ficticio para explorar) y **"Case Study — Canonical Starter"** (Content →
+Content con Columns 40/60 → Content (artefacto ancho) → Reading de
+cierre, con copy de andamiaje
 `{entre llaves}` para un caso nuevo — Trazur, French Bakery, Samic). Los
 patterns del Presupuestador y los bodies Custom HTML existentes siguen
 renderizando igual; ningún post necesita migración.
