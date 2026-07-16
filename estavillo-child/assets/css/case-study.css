@@ -268,10 +268,10 @@
 
 /* ---------- prose: contenido del editor estándar (the_content()) ----------
 
-   Sistema editorial de anchos (sprint Gutenberg + spec "Grid System v1"):
-   - El body del caso vive en un container PROPIO más ancho que el resto
-     del sitio: .es-container--case (1320px). Header/footer/nav/hero
-     siguen en 1140 (--es-max-w) — no se tocan.
+   Sistema editorial de anchos (corrección de alineación — ver más abajo):
+   - El body del caso comparte el MISMO container que el resto de la
+     página: --es-max-w (1140px), igual que header, hero, Case Index y
+     breadcrumbs. Nada usa un ancho de container distinto.
    - El texto de lectura suelto (párrafos, listas, blockquotes, headings,
      captions, quotes, details) se limita a una medida legible:
      --es-case-measure (820px ≈ 75–80 caracteres a 15.5px) — compat con
@@ -290,11 +290,19 @@
      a propósito (corrección de arquitectura: una grilla de 12 columnas
      con regiones fijas resultó demasiado rígida en uso real). */
 
-/* Container del body del caso: 1320px máx (borde a borde con el mismo
-   padding lateral que el resto del sitio). El hero del caso queda a 1140
-   a propósito — spec: "do not alter the 1140px header/footer measure". */
+/* Corrección de alineación: .es-container--case existió brevemente con
+   max-width: 1320px (spec "Grid System v1"), MÁS ANCHO que el resto del
+   sitio. En uso real eso desalineaba el body del caso contra el header,
+   el hero, el Case Index y las breadcrumbs — los cuatro siguen usando
+   var(--es-max-w) — corriendo el borde izquierdo del body ~90px a la
+   izquierda del borde del hero de arriba. La clase queda acá (el
+   template todavía la aplica) pero ahora es un alias explícito del
+   mismo ancho que el chrome del sitio — un solo container, un solo
+   borde, en toda la página. Si en el futuro un artefacto necesita
+   genuinamente más ancho, esa debe ser una decisión explícita y acotada
+   a ese componente, no un cambio de container a nivel página. */
 .es-container--case {
-	max-width: 1320px;
+	max-width: var(--es-max-w);
 }
 
 .es-case__body {
@@ -467,9 +475,9 @@
    nativo de Gutenberg (p. ej. Columns 40/60 con Case Section en una
    columna y Case Figure/Decisions en la otra). "ancho completo" siempre
    significa el ancho completo del PADRE INMEDIATO, nunca del viewport ni
-   del container de 1320px — por eso NINGUNA regla de acá usa vw, %
-   absoluto a la página, ni auto-margins de re-posicionamiento. La regla
-   base de abajo (width/max-width/min-width) es lo que hace que "ancho
+   del container de la página (--es-max-w) — por eso NINGUNA regla de acá
+   usa vw, % absoluto a la página, ni auto-margins de re-posicionamiento.
+   La regla base de abajo (width/max-width/min-width) es lo que hace que "ancho
    completo del padre" sea cierto tanto en el body como adentro de una
    columna angosta: sin min-width:0 un hijo con contenido intrínsecamente
    ancho (p. ej. la grilla de Case Decisions) puede forzar a la columna
