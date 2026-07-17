@@ -596,6 +596,59 @@ full re-run of every Sprint 4L/4M harness with zero regressions.
 
 ---
 
+## Sprint 4O — Patterns Phase 0 (second-pass architecture review) — done
+
+**Goal:** before writing Trazur/Samic/French Bakery content, decide the
+right abstraction level for every recurring case artifact (persona,
+comparison table, journey map, flow diagram, methodology, KPI section,
+callout, etc.) with an explicit bias toward the smallest possible system
+— avoid repeating the Sprint 4M mistake (a custom grid where Gutenberg
+already had an answer) and build new custom blocks only once multiple
+real cases validate the same shape. One real case (Trazur, audited from
+the project owner's own case-study PDF export) isn't that evidence yet.
+
+**Result — three Patterns + one block style, zero new blocks:**
+- **"Case Study — Persona"** (`patterns/case-persona.php`) — Group >
+  Columns 35/65 > photo (`estavillo/case-figure`) + name/role/
+  demographics, and Biography + Goals/Frustrations (nested Columns
+  50/50) + a pull-quote (`estavillo/case-quote`).
+- **"Case Study — Comparison Table"** (`patterns/case-comparison-table.php`)
+  — `estavillo/case-section` (eyebrow/heading/lead) + a native Table (4
+  generic columns, 3 placeholder rows) + a caption.
+- **"Case Study — Callout Panel"** (`patterns/case-callout-panel.php`) —
+  a native Group with an opt-in class (`.es-case-callout`, existing
+  `--es-*` tokens only, not the block's own Color panel — this theme has
+  no `theme.json` palette exposing those tokens as pickable colors) +
+  eyebrow/heading/paragraph/optional list.
+- **Checkmark List** — a `register_block_style()` variation on
+  `core/list` (`estavillo-child/inc/block-styles.php` +
+  `.es-case__body ul.is-style-checkmark` in `case-study.css`, driven by
+  `var(--es-accent)` — never a hardcoded color). Opt-in per list; the
+  default bullet list is untouched.
+
+**Deliberately not done:** Journey Maps and Flow Diagrams stay images —
+a flowchart's arrows/decision nodes are a diagramming problem, not a
+content-editing one. Image+text layouts stay plain native Columns — no
+dedicated pattern, since the right ratio depends on the narrative.
+
+**Validated:** all three patterns parsed and round-tripped through the
+real `@wordpress/blocks` + `@wordpress/block-library` packages (not
+memory/guesswork) — zero invalid blocks; rendered through the real
+`case-figure`/`case-quote`/`case-section` `render.php` files with no
+fatals and no case-specific content leakage; Chromium screenshots of
+Persona (desktop + mobile), Comparison Table (desktop + mobile, honest
+`scrollWidth`/`clientWidth` measurement proving the table scrolls
+horizontally instead of crushing text below 560px), Callout Panel (dark
++ light via `[data-theme]`), and Checkmark List vs. the untouched
+standard list (incl. a nested sub-list, to confirm nested markers aren't
+silently lost) — zero console errors across every fixture. Confirmed via
+diff that every existing Estavillo Case Study block, and every other CSS
+rule in `case-study.css`, is unchanged (purely additive commit).
+
+Theme `0.2.1` → `0.2.2`, plugin `1.4.0` → `1.5.0`.
+
+---
+
 ## Sprint 5 — Hero variants
 
 **Goal:** expand hero variety only once the above is stable — not before.

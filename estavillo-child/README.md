@@ -702,6 +702,83 @@ cierre, con copy de andamiaje
 patterns del Presupuestador y los bodies Custom HTML existentes siguen
 renderizando igual; ningún post necesita migración.
 
+#### Patterns Phase 0 (segunda revisión de arquitectura — auditoría de artefactos Trazur)
+
+Antes de construir bloques nuevos para Trazur/Samic/French Bakery, se hizo
+una segunda revisión de arquitectura con un sesgo explícito: **la menor
+cantidad posible de piezas nuevas**, evitando repetir el error de la
+primera versión de Case Section (una grilla propia donde Gutenberg ya
+resolvía el problema). Conclusión: ningún artefacto recurrente (Persona,
+Comparison Table, Journey Map, Flow Diagram, Methodology, Callout, etc.)
+justificaba todavía un bloque nuevo — la prioridad explícita es **"construir
+bloques nuevos solo después de que múltiples proyectos reales validen la
+misma estructura"**, y hasta ahora solo hay un caso real (Trazur) para
+cualquiera de estos.
+
+Se agregaron tres **Patterns** — composiciones guardadas, no bloques — más
+una variación de estilo CSS-only:
+
+- **"Case Study — Persona"** — Group > Columns 35/65 > foto (bloque
+  existente `estavillo/case-figure`, reemplazable desde el inserter) +
+  heading + demográficos (lista nativa) a la izquierda; Biography + Goals/
+  Frustrations (Columns 50/50 anidado) + una cita (bloque existente
+  `estavillo/case-quote`) a la derecha. Copy 100% ficticio entre `{llaves}`.
+- **"Case Study — Comparison Table"** — un `estavillo/case-section`
+  (eyebrow/heading/lead, sin duplicar esos tres campos con Heading/
+  Paragraph nativos aparte) + una **Table nativa** (`core/table`, 4
+  columnas/3 filas de arranque — agregá o quitá filas/columnas con los
+  controles propios del bloque Table) + un caption (`.es-case-caption`,
+  la misma clase que ya usan los demás patterns). Genérico a propósito:
+  sirve para IA-vs-manual, comparación de competidores, antes/después, o
+  hallazgos de investigación — el mismo bloque, distinto contenido.
+- **"Case Study — Callout Panel"** — un Group nativo con la clase
+  `.es-case-callout` (fondo/borde sutil, definidos en `case-study.css`
+  con los tokens `--es-*` existentes — **no** el panel de color nativo del
+  bloque Group, porque este theme no registra una paleta `theme.json` que
+  mapee esos tokens como colores elegibles: el panel nativo solo ofrecería
+  colores genéricos o un hex arbitrario, exactamente lo que se quería
+  evitar) + eyebrow (`.es-case-label`, la misma clase que ya usa el
+  eyebrow de Case Section) + heading + párrafo + lista opcional. Sirve
+  para notas de contexto, aprendizajes clave, advertencias, principios de
+  diseño o limitaciones — mismo panel, distinto contenido.
+- **Checkmark List** — una *block style variation* nativa sobre
+  `core/list` (`register_block_style()` en `inc/block-styles.php`), no un
+  bloque nuevo: aparece como opción "Checkmark List" en el panel de
+  Estilos de cualquier lista, junto a la opción "Default" sin tocarla. El
+  CSS (`.es-case__body ul.is-style-checkmark`, en `case-study.css`) usa
+  `var(--es-accent)` — nunca un verde hardcodeado — así el tilde sigue el
+  mismo switch de acento del Customizer que el resto del sistema (ver
+  `.es-case-ladder__step--done` más arriba). Listas anidadas dentro de una
+  lista Checkmark vuelven a sus bullets/números normales automáticamente
+  (sin esto heredarían `list-style: none` del padre y quedarían sin
+  marcador).
+
+Los tres patterns son **composiciones, no bloques**: una vez insertados
+son bloques Gutenberg comunes y silvestres — el editor puede desagrupar,
+mover, duplicar o borrar cualquier parte sin ninguna restricción especial,
+igual que con cualquier otro contenido armado a mano. No se registró
+ningún `block.json`/`render.php`/`edit.js` nuevo en este sprint; los
+únicos bloques usados adentro de los tres patterns son bloques nativos de
+Gutenberg + `case-figure`/`case-quote`/`case-section`, que ya existían.
+
+Dos decisiones de la revisión que **no** generaron trabajo nuevo, a
+propósito:
+
+- **Journey Maps y Flow Diagrams siguen siendo imagen** (`case-figure`,
+  variant `wide` o `browser`). Un flowchart con flechas y nodos de
+  decisión es un problema de diagramación, no de edición de contenido —
+  construir un bloque para eso tendría el costo de implementación más
+  alto de toda la lista con casi ningún beneficio real de edición. Un
+  journey map (swimlane + curva de emoción) es estructuralmente más
+  cercano a una tabla, pero con un solo caso real (Trazur) todavía no
+  alcanza la barra de "validado por múltiples proyectos" — se revisa de
+  nuevo si Samic o French Bakery producen uno con la misma forma.
+- **Los layouts imagen+texto siguen siendo Columns nativos de Gutenberg**
+  (40/60, 50/50, 60/40 — ver más arriba) — deliberadamente sin un pattern
+  dedicado, porque la proporción correcta depende de cada narrativa y
+  forzarla a un preset fijo iría en contra de por qué se sacó la grilla
+  propia de Case Section en primer lugar.
+
 Los bloques `case-split-content`/`case-split-media` de la arquitectura
 anterior siguen registrados solo para que un post YA GUARDADO con ellos
 no rompa (no se insertan a mano, `inserter:false`). Si tenías un post de

@@ -85,5 +85,47 @@ function es_case_patterns_register() {
 			'content'     => require ES_PORTFOLIO_CORE_DIR . 'patterns/canonical-starter.php',
 		)
 	);
+
+	// Phase 0 of the second-pass architecture review (Trazur artifact audit,
+	// see estavillo-child/README.md, "Patterns Phase 0"): three reusable
+	// compositions built ONLY from
+	// native Gutenberg blocks + existing estavillo/* Case Study blocks —
+	// no new block.json/render.php/edit.js anywhere. Patterns, not blocks,
+	// on purpose: editors can freely ungroup/move/replace anything inside
+	// them, and none of the three shapes has been validated by more than
+	// one real case yet (priority: build new blocks only after multiple
+	// projects prove the same structure repeats).
+	register_block_pattern(
+		'estavillo/case-persona',
+		array(
+			'title'       => __( 'Case Study — Persona', 'estavillo-portfolio-core' ),
+			'description' => __( 'Persona card: photo (Case Figure), name/role/demographics, biography, goals/frustrations in two columns, and a pull-quote (Case Quote). Fictional placeholder copy — replace before publishing.', 'estavillo-portfolio-core' ),
+			'categories'  => array( 'estavillo-case' ),
+			'postTypes'   => array( 'es_case_study' ),
+			'content'     => require ES_PORTFOLIO_CORE_DIR . 'patterns/case-persona.php',
+		)
+	);
+
+	register_block_pattern(
+		'estavillo/case-comparison-table',
+		array(
+			'title'       => __( 'Case Study — Comparison Table', 'estavillo-portfolio-core' ),
+			'description' => __( 'A Case Section (eyebrow/heading/lead) with a native Table (header row, 4 generic columns, 3 placeholder rows) and a caption below. Generic enough for tool comparisons, heuristic evaluations, before/after, or research findings — add/remove rows and columns with the Table block\'s own controls.', 'estavillo-portfolio-core' ),
+			'categories'  => array( 'estavillo-case' ),
+			'postTypes'   => array( 'es_case_study' ),
+			'content'     => require ES_PORTFOLIO_CORE_DIR . 'patterns/case-comparison-table.php',
+		)
+	);
+
+	register_block_pattern(
+		'estavillo/case-callout-panel',
+		array(
+			'title'       => __( 'Case Study — Callout Panel', 'estavillo-portfolio-core' ),
+			'description' => __( 'A tinted panel (native Group, .es-case-callout — existing tokens only, no new colors) with an eyebrow, heading, short paragraph and an optional list. For context notes, key learnings, warnings, design principles or limitations.', 'estavillo-portfolio-core' ),
+			'categories'  => array( 'estavillo-case' ),
+			'postTypes'   => array( 'es_case_study' ),
+			'content'     => require ES_PORTFOLIO_CORE_DIR . 'patterns/case-callout-panel.php',
+		)
+	);
 }
 add_action( 'init', 'es_case_patterns_register', 20 );

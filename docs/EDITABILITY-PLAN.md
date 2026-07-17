@@ -465,6 +465,53 @@ including the Presupuestador patterns) fall back to Content — full
 width, no cap, functionally the same or better than before; legacy
 Custom-HTML bodies render unchanged; no automatic migration of any post.
 
+### Patterns Phase 0 (second-pass architecture review) — **done**
+
+Before writing any content for Trazur, a second architecture pass asked a
+narrower question than the first: for each recurring artifact type
+(persona, comparison table, journey map, flow diagram, methodology, KPI
+section, timeline, callout, etc.), what is the smallest structure that
+solves it — an image, plain native blocks, native blocks saved as a
+Pattern, a new custom block, or an existing Estavillo/Kadence block? The
+explicit bias: avoid repeating the original Case Section mistake (a
+custom grid where Gutenberg already had an answer), and build new custom
+blocks only after multiple real cases validate the same shape — one real
+example (Trazur) isn't enough evidence yet.
+
+Result: three reusable **Patterns** (compositions of existing blocks,
+registered exactly like the Presupuestador/Canonical Starter patterns
+above) plus one CSS-only block style — no new `block.json`/`render.php`/
+`edit.js` anywhere:
+
+- **"Case Study — Persona"** — Group > Columns 35/65 > photo
+  (`estavillo/case-figure`, replaceable) + name/role/demographics, and
+  Biography + Goals/Frustrations (nested Columns 50/50) + a pull-quote
+  (`estavillo/case-quote`). Fictional placeholder copy.
+- **"Case Study — Comparison Table"** — `estavillo/case-section`
+  (eyebrow/heading/lead) + a native **Table** block (4 generic columns,
+  3 placeholder rows — add/remove with the Table block's own controls) +
+  a caption. Generic enough for tool comparisons, before/after,
+  competitor comparisons, or research findings.
+- **"Case Study — Callout Panel"** — a native Group with an opt-in class
+  (`.es-case-callout`, existing `--es-*` tokens only — deliberately not
+  the Group block's own Color panel, since this theme has no `theme.json`
+  palette exposing those tokens as pickable colors) + eyebrow/heading/
+  paragraph/optional list.
+- **Checkmark List** — a `register_block_style()` variation on
+  `core/list` (`estavillo-child/inc/block-styles.php`): opt-in per list,
+  the default bullet list is untouched.
+
+All three patterns are ordinary, fully editable Gutenberg content the
+moment they're inserted — ungroup, move, duplicate, delete any part, same
+as hand-built content. Two things the review deliberately left as images/
+native-only rather than turning into new work: Journey Maps and Flow
+Diagrams stay images (a flowchart's arrows/decision nodes are a
+diagramming problem, not a content-editing one — building a block for
+that would be the highest-effort, lowest-editing-value item on the list);
+image+text layouts stay plain native Columns (no dedicated pattern — the
+right ratio depends on the narrative, and forcing a preset would
+reintroduce the rigidity Case Section's grid was removed for).
+
 ---
 
 ## Editability priority order

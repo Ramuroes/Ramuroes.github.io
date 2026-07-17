@@ -104,6 +104,20 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   Samic) start from the **"Case Study — Canonical Starter"** pattern; use
   **"Case Study — Editorial System Demo"** as the reference lab page for
   what each width does and how to compose columns.
+- **Done (Patterns Phase 0)** — Second-pass architecture review of
+  recurring case artifacts (persona, comparison table, journey map, flow
+  diagram, methodology, callouts, etc. — prompted by auditing the real
+  Trazur case) concluded no new custom block was justified yet (one real
+  case isn't "validated by multiple projects"). Added three reusable
+  Patterns built only from native + existing Estavillo blocks —
+  **"Case Study — Persona"**, **"Case Study — Comparison Table"**,
+  **"Case Study — Callout Panel"** — plus a CSS-only **Checkmark List**
+  block style. See `estavillo-child/README.md` → "Patterns Phase 0" and
+  `EDITABILITY-PLAN.md` for the full breakdown. Journey Maps and Flow
+  Diagrams stay images; image+text layouts stay plain native Columns —
+  neither got a dedicated pattern. Available now for the Trazur/Samic/
+  French Bakery content tickets below; no code changes expected when
+  those are picked up unless real content surfaces a genuine gap.
 - **Done (Sprint 3)** — **Featured Case** is editable: reuses the Case
   Study CPT with a "Feature this case on Home" checkbox instead of a
   separate mechanism. See `EDITABILITY-PLAN.md`.

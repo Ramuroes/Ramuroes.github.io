@@ -1220,3 +1220,125 @@
 		gap: 8px;
 	}
 }
+
+/* =========================================================================
+   Phase 0 — reusable Patterns (second-pass architecture review)
+   -------------------------------------------------------------------------
+   Three additive, opt-in rules for the three Patterns registered in the
+   plugin (Case Study — Persona / Comparison Table / Callout Panel; see
+   docs/DECISIONS.md for why these are Patterns, not new blocks). Same
+   rule as everything else in this file: only --es-* tokens, nothing
+   global, nothing that changes an existing component. The Persona pattern
+   needs no new CSS at all — it's built entirely from things already
+   styled above (case-figure, headings, lists, case-quote, Columns).
+   ========================================================================= */
+
+/* ---------- native Table (Comparison Table pattern) ----------
+   wp-block-library's own Table CSS never loads on this standalone
+   template — same reason Columns needed its own scoped fallback earlier
+   in this file. A bare <table> would have no visual structure and, at
+   several columns of prose, get crushed illegibly on narrow screens.
+   This reimplements only the essentials: a token-based header/border
+   treatment, and — per the pattern's own requirement — a horizontal-
+   scroll fallback (min-width on the table + overflow-x on its wrapper)
+   instead of shrinking text below a readable size. figcaption is already
+   covered by the generic .es-case__body figcaption rule above; no
+   table-specific duplicate needed. */
+
+.es-case__body .wp-block-table {
+	margin: clamp(28px, 3.5vw, 40px) 0;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.es-case__body .wp-block-table table {
+	width: 100%;
+	min-width: 560px;
+	border-collapse: collapse;
+}
+
+.es-case__body .wp-block-table th,
+.es-case__body .wp-block-table td {
+	padding: 12px 16px;
+	border: 1px solid var(--es-line);
+	text-align: left;
+	vertical-align: top;
+	font-size: 13.5px;
+	line-height: 1.5;
+	color: var(--es-ink-2);
+}
+
+.es-case__body .wp-block-table th {
+	font-family: var(--es-sans);
+	font-weight: 600;
+	font-size: 12.5px;
+	color: var(--es-ink);
+	background: var(--es-surface-2);
+}
+
+/* ---------- callout panel (Callout Panel pattern) ----------
+   Deliberately a class, not the Group block's native Color panel: this
+   theme has no theme.json palette mapping --es-* tokens as selectable
+   editor colors, so the panel would only offer generic defaults or an
+   arbitrary custom hex — exactly what "no arbitrary new color" rules
+   out. max-width matches .es-case-quote/.es-case-details (the other two
+   "reading-width" components) so a callout reads consistently regardless
+   of which Case Section layout it's placed in. */
+
+.es-case__body .es-case-callout {
+	background: var(--es-paper-2);
+	border: 1px solid var(--es-line);
+	padding: clamp(22px, 2.6vw, 30px);
+	margin: clamp(28px, 3.5vw, 40px) 0;
+	max-width: var(--es-case-measure);
+}
+
+.es-case__body .es-case-callout > * + * {
+	margin-top: 0.9em;
+}
+
+.es-case__body .es-case-callout .es-case-label {
+	margin-bottom: 0;
+}
+
+/* ---------- Checkmark List block style variation ----------
+   Registered via register_block_style('core/list', …) in the child theme
+   (inc/block-styles.php) — this is the CSS half only; the style
+   registration is what makes "Checkmark List" appear as an opt-in picker
+   option instead of changing every list. --es-accent (not a hardcoded
+   green) so it follows the Customizer accent switch like every other
+   checkmark glyph in this file (see .es-case-ladder__step--done above). */
+
+.es-case__body ul.is-style-checkmark {
+	list-style: none;
+	padding-left: 0;
+}
+
+.es-case__body ul.is-style-checkmark > li {
+	position: relative;
+	padding-left: 26px;
+}
+
+.es-case__body ul.is-style-checkmark > li::before {
+	content: '✓';
+	position: absolute;
+	left: 0;
+	top: 0;
+	color: var(--es-accent);
+	font-weight: 600;
+}
+
+/* list-style is inherited — without this reset, a nested list would
+   silently lose its own bullets/numbers too (inheriting "none" from the
+   checkmark parent) instead of just staying a normal nested list. */
+.es-case__body ul.is-style-checkmark li > ul {
+	list-style: disc;
+	margin-top: 0.5em;
+	padding-left: 1.3em;
+}
+
+.es-case__body ul.is-style-checkmark li > ol {
+	list-style: decimal;
+	margin-top: 0.5em;
+	padding-left: 1.3em;
+}
