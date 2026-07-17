@@ -718,7 +718,8 @@ cualquiera de estos.
 Se agregaron tres **Patterns** — composiciones guardadas, no bloques — más
 una variación de estilo CSS-only:
 
-- **"Case Study — Persona"** — Group > Columns 35/65 > foto (bloque
+- **"Case Study — Persona"** — Columns 35/65 (sin Group envolvente — ver
+  el bug-fix ticket de abajo) > foto (bloque
   existente `estavillo/case-figure`, reemplazable desde el inserter) +
   heading + demográficos (lista nativa) a la izquierda; Biography + Goals/
   Frustrations (Columns 50/50 anidado) + una cita (bloque existente

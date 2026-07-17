@@ -357,6 +357,25 @@
 	font-size: clamp(19px, 2vw, 22px);
 }
 
+/* h4: small structural sub-label (e.g. "Goals"/"Frustrations" inside the
+   Persona pattern) — not covered by the h2/h3 rule above, so it was
+   falling through to whatever un-tokenized heading color the parent
+   Kadence theme sets globally (tuned for a light background), reading as
+   low-contrast on this system's dark --es-paper surface. Sans, not
+   serif, and deliberately smaller than h2/h3: this is a short label
+   above 2-3 list items, not an editorial chapter heading. --es-ink (not
+   --es-accent) on purpose — a neutral, equally-weighted label for BOTH
+   Goals and Frustrations, no green/red good/bad pairing implied. */
+.es-case__body h4 {
+	font-family: var(--es-sans);
+	font-weight: 600;
+	font-size: 14px;
+	letter-spacing: 0.01em;
+	color: var(--es-ink);
+	margin-top: 1.5em;
+	margin-bottom: 0;
+}
+
 .es-case__body p {
 	margin: 0;
 }
@@ -1251,6 +1270,22 @@
 	-webkit-overflow-scrolling: touch;
 }
 
+/* Editor-only: undo the horizontal-scroll rule above. CSS overflow is
+   linked per-axis — an element can't compute overflow-x:auto while
+   overflow-y stays "visible" (confirmed against real Chromium computed
+   styles), so the rule above also makes this element clip vertically,
+   not just scroll horizontally. That's the correct trade-off on the
+   frontend (a table wider than the viewport must go somewhere), but the
+   editor doesn't need it — editors work on real screens, not the
+   narrow-mobile case this exists for — and an unnecessary scroll/clip
+   container is one more thing that COULD interact badly with the block
+   toolbar's "Edit table" popover (row/column insert/delete — see the
+   README "Patterns Phase 0" section for exactly where that lives).
+   Removing it here costs nothing and rules that out entirely. */
+.editor-styles-wrapper .es-case__body .wp-block-table {
+	overflow: visible;
+}
+
 .es-case__body .wp-block-table table {
 	width: 100%;
 	min-width: 560px;
@@ -1277,20 +1312,35 @@
 }
 
 /* ---------- callout panel (Callout Panel pattern) ----------
-   Deliberately a class, not the Group block's native Color panel: this
-   theme has no theme.json palette mapping --es-* tokens as selectable
-   editor colors, so the panel would only offer generic defaults or an
-   arbitrary custom hex — exactly what "no arbitrary new color" rules
-   out. max-width matches .es-case-quote/.es-case-details (the other two
-   "reading-width" components) so a callout reads consistently regardless
-   of which Case Section layout it's placed in. */
+   Background/border deliberately a class, not the Group block's native
+   Color panel: this theme has no theme.json palette mapping --es-*
+   tokens as selectable editor colors, so the panel would only offer
+   generic defaults or an arbitrary custom hex by default — this class
+   supplies a sensible token-based default instead. The native Color
+   panel is NOT disabled by this — it's a normal, unmodified core/group,
+   so an editor can still pick a custom background color from the block's
+   own Inspector controls; WordPress emits that as an inline
+   `style="background-color:…"` on the same element, which — by ordinary
+   CSS cascade (inline style beats a class selector) — automatically
+   overrides this default without any extra code.
+
+   max-width: bug fix — this used to match .es-case-quote/.es-case-details
+   (var(--es-case-measure), 820px), on the theory that a callout should
+   read as "reading width" like those two. Real-world testing showed
+   that reads as broken/constrained-left instead, especially inside a
+   full-width Case Section: unlike a quote or an accordion, a callout is
+   a full block-level panel, not inline reading prose, so it should fill
+   whatever container (case body, Case Section, or a Gutenberg Column)
+   it's placed in — full width of the immediate parent, same as
+   .es-case-taxonomy/.es-case-stats/.es-case-decisions/.es-case-status
+   below. */
 
 .es-case__body .es-case-callout {
 	background: var(--es-paper-2);
 	border: 1px solid var(--es-line);
 	padding: clamp(22px, 2.6vw, 30px);
 	margin: clamp(28px, 3.5vw, 40px) 0;
-	max-width: var(--es-case-measure);
+	max-width: 100%;
 }
 
 .es-case__body .es-case-callout > * + * {

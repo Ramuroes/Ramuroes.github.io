@@ -12,11 +12,20 @@
  * skeleton (photo, demographics, bio, goals, frustrations, quote) is fully
  * expressible with blocks that already exist.
  *
- * Root is a Group (no background/className — purely an editor-convenience
- * wrapper so the whole persona can be selected/moved/duplicated as one
- * unit in List View) containing a 35/65 Columns split. Ratio, order and
- * every block inside are ordinary Gutenberg content once inserted —
- * editors can freely ungroup, reorder or delete any part of it.
+ * Root is the 35/65 Columns split directly — no wrapping Group. An
+ * earlier version added an outer Group purely as an editor-convenience
+ * wrapper (select/move/duplicate the whole persona as one unit); live
+ * WordPress testing showed that extra layer made canvas double-click
+ * editing on the nested headings/paragraphs/lists feel unreliable —
+ * every click has to resolve through one more block-selection layer
+ * before reaching the actual RichText, and Persona was already the
+ * deepest-nesting pattern in this plugin (up to 4 levels for Goals/
+ * Frustrations). Patterns support multiple top-level blocks natively
+ * (see editorial-demo.php's several root-level case-sections), so
+ * dropping the Group costs nothing structurally — List View still shows
+ * the whole persona as one collapsible Columns entry. Every block inside
+ * is ordinary Gutenberg content once inserted — editors can freely
+ * ungroup, reorder or delete any part of it.
  *
  * 100% fictional placeholder copy in {braces} — no real person, no case
  * content. Translate/replace inline like any other block content; no
@@ -30,8 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 return <<<'CONTENT'
-<!-- wp:group -->
-<div class="wp-block-group"><!-- wp:columns -->
+<!-- wp:columns -->
 <div class="wp-block-columns"><!-- wp:column {"width":"35%"} -->
 <div class="wp-block-column" style="flex-basis:35%"><!-- wp:estavillo/case-figure {"variant":"standard","placeholderLabel":"persona-photo","alt":"Placeholder photo — replace with a real or clearly fictional portrait"} /-->
 
@@ -107,6 +115,5 @@ return <<<'CONTENT'
 
 <!-- wp:estavillo/case-quote {"quote":"{A short first-person line that captures this persona's core need or frustration.}","cite":"{Persona name}, {role}"} /--></div>
 <!-- /wp:column --></div>
-<!-- /wp:columns --></div>
-<!-- /wp:group -->
+<!-- /wp:columns -->
 CONTENT;

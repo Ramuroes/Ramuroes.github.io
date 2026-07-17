@@ -608,8 +608,9 @@ real cases validate the same shape. One real case (Trazur, audited from
 the project owner's own case-study PDF export) isn't that evidence yet.
 
 **Result — three Patterns + one block style, zero new blocks:**
-- **"Case Study — Persona"** (`patterns/case-persona.php`) — Group >
-  Columns 35/65 > photo (`estavillo/case-figure`) + name/role/
+- **"Case Study — Persona"** (`patterns/case-persona.php`) — Columns
+  35/65 (no wrapping Group — see the bug-fix sprint below) > photo
+  (`estavillo/case-figure`) + name/role/
   demographics, and Biography + Goals/Frustrations (nested Columns
   50/50) + a pull-quote (`estavillo/case-quote`).
 - **"Case Study — Comparison Table"** (`patterns/case-comparison-table.php`)
@@ -646,6 +647,99 @@ diff that every existing Estavillo Case Study block, and every other CSS
 rule in `case-study.css`, is unchanged (purely additive commit).
 
 Theme `0.2.1` → `0.2.2`, plugin `1.4.0` → `1.5.0`.
+
+---
+
+## Sprint 4P — Patterns Phase 0 bug fixes (live-editor testing) — done
+
+**Goal:** four real usability bugs surfaced testing the Sprint 4O patterns
+in the actual WordPress editor. Focused fix-only ticket — no Trazur
+migration, no new blocks, no redesign. Ownership split per the ticket's
+explicit rule: plugin owns pattern structure, theme owns visual styling.
+
+**Bug 1 — Persona content not reliably editable (plugin).** Audited the
+full pattern for `templateLock`, block-level `lock`, `contentOnly` mode,
+`parent`/`allowedBlocks` restrictions, and pointer-event-intercepting
+CSS/overlays — found none anywhere in the plugin or theme editor code
+(confirmed by grep across the whole plugin plus a manual read of every
+relevant `edit.js` and `case-blocks-editor.css`). Root cause instead:
+excess structural nesting. Persona's outer `wp:group` wrapper added a
+whole extra block-selection layer with no functional purpose, on top of
+an already 4-level-deep composition (name/role/demographics/biography
+sat 3 canvas-clicks deep; Goals/Frustrations sat 5-6). Removed the
+wrapper — Columns is now the pattern's own root (patterns support
+multiple root-level blocks natively, same as `editorial-demo.php`).
+Measured via a real `@wordpress/blocks.parse()` depth count (not a
+guess): every leaf field moved one level shallower (e.g. name/role now
+depth 2 vs 3; Goals/Frustrations now depth 4-5 vs 5-6).
+
+**Bug 2 — Goals/Frustrations low contrast (theme).** `case-study.css`
+only ever styled `h2`/`h3` — the Persona pattern's `h4` sub-headings fell
+through unstyled to the parent Kadence theme's own default heading
+color (tuned for a light background), reading as low-contrast on this
+system's dark surface. Added a dedicated `.es-case__body h4` rule:
+sans-serif, 14px, `var(--es-ink)` — a neutral light color, not
+`--es-accent`, so Goals and Frustrations stay visually equal (no
+red/green good/bad implication). Measured contrast: `#ebe7df` on
+`#131211` ≈ 14.9:1, well past WCAG AAA (7:1).
+
+**Bug 3 — Comparison Table row/column controls (theme).** Read the real
+`@wordpress/block-library` `table/edit.js` source: row/column insert and
+delete live in the block's own floating toolbar, under an "Edit table"
+dropdown (`BlockControls` → `ToolbarDropdownMenu`) — a portaled Slot/Fill
+element, not something rendered inside the table's own clipped box, so
+nothing in this pattern could disable it outright. Still found and fixed
+a real, verifiable side effect: `.wp-block-table { overflow-x: auto }`
+computes `overflow-y` to `auto` too (confirmed against real Chromium —
+CSS can't have one axis "visible" while the other isn't), meaning the
+frontend's mobile-scroll rule was also clipping the table vertically
+inside the editor for no reason. Added an editor-only reset
+(`.editor-styles-wrapper .es-case__body .wp-block-table { overflow:
+visible }`) — frontend mobile-scroll behavior unchanged, editor no
+longer has any unnecessary clipping. **Where the controls live, for
+QA:** select the Table block → the floating toolbar shows a table icon
+labeled "Edit table" → its dropdown has Insert row before/after, Delete
+row, Insert column before/after, Delete column.
+
+**Bug 4 — Callout Panel width (theme).** `.es-case-callout` had
+`max-width: var(--es-case-measure)` (820px), matching
+`.es-case-quote`/`.es-case-details`'s reading-width treatment — wrong
+call for a full block-level panel. Changed to `max-width: 100%`.
+Verified in two real contexts (a Case Section and a 40%-width Column):
+callout width now equals its immediate parent's width exactly in both.
+
+**Bug 5 — Callout visual flexibility.** Already satisfied by the
+existing background/border/padding/dark-light-token treatment; no
+additional change beyond Bug 4. Confirmed the Group block's native
+Color panel is not disabled by `.es-case-callout` — an editor-picked
+custom background renders as an inline `style=`, which beats a class
+selector by ordinary CSS cascade, so it already overrides the default
+with no extra code.
+
+**Existing inserted patterns:** confirmed — PHP-registered
+(`register_block_pattern()`) patterns are unsynced. Inserting one copies
+its blocks into the post's own content once; there is no ongoing link
+back to the pattern definition (that's what Synced Patterns/`wp_block`
+are for, not this). Practical effect: the Bug 1 fix (pattern structure)
+only applies to Persona copies inserted *after* the plugin update — any
+already-inserted test copy keeps its old Group-wrapped structure until
+deleted and reinserted. Bugs 2/3/4 are pure CSS/theme fixes and apply
+immediately, automatically, to any already-inserted content once the
+theme is updated — no reinsertion needed for those three.
+
+**Validated:** real `@wordpress/blocks` + `@wordpress/block-library`
+round-trip (zero invalid blocks) on the edited Persona pattern; render
+harness (`case-figure`/`case-quote`/`case-section` `render.php`, no
+fatals); Chromium: h4 computed color, table computed overflow in a
+simulated `.editor-styles-wrapper` context vs. frontend, callout width
+inside a Case Section and inside a Column, checkmark list vs. standard
+list (both unchanged) — zero console errors throughout. Confirmed via
+diff that no `blocks/*/` file was touched anywhere (zero new block
+types, no existing Estavillo Case Study block modified).
+
+Theme `0.2.2` → `0.2.3` (CSS only), plugin `1.5.0` → `1.5.1` (pattern
+content only) — only the ZIP for the package that actually changed
+needs re-uploading per package.
 
 ---
 

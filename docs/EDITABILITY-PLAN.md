@@ -483,7 +483,8 @@ registered exactly like the Presupuestador/Canonical Starter patterns
 above) plus one CSS-only block style — no new `block.json`/`render.php`/
 `edit.js` anywhere:
 
-- **"Case Study — Persona"** — Group > Columns 35/65 > photo
+- **"Case Study — Persona"** — Columns 35/65 (no wrapping Group — see the
+  bug-fix entry below) > photo
   (`estavillo/case-figure`, replaceable) + name/role/demographics, and
   Biography + Goals/Frustrations (nested Columns 50/50) + a pull-quote
   (`estavillo/case-quote`). Fictional placeholder copy.
