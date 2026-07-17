@@ -98,13 +98,22 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   `docs/content/trazur-gutenberg-es.html` +
   `docs/content/trazur-fields-es.md`, validated (round-trip parser +
   render harness + Chromium desktop/mobile/dark/light, zero invalid
-  blocks). **Still pending:** the wp-admin paste-and-publish step itself
-  (no wp-admin access from this environment), all 9 real
-  images/screenshots replacing the `{asset: …}` placeholders + the
-  poster PDF, live-WordPress visual QA, the claims flagged in
-  `trazur-fields-es.md` needing sign-off, and the English translation
-  (separate, later task). Do not mark this case published until those
-  are done.
+  blocks). **Trazur's English content is also written and integrated** —
+  `docs/content/trazur-gutenberg-en.html` +
+  `docs/content/trazur-fields-en.md`, an editorial adaptation (not a
+  literal translation) of the approved Spanish case for an international
+  Product Design audience, same 17 sections/anchors (renamed to English
+  slugs) and same evidence, validated the same way (round-trip parser +
+  render harness + Chromium desktop/mobile/dark/light, 144/144 blocks
+  valid, zero invalid blocks, zero overflow). **Still pending for both
+  languages:** the wp-admin paste-and-publish step itself (no wp-admin
+  access from this environment), all real images/screenshots replacing
+  the `{asset: …}` / `placeholderLabel` placeholders (shared between the
+  two language versions — same underlying images) + the poster PDF,
+  live-WordPress visual QA, and the claims flagged in
+  `trazur-fields-es.md` / `trazur-fields-en.md` needing sign-off (the
+  English sheet also flags its own terminology and wording choices for
+  review). Do not mark either case published until those are done.
 - **P1 (new, after Sprint 4M)** — Migrate the Presupuestador body to the
   corrected editorial composition system: Case Section's Content/Reading/
   Wide width control + native Gutenberg Columns for side-by-side text/
