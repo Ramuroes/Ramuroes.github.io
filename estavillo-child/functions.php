@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.4' );
+define( 'ES_CHILD_VERSION', '0.2.5' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -586,20 +586,26 @@ function es_about_hobbies_visible() {
 /**
  * Defaults de "Career timeline" (About page) — mismo principio que Hobbies/
  * Process Steps: contenido real de arranque en vez de una sección vacía,
- * hasta que el admin cargue lo suyo en Home Content. Solo incluye las
- * entradas que se pueden afirmar sin inventar dato (empresa, cargo o fecha)
- * — "Current work" y "Ceibal" quedan fuera de este default a propósito
- * hasta tener esos datos reales; la sección simplemente muestra menos
- * entradas mientras tanto, no entradas con texto inventado.
+ * hasta que el admin cargue lo suyo en Home Content. La entrada 1 reusa
+ * Role/Period/Source-context ya aprobados en
+ * docs/content/workshop-quoting-system-fields-en.md (el field sheet más
+ * reciente del caso Guzmán Villalba — "Lead Product Designer",
+ * "2025–2026" — superseding el Role/Period más viejo de
+ * presupuestador-case-study-fields.md) — esto también responde "current
+ * role" (el Period sigue abierto en 2025–2026). "Ceibal" sigue fuera de
+ * este default a propósito: ningún cargo/fecha para Ceibal existe en
+ * ningún documento aprobado del repo, así que no hay nada real que reusar
+ * todavía — la sección simplemente muestra menos entradas mientras tanto,
+ * no una entrada con texto inventado.
  *
  * @return array<int,array{year:string,title:string,text:string}>
  */
 function es_about_timeline_defaults() {
 	return array(
 		array(
-			'year'  => '',
-			'title' => 'Freelance Product Designer',
-			'text'  => 'Independent product design work for small operations, including a full internal quoting system for Guzmán Villalba, a metal fabrication workshop in Montevideo.',
+			'year'  => '2025–2026',
+			'title' => 'Lead Product Designer — Guzmán Villalba',
+			'text'  => 'Designed and implemented at Guzmán Villalba, a custom metal fabrication workshop in Montevideo, Uruguay — a quoting system that turns tacit pricing knowledge into an explicit, reusable decision framework.',
 		),
 		array(
 			'year'  => '2025',
@@ -611,9 +617,12 @@ function es_about_timeline_defaults() {
 
 /**
  * Defaults de "Education & certificates" (About page) — mismo principio
- * que el resto de este archivo. Institución y año quedan vacíos donde no
- * hay dato confirmado (el template solo imprime esa línea de meta si
- * institución o año están presentes — nunca un campo vacío o inventado).
+ * que el resto de este archivo. Institución y certificadora reusan datos
+ * confirmados por el project owner (Universidad de la República / UdelaR;
+ * Google UX Design Professional Certificate impartido vía Coursera). El
+ * año de cada título queda vacío donde todavía no hay dato confirmado (el
+ * template solo imprime esa línea de meta si institución o año están
+ * presentes — nunca un campo vacío o inventado).
  *
  * @return array<int,array{title:string,org:string,year:string}>
  */
@@ -621,12 +630,12 @@ function es_about_education_defaults() {
 	return array(
 		array(
 			'title' => "Bachelor's Degree in Industrial Design (Product Design)",
-			'org'   => '',
+			'org'   => 'Universidad de la República (UdelaR)',
 			'year'  => '',
 		),
 		array(
 			'title' => 'Google UX Design Professional Certificate',
-			'org'   => 'Google',
+			'org'   => 'Google · Coursera',
 			'year'  => '',
 		),
 	);

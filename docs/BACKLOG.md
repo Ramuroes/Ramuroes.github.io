@@ -28,30 +28,34 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   Added `es_about_timeline_defaults()` and `es_about_education_defaults()`
   (same pattern as the existing hobbies/process-steps defaults) so
   Timeline and Education have real starting content too. **Deliberately
-  incomplete, not invented:** Timeline ships only 2 of the 4 rows
-  (Freelance/Guzmán Villalba, Trazur) — "Current work" and "Ceibal" are
-  left out entirely rather than filled with placeholder text, since no
-  real company/title/dates for either exist anywhere in this repo
-  (verified by search) and the brief that requested this integration
-  explicitly said not to invent them. Same for Education (institution
-  name and both years genuinely unknown — left blank, template only
-  shows what's present) and the Connect page's Availability status line
-  (a real-time claim only the site owner can set — left unset rather than
-  guessed). Navigation labels and Footer social links were intentionally
-  NOT touched this pass — they were never part of an approved-content
-  round, unlike the six sections above. Validated with a real-load PHP
-  harness (requires the actual `functions.php` + `inc/*.php` with a
-  WP-core shim, renders the actual template-parts via output buffering —
-  not a synthetic approximation) and Chromium screenshots of Home/About/
-  How I Work at 1440px/390px in both dark and light (the real
+  incomplete, not invented:** the first pass left the Timeline/Education
+  entries that couldn't be sourced blank rather than guessed. A follow-up
+  correction pass then reused already-approved data found elsewhere in
+  the repo instead of leaving it blank: the Timeline's first entry now
+  reads **"Lead Product Designer — Guzmán Villalba", 2025–2026** (the
+  exact Role/Period/Source-context already approved in
+  `docs/content/workshop-quoting-system-fields-en.md` — this also
+  answers "current role," since that Period is still open), and
+  Education now credits **Universidad de la República (UdelaR)** and
+  **Google · Coursera** (both confirmed by the project owner). **Ceibal**
+  still has no approved role/dates anywhere in the repo and stays out of
+  the Timeline rather than guessed. Same for Education's two Year
+  fields, and the Connect page's Availability status line (a real-time
+  claim only the site owner can set). Navigation labels and Footer
+  social links were intentionally NOT touched — never part of an
+  approved-content round. Validated with a real-load PHP harness
+  (requires the actual `functions.php` + `inc/*.php` with a WP-core
+  shim, renders the actual template-parts via output buffering — not a
+  synthetic approximation) and Chromium screenshots of Home/About/How I
+  Work at 1440px/390px in both dark and light (the real
   `[data-theme='light']` token override) — zero console errors, zero
   overflow, zero broken images in all 12 combinations. **Still open:**
-  the 2 missing Timeline rows, Education institution/year, Connect
+  Ceibal's Timeline entry, Education's two Year fields, Connect
   Availability line, real LinkedIn/Behance URLs, and — once real pages
   exist in wp-admin — swapping the Nav/CTA anchor URLs (`#work`,
-  `#about`, etc.) for real page slugs (anchors currently silently fail to
-  navigate from any page other than Home, a pre-existing, out-of-scope
-  issue this pass did not fix).
+  `#about`, etc.) for real page slugs. That last item now has a
+  recommended architecture (see "Nav/CTA links break when browsing
+  About/How I Work/Work/Contact" below) but is not yet implemented.
 
 ---
 
@@ -90,6 +94,31 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   refinement.
 - **P1** — Hero-to-How-I-Work transition still feels slightly awkward even
   after the gradient softening fix (border removal + fade).
+- **P1 — Nav/CTA links break when browsing About/How I Work/Work/Contact.**
+  `es_nav_links()` defaults (and the About/Connect/How-I-Work CTA URL
+  defaults) are same-page anchors (`#work`, `#about`, `#process`,
+  `#connect`) meant for Home's own single-page scroll layout. From any of
+  the 4 standalone pages there's no element with those ids, so the links
+  silently do nothing. **Recommended fix (analysis only — not yet
+  implemented):** reject a blanket switch to real page URLs, since Home's
+  header/mobile-menu/footer nav is shared with Home's *own* inline
+  sections (Featured/Selected Work/About/Connect all live on Home too,
+  using those same anchors) — swapping every nav link to a page URL would
+  break Home's in-page scroll. Instead: (1) give each nav-link row one
+  new optional field, "Page URL", alongside the existing Label + anchor;
+  (2) add a small helper, `es_nav_link_href( $link )`, used by
+  site-header.php (desktop nav + mobile menu) and site-footer.php instead
+  of printing `$link['url']` directly — on Home it always returns the
+  anchor (preserving today's scroll behavior exactly); off Home it
+  returns the Page URL if one's set, and otherwise falls back to
+  `home_url( '/' ) . $anchor` (navigates to Home, then scrolls — works
+  correctly today, with zero admin setup, unlike the current bare
+  anchor). This is additive only (one new optional field, one small
+  helper function used in 2 existing template-parts) — no new blocks, no
+  template redesign, and zero behavior change for anyone who hasn't
+  filled in a Page URL yet. Rejected alternatives: real page URLs
+  everywhere (breaks Home's own sections, above); anchors everywhere
+  unprefixed (today's broken state).
 
 ## Design polish
 
