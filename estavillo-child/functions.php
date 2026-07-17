@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.3' );
+define( 'ES_CHILD_VERSION', '0.2.4' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -272,34 +272,52 @@ function es_process_icon_svg( $key ) {
 function es_home_process_steps_defaults() {
 	return array(
 		array(
-			'title' => 'Understand the system',
-			'text'  => 'Map the operational context before touching any screen.',
-			'icon'  => '',
+			'title'    => 'Understand the system',
+			'text'     => 'Before I open any design tool, I map how the system actually operates — not how it\'s supposed to.',
+			'icon_key' => 'compass',
+			'why'      => 'A screen is the visible 1% of a system. Redesigning it without understanding the other 99% just makes the same problem look better.',
+			'example'  => 'On the Workshop Quoting System, that meant sitting on the shop floor to see how a quote actually got built — paper, memory, a spreadsheet nobody trusted — long before assuming the fix was a better form.',
+			'tools'    => 'Contextual inquiry, stakeholder mapping, process observation',
 		),
 		array(
-			'title' => 'Map the flows',
-			'text'  => 'Make the invisible process visible and shared.',
-			'icon'  => '',
+			'title'    => 'Find the real bottleneck',
+			'text'     => 'Every system has one point where things actually break. I look for that specific point, not a list of general issues.',
+			'icon_key' => 'target',
+			'why'      => 'Teams often ask for a redesign when the real problem sits one step earlier or later. Naming the actual bottleneck precisely is what keeps the rest of the work from becoming decoration.',
+			'example'  => 'In Trazur, the interface had real usability issues, but the deeper bottleneck was trust — people didn\'t believe the platform understood their situation, so they disengaged before the screen ever became the problem.',
+			'tools'    => 'Root-cause analysis, journey mapping, structured evaluation',
 		),
 		array(
-			'title' => 'Identify bottlenecks',
-			'text'  => 'Find where decisions, information or knowledge break down.',
-			'icon'  => '',
+			'title'    => 'Gather evidence',
+			'text'     => 'I build a case before I build a solution — evidence a team can react to, not an opinion they have to accept.',
+			'icon_key' => 'document',
+			'why'      => 'A strong opinion in the room isn\'t evidence, no matter how senior it comes from. Evidence turns a debate about taste into a decision about the system.',
+			'example'  => 'For Trazur, that meant pairing traditional research with AI-assisted analysis to process a heavier volume of evidence faster — every synthesized finding still reviewed by a person before it counted as one.',
+			'tools'    => 'Interviews, field observation, AI-assisted synthesis',
 		),
 		array(
-			'title' => 'Design interventions',
-			'text'  => 'Prototype the logic before the interface.',
-			'icon'  => '',
+			'title'    => 'Challenge assumptions',
+			'text'     => 'Before anything gets built, I try to break the plan myself — find where it depends on something nobody\'s actually confirmed.',
+			'icon_key' => 'check',
+			'why'      => 'Every proposal quietly assumes something. Finding that assumption and testing the one that would be expensive to get wrong is cheaper than discovering it after launch.',
+			'example'  => 'On the Workshop Quoting System, that meant checking with the person who actually prices jobs that a proposed shortcut wasn\'t quietly removing a judgment call they relied on.',
+			'tools'    => 'Assumption mapping, walkthroughs with real users, comparative testing',
 		),
 		array(
-			'title' => 'Validate in the real world',
-			'text'  => 'Real users, real data, real pressure.',
-			'icon'  => '',
+			'title'    => 'Design practical solutions',
+			'text'     => 'Not every problem needs a new interface — sometimes the strongest move is fixing what\'s underneath it. When an interface is the right call, I design it for the conditions that actually exist: limited connectivity, time pressure, mixed skill levels, not an idealized user in an ideal setting.',
+			'icon_key' => 'layers',
+			'why'      => 'A solution that only works under perfect conditions doesn\'t survive a busy shop floor or a rural connection that drops mid-session. Practical means it still works on a bad day.',
+			'example'  => 'Trazur\'s proposed solution was built around low-connectivity, low-fidelity conditions from the start, instead of assuming a fast connection and a confident, tech-comfortable user.',
+			'tools'    => 'Service blueprints, wireframing, systems-level design decisions',
 		),
 		array(
-			'title' => 'Document and scale',
-			'text'  => 'Good design must survive the designer.',
-			'icon'  => '',
+			'title'    => 'Iterate with purpose',
+			'text'     => 'I treat a first version as a hypothesis, not a finish line — and decide in advance what would prove it wrong.',
+			'icon_key' => 'rocket',
+			'why'      => 'Iteration without a target just produces motion. Knowing what "wrong" looks like before you ship is what makes the next version actually better, not just different.',
+			'example'  => 'Across projects — from an operational tool built for Guzmán Villalba to institutional work at Ceibal — the versions that held up were the ones designed to be revisited on purpose, not the ones treated as finished at delivery.',
+			'tools'    => 'Usage review, structured feedback loops, versioned documentation',
 		),
 	);
 }
@@ -500,43 +518,43 @@ function es_home_about_hobbies_defaults() {
 		array(
 			'label' => 'Taekwondo',
 			'icon'  => 'taekwondo',
-			'text'  => '',
+			'text'  => 'Years of practice; the same discipline and repetition show up in how I work.',
 			'show'  => true,
 		),
 		array(
 			'label' => 'Music',
 			'icon'  => 'guitar',
-			'text'  => '',
+			'text'  => 'Guitar, mostly rock — another way of building something out of structure and repetition.',
 			'show'  => true,
 		),
 		array(
 			'label' => 'Coffee',
 			'icon'  => 'coffee',
-			'text'  => '',
+			'text'  => 'A daily ritual, not a productivity hack.',
 			'show'  => true,
 		),
 		array(
 			'label' => 'Horse riding',
 			'icon'  => 'horse-head',
-			'text'  => '',
+			'text'  => 'One of the few things that gets me fully off-screen.',
 			'show'  => true,
 		),
 		array(
 			'label' => 'Drawing',
 			'icon'  => 'drawing',
-			'text'  => '',
+			'text'  => 'Where Industrial Design started for me — still just for the habit of it.',
 			'show'  => true,
 		),
 		array(
 			'label' => 'Travel',
 			'icon'  => 'travel',
-			'text'  => '',
+			'text'  => 'New places, mostly for the systems and details other people don\'t notice.',
 			'show'  => true,
 		),
 		array(
 			'label' => 'Cinema',
 			'icon'  => 'cinema',
-			'text'  => '',
+			'text'  => 'A steady source of pacing and structure, outside of any brief.',
 			'show'  => true,
 		),
 	);
@@ -562,6 +580,55 @@ function es_about_hobbies_visible() {
 				return ! empty( $item['label'] ) && ( ! isset( $item['show'] ) || false !== $item['show'] );
 			}
 		)
+	);
+}
+
+/**
+ * Defaults de "Career timeline" (About page) — mismo principio que Hobbies/
+ * Process Steps: contenido real de arranque en vez de una sección vacía,
+ * hasta que el admin cargue lo suyo en Home Content. Solo incluye las
+ * entradas que se pueden afirmar sin inventar dato (empresa, cargo o fecha)
+ * — "Current work" y "Ceibal" quedan fuera de este default a propósito
+ * hasta tener esos datos reales; la sección simplemente muestra menos
+ * entradas mientras tanto, no entradas con texto inventado.
+ *
+ * @return array<int,array{year:string,title:string,text:string}>
+ */
+function es_about_timeline_defaults() {
+	return array(
+		array(
+			'year'  => '',
+			'title' => 'Freelance Product Designer',
+			'text'  => 'Independent product design work for small operations, including a full internal quoting system for Guzmán Villalba, a metal fabrication workshop in Montevideo.',
+		),
+		array(
+			'year'  => '2025',
+			'title' => 'UX Researcher & UX/UI Designer — Trazur',
+			'text'  => 'Undergraduate thesis project (6 months), built with Renzo Morandi under the guidance of Alejandra Capocasale: UX research and AI-assisted analysis to redesign a rural e-learning platform for livestock traceability training.',
+		),
+	);
+}
+
+/**
+ * Defaults de "Education & certificates" (About page) — mismo principio
+ * que el resto de este archivo. Institución y año quedan vacíos donde no
+ * hay dato confirmado (el template solo imprime esa línea de meta si
+ * institución o año están presentes — nunca un campo vacío o inventado).
+ *
+ * @return array<int,array{title:string,org:string,year:string}>
+ */
+function es_about_education_defaults() {
+	return array(
+		array(
+			'title' => "Bachelor's Degree in Industrial Design (Product Design)",
+			'org'   => '',
+			'year'  => '',
+		),
+		array(
+			'title' => 'Google UX Design Professional Certificate',
+			'org'   => 'Google',
+			'year'  => '',
+		),
 	);
 }
 

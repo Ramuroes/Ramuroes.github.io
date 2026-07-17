@@ -16,7 +16,7 @@ $es_num = isset( $args['num'] ) ? $args['num'] : '04';
 
 $es_about_text = apply_filters(
 	'es_home_about_text',
-	"I'm Ramiro Estavillo, Product Designer. I studied Industrial Design and have spent over a decade designing across physical products, communication systems, digital interfaces and operational workflows. What connects all of it is a preference for understanding how things actually work before proposing how they could work better."
+	'I hold a Bachelor\'s Degree in Industrial Design (Product Design) — not a past title, but the foundation this practice still runs on. It\'s why interfaces are never my starting point: the system behind them is, with products, services and operations treated as one connected structure, understood before any part of it changes. Research stays part of the decision itself, not a report attached to it afterward, and the goal is always the same — turn a complex, often invisible process into something practical enough to use. AI increasingly helps accelerate that research, synthesis and documentation, but the decisions themselves stay grounded in human judgment.'
 );
 $es_about_url      = apply_filters( 'es_home_about_url', '#about' );
 $es_about_portrait = apply_filters( 'es_home_about_portrait', '' );

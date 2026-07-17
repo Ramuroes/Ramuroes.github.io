@@ -13,6 +13,46 @@ Priority labels:
 Items are grouped by area for readability, but priority (not grouping)
 determines pickup order. See `ROADMAP.md` for how these map onto sprints.
 
+- **Done (Phase 1 — Portfolio Content integration)** — The approved About /
+  How I Work / Hobbies / Connect copy (chat-drafted and iterated across
+  several editorial rounds) is now live as the theme's own default content
+  in `estavillo-child/functions.php` and `template-parts/{about-teaser,
+  about-content,footer-cta,contact-content}.php` — no wp-admin access
+  exists in this environment, so "populating the CMS" means the code-level
+  defaults the `es_portfolio_home_content` option falls back to (same
+  "Home never breaks" pattern used everywhere else), not a live database
+  write. Also fixed a real dormant bug found during integration: the six
+  How I Work step defaults never set `icon_key`, so the process icons
+  never rendered anywhere they weren't manually re-entered in wp-admin —
+  now every step ships with a real icon key from the curated library.
+  Added `es_about_timeline_defaults()` and `es_about_education_defaults()`
+  (same pattern as the existing hobbies/process-steps defaults) so
+  Timeline and Education have real starting content too. **Deliberately
+  incomplete, not invented:** Timeline ships only 2 of the 4 rows
+  (Freelance/Guzmán Villalba, Trazur) — "Current work" and "Ceibal" are
+  left out entirely rather than filled with placeholder text, since no
+  real company/title/dates for either exist anywhere in this repo
+  (verified by search) and the brief that requested this integration
+  explicitly said not to invent them. Same for Education (institution
+  name and both years genuinely unknown — left blank, template only
+  shows what's present) and the Connect page's Availability status line
+  (a real-time claim only the site owner can set — left unset rather than
+  guessed). Navigation labels and Footer social links were intentionally
+  NOT touched this pass — they were never part of an approved-content
+  round, unlike the six sections above. Validated with a real-load PHP
+  harness (requires the actual `functions.php` + `inc/*.php` with a
+  WP-core shim, renders the actual template-parts via output buffering —
+  not a synthetic approximation) and Chromium screenshots of Home/About/
+  How I Work at 1440px/390px in both dark and light (the real
+  `[data-theme='light']` token override) — zero console errors, zero
+  overflow, zero broken images in all 12 combinations. **Still open:**
+  the 2 missing Timeline rows, Education institution/year, Connect
+  Availability line, real LinkedIn/Behance URLs, and — once real pages
+  exist in wp-admin — swapping the Nav/CTA anchor URLs (`#work`,
+  `#about`, etc.) for real page slugs (anchors currently silently fail to
+  navigate from any page other than Home, a pre-existing, out-of-scope
+  issue this pass did not fix).
+
 ---
 
 ## Bugs / fixes

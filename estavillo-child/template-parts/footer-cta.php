@@ -16,7 +16,7 @@ $es_num       = isset( $args['num'] ) ? $args['num'] : '05';
 $es_cta_title = apply_filters( 'es_home_cta_title', "Let's <em>talk.</em>" );
 $es_cta_lead  = apply_filters(
 	'es_home_cta_lead',
-	"I'm selectively open to product design opportunities with operational depth — especially systems, workflows and AI-assisted products."
+	"I'm open to Product Design, Design Systems and UX Research roles — anywhere the goal is making a real system work better, not just look better. If that's what you're building, I'd like to hear about it."
 );
 $es_email       = es_contact_email();
 $es_connect_url = apply_filters( 'es_home_connect_url', '#connect' );

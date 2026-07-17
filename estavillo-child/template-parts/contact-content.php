@@ -27,9 +27,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 $es_cta_title = apply_filters( 'es_home_cta_title', "Let's <em>talk.</em>" );
 $es_cta_lead  = apply_filters(
 	'es_home_cta_lead',
-	"I'm selectively open to product design opportunities with operational depth — especially systems, workflows and AI-assisted products."
+	"I'm open to Product Design, Design Systems and UX Research roles — anywhere the goal is making a real system work better, not just look better. If that's what you're building, I'd like to hear about it."
 );
-$es_note   = apply_filters( 'es_connect_note', '' );
+$es_note   = apply_filters( 'es_connect_note', 'Based in Montevideo, Uruguay — open to remote, international roles.' );
 $es_status = apply_filters( 'es_connect_status', '' );
 $es_email  = es_contact_email();
 $es_social = apply_filters(
