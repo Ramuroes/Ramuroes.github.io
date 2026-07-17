@@ -93,9 +93,18 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   the Media Library via each Case Figure block, no HTML editing — and
   picking a "Hero layout" once a real featured image exists. Also delete
   the temporary Customizer "Additional CSS" visibility override after
-  updating the theme (Sprint 4J fixed the root cause). **Trazur's content
-  still needs to be written** (no HTML deliverable yet — earlier tickets
-  only covered Presupuestador).
+  updating the theme (Sprint 4J fixed the root cause). **Trazur's Spanish
+  content is written and integrated** —
+  `docs/content/trazur-gutenberg-es.html` +
+  `docs/content/trazur-fields-es.md`, validated (round-trip parser +
+  render harness + Chromium desktop/mobile/dark/light, zero invalid
+  blocks). **Still pending:** the wp-admin paste-and-publish step itself
+  (no wp-admin access from this environment), all 9 real
+  images/screenshots replacing the `{asset: …}` placeholders + the
+  poster PDF, live-WordPress visual QA, the claims flagged in
+  `trazur-fields-es.md` needing sign-off, and the English translation
+  (separate, later task). Do not mark this case published until those
+  are done.
 - **P1 (new, after Sprint 4M)** — Migrate the Presupuestador body to the
   corrected editorial composition system: Case Section's Content/Reading/
   Wide width control + native Gutenberg Columns for side-by-side text/
