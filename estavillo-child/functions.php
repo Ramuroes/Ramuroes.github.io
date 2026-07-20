@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.5' );
+define( 'ES_CHILD_VERSION', '0.2.6' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -405,6 +405,63 @@ function es_process_step_icon_markup( $step ) {
 }
 
 /**
+ * Imprime una entrada de Experience (Selected o Previous — mismo esquema,
+ * $compact solo cambia la clase modificadora para el tratamiento visual
+ * más chico de Previous Experience). Vive acá (no en el template-part)
+ * para no redeclarar una función cada vez que about-content.php se
+ * incluye — mismo criterio que el resto de los helpers de render de este
+ * archivo (es_process_step_icon_markup(), etc.).
+ *
+ * Cada bullet de 'contributions' vive en un <details> nativo propio ("Key
+ * contributions") — colapsado por default, mismo componente que agrupa
+ * Previous Experience/Other Certifications enteras (.es-about-details,
+ * ver assets/css/pages.css).
+ *
+ * @param array $es_exp  Una fila de es_about_experience_{selected,previous}_defaults().
+ * @param bool  $compact True para Previous Experience (tratamiento más chico).
+ */
+function es_about_render_experience_item( $es_exp, $compact = false ) {
+	if ( empty( $es_exp['org'] ) ) {
+		return;
+	}
+	$es_meta = array_filter( array( $es_exp['location'] ?? '', $es_exp['period'] ?? '' ) );
+	?>
+	<article class="es-exp-item<?php echo $compact ? ' es-exp-item--compact' : ''; ?>" data-es-reveal>
+		<div class="es-exp-item__head">
+			<?php if ( ! empty( $es_exp['role'] ) ) : ?>
+				<h3 class="es-exp-item__role"><?php echo esc_html( $es_exp['role'] ); ?></h3>
+			<?php endif; ?>
+			<span class="es-exp-item__org"><?php echo esc_html( $es_exp['org'] ); ?></span>
+		</div>
+		<?php if ( ! empty( $es_meta ) ) : ?>
+			<div class="es-exp-item__meta"><?php echo esc_html( implode( ' · ', $es_meta ) ); ?></div>
+		<?php endif; ?>
+		<?php if ( ! empty( $es_exp['summary'] ) ) : ?>
+			<p class="es-exp-item__summary"><?php echo esc_html( $es_exp['summary'] ); ?></p>
+		<?php endif; ?>
+		<?php if ( ! empty( $es_exp['contributions'] ) && is_array( $es_exp['contributions'] ) ) : ?>
+			<details class="es-about-details es-about-details--nested">
+				<summary><?php esc_html_e( 'Key contributions', 'estavillo-child' ); ?></summary>
+				<div class="es-about-details__body">
+					<ul class="es-about-contributions">
+						<?php foreach ( $es_exp['contributions'] as $es_line ) : ?>
+							<li><?php echo esc_html( $es_line ); ?></li>
+						<?php endforeach; ?>
+					</ul>
+				</div>
+			</details>
+		<?php endif; ?>
+		<?php if ( ! empty( $es_exp['link_url'] ) ) : ?>
+			<a class="es-exp-item__link" href="<?php echo esc_url( $es_exp['link_url'] ); ?>">
+				<?php echo esc_html( ! empty( $es_exp['link_label'] ) ? $es_exp['link_label'] : __( 'View case study', 'estavillo-child' ) ); ?>
+				<span aria-hidden="true">&rarr;</span>
+			</a>
+		<?php endif; ?>
+	</article>
+	<?php
+}
+
+/**
  * Claves canónicas de la librería de hobby-icons: el artwork final
  * APROBADO (estavillo-hobby-icons.zip), instalado como archivos en
  * assets/icons/{clave}.svg. Los archivos son la fuente de verdad —
@@ -503,22 +560,46 @@ function es_hobby_icon_svg( $key ) {
 }
 
 /**
- * Defaults de "Hobbies & interests" (About) — los 7 sugeridos por el
- * ticket original, mostrados de entrada como cualquier otro contenido
- * placeholder del sitio (mismo principio que About text / Process steps:
- * contenido real de arranque, no una sección vacía). El admin los edita,
- * reordena (moviendo qué fila llena — mismo criterio "posición = orden"
- * que Nav Links/Process Steps/Timeline/Educación), oculta (checkbox
- * "Show") o reemplaza desde Home Content, hasta 8 filas.
+ * Defaults de "Hobbies & interests" (About) — 9 items confirmados en
+ * docs/about-page-authoritative-source.md §8 (reemplaza los 7 anteriores;
+ * 3 quedan renombrados — "Horse riding"→"Horses", "Travel"→"Travelling",
+ * "Cinema"→"Movies & Series" — mismo hobby real, wording del documento
+ * fuente). "Gaming" y "Photography" son nuevos y no tienen ícono en la
+ * librería curada (es_hobby_icon_choices() — 8 claves, ninguna de
+ * gaming/fotografía); el documento fuente pide "keep the current approved
+ * icon system", así que no se dibuja arte nuevo acá — quedan con
+ * icon:'', que ya cae en el estado --empty existente del template (mismo
+ * mecanismo que cualquier hobby sin ícono asignado desde wp-admin). El
+ * texto corto se preserva para los 7 hobbies que ya lo tenían (adaptado a
+ * la nueva label donde cambió); Gaming/Photography quedan sin texto corto
+ * — no había nada aprobado que reusar para esos dos.
  *
  * @return array<int,array{label:string,icon:string,text:string,show:bool}>
  */
 function es_home_about_hobbies_defaults() {
 	return array(
 		array(
-			'label' => 'Taekwondo',
-			'icon'  => 'taekwondo',
-			'text'  => 'Years of practice; the same discipline and repetition show up in how I work.',
+			'label' => 'Horses',
+			'icon'  => 'horse-head',
+			'text'  => 'One of the few things that gets me fully off-screen.',
+			'show'  => true,
+		),
+		array(
+			'label' => 'Gaming',
+			'icon'  => '',
+			'text'  => '',
+			'show'  => true,
+		),
+		array(
+			'label' => 'Movies & Series',
+			'icon'  => 'cinema',
+			'text'  => 'A steady source of pacing and structure, outside of any brief.',
+			'show'  => true,
+		),
+		array(
+			'label' => 'Travelling',
+			'icon'  => 'travel',
+			'text'  => 'New places, mostly for the systems and details other people don\'t notice.',
 			'show'  => true,
 		),
 		array(
@@ -528,33 +609,27 @@ function es_home_about_hobbies_defaults() {
 			'show'  => true,
 		),
 		array(
-			'label' => 'Coffee',
-			'icon'  => 'coffee',
-			'text'  => 'A daily ritual, not a productivity hack.',
-			'show'  => true,
-		),
-		array(
-			'label' => 'Horse riding',
-			'icon'  => 'horse-head',
-			'text'  => 'One of the few things that gets me fully off-screen.',
-			'show'  => true,
-		),
-		array(
 			'label' => 'Drawing',
 			'icon'  => 'drawing',
 			'text'  => 'Where Industrial Design started for me — still just for the habit of it.',
 			'show'  => true,
 		),
 		array(
-			'label' => 'Travel',
-			'icon'  => 'travel',
-			'text'  => 'New places, mostly for the systems and details other people don\'t notice.',
+			'label' => 'Taekwondo',
+			'icon'  => 'taekwondo',
+			'text'  => 'Years of practice; the same discipline and repetition show up in how I work.',
 			'show'  => true,
 		),
 		array(
-			'label' => 'Cinema',
-			'icon'  => 'cinema',
-			'text'  => 'A steady source of pacing and structure, outside of any brief.',
+			'label' => 'Photography',
+			'icon'  => '',
+			'text'  => '',
+			'show'  => true,
+		),
+		array(
+			'label' => 'Coffee',
+			'icon'  => 'coffee',
+			'text'  => 'A daily ritual, not a productivity hack.',
 			'show'  => true,
 		),
 	);
@@ -584,59 +659,311 @@ function es_about_hobbies_visible() {
 }
 
 /**
- * Defaults de "Career timeline" (About page) — mismo principio que Hobbies/
- * Process Steps: contenido real de arranque en vez de una sección vacía,
- * hasta que el admin cargue lo suyo en Home Content. La entrada 1 reusa
- * Role/Period/Source-context ya aprobados en
- * docs/content/workshop-quoting-system-fields-en.md (el field sheet más
- * reciente del caso Guzmán Villalba — "Lead Product Designer",
- * "2025–2026" — superseding el Role/Period más viejo de
- * presupuestador-case-study-fields.md) — esto también responde "current
- * role" (el Period sigue abierto en 2025–2026). "Ceibal" sigue fuera de
- * este default a propósito: ningún cargo/fecha para Ceibal existe en
- * ningún documento aprobado del repo, así que no hay nada real que reusar
- * todavía — la sección simplemente muestra menos entradas mientras tanto,
- * no una entrada con texto inventado.
+ * Defaults de "Selected Experience" y "Previous Experience" (About page).
  *
- * @return array<int,array{year:string,title:string,text:string}>
+ * Fuente: docs/about-page-authoritative-source.md — documento agregado
+ * por el project owner como fuente de verdad explícita para toda la
+ * historia profesional del About page, tras dos tickets previos donde
+ * quedó claro que reconstruir esto desde el resto del repo era
+ * insuficiente. Cada campo de cada entrada de abajo viene literal de ese
+ * documento — no se resumió de memoria ni se sustituyó por copy genérico.
+ *
+ * 'contributions' es un array de líneas (una bullet por línea en el
+ * admin — textarea, split por salto de línea) para la lista "Key
+ * contributions" que va dentro de un <details> propio por entrada — ver
+ * about-content.php. 'link_url'/'link_label' quedan vacíos en los 3 casos
+ * de Selected Experience: el documento fuente dice "use el link existente
+ * si ya existe" pero ningún Case Study está publicado todavía (sin acceso
+ * a wp-admin en este entorno), así que no hay URL real que enlazar
+ * todavía — no se inventa una.
+ *
+ * @return array<int,array{org:string,role:string,location:string,period:string,summary:string,contributions:string[],link_label:string,link_url:string}>
  */
-function es_about_timeline_defaults() {
+function es_about_experience_selected_defaults() {
 	return array(
 		array(
-			'year'  => '2025–2026',
-			'title' => 'Lead Product Designer — Guzmán Villalba',
-			'text'  => 'Designed and implemented at Guzmán Villalba, a custom metal fabrication workshop in Montevideo, Uruguay — a quoting system that turns tacit pricing knowledge into an explicit, reusable decision framework.',
+			'org'           => 'Guzmán Villalba',
+			'role'          => 'Lead Product Designer',
+			'location'      => 'Uruguay',
+			'period'        => '2025–Present',
+			'summary'       => 'Designing and evolving an internal quoting and operational system for a custom metalwork workshop. The work focuses on turning tacit knowledge, fragmented information and owner-dependent decisions into a more consistent, traceable and usable process.',
+			'contributions' => array(
+				'Mapped the existing quoting workflow across WhatsApp, email, spreadsheets, Trello, physical documents and workshop conversations.',
+				'Identified bottlenecks caused by undocumented criteria, scattered information and constant validation dependencies.',
+				'Designed and iterated an internal quoting system using Google Sheets, Apps Script and AI-assisted workflows.',
+				'Structured categories, price ranges, labor units, placement criteria and reusable estimating rules.',
+				'Connected Product Design, Service Design and operational thinking in a physical-business environment.',
+				'Improved the documentation of suppliers, materials, decisions and quoting criteria.',
+				'Defined a progressive roadmap from a quick-estimate MVP toward a broader project and approval system.',
+				'Documented the work as an evolving Product Design case study.',
+			),
+			'link_label'    => '',
+			'link_url'      => '',
 		),
 		array(
-			'year'  => '2025',
-			'title' => 'UX Researcher & UX/UI Designer — Trazur',
-			'text'  => 'Undergraduate thesis project (6 months), built with Renzo Morandi under the guidance of Alejandra Capocasale: UX research and AI-assisted analysis to redesign a rural e-learning platform for livestock traceability training.',
+			'org'           => 'Trazur',
+			'role'          => 'Product Designer & UX Researcher',
+			'location'      => 'Montevideo, Uruguay',
+			'period'        => '2010–Present',
+			'summary'       => 'Long-term work across the digital experience, online-course platform and communication ecosystem of an agricultural traceability and training business. The role evolved from web and content execution toward Product Design, UX Research and service improvement.',
+			'contributions' => array(
+				'Designed and maintained the company website in WordPress.',
+				'Developed user flows and wireframes for the digital experience.',
+				'Conducted usability testing and user interviews.',
+				'Studied the needs and barriers of rural users in relation to technology.',
+				'Supported the implementation and operation of online courses.',
+				'Helped manage enrollment, student support and technical issues related to the courses.',
+				'Created and maintained digital content across the website and social channels.',
+				'Analyzed competitors and opportunities for improving the service.',
+				'Worked on the redesign of the e-learning experience through UX Research.',
+				'Used AI-assisted synthesis as part of the research process, with human review and validation.',
+				'Explored how connectivity, trust and digital confidence affect adoption among rural users.',
+				'Contributed to the final degree project focused on the redesign of an e-learning platform for livestock traceability (not sole authorship — a collaborative thesis project).',
+			),
+			'link_label'    => '',
+			'link_url'      => '',
+		),
+		array(
+			'org'           => 'Ceibal',
+			'role'          => 'Project Manager',
+			'location'      => 'Montevideo, Uruguay',
+			'period'        => '2023–2024',
+			'summary'       => "Led and coordinated digital projects for Ceibal's institutional portal and related initiatives, working with cross-functional teams, internal stakeholders and external vendors.",
+			'contributions' => array(
+				'Managed multiple digital projects, including Portal Ceibal, transparency initiatives and mailing systems.',
+				'Developed and maintained project plans, timelines and roadmaps.',
+				'Coordinated cross-functional teams in agile environments using Scrum and Kanban.',
+				'Worked with internal stakeholders and external vendors.',
+				'Prioritized high-volume tasks and competing project demands.',
+				'Supported iterative development and continuous improvement.',
+				'Conducted risk assessment and followed corrective actions.',
+				'Communicated project progress with stakeholders.',
+				'Helped improve workflows and operational coordination.',
+			),
+			'link_label'    => '',
+			'link_url'      => '',
 		),
 	);
 }
 
 /**
- * Defaults de "Education & certificates" (About page) — mismo principio
- * que el resto de este archivo. Institución y certificadora reusan datos
- * confirmados por el project owner (Universidad de la República / UdelaR;
- * Google UX Design Professional Certificate impartido vía Coursera). El
- * año de cada título queda vacío donde todavía no hay dato confirmado (el
- * template solo imprime esa línea de meta si institución o año están
- * presentes — nunca un campo vacío o inventado).
+ * Defaults de "Previous Experience" (About page) — mismo esquema que
+ * Selected Experience, mismo origen (docs/about-page-authoritative-source.md).
+ * "Master" y "FUMS" (que aparecían en una ticket anterior, superada) NO
+ * están acá — el documento fuente dice explícitamente que no forman parte
+ * de la historia real del About page.
  *
- * @return array<int,array{title:string,org:string,year:string}>
+ * Samic SA incluye su "role progression" (3 fases fechadas) como las
+ * primeras 3 líneas de 'contributions', en vez de un sub-esquema anidado
+ * nuevo — mismo campo, mismo tratamiento visual, sin inventar UI nueva
+ * para un caso único.
+ *
+ * @return array<int,array{org:string,role:string,location:string,period:string,summary:string,contributions:string[],link_label:string,link_url:string}>
+ */
+function es_about_experience_previous_defaults() {
+	return array(
+		array(
+			'org'           => 'Verona Office & Home',
+			'role'          => 'Sales Supervisor and Administrative Organizer',
+			'location'      => 'Montevideo, Uruguay',
+			'period'        => '2021–2022',
+			'summary'       => 'Supervised the sales team and helped organize internal processes, identifying problems across sales, administration, marketing, logistics and warehouse operations.',
+			'contributions' => array(
+				'Identified pain points in sales and internal business processes.',
+				'Conducted questionnaires to understand public awareness of the company and identify marketing gaps.',
+				'Interviewed employees to understand internal problems and operational friction.',
+				'Facilitated brainstorming sessions with the sales team.',
+				'Proposed, prioritized and implemented process improvements.',
+				'Led the sales team.',
+				'Created guides, protocols and working methodologies.',
+				'Planned marketing actions across social media, showroom and website.',
+				'Studied competitors and market positioning.',
+				'Implemented, taught and monitored a CRM for the sales team.',
+				'Implemented, taught and monitored the administrative software.',
+				'Identified and addressed logistics and warehouse problems.',
+			),
+			'link_label'    => '',
+			'link_url'      => '',
+		),
+		array(
+			'org'           => 'Samic SA',
+			'role'          => 'Web & Graphic Designer / Store Manager',
+			'location'      => 'Montevideo, Uruguay',
+			'period'        => '2015–2021',
+			'summary'       => 'A multidisciplinary role spanning graphic design, web design, e-commerce, content, communication and business operations. This experience became an important foundation for later Product Design work.',
+			'contributions' => array(
+				'2015–2016: Flooring estimator and graphic designer; identified the need for a dedicated design and communication function.',
+				'2016–2021: Web and graphic designer.',
+				'2018–2021: General manager, applying planning methods influenced by Design Thinking.',
+				'Identified business needs related to sales, communication and customer acquisition.',
+				'Recognized that many customers were far from the physical store and helped create new digital sales channels.',
+				'Designed user flows, navigation architecture and e-commerce wireframes.',
+				'Prototyped, implemented and maintained the e-commerce experience in WordPress and WooCommerce.',
+				'Worked with HTML and CSS where necessary.',
+				'Conducted usability testing with internal and external users.',
+				'Iterated the experience across web, marketplace and social platforms.',
+				'Managed product publishing and catalog content.',
+				'Created graphic and digital content for platforms and social channels.',
+				'Collaborated with the creative director on communication materials.',
+				'Produced visual, video, GIF and motion content where required.',
+				'Planned processes, guidelines and internal improvements across administration, sales and logistics.',
+				'Used Mailchimp for newsletter campaigns.',
+				'Contributed to a new digital sales channel, improved shopping experience and more organized operations.',
+			),
+			'link_label'    => '',
+			'link_url'      => '',
+		),
+		array(
+			'org'           => 'Fupsi.org',
+			'role'          => 'Webmaster / Freelancer',
+			'location'      => 'Montevideo, Uruguay',
+			'period'        => '2012–2018',
+			'summary'       => "Redesigned and maintained the organization's visual identity, WordPress website and newsletter communication.",
+			'contributions' => array(
+				'Redesigned the corporate identity.',
+				'Redesigned and maintained the WordPress website.',
+				'Sent newsletter campaigns with Mailchimp.',
+				'Conducted usability tests and satisfaction surveys.',
+				'Developed user flows and wireframes.',
+				'Implemented and maintained the website.',
+				'Improved the user experience across digital touchpoints over time.',
+			),
+			'link_label'    => '',
+			'link_url'      => '',
+		),
+	);
+}
+
+/**
+ * Defaults de "Education & certificates" (About page) — esquema ampliado
+ * respecto de la versión anterior (title/org/year) para soportar todo lo
+ * que pide docs/about-page-authoritative-source.md §5: orientación,
+ * facultad/escuela, período de estudio distinto del año de emisión
+ * oficial, descripción y proyecto final de grado. 'year' es el año de
+ * EMISIÓN oficial del título (2026 — el documento fuente es explícito:
+ * "Do not say the degree is pending issuance. The degree is completed and
+ * officially issued."), no el año de inicio/fin de cursada (eso vive en
+ * 'period', 2008–2025, dentro de 'description'). 'link' queda vacío para
+ * las dos entradas: ningún link de credencial verificado existe en el
+ * repo para ninguna de las dos.
+ *
+ * @return array<int,array{title:string,org:string,meta:string,year:string,description:string,final_project:string,link:string}>
  */
 function es_about_education_defaults() {
 	return array(
 		array(
-			'title' => "Bachelor's Degree in Industrial Design (Product Design)",
-			'org'   => 'Universidad de la República (UdelaR)',
-			'year'  => '',
+			'title'         => "Bachelor's Degree in Industrial Design — Product Design orientation",
+			'org'           => 'Universidad de la República (UdelaR)',
+			'meta'          => 'Facultad de Arquitectura, Diseño y Urbanismo (FADU) · Escuela Universitaria Centro de Diseño (EUCD), Uruguay',
+			'year'          => '2026',
+			'description'   => 'Product-oriented education focused on design methodology, systems thinking, manufacturing, ergonomics, research and user-centered design. Studied 2008–2025; degree officially completed and issued in 2026.',
+			'final_project' => 'Final degree project: "Analysis of an E-learning Platform for Livestock Traceability through UX Research and Artificial Intelligence."',
+			'link'          => '',
 		),
 		array(
-			'title' => 'Google UX Design Professional Certificate',
-			'org'   => 'Google · Coursera',
-			'year'  => '',
+			'title'         => 'Google UX Design Professional Certificate',
+			'org'           => 'Google · Coursera',
+			'meta'          => '',
+			'year'          => '2026',
+			'description'   => '',
+			'final_project' => '',
+			'link'          => '',
+		),
+	);
+}
+
+/**
+ * Defaults de "Other Certifications" (About page) — grupo secundario
+ * colapsado (ver about-content.php). Los 8 items vienen literales de
+ * docs/about-page-authoritative-source.md §6. Ningún link de credencial
+ * existe en el repo para ninguno — 'link' queda vacío en los 8, nunca
+ * inventado. El ítem 6 (Figma for UX Design) no trae Credential ID en el
+ * documento fuente — queda vacío, no se inventa uno.
+ *
+ * @return array<int,array{name:string,issuer:string,date:string,credential_id:string,link:string}>
+ */
+function es_about_certifications_other_defaults() {
+	return array(
+		array(
+			'name'          => "User Experience: The Beginner's Guide",
+			'issuer'        => 'Interaction Design Foundation',
+			'date'          => 'August 2022',
+			'credential_id' => '133455',
+			'link'          => '',
+		),
+		array(
+			'name'          => 'Design Thinking: The Ultimate Guide',
+			'issuer'        => 'Interaction Design Foundation',
+			'date'          => 'September 2022',
+			'credential_id' => '133455',
+			'link'          => '',
+		),
+		array(
+			'name'          => 'Foundations of User Experience (UX) Design',
+			'issuer'        => 'Google · Coursera',
+			'date'          => 'June 2022',
+			'credential_id' => 'UVWFHTTRTX',
+			'link'          => '',
+		),
+		array(
+			'name'          => 'Agile with Atlassian Jira',
+			'issuer'        => 'Atlassian University · Coursera',
+			'date'          => 'July 2022',
+			'credential_id' => 'NFV95GJGQZ5E',
+			'link'          => '',
+		),
+		array(
+			'name'          => 'Introduction to UI Design',
+			'issuer'        => 'University of Minnesota · Coursera',
+			'date'          => 'August 2022',
+			'credential_id' => '2T7RU7RZBXEH',
+			'link'          => '',
+		),
+		array(
+			'name'          => 'Figma for UX Design',
+			'issuer'        => 'LinkedIn Learning',
+			'date'          => 'June 2022',
+			'credential_id' => '',
+			'link'          => '',
+		),
+		array(
+			'name'          => 'Introduction to C# Programming and Unity',
+			'issuer'        => 'University of Colorado System · Coursera',
+			'date'          => 'August 2022',
+			'credential_id' => 'FP7749Y8DSBJ',
+			'link'          => '',
+		),
+		array(
+			'name'          => 'Introduction to Video Game Development with Unity',
+			'issuer'        => 'Universitat Politècnica de València · edX',
+			'date'          => 'July 2022',
+			'credential_id' => '86c1923e49464142ac08e9fdbce62ce2',
+			'link'          => '',
+		),
+	);
+}
+
+/**
+ * Defaults de "Languages" (About page) — confirmados por el project owner
+ * vía docs/about-page-authoritative-source.md §7 ("Advanced (C1)" es más
+ * específico que el "Advanced" plano de la ticket anterior — el documento
+ * fuente gana).
+ *
+ * @return array<int,array{name:string,level:string}>
+ */
+function es_about_languages_defaults() {
+	return array(
+		array(
+			'name'  => 'Spanish',
+			'level' => 'Native',
+		),
+		array(
+			'name'  => 'English',
+			'level' => 'Advanced (C1)',
+		),
+		array(
+			'name'  => 'Portuguese',
+			'level' => 'Basic',
 		),
 	);
 }

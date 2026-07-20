@@ -56,6 +56,42 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   `#about`, etc.) for real page slugs. That last item now has a
   recommended architecture (see "Nav/CTA links break when browsing
   About/How I Work/Work/Contact" below) but is not yet implemented.
+- **Done (About page — full professional-history restructure)** — The
+  About page's Career Timeline (2 sparse entries) is replaced with a full
+  information architecture: **Selected Experience** (Guzmán Villalba,
+  Trazur, Ceibal — always visible, prioritized) and **Previous
+  Experience** (Verona Office & Home, Samic SA, Fupsi.org — a secondary,
+  collapsed group). Every entry supports role/organization/location/
+  period/summary plus a "Key contributions" bullet list inside its own
+  native `<details>/<summary>` disclosure (reused the theme's existing
+  disclosure pattern from `estavillo/case-details`, ported into
+  `pages.css` as `.es-about-details` — no new JS, no new Gutenberg
+  block). Education gained institution/faculty/school/description/final-
+  project fields (still `title`/`org`/`year` at its core, extended, not
+  replaced). Added two new sections: **Other Certifications** (8 items,
+  collapsed group) and **Languages**. All content sourced from
+  `docs/about-page-authoritative-source.md`, a document the project owner
+  added specifically because two prior attempts to reconstruct this
+  content from the rest of the repo were insufficient — nothing in this
+  pass was invented or reconstructed from partial sources; every role,
+  date, and responsibility traces to that file. Confirmed **no** "Master"
+  or "FUMS" entries (both were in a superseded draft from an earlier,
+  interrupted ticket; the authoritative source explicitly excludes them).
+  New CMS admin UI in `home-content-options.php` for all of the above
+  (Selected/Previous Experience, extended Education, Other
+  Certifications, Languages), replacing the old Career Timeline UI —
+  same `es_portfolio_home_content` option, same saved-value → theme-
+  default → empty-fallback precedence, no database migration. Hobbies
+  list also updated to the authoritative 9-item list (previously 7) —
+  two new interests (Gaming, Photography) ship without icons, since the
+  curated hobby-icon library has no artwork for them yet; they render
+  label-only via the existing `--empty` icon state rather than get new
+  SVGs drawn for this ticket. Validated with the same real-load PHP
+  harness plus a dedicated Chromium accessibility pass (keyboard focus,
+  Enter-to-toggle, visible focus outline, correct default-collapsed
+  state, content actually hidden/revealed) across desktop/tablet/mobile
+  × dark/light (18 combinations, zero console errors, zero overflow).
+  Theme bumped to 0.2.6, plugin to 1.5.2.
 
 ---
 

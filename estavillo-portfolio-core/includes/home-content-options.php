@@ -40,6 +40,82 @@ function es_portfolio_get_home_content() {
 }
 
 /**
+ * Sanitiza N filas de un grupo "Experience" (Selected/Previous, mismo
+ * esquema para las dos — ver es_about_experience_selected_defaults() /
+ * es_about_experience_previous_defaults() en el tema). 'contributions' es
+ * un <textarea>, una bullet por línea — se separa por salto de línea acá,
+ * líneas vacías descartadas, para guardar el mismo array<string> que
+ * espera about-content.php.
+ *
+ * @param array  $post   $_POST completo.
+ * @param string $prefix Prefijo de los campos (p.ej. 'es_exp_sel').
+ * @return array<int,array{org:string,role:string,location:string,period:string,summary:string,contributions:string[],link_label:string,link_url:string}>
+ */
+function es_portfolio_sanitize_experience_rows( $post, $prefix ) {
+	$orgs           = isset( $post[ "{$prefix}_org" ] ) ? wp_unslash( $post[ "{$prefix}_org" ] ) : array();
+	$roles          = isset( $post[ "{$prefix}_role" ] ) ? wp_unslash( $post[ "{$prefix}_role" ] ) : array();
+	$locations      = isset( $post[ "{$prefix}_location" ] ) ? wp_unslash( $post[ "{$prefix}_location" ] ) : array();
+	$periods        = isset( $post[ "{$prefix}_period" ] ) ? wp_unslash( $post[ "{$prefix}_period" ] ) : array();
+	$summaries      = isset( $post[ "{$prefix}_summary" ] ) ? wp_unslash( $post[ "{$prefix}_summary" ] ) : array();
+	$contributions  = isset( $post[ "{$prefix}_contributions" ] ) ? wp_unslash( $post[ "{$prefix}_contributions" ] ) : array();
+	$link_labels    = isset( $post[ "{$prefix}_link_label" ] ) ? wp_unslash( $post[ "{$prefix}_link_label" ] ) : array();
+	$link_urls      = isset( $post[ "{$prefix}_link_url" ] ) ? wp_unslash( $post[ "{$prefix}_link_url" ] ) : array();
+	$rows           = array();
+	foreach ( $orgs as $i => $org ) {
+		$es_lines = array();
+		if ( isset( $contributions[ $i ] ) && '' !== trim( $contributions[ $i ] ) ) {
+			foreach ( preg_split( '/\r\n|\r|\n/', $contributions[ $i ] ) as $es_line ) {
+				$es_line = sanitize_text_field( $es_line );
+				if ( '' !== $es_line ) {
+					$es_lines[] = $es_line;
+				}
+			}
+		}
+		$rows[ $i ] = array(
+			'org'           => sanitize_text_field( $org ),
+			'role'          => sanitize_text_field( $roles[ $i ] ?? '' ),
+			'location'      => sanitize_text_field( $locations[ $i ] ?? '' ),
+			'period'        => sanitize_text_field( $periods[ $i ] ?? '' ),
+			'summary'       => sanitize_textarea_field( $summaries[ $i ] ?? '' ),
+			'contributions' => $es_lines,
+			'link_label'    => sanitize_text_field( $link_labels[ $i ] ?? '' ),
+			'link_url'      => isset( $link_urls[ $i ] ) ? esc_url_raw( $link_urls[ $i ] ) : '',
+		);
+	}
+	return $rows;
+}
+
+/**
+ * Merge genérico "fila guardada pisa el default de esa misma posición,
+ * solo si su campo llave no está vacío" — mismo principio que Nav Links/
+ * How I Work, generalizado para no repetirlo 4 veces (Selected/Previous
+ * Experience, Other Certifications, Languages). A diferencia de Timeline/
+ * Educación (reemplazo completo si hay AL MENOS una fila con título), acá
+ * cada fila se evalúa independiente: una fila guardada vacía no pisa el
+ * default de esa posición, y una fila default sin equivalente guardado se
+ * mantiene tal cual — así el admin puede editar una sola entrada sin
+ * reescribir las demás.
+ *
+ * @param array  $default   Filas default del tema.
+ * @param array  $saved     Filas guardadas en wp-admin (puede venir vacío).
+ * @param string $key_field Campo que decide si una fila guardada es real.
+ * @return array
+ */
+function es_portfolio_merge_keyed_rows( $default, $saved, $key_field ) {
+	if ( empty( $saved ) || ! is_array( $saved ) ) {
+		return $default;
+	}
+	$merged = $default;
+	foreach ( $saved as $i => $row ) {
+		if ( empty( $row[ $key_field ] ) ) {
+			continue;
+		}
+		$merged[ $i ] = $row;
+	}
+	return array_values( $merged );
+}
+
+/**
  * Registra la página de opciones como submenú de Case Studies.
  */
 function es_portfolio_home_content_menu() {
@@ -113,36 +189,74 @@ function es_portfolio_home_content_save() {
 		$data['about_hobbies_items'] = $es_hobbies;
 	}
 
-	// Timeline / education: mismo patrón de merge por-fila que How I Work y
-	// Header abajo — una fila con título vacío no pisa nada.
-	if ( isset( $_POST['es_about_timeline_title'] ) && is_array( $_POST['es_about_timeline_title'] ) ) {
-		$es_tl_titles = wp_unslash( $_POST['es_about_timeline_title'] );
-		$es_tl_years  = isset( $_POST['es_about_timeline_year'] ) && is_array( $_POST['es_about_timeline_year'] ) ? wp_unslash( $_POST['es_about_timeline_year'] ) : array();
-		$es_tl_texts  = isset( $_POST['es_about_timeline_text'] ) && is_array( $_POST['es_about_timeline_text'] ) ? wp_unslash( $_POST['es_about_timeline_text'] ) : array();
-		$es_timeline  = array();
-		foreach ( $es_tl_titles as $i => $es_tl_title ) {
-			$es_timeline[ $i ] = array(
-				'year'  => sanitize_text_field( $es_tl_years[ $i ] ?? '' ),
-				'title' => sanitize_text_field( $es_tl_title ),
-				'text'  => sanitize_text_field( $es_tl_texts[ $i ] ?? '' ),
-			);
-		}
-		$data['about_timeline'] = $es_timeline;
+	// Selected Experience / Previous Experience: reemplaza el "Career
+	// timeline" plano de una ticket anterior — ver
+	// es_portfolio_sanitize_experience_rows() arriba para el esquema
+	// compartido (org/role/location/period/summary/contributions/link).
+	if ( isset( $_POST['es_exp_sel_org'] ) && is_array( $_POST['es_exp_sel_org'] ) ) {
+		$data['about_experience_selected'] = es_portfolio_sanitize_experience_rows( $_POST, 'es_exp_sel' );
+	}
+	if ( isset( $_POST['es_exp_prev_org'] ) && is_array( $_POST['es_exp_prev_org'] ) ) {
+		$data['about_experience_previous'] = es_portfolio_sanitize_experience_rows( $_POST, 'es_exp_prev' );
 	}
 
+	// Education & certificates: esquema ampliado (meta/description/
+	// final_project/link) respecto de la versión anterior (title/org/year).
 	if ( isset( $_POST['es_about_edu_title'] ) && is_array( $_POST['es_about_edu_title'] ) ) {
 		$es_edu_titles = wp_unslash( $_POST['es_about_edu_title'] );
 		$es_edu_orgs   = isset( $_POST['es_about_edu_org'] ) && is_array( $_POST['es_about_edu_org'] ) ? wp_unslash( $_POST['es_about_edu_org'] ) : array();
+		$es_edu_metas  = isset( $_POST['es_about_edu_meta'] ) && is_array( $_POST['es_about_edu_meta'] ) ? wp_unslash( $_POST['es_about_edu_meta'] ) : array();
 		$es_edu_years  = isset( $_POST['es_about_edu_year'] ) && is_array( $_POST['es_about_edu_year'] ) ? wp_unslash( $_POST['es_about_edu_year'] ) : array();
+		$es_edu_descs  = isset( $_POST['es_about_edu_description'] ) && is_array( $_POST['es_about_edu_description'] ) ? wp_unslash( $_POST['es_about_edu_description'] ) : array();
+		$es_edu_finals = isset( $_POST['es_about_edu_final_project'] ) && is_array( $_POST['es_about_edu_final_project'] ) ? wp_unslash( $_POST['es_about_edu_final_project'] ) : array();
+		$es_edu_links  = isset( $_POST['es_about_edu_link'] ) && is_array( $_POST['es_about_edu_link'] ) ? wp_unslash( $_POST['es_about_edu_link'] ) : array();
 		$es_education  = array();
 		foreach ( $es_edu_titles as $i => $es_edu_title ) {
 			$es_education[ $i ] = array(
-				'title' => sanitize_text_field( $es_edu_title ),
-				'org'   => sanitize_text_field( $es_edu_orgs[ $i ] ?? '' ),
-				'year'  => sanitize_text_field( $es_edu_years[ $i ] ?? '' ),
+				'title'         => sanitize_text_field( $es_edu_title ),
+				'org'           => sanitize_text_field( $es_edu_orgs[ $i ] ?? '' ),
+				'meta'          => sanitize_text_field( $es_edu_metas[ $i ] ?? '' ),
+				'year'          => sanitize_text_field( $es_edu_years[ $i ] ?? '' ),
+				'description'   => sanitize_textarea_field( $es_edu_descs[ $i ] ?? '' ),
+				'final_project' => sanitize_textarea_field( $es_edu_finals[ $i ] ?? '' ),
+				'link'          => isset( $es_edu_links[ $i ] ) ? esc_url_raw( $es_edu_links[ $i ] ) : '',
 			);
 		}
 		$data['about_education'] = $es_education;
+	}
+
+	// Other Certifications (secondary, collapsed group on the About page).
+	if ( isset( $_POST['es_cert_name'] ) && is_array( $_POST['es_cert_name'] ) ) {
+		$es_cert_names   = wp_unslash( $_POST['es_cert_name'] );
+		$es_cert_issuers = isset( $_POST['es_cert_issuer'] ) && is_array( $_POST['es_cert_issuer'] ) ? wp_unslash( $_POST['es_cert_issuer'] ) : array();
+		$es_cert_dates   = isset( $_POST['es_cert_date'] ) && is_array( $_POST['es_cert_date'] ) ? wp_unslash( $_POST['es_cert_date'] ) : array();
+		$es_cert_ids     = isset( $_POST['es_cert_credential_id'] ) && is_array( $_POST['es_cert_credential_id'] ) ? wp_unslash( $_POST['es_cert_credential_id'] ) : array();
+		$es_cert_links   = isset( $_POST['es_cert_link'] ) && is_array( $_POST['es_cert_link'] ) ? wp_unslash( $_POST['es_cert_link'] ) : array();
+		$es_certs        = array();
+		foreach ( $es_cert_names as $i => $es_cert_name ) {
+			$es_certs[ $i ] = array(
+				'name'          => sanitize_text_field( $es_cert_name ),
+				'issuer'        => sanitize_text_field( $es_cert_issuers[ $i ] ?? '' ),
+				'date'          => sanitize_text_field( $es_cert_dates[ $i ] ?? '' ),
+				'credential_id' => sanitize_text_field( $es_cert_ids[ $i ] ?? '' ),
+				'link'          => isset( $es_cert_links[ $i ] ) ? esc_url_raw( $es_cert_links[ $i ] ) : '',
+			);
+		}
+		$data['about_certifications_other'] = $es_certs;
+	}
+
+	// Languages.
+	if ( isset( $_POST['es_lang_name'] ) && is_array( $_POST['es_lang_name'] ) ) {
+		$es_lang_names  = wp_unslash( $_POST['es_lang_name'] );
+		$es_lang_levels = isset( $_POST['es_lang_level'] ) && is_array( $_POST['es_lang_level'] ) ? wp_unslash( $_POST['es_lang_level'] ) : array();
+		$es_languages   = array();
+		foreach ( $es_lang_names as $i => $es_lang_name ) {
+			$es_languages[ $i ] = array(
+				'name'  => sanitize_text_field( $es_lang_name ),
+				'level' => sanitize_text_field( $es_lang_levels[ $i ] ?? '' ),
+			);
+		}
+		$data['about_languages'] = $es_languages;
 	}
 
 	// ---- How I Work ----
@@ -280,13 +394,13 @@ function es_portfolio_home_content_page() {
 			</table>
 
 			<h3><?php esc_html_e( 'Hobbies & interests (About page)', 'estavillo-portfolio-core' ); ?></h3>
-			<p class="description"><?php esc_html_e( 'Ships with 7 suggested interests already filled in — edit, reorder (by moving which row a label fills), hide with "Show", or replace with your own, up to 8 rows. Leave a row\'s label blank to remove it entirely. Short text is optional and only shown if filled in.', 'estavillo-portfolio-core' ); ?></p>
+			<p class="description"><?php esc_html_e( 'Ships with 9 suggested interests already filled in — edit, reorder (by moving which row a label fills), hide with "Show", or replace with your own, up to 9 rows. Leave a row\'s label blank to remove it entirely. Short text is optional and only shown if filled in. Two interests (Gaming, Photography) ship without an icon — the curated icon library doesn\'t have artwork for them yet, so they render label-only until real SVGs are added.', 'estavillo-portfolio-core' ); ?></p>
 			<table class="form-table" role="presentation">
 				<?php
 				$es_hobbies_data  = $data['about_hobbies_items'] ?? array();
 				$es_hobby_choices = function_exists( 'es_hobby_icon_choices' ) ? es_hobby_icon_choices() : array();
 				$es_hobby_defaults = function_exists( 'es_home_about_hobbies_defaults' ) ? es_home_about_hobbies_defaults() : array();
-				for ( $i = 0; $i < 8; $i++ ) :
+				for ( $i = 0; $i < 9; $i++ ) :
 					$es_hobby_saved = $es_hobbies_data[ $i ] ?? null;
 					if ( null !== $es_hobby_saved ) {
 						$es_hobby_label = $es_hobby_saved['label'] ?? '';
@@ -333,43 +447,111 @@ function es_portfolio_home_content_page() {
 				<?php endfor; ?>
 			</table>
 
-			<h3><?php esc_html_e( 'Career timeline (About page)', 'estavillo-portfolio-core' ); ?></h3>
-			<p class="description"><?php esc_html_e( 'Leave a row\'s title blank to keep it out of the timeline. Shown on the About page only, most recent first (order them as you want them displayed).', 'estavillo-portfolio-core' ); ?></p>
+			<h3><?php esc_html_e( 'Selected Experience (About page)', 'estavillo-portfolio-core' ); ?></h3>
+			<p class="description"><?php esc_html_e( 'The 3 roles shown prioritized and always visible on the About page. Leave a row\'s Organization blank to keep it out of the list. "Key contributions" is a bullet list — one line per bullet, shown inside a collapsed disclosure.', 'estavillo-portfolio-core' ); ?></p>
 			<table class="form-table" role="presentation">
 				<?php
-				$es_timeline = $data['about_timeline'] ?? array();
+				$es_exp_sel = $data['about_experience_selected'] ?? array();
 				for ( $i = 0; $i < 4; $i++ ) :
-					$es_tl_year  = $es_timeline[ $i ]['year'] ?? '';
-					$es_tl_title = $es_timeline[ $i ]['title'] ?? '';
-					$es_tl_text  = $es_timeline[ $i ]['text'] ?? '';
+					$es_row = $es_exp_sel[ $i ] ?? array();
 					?>
 					<tr>
 						<th scope="row"><?php echo esc_html( sprintf( __( 'Entry %d', 'estavillo-portfolio-core' ), $i + 1 ) ); ?></th>
 						<td>
-							<input type="text" name="es_about_timeline_year[<?php echo esc_attr( $i ); ?>]" class="small-text" value="<?php echo esc_attr( $es_tl_year ); ?>" placeholder="<?php esc_attr_e( 'Year(s)', 'estavillo-portfolio-core' ); ?>">
-							<input type="text" name="es_about_timeline_title[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_tl_title ); ?>" placeholder="<?php esc_attr_e( 'Role / title', 'estavillo-portfolio-core' ); ?>"><br>
-							<input type="text" name="es_about_timeline_text[<?php echo esc_attr( $i ); ?>]" class="large-text" value="<?php echo esc_attr( $es_tl_text ); ?>" placeholder="<?php esc_attr_e( 'Short description', 'estavillo-portfolio-core' ); ?>">
+							<input type="text" name="es_exp_sel_org[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['org'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Organization', 'estavillo-portfolio-core' ); ?>">
+							<input type="text" name="es_exp_sel_role[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['role'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Role', 'estavillo-portfolio-core' ); ?>"><br>
+							<input type="text" name="es_exp_sel_location[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['location'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Location (optional)', 'estavillo-portfolio-core' ); ?>">
+							<input type="text" name="es_exp_sel_period[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['period'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Period, e.g. 2025–Present', 'estavillo-portfolio-core' ); ?>"><br>
+							<textarea name="es_exp_sel_summary[<?php echo esc_attr( $i ); ?>]" rows="2" class="large-text" placeholder="<?php esc_attr_e( 'Visible summary', 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( $es_row['summary'] ?? '' ); ?></textarea>
+							<textarea name="es_exp_sel_contributions[<?php echo esc_attr( $i ); ?>]" rows="4" class="large-text" placeholder="<?php esc_attr_e( 'Key contributions — one bullet per line', 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( isset( $es_row['contributions'] ) && is_array( $es_row['contributions'] ) ? implode( "\n", $es_row['contributions'] ) : '' ); ?></textarea><br>
+							<input type="text" name="es_exp_sel_link_label[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['link_label'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Link label, e.g. "View case study" (optional)', 'estavillo-portfolio-core' ); ?>">
+							<input type="url" name="es_exp_sel_link_url[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['link_url'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Link URL (optional)', 'estavillo-portfolio-core' ); ?>">
+						</td>
+					</tr>
+				<?php endfor; ?>
+			</table>
+
+			<h3><?php esc_html_e( 'Previous Experience (About page)', 'estavillo-portfolio-core' ); ?></h3>
+			<p class="description"><?php esc_html_e( 'Shown as a secondary, collapsed group below Selected Experience. Same fields as above. Leave a row\'s Organization blank to keep it out of the list.', 'estavillo-portfolio-core' ); ?></p>
+			<table class="form-table" role="presentation">
+				<?php
+				$es_exp_prev = $data['about_experience_previous'] ?? array();
+				for ( $i = 0; $i < 5; $i++ ) :
+					$es_row = $es_exp_prev[ $i ] ?? array();
+					?>
+					<tr>
+						<th scope="row"><?php echo esc_html( sprintf( __( 'Entry %d', 'estavillo-portfolio-core' ), $i + 1 ) ); ?></th>
+						<td>
+							<input type="text" name="es_exp_prev_org[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['org'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Organization', 'estavillo-portfolio-core' ); ?>">
+							<input type="text" name="es_exp_prev_role[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['role'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Role', 'estavillo-portfolio-core' ); ?>"><br>
+							<input type="text" name="es_exp_prev_location[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['location'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Location (optional)', 'estavillo-portfolio-core' ); ?>">
+							<input type="text" name="es_exp_prev_period[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['period'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Period (optional)', 'estavillo-portfolio-core' ); ?>"><br>
+							<textarea name="es_exp_prev_summary[<?php echo esc_attr( $i ); ?>]" rows="2" class="large-text" placeholder="<?php esc_attr_e( 'Visible summary', 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( $es_row['summary'] ?? '' ); ?></textarea>
+							<textarea name="es_exp_prev_contributions[<?php echo esc_attr( $i ); ?>]" rows="4" class="large-text" placeholder="<?php esc_attr_e( 'Key contributions — one bullet per line', 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( isset( $es_row['contributions'] ) && is_array( $es_row['contributions'] ) ? implode( "\n", $es_row['contributions'] ) : '' ); ?></textarea><br>
+							<input type="text" name="es_exp_prev_link_label[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['link_label'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Link label (optional)', 'estavillo-portfolio-core' ); ?>">
+							<input type="url" name="es_exp_prev_link_url[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['link_url'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Link URL (optional)', 'estavillo-portfolio-core' ); ?>">
 						</td>
 					</tr>
 				<?php endfor; ?>
 			</table>
 
 			<h3><?php esc_html_e( 'Education & certificates (About page)', 'estavillo-portfolio-core' ); ?></h3>
-			<p class="description"><?php esc_html_e( 'Leave a row\'s title blank to keep it out of the list.', 'estavillo-portfolio-core' ); ?></p>
+			<p class="description"><?php esc_html_e( 'Leave a row\'s title blank to keep it out of the list. "Meta" is a secondary line (faculty/school/location). "Year" is the official completion/issue year.', 'estavillo-portfolio-core' ); ?></p>
 			<table class="form-table" role="presentation">
 				<?php
 				$es_education = $data['about_education'] ?? array();
 				for ( $i = 0; $i < 4; $i++ ) :
-					$es_edu_title = $es_education[ $i ]['title'] ?? '';
-					$es_edu_org   = $es_education[ $i ]['org'] ?? '';
-					$es_edu_year  = $es_education[ $i ]['year'] ?? '';
+					$es_row = $es_education[ $i ] ?? array();
 					?>
 					<tr>
 						<th scope="row"><?php echo esc_html( sprintf( __( 'Entry %d', 'estavillo-portfolio-core' ), $i + 1 ) ); ?></th>
 						<td>
-							<input type="text" name="es_about_edu_title[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_edu_title ); ?>" placeholder="<?php esc_attr_e( 'Degree / certificate', 'estavillo-portfolio-core' ); ?>">
-							<input type="text" name="es_about_edu_org[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_edu_org ); ?>" placeholder="<?php esc_attr_e( 'Institution', 'estavillo-portfolio-core' ); ?>">
-							<input type="text" name="es_about_edu_year[<?php echo esc_attr( $i ); ?>]" class="small-text" value="<?php echo esc_attr( $es_edu_year ); ?>" placeholder="<?php esc_attr_e( 'Year', 'estavillo-portfolio-core' ); ?>">
+							<input type="text" name="es_about_edu_title[<?php echo esc_attr( $i ); ?>]" class="large-text" value="<?php echo esc_attr( $es_row['title'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Degree / certificate', 'estavillo-portfolio-core' ); ?>"><br>
+							<input type="text" name="es_about_edu_org[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['org'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Institution / issuer', 'estavillo-portfolio-core' ); ?>">
+							<input type="text" name="es_about_edu_year[<?php echo esc_attr( $i ); ?>]" class="small-text" value="<?php echo esc_attr( $es_row['year'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Year', 'estavillo-portfolio-core' ); ?>"><br>
+							<input type="text" name="es_about_edu_meta[<?php echo esc_attr( $i ); ?>]" class="large-text" value="<?php echo esc_attr( $es_row['meta'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Meta line — faculty/school/location (optional)', 'estavillo-portfolio-core' ); ?>">
+							<textarea name="es_about_edu_description[<?php echo esc_attr( $i ); ?>]" rows="2" class="large-text" placeholder="<?php esc_attr_e( 'Description (optional)', 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( $es_row['description'] ?? '' ); ?></textarea>
+							<textarea name="es_about_edu_final_project[<?php echo esc_attr( $i ); ?>]" rows="2" class="large-text" placeholder="<?php esc_attr_e( 'Final project (optional)', 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( $es_row['final_project'] ?? '' ); ?></textarea>
+							<input type="url" name="es_about_edu_link[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['link'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Credential link (optional)', 'estavillo-portfolio-core' ); ?>">
+						</td>
+					</tr>
+				<?php endfor; ?>
+			</table>
+
+			<h3><?php esc_html_e( 'Other Certifications (About page)', 'estavillo-portfolio-core' ); ?></h3>
+			<p class="description"><?php esc_html_e( 'Shown as a secondary, collapsed group. Leave a row\'s Name blank to keep it out of the list.', 'estavillo-portfolio-core' ); ?></p>
+			<table class="form-table" role="presentation">
+				<?php
+				$es_certs = $data['about_certifications_other'] ?? array();
+				for ( $i = 0; $i < 10; $i++ ) :
+					$es_row = $es_certs[ $i ] ?? array();
+					?>
+					<tr>
+						<th scope="row"><?php echo esc_html( sprintf( __( 'Entry %d', 'estavillo-portfolio-core' ), $i + 1 ) ); ?></th>
+						<td>
+							<input type="text" name="es_cert_name[<?php echo esc_attr( $i ); ?>]" class="large-text" value="<?php echo esc_attr( $es_row['name'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Certificate name', 'estavillo-portfolio-core' ); ?>"><br>
+							<input type="text" name="es_cert_issuer[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['issuer'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Issuer', 'estavillo-portfolio-core' ); ?>">
+							<input type="text" name="es_cert_date[<?php echo esc_attr( $i ); ?>]" class="small-text" value="<?php echo esc_attr( $es_row['date'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Date', 'estavillo-portfolio-core' ); ?>">
+							<input type="text" name="es_cert_credential_id[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['credential_id'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Credential ID (optional)', 'estavillo-portfolio-core' ); ?>">
+							<input type="url" name="es_cert_link[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['link'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Credential link (optional)', 'estavillo-portfolio-core' ); ?>">
+						</td>
+					</tr>
+				<?php endfor; ?>
+			</table>
+
+			<h3><?php esc_html_e( 'Languages (About page)', 'estavillo-portfolio-core' ); ?></h3>
+			<p class="description"><?php esc_html_e( 'Leave a row\'s Language blank to keep it out of the list.', 'estavillo-portfolio-core' ); ?></p>
+			<table class="form-table" role="presentation">
+				<?php
+				$es_languages = $data['about_languages'] ?? array();
+				for ( $i = 0; $i < 5; $i++ ) :
+					$es_row = $es_languages[ $i ] ?? array();
+					?>
+					<tr>
+						<th scope="row"><?php echo esc_html( sprintf( __( 'Entry %d', 'estavillo-portfolio-core' ), $i + 1 ) ); ?></th>
+						<td>
+							<input type="text" name="es_lang_name[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['name'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Language', 'estavillo-portfolio-core' ); ?>">
+							<input type="text" name="es_lang_level[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['level'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Level, e.g. Native / Advanced (C1) / Basic', 'estavillo-portfolio-core' ); ?>">
 						</td>
 					</tr>
 				<?php endfor; ?>
@@ -550,20 +732,25 @@ function es_portfolio_filter_about_hobbies_items( $default ) {
 }
 add_filter( 'es_about_hobbies_items', 'es_portfolio_filter_about_hobbies_items' );
 
-function es_portfolio_filter_about_timeline( $default ) {
+/**
+ * Puentes para Selected Experience / Previous Experience: merge por
+ * posición (ver es_portfolio_merge_keyed_rows() arriba) en vez del
+ * reemplazo completo que usaba el "Career timeline" anterior — acá cada
+ * entrada es una organización específica y fija (Guzmán Villalba/Trazur/
+ * Ceibal; Verona/Samic/Fupsi), así que editar una sola fila en wp-admin
+ * NUNCA debe borrar las otras dos que el admin no tocó.
+ */
+function es_portfolio_filter_about_experience_selected( $default ) {
 	$data = es_portfolio_get_home_content();
-	if ( empty( $data['about_timeline'] ) || ! is_array( $data['about_timeline'] ) ) {
-		return $default;
-	}
-	$entries = array_filter(
-		$data['about_timeline'],
-		function ( $entry ) {
-			return ! empty( $entry['title'] );
-		}
-	);
-	return $entries ? array_values( $entries ) : $default;
+	return es_portfolio_merge_keyed_rows( $default, $data['about_experience_selected'] ?? array(), 'org' );
 }
-add_filter( 'es_about_timeline', 'es_portfolio_filter_about_timeline' );
+add_filter( 'es_about_experience_selected', 'es_portfolio_filter_about_experience_selected' );
+
+function es_portfolio_filter_about_experience_previous( $default ) {
+	$data = es_portfolio_get_home_content();
+	return es_portfolio_merge_keyed_rows( $default, $data['about_experience_previous'] ?? array(), 'org' );
+}
+add_filter( 'es_about_experience_previous', 'es_portfolio_filter_about_experience_previous' );
 
 function es_portfolio_filter_about_education( $default ) {
 	$data = es_portfolio_get_home_content();
@@ -579,6 +766,22 @@ function es_portfolio_filter_about_education( $default ) {
 	return $entries ? array_values( $entries ) : $default;
 }
 add_filter( 'es_about_education', 'es_portfolio_filter_about_education' );
+
+/**
+ * Puentes para Other Certifications / Languages — mismo merge por
+ * posición que Selected/Previous Experience arriba.
+ */
+function es_portfolio_filter_about_certifications_other( $default ) {
+	$data = es_portfolio_get_home_content();
+	return es_portfolio_merge_keyed_rows( $default, $data['about_certifications_other'] ?? array(), 'name' );
+}
+add_filter( 'es_about_certifications_other', 'es_portfolio_filter_about_certifications_other' );
+
+function es_portfolio_filter_about_languages( $default ) {
+	$data = es_portfolio_get_home_content();
+	return es_portfolio_merge_keyed_rows( $default, $data['about_languages'] ?? array(), 'name' );
+}
+add_filter( 'es_about_languages', 'es_portfolio_filter_about_languages' );
 
 /**
  * Puente para How I Work. A diferencia de About (campos sueltos), acá se
