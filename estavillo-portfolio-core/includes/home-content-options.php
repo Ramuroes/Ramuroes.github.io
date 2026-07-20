@@ -116,6 +116,100 @@ function es_portfolio_merge_keyed_rows( $default, $saved, $key_field ) {
 }
 
 /**
+ * Versión del set de grupos "About" que la inicialización de abajo sabe
+ * sembrar. Subir este número (y agregar la clave nueva al array de
+ * es_portfolio_about_default_seeds()) es la forma de sumar un grupo nuevo
+ * en el futuro sin tocar los que ya se sembraron — cada grupo se evalúa
+ * de forma independiente, así que ni siquiera hace falta subir la versión
+ * para que un grupo nuevo se siembre solo (ver el loop de abajo: corre
+ * igual aunque el option ya esté "inicializado", el guard de versión es
+ * solo para no pagar el costo de este chequeo en cada admin_init una vez
+ * que TODOS los grupos conocidos ya están sembrados).
+ */
+define( 'ES_PORTFOLIO_ABOUT_DEFAULTS_VERSION', 1 );
+
+/**
+ * Mapa "clave del option => función de tema que devuelve su default".
+ * Fuente única para es_portfolio_maybe_seed_about_defaults() — separado
+ * en su propia función para poder testearlo/reusarlo sin ejecutar el
+ * side-effect de update_option().
+ *
+ * @return array<string,string>
+ */
+function es_portfolio_about_default_seeds() {
+	return array(
+		'about_text'                 => 'es_about_intro_default',
+		'about_experience_selected'  => 'es_about_experience_selected_defaults',
+		'about_experience_previous'  => 'es_about_experience_previous_defaults',
+		'about_education'            => 'es_about_education_defaults',
+		'about_certifications_other' => 'es_about_certifications_other_defaults',
+		'about_languages'            => 'es_about_languages_defaults',
+		'about_hobbies_items'        => 'es_home_about_hobbies_defaults',
+	);
+}
+
+/**
+ * Siembra en el option real (no solo en pantalla) el default del tema
+ * para cada grupo del About page que todavía nunca se guardó — root cause
+ * de la ticket "Content editability": el admin de Portfolio Content leía
+ * $data[clave] directo (sin fallback a los defaults del tema), así que
+ * mientras el option nunca tuvo esas claves, el formulario se veía vacío
+ * aunque el frontend mostrara contenido completo (ese viene de
+ * apply_filters($hook, defaults_del_tema()) en about-content.php — el
+ * option nunca tuvo un valor real ahí, solo el fallback PHP).
+ *
+ * Precedencia resultante después de esto:
+ *   valor guardado en wp-admin (el editor lo tocó)
+ *     → valor sembrado acá (recién ahora es un valor REAL del option,
+ *       igual de editable, indistinguible para el resto del código de
+ *       "el admin lo tipeó a mano")
+ *     → default hardcodeado del tema (solo se usa si ni siquiera esta
+ *       siembra llegó a correr — p.ej. entre instalar el plugin y la
+ *       primera carga de /wp-admin/).
+ *
+ * Garantías de seguridad (todas ellas, no una interpretación laxa):
+ *   - Por grupo, no por option completo: cada una de las 7 claves de
+ *     es_portfolio_about_default_seeds() se evalúa independiente. Editar
+ *     "Languages" en wp-admin nunca afecta si "Education" se siembra o no.
+ *   - "Genuinely absent" = array_key_exists() en false, no empty(). Si el
+ *     admin guardó el formulario alguna vez y esa guardada dejó la clave
+ *     como array vacío (p.ej. borró las 3 filas de Languages a propósito),
+ *     la clave YA EXISTE en el option → nunca se vuelve a tocar. Vaciar un
+ *     campo a propósito se respeta para siempre, no se re-rellena.
+ *   - No destructivo: la única escritura es agregar claves que no
+ *     existían; ninguna clave existente se lee siquiera para comparar.
+ *   - Versionado: ES_PORTFOLIO_ABOUT_DEFAULTS_VERSION + el flag
+ *     '_about_defaults_seeded_version' en el propio option. Una vez que
+ *     ese flag alcanza la versión actual, la función retorna en la
+ *     primera línea — no vuelve a correr el loop en cada admin_init.
+ *     Subir la constante en el futuro (para sumar un grupo nuevo) hace
+ *     que el loop corra una vez más, pero el guard "ya existe la clave"
+ *     de cada grupo sigue protegiendo a los 7 grupos ya sembrados.
+ */
+function es_portfolio_maybe_seed_about_defaults() {
+	$data = es_portfolio_get_home_content();
+
+	$seeded_version = isset( $data['_about_defaults_seeded_version'] ) ? (int) $data['_about_defaults_seeded_version'] : 0;
+	if ( $seeded_version >= ES_PORTFOLIO_ABOUT_DEFAULTS_VERSION ) {
+		return;
+	}
+
+	foreach ( es_portfolio_about_default_seeds() as $es_key => $es_default_fn ) {
+		if ( array_key_exists( $es_key, $data ) ) {
+			continue; // Ya existe (guardado real o siembra previa) — nunca se pisa.
+		}
+		if ( ! function_exists( $es_default_fn ) ) {
+			continue; // Tema no cargado todavía / función no existe — no rompe nada, se reintenta el próximo admin_init.
+		}
+		$data[ $es_key ] = call_user_func( $es_default_fn );
+	}
+
+	$data['_about_defaults_seeded_version'] = ES_PORTFOLIO_ABOUT_DEFAULTS_VERSION;
+	update_option( 'es_portfolio_home_content', $data );
+}
+add_action( 'admin_init', 'es_portfolio_maybe_seed_about_defaults', 5 );
+
+/**
  * Registra la página de opciones como submenú de Case Studies.
  */
 function es_portfolio_home_content_menu() {
@@ -375,7 +469,10 @@ function es_portfolio_home_content_page() {
 			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row"><label for="es_about_text"><?php esc_html_e( 'About text', 'estavillo-portfolio-core' ); ?></label></th>
-					<td><textarea id="es_about_text" name="es_about_text" rows="5" class="large-text"><?php echo esc_textarea( $data['about_text'] ?? '' ); ?></textarea></td>
+					<td>
+						<textarea id="es_about_text" name="es_about_text" rows="10" class="large-text"><?php echo esc_textarea( $data['about_text'] ?? '' ); ?></textarea>
+						<p class="description"><?php esc_html_e( 'Separate paragraphs with a blank line — each one renders as its own paragraph on the About page.', 'estavillo-portfolio-core' ); ?></p>
+					</td>
 				</tr>
 				<tr>
 					<th scope="row"><label for="es_about_url"><?php esc_html_e( 'About link (CTA URL)', 'estavillo-portfolio-core' ); ?></label></th>
@@ -447,8 +544,8 @@ function es_portfolio_home_content_page() {
 				<?php endfor; ?>
 			</table>
 
-			<h3><?php esc_html_e( 'Selected Experience (About page)', 'estavillo-portfolio-core' ); ?></h3>
-			<p class="description"><?php esc_html_e( 'The 3 roles shown prioritized and always visible on the About page. Leave a row\'s Organization blank to keep it out of the list. "Key contributions" is a bullet list — one line per bullet, shown inside a collapsed disclosure.', 'estavillo-portfolio-core' ); ?></p>
+			<h3><?php esc_html_e( 'Experience (About page)', 'estavillo-portfolio-core' ); ?></h3>
+			<p class="description"><?php esc_html_e( 'The roles shown prioritized and always visible on the About page. Leave a row\'s Organization blank to keep it out of the list. "Key contributions" is a bullet list — one line per bullet, shown inside a collapsed disclosure.', 'estavillo-portfolio-core' ); ?></p>
 			<table class="form-table" role="presentation">
 				<?php
 				$es_exp_sel = $data['about_experience_selected'] ?? array();
@@ -471,8 +568,8 @@ function es_portfolio_home_content_page() {
 				<?php endfor; ?>
 			</table>
 
-			<h3><?php esc_html_e( 'Previous Experience (About page)', 'estavillo-portfolio-core' ); ?></h3>
-			<p class="description"><?php esc_html_e( 'Shown as a secondary, collapsed group below Selected Experience. Same fields as above. Leave a row\'s Organization blank to keep it out of the list.', 'estavillo-portfolio-core' ); ?></p>
+			<h3><?php esc_html_e( 'Earlier Experience (About page)', 'estavillo-portfolio-core' ); ?></h3>
+			<p class="description"><?php esc_html_e( 'Shown as a secondary, collapsed group below Experience. Same fields as above. Leave a row\'s Organization blank to keep it out of the list.', 'estavillo-portfolio-core' ); ?></p>
 			<table class="form-table" role="presentation">
 				<?php
 				$es_exp_prev = $data['about_experience_previous'] ?? array();

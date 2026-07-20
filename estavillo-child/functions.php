@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.6' );
+define( 'ES_CHILD_VERSION', '0.2.7' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -63,6 +63,7 @@ function es_child_ui_strings() {
 		'work_view_all'       => 'All work',
 		'work_view_case'      => 'View case study',
 		'about_label'         => 'About',
+		'about_intro_label'   => 'My approach',
 		'about_cta'           => 'More about me',
 		'cta_label'           => 'Connect',
 		'cta_button'          => 'Write me',
@@ -656,6 +657,40 @@ function es_about_hobbies_visible() {
 			}
 		)
 	);
+}
+
+/**
+ * Copy de intro por defecto de la página About — texto directo, personal,
+ * no defensivo (reemplaza el copy anterior "not a past title... the
+ * foundation this practice still runs on", reportado como demasiado
+ * conceptual/defensivo en la ticket de corrección). 4 párrafos separados
+ * por línea en blanco — ver es_about_render_intro_paragraphs() más abajo
+ * para cómo esos saltos se convierten en <p> independientes en vez de
+ * colapsar en un solo bloque de texto.
+ *
+ * @return string
+ */
+function es_about_intro_default() {
+	return "Hi, I'm Ramiro Estavillo, a Product Designer and Industrial Designer based in Montevideo.\n\nI hold a Bachelor's Degree in Industrial Design, with a Product Design orientation, and I apply that foundation to digital products, services and operational systems.\n\nMy work usually begins by understanding how people, information and decisions move through a system — not only what happens on the screen. I combine research, systems thinking and practical implementation to turn complex processes into clearer, more usable solutions.\n\nI also use AI to accelerate research synthesis, documentation and exploration, while keeping design decisions grounded in human judgment and real-world context.";
+}
+
+/**
+ * Divide el texto de intro de About en párrafos (separados por línea en
+ * blanco en el valor guardado/default) — el <textarea> del admin guarda
+ * saltos de línea reales (sanitize_textarea_field() los preserva), pero
+ * imprimirlos dentro de un solo <p> los colapsa visualmente a un bloque
+ * (whitespace collapsing de HTML). Esta función es la única responsable
+ * de esa división, para no repetir la regex en el template-part.
+ *
+ * @param string $text Texto crudo (default o guardado vía es_home_about_text).
+ * @return string[] Párrafos ya recortados, sin líneas vacías.
+ */
+function es_about_intro_paragraphs( $text ) {
+	if ( '' === trim( (string) $text ) ) {
+		return array();
+	}
+	$paragraphs = preg_split( '/\r\n\r\n|\n\n+|\r\r+/', trim( $text ) );
+	return array_values( array_filter( array_map( 'trim', $paragraphs ) ) );
 }
 
 /**

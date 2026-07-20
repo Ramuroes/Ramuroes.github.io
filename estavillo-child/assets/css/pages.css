@@ -279,22 +279,42 @@
 	max-width: 56ch;
 }
 
-/* ---------- About: Selected / Previous Experience ----------
+/* ---------- About: Experience / Earlier Experience ----------
    Reemplaza el "Career timeline" plano (.es-timeline arriba, hoy sin uso
    — se deja en el archivo por si se reusa, no se borra sin necesidad).
-   Selected Experience: entradas siempre visibles (org/role/location/
-   period/summary) — el detalle largo ("Key contributions") vive en un
-   <details> propio por entrada, componente compartido con Previous
-   Experience/Other Certifications: ver .es-about-details más abajo. */
+   Experience: entradas siempre visibles (org/role/location/period/
+   summary) — el detalle largo ("Key contributions") vive en un <details>
+   propio por entrada, componente compartido con Earlier Experience/Other
+   Certifications: ver .es-about-details más abajo.
+
+   Rail + punto: tratamiento editorial mínimo para conservar "sensación de
+   cronología" (pedido explícito de la ticket de corrección) sin construir
+   un componente de timeline elaborado ni JS — una regla vertical continua
+   + un punto por entrada, sobre el hairline divider que ya separaba cada
+   entrada. Funciona igual en mobile (el padding-left es chico, no rompe
+   el ancho legible). */
 
 .es-exp-list {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	gap: clamp(28px, 3.5vw, 40px);
 	max-width: 720px;
+	padding-left: 18px;
+}
+
+.es-exp-list::before {
+	content: '';
+	position: absolute;
+	top: 6px;
+	bottom: 6px;
+	left: 0;
+	width: 1px;
+	background: var(--es-line);
 }
 
 .es-exp-item {
+	position: relative;
 	padding-top: clamp(20px, 2.5vw, 28px);
 	border-top: 1px solid var(--es-line);
 }
@@ -302,6 +322,22 @@
 .es-exp-list > .es-exp-item:first-child {
 	border-top: none;
 	padding-top: 0;
+}
+
+.es-exp-item::before {
+	content: '';
+	position: absolute;
+	top: clamp(20px, 2.5vw, 28px);
+	left: -21px;
+	width: 7px;
+	height: 7px;
+	margin-top: 5px;
+	border-radius: 50%;
+	background: var(--es-accent);
+}
+
+.es-exp-list > .es-exp-item:first-child::before {
+	top: 0;
 }
 
 .es-exp-item__head {
@@ -359,9 +395,9 @@
 	text-decoration: underline;
 }
 
-/* Previous Experience / Other Certifications reusan el mismo item pero
+/* Earlier Experience / Other Certifications reusan el mismo item pero
    más compacto — viven dentro del <details> exterior de su sección, no
-   compiten visualmente con Selected Experience. */
+   compiten visualmente con Experience. */
 .es-exp-item--compact {
 	padding-top: 18px;
 }
@@ -375,65 +411,68 @@
 }
 
 /* ---------- About: <details> nativo compartido ----------
-   Mismo lenguaje visual que estavillo/case-details (case-study.css
-   .es-case-details) — marcador "+" que rota a "×", summary en mono,
-   panel con borde. Acá vive en pages.css (About no carga case-study.css)
-   bajo un nombre propio. Dos tamaños: '--nested' (una entrada, "Key
-   contributions") y '--group' (una sección entera, "Previous Experience"
-   / "Other Certifications"). */
-
-.es-about-details {
-	border: 1px solid var(--es-line);
-	background: var(--es-paper-2);
-}
+   Tratamiento editorial liviano (corrección sobre la versión anterior,
+   reportada como "visualmente demasiado boxeada/pesada" — panel con
+   borde completo + fondo sólido). Ya no hay caja: solo un hairline bajo
+   el summary (siempre visible, abierto o cerrado) y un indicador +/−
+   simple a la derecha. Dos tamaños: '--nested' (una entrada, "Key
+   contributions") y '--group' (una sección entera, "Earlier Experience"
+   / "Other Certifications"). Mismos tokens de color/tipografía que el
+   resto de la página — compatible con dark/light sin reglas propias. */
 
 .es-about-details summary {
 	list-style: none;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
-	gap: 12px;
+	justify-content: space-between;
+	gap: 16px;
 	font-family: var(--es-mono);
 	color: var(--es-ink-2);
-	letter-spacing: 0.02em;
+	letter-spacing: 0.03em;
+	border-bottom: 1px solid var(--es-line);
+	transition: color 0.15s ease, border-color 0.15s ease;
 }
 
 .es-about-details summary::-webkit-details-marker {
 	display: none;
 }
 
+.es-about-details summary:hover {
+	color: var(--es-ink);
+	border-color: var(--es-line-strong);
+}
+
 .es-about-details summary:focus-visible {
 	outline: 2px solid var(--es-accent);
-	outline-offset: -2px;
+	outline-offset: 2px;
 }
 
-.es-about-details summary::before {
+.es-about-details summary::after {
 	content: '+';
 	color: var(--es-accent);
-	font-size: 16px;
-	width: 14px;
+	font-size: 15px;
+	line-height: 1;
 	flex: none;
-	transition: transform 0.2s ease;
 }
 
-.es-about-details[open] summary::before {
-	transform: rotate(45deg);
+.es-about-details[open] summary::after {
+	content: '−';
 }
 
 .es-about-details--nested {
-	margin-top: 4px;
+	margin-top: 8px;
 	max-width: 62ch;
 }
 
 .es-about-details--nested summary {
-	padding: 12px 16px;
+	padding: 10px 0;
 	font-size: 12px;
 	font-weight: 500;
 }
 
 .es-about-details--nested .es-about-details__body {
-	padding: 4px 16px 18px;
-	border-top: 1px solid var(--es-line);
+	padding: 16px 0 4px;
 }
 
 .es-about-details--group {
@@ -441,14 +480,13 @@
 }
 
 .es-about-details--group summary {
-	padding: 18px 22px;
+	padding: 14px 0;
 	font-size: 13px;
 	font-weight: 500;
 }
 
 .es-about-details--group .es-about-details__body {
-	padding: 6px 22px 24px;
-	border-top: 1px solid var(--es-line);
+	padding-top: 20px;
 }
 
 .es-about-details--group .es-exp-list {
@@ -482,6 +520,31 @@
 .es-cred:first-child {
 	padding-top: 0;
 	border-top: none;
+}
+
+/* Fix: en el grid de 2 columnas de escritorio, :first-child solo resetea
+   la primera celda (el título de la Licenciatura empieza en 0) mientras
+   la segunda (Google, misma fila) conserva su padding-top/border-top —
+   su título arranca más abajo que el de al lado. En vez de eso, resetea
+   las primeras 2 celdas (la fila entera de escritorio), y en mobile
+   (donde .es-grid--2 colapsa a 1 columna, ver layout.css) se revierte a
+   solo la primera celda para que las entradas apiladas conserven su
+   divisor entre sí. */
+.es-about-page__education .es-grid--2 .es-cred:nth-child(-n+2) {
+	padding-top: 0;
+	border-top: none;
+}
+
+@media (max-width: 680px) {
+	.es-about-page__education .es-grid--2 .es-cred:nth-child(-n+2) {
+		padding-top: 20px;
+		border-top: 1px solid var(--es-line);
+	}
+
+	.es-about-page__education .es-grid--2 .es-cred:first-child {
+		padding-top: 0;
+		border-top: none;
+	}
 }
 
 .es-cred__title {

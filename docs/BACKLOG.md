@@ -92,6 +92,66 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   state, content actually hidden/revealed) across desktop/tablet/mobile
   × dark/light (18 combinations, zero console errors, zero overflow).
   Theme bumped to 0.2.6, plugin to 1.5.2.
+- **Done (About page correction — editability, repetition, copy, disclosure,
+  timeline, alignment)** — Follow-up correction pass on the restructure
+  above, addressing 8 reported problems without starting the Gutenberg
+  migration (see the new P1 item below for that). **(1) Editability root
+  cause fixed:** the "Portfolio Content" admin form read
+  `$data['about_experience_selected']` etc. directly with no fallback to
+  the theme defaults — the option genuinely never had those keys, so the
+  form looked empty even though the frontend rendered full content (via
+  `apply_filters($hook, theme_default())`). Added
+  `es_portfolio_maybe_seed_about_defaults()` (`home-content-options.php`),
+  a versioned, admin_init-hooked, one-time seed: for each of the 7 About
+  field groups (About text, Experience, Earlier Experience, Education,
+  Other Certifications, Languages, Hobbies) that is genuinely absent from
+  the saved option (`array_key_exists()`, not `empty()` — so a
+  deliberately-emptied field is never re-filled), it writes the current
+  theme default into the option as a real, editable value. Guarded by
+  `ES_PORTFOLIO_ABOUT_DEFAULTS_VERSION` so it runs its per-group check
+  once and never overwrites anything already saved (including a prior
+  seed). **(2) "About" repetition** reduced: the About page's first
+  content section is no longer labeled "About" (new dedicated string,
+  `about_intro_label` = "My approach" — kept separate from `about_label`,
+  which the Home teaser and the About page's own hero eyebrow still use
+  unchanged); hero title changed from "About." to "About me." in
+  `templates/page-about.php`. Breadcrumb and eyebrow left as-is per the
+  ticket. **(3) Introduction copy replaced** with the approved
+  direct/personal direction (`es_about_intro_default()` in
+  `functions.php`) — 4 short paragraphs instead of one dense
+  academic-sounding block; `es_about_intro_paragraphs()` splits on blank
+  lines so the admin's `about_text` textarea (bumped to 10 rows) renders
+  as real `<p>` tags instead of collapsing into one paragraph.
+  **(4) Experience relabeled:** "Selected Experience" → "Experience",
+  "Previous Experience" → "Earlier Experience" (frontend labels, admin
+  section headings, and the disclosure summary text — id changed
+  `#previous-experience` → `#earlier-experience`, nothing links to it).
+  **(5) Timeline feeling preserved** with a minimal CSS-only treatment: a
+  continuous 1px vertical rule + a small accent dot per entry on
+  `.es-exp-list`/`.es-exp-item` (pure CSS pseudo-elements, no JS, no new
+  component) — works the same on mobile. **(6) Disclosure lightened:**
+  `.es-about-details` no longer has a bordered box + solid background;
+  replaced with a plain `summary` row (label left, simple `+`/`−`
+  indicator right) and a single hairline `border-bottom` under the
+  summary, always visible open or closed — same color/type tokens, so
+  dark/light both still work with zero extra rules. **(7) Education
+  desktop alignment bug fixed:** `.es-cred:first-child` only reset the
+  top border/padding on the *first* grid cell, so in the 2-column row the
+  Google certificate (2nd cell) kept its top padding and started lower
+  than the Degree title next to it. Fixed by resetting the first *row*
+  (`:nth-child(-n+2)`, scoped to `.es-about-page__education`) on desktop,
+  reverted at the ≤680px stacking breakpoint so mobile keeps a divider
+  between the two stacked entries. **(8) Certification links audited:**
+  searched the entire git history for any previously-used verification
+  URL for the 8 Other Certifications or the 2 Education entries — none
+  exists anywhere (only credential IDs, never a `coursera.org/verify`-
+  style link or similar); confirmed nothing to recover, left `link`
+  fields empty and editable, no broken links rendered, matches the
+  authoritative doc's own "do not invent URLs" instruction. Skills
+  section: not rendered (none exists to hide). Resume: byte-identical,
+  untouched. Validated with the real-load PHP harness (all 7 seed groups,
+  paragraph-splitting, no Master/FUMS) plus Chromium across desktop/
+  tablet/mobile × dark/light. Theme bumped to 0.2.7, plugin to 1.5.3.
 
 ---
 
@@ -178,6 +238,34 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   Connect/Footer) — not one huge PHP-only template forever. See
   `EDITABILITY-PLAN.md`. Do this as small, ticket-sized section
   conversions, one at a time — not a single big migration.
+- **P1 — Migrate the About page body to Gutenberg (documented now, not
+  started).** About is currently the most content-heavy page still driven
+  entirely by PHP template + "Portfolio Content" option fields (Experience,
+  Earlier Experience, Education, Other Certifications, Languages, Hobbies —
+  each a fixed-shape repeater with a capped row count, same pattern as How
+  I Work's 6 steps). The preferred future architecture, following the same
+  approach already proven for Case Studies (`single-es_case_study.php` +
+  `the_content()`): the About page body becomes normal Gutenberg-editable
+  content, so the site owner can add, remove, and reorder sections — including
+  a Skills section, images, callouts, or anything else — without a PHP
+  edit for every change. Scope for that future ticket: (1) migrate the
+  existing About sections (Experience, Earlier Experience, Education,
+  Other Certifications, Languages, Hobbies) into block content or
+  block/pattern equivalents with **zero data loss** — every entry
+  currently in `es_portfolio_home_content` needs a real migration path,
+  not a re-entry-from-scratch; (2) once migrated, "Portfolio Content"
+  should retain only the fields that are genuinely shared/global across
+  pages — navigation, footer, contact data, Resume URL(s), and any other
+  cross-page setting — not page-specific content that Gutenberg now owns;
+  (3) Skills has never been built or rendered on the About page — the
+  authoritative source doc explicitly says not to add one "in this
+  version," not never — this future Gutenberg migration is the natural
+  place to add a Skills section, as a normal block, if/when the site
+  owner defines what should be in it (no such content exists anywhere in
+  the repo today; nothing to migrate for it, only to add fresh later). Not
+  started. Do not begin this migration inside an unrelated content
+  ticket — it is large enough to be its own ticket, planned and reviewed
+  on its own.
 - **Done (Sprint 3)** — **Selected Work** is now the first section
   converted to editable content: a "Case Study" custom post type, editable
   in wp-admin, with a hardcoded-placeholder fallback so Home never breaks

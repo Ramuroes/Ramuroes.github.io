@@ -29,10 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$es_about_text     = apply_filters(
-	'es_home_about_text',
-	'I hold a Bachelor\'s Degree in Industrial Design (Product Design) — not a past title, but the foundation this practice still runs on. It\'s why interfaces are never my starting point: the system behind them is, with products, services and operations treated as one connected structure, understood before any part of it changes. Research stays part of the decision itself, not a report attached to it afterward, and the goal is always the same — turn a complex, often invisible process into something practical enough to use. AI increasingly helps accelerate that research, synthesis and documentation, but the decisions themselves stay grounded in human judgment.'
-);
+$es_about_text     = apply_filters( 'es_home_about_text', es_about_intro_default() );
 $es_about_portrait   = apply_filters( 'es_home_about_portrait', '' );
 $es_cv_url           = apply_filters( 'es_about_cv_url', '' );
 $es_exp_selected     = apply_filters( 'es_about_experience_selected', es_about_experience_selected_defaults() );
@@ -59,10 +56,12 @@ $es_hobbies          = es_about_hobbies_visible();
 			<div class="es-section-head">
 				<div class="es-section-head__title">
 					<span class="es-section-head__num">01</span>
-					<h2 class="es-label"><?php echo esc_html( es__( 'about_label' ) ); ?></h2>
+					<h2 class="es-label"><?php echo esc_html( es__( 'about_intro_label' ) ); ?></h2>
 				</div>
 			</div>
-			<p class="es-about-page__text"><?php echo esc_html( $es_about_text ); ?></p>
+			<?php foreach ( es_about_intro_paragraphs( $es_about_text ) as $es_about_para ) : ?>
+				<p class="es-about-page__text"><?php echo esc_html( $es_about_para ); ?></p>
+			<?php endforeach; ?>
 			<?php if ( ! empty( $es_cv_url ) ) : ?>
 				<a class="es-btn" href="<?php echo esc_url( $es_cv_url ); ?>" target="_blank" rel="noopener">
 					<?php esc_html_e( 'Download CV', 'estavillo-child' ); ?>
@@ -79,7 +78,7 @@ $es_hobbies          = es_about_hobbies_visible();
 		<div class="es-section-head" data-es-reveal>
 			<div class="es-section-head__title">
 				<span class="es-section-head__num">02</span>
-				<h2 class="es-label"><?php esc_html_e( 'Selected Experience', 'estavillo-child' ); ?></h2>
+				<h2 class="es-label"><?php esc_html_e( 'Experience', 'estavillo-child' ); ?></h2>
 			</div>
 		</div>
 		<div class="es-exp-list">
@@ -92,12 +91,12 @@ $es_hobbies          = es_about_hobbies_visible();
 <?php endif; ?>
 
 <?php if ( ! empty( $es_exp_previous ) ) : ?>
-<section class="es-section es-about-page__experience-previous" id="previous-experience">
+<section class="es-section es-about-page__experience-previous" id="earlier-experience">
 	<div class="es-container">
 		<div class="es-section-head" data-es-reveal>
 			<div class="es-section-head__title">
 				<span class="es-section-head__num">03</span>
-				<h2 class="es-label"><?php esc_html_e( 'Previous Experience', 'estavillo-child' ); ?></h2>
+				<h2 class="es-label"><?php esc_html_e( 'Earlier Experience', 'estavillo-child' ); ?></h2>
 			</div>
 		</div>
 		<details class="es-about-details es-about-details--group">
@@ -105,8 +104,8 @@ $es_hobbies          = es_about_hobbies_visible();
 				<?php
 				echo esc_html(
 					sprintf(
-						/* translators: %d: number of previous roles */
-						_n( 'Show %d previous role', 'Show %d previous roles', count( $es_exp_previous ), 'estavillo-child' ),
+						/* translators: %d: number of earlier roles */
+						_n( 'Show %d earlier role', 'Show %d earlier roles', count( $es_exp_previous ), 'estavillo-child' ),
 						count( $es_exp_previous )
 					)
 				);
