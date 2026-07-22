@@ -571,6 +571,27 @@
 	max-width: 62ch;
 }
 
+/* Bachelor's/Google supporting-themes bullet list (About Gutenberg
+   migration, round-3 correction — new approved content, core/list). Same
+   treatment as the existing "Key contributions" list, scoped under
+   .es-cred so it only ever applies inside an Education entry. */
+.es-cred__list {
+	margin: 10px 0 0;
+	padding-left: 18px;
+	list-style: disc;
+	max-width: 62ch;
+}
+
+.es-cred__list li {
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+}
+
+.es-cred__list li + li {
+	margin-top: 6px;
+}
+
 .es-cred__link {
 	display: inline-block;
 	margin-top: 10px;
@@ -894,7 +915,15 @@
 	flex: none;
 }
 
-.es-case-details.is-style-light[open] summary::after {
+/* Direct-child combinator is deliberate (round-3 fix): without it this
+   also matched any NESTED "Key contributions" summary sitting inside an
+   OPEN outer details (e.g. Earlier Experience's "Show N earlier roles")
+   even while that nested one was still closed — every nested summary
+   showed "−" as soon as its ancestor opened, regardless of its own
+   [open] state. <summary> is always the details element's own first
+   child per the HTML spec, so ">" correctly scopes this to the [open]
+   element's OWN summary only. */
+.es-case-details.is-style-light[open] > summary::after {
 	content: '−';
 }
 
@@ -958,44 +987,42 @@
 	gap: 18px;
 }
 
-/* ---------- 3. core/columns — Education 2-col grid + alignment fix ----------
-   core/columns ships its own flex-based layout CSS; this replaces it with
-   the theme's existing 2-col grid (same values as .es-grid--2) scoped
-   tightly to the About page's Education section so it can never affect
-   Columns used anywhere else. Each core/column already carries the
-   existing "es-cred" Additional CSS Class directly (same element, not a
-   nested one), so the existing .es-cred / .es-cred:first-child rules
-   already apply as-is — the only genuinely new behavior needed here is
-   resetting the SECOND cell of the first row too (same alignment bug
-   fixed for the PHP version in the previous correction ticket: without
-   this, the second title starts lower than the first), reverted at the
-   same ≤680px breakpoint so mobile keeps a divider between the two
-   stacked entries. */
+/* ---------- 3. core/columns — Education 60/40 ----------
+   Correction ticket round 3: the previous CSS-Grid override on top of
+   core/columns' own flex layout didn't reliably apply in real WordPress
+   (Columns stayed effectively single-column). Fixed at the markup level
+   instead — real core/column width via the native flex-basis mechanism
+   (same "width" attribute + inline style the block editor itself writes
+   when a user drags a column handle, proven already in
+   patterns/case-persona.php) — so this file only needs to style the
+   ALREADY-two-column native layout: a generous gutter, a subtle vertical
+   divider between the columns (desktop only — "optional subtle divider",
+   not a heavy rule), and a horizontal divider between the two entries
+   once they stack on mobile. No className on the core/column blocks
+   themselves (deliberate: combining a custom className with a width
+   attribute on the same core/column has no proven-safe precedent in this
+   codebase yet, so this styles the columns purely via their position
+   inside .es-about-page__education, with zero risk of an unexpected
+   class-list mismatch on paste). .es-cred__title/__meta/__description/
+   __final-project (on the paragraphs INSIDE each column) are unchanged. */
 
 .es-about-page__education .wp-block-columns {
-	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: clamp(16px, 2vw, 24px);
+	column-gap: clamp(32px, 4vw, 56px);
+	row-gap: clamp(24px, 3vw, 32px);
+	align-items: flex-start;
 }
 
-.es-about-page__education .wp-block-columns > .wp-block-column.es-cred:nth-child(-n+2) {
-	padding-top: 0;
-	border-top: none;
+.es-about-page__education .wp-block-columns > .wp-block-column:last-child {
+	border-left: 1px solid var(--es-line);
+	padding-left: clamp(32px, 4vw, 56px);
 }
 
 @media (max-width: 680px) {
-	.es-about-page__education .wp-block-columns {
-		grid-template-columns: 1fr;
-	}
-
-	.es-about-page__education .wp-block-columns > .wp-block-column.es-cred:nth-child(-n+2) {
-		padding-top: 20px;
+	.es-about-page__education .wp-block-columns > .wp-block-column:last-child {
+		border-left: none;
+		padding-left: 0;
+		padding-top: 24px;
 		border-top: 1px solid var(--es-line);
-	}
-
-	.es-about-page__education .wp-block-columns > .wp-block-column.es-cred:first-child {
-		padding-top: 0;
-		border-top: none;
 	}
 }
 
@@ -1004,16 +1031,113 @@
    real photo is inserted. Zero effect while the block is still empty —
    an unpicked core/image renders nothing on the frontend (no url, no
    invented placeholder graphic), matching the "do not leave a visual
-   placeholder" correction exactly. */
+   placeholder" correction exactly. Scoped by position (first column of
+   the About intro's Columns block) rather than a className on the
+   core/column itself — see the Education comment above for why. */
 
-.es-about__portrait .wp-block-image {
+.es-about-page__intro .wp-block-columns > .wp-block-column:first-child .wp-block-image {
 	margin: 0;
 }
 
-.es-about__portrait .wp-block-image img {
+.es-about-page__intro .wp-block-columns > .wp-block-column:first-child .wp-block-image img {
 	display: block;
 	width: 100%;
 	aspect-ratio: 3 / 4;
 	object-fit: cover;
 	border-radius: var(--es-radius);
+}
+
+/* ---------- 5. core/columns — About intro (Portrait + text), round-3 fix ----------
+   Same root cause and same fix as Education above: real core/columns with
+   a native flex-basis width (42/58, ~5/12–7/12) instead of the old
+   CSS-Grid override on a plain core/group (.es-about__grid, SHARED with
+   the Home "About" teaser — deliberately left untouched in
+   pages-home.css: this page never uses that class anymore). Gutter here
+   matches the previous grid's gap value for visual continuity; the text
+   column is narrower than the old single-column intro, so its measure is
+   reduced slightly (56ch/clamp(20,2.3vw,27) → 48ch/clamp(18,1.8vw,24)),
+   per the correction ticket's explicit allowance ("intro type may reduce
+   slightly"). */
+
+.es-about-page__intro .wp-block-columns {
+	column-gap: clamp(32px, 5vw, 72px);
+	align-items: flex-start;
+}
+
+.es-about-page__intro .es-about-page__text {
+	max-width: 48ch;
+	font-size: clamp(18px, 1.8vw, 24px);
+}
+
+/* ---------- 6. core/buttons — Resume/CV wrapper reset (round-3 fix) ----------
+   Round-3 report: the CV button showed two visible outlines. The .es-btn
+   pill chrome was already scoped correctly to .wp-block-button__link (the
+   real <a>); this adds an explicit reset on BOTH wrapper levels
+   (.wp-block-buttons and .wp-block-button itself) so neither can ever
+   render a second border/background/pill-shape of its own — whatever the
+   source of the second outline (parent theme's own default button
+   styling is the most likely one), only .wp-block-button__link is left
+   with visible chrome. !important is deliberate here: this is a reset of
+   generic upstream defaults, not a specificity fight the theme should
+   need to keep re-winning as those defaults evolve. */
+
+.es-btn-group,
+.es-btn-group > .wp-block-button.es-btn {
+	border: none !important;
+	background: none !important;
+	border-radius: 0 !important;
+	padding: 0 !important;
+	box-shadow: none !important;
+}
+
+/* ---------- 7. Experience — remove the nested "Key contributions"
+   disclosure's own divider (round-3 fix) ----------
+   Round-3 report: each Experience/Earlier-Experience entry showed TWO
+   dividers with an empty gap between them — the nested case-details'
+   own summary border-bottom (section 1 above, ".es-case-details.is-style-
+   light summary") PLUS the next .es-exp-item's border-top (this file,
+   "About: Experience / Earlier Experience"). Fixed by dropping the
+   border-bottom only in the nested (per-entry) context — the group-level
+   ones ("Show N earlier roles" / "Show N certifications") are untouched,
+   they don't have a competing sibling border-top right after them. The
+   next .es-exp-item's border-top remains the ONE separator per item, as
+   required. When open, the opened content gets a subtle left rule
+   instead (same visual language as .es-process-detail__note elsewhere on
+   this page) so the summary and its opened content read as one element
+   belonging to the entry, not as two things split by a rule. */
+
+.es-exp-item .es-case-details.is-style-light summary {
+	border-bottom: none;
+}
+
+.es-exp-item .es-case-details.is-style-light[open] > .es-case-details__body {
+	border-left: 2px solid var(--es-line);
+	padding-left: 14px;
+	margin-top: 2px;
+}
+
+/* ---------- 8. Hobbies — deterministic desktop grid (round-3 fix) ----------
+   Round-3 report: on desktop the Hobbies grid rendered as a single narrow
+   column, reading like a mobile layout. auto-fill/minmax sizes columns
+   from the CONTAINER's available width, which is fragile inside nested
+   Gutenberg wrapper divs in real WordPress (a wrapper not reporting the
+   full content width makes every track collapse to one column). Fixed
+   with an explicit, deterministic column count instead — 3 columns on
+   desktop, 2 on tablet, 1 on narrow mobile — so the layout can't collapse
+   based on ambiguous container sizing. */
+
+.es-hobbies__list {
+	grid-template-columns: repeat(3, 1fr) !important;
+}
+
+@media (max-width: 900px) {
+	.es-hobbies__list {
+		grid-template-columns: repeat(2, 1fr) !important;
+	}
+}
+
+@media (max-width: 560px) {
+	.es-hobbies__list {
+		grid-template-columns: 1fr !important;
+	}
 }

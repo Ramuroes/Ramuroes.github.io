@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/hobby-list",
+	"title": "Hobby List",
+	"category": "estavillo-about",
+	"icon": "heart",
+	"description": "Grilla de hobbies/intereses (.es-hobbies__list): un ítem por ícono + etiqueta, reordenable/agregable/borrable. El ícono se elige de la librería aprobada (misma que Home Content) y se resuelve a SVG SIEMPRE server-side — igual que el fallback PHP legacy — así currentColor sigue heredando el tinte del theme en hover/focus sin duplicar artwork en el bloque.",
+	"keywords": [ "estavillo", "hobbies", "intereses", "about" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"items": {
+			"type": "array",
+			"default": [],
+			"items": { "type": "object" }
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-about-block-hobby-list",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}
