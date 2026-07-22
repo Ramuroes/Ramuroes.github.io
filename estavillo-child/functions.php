@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.10' );
+define( 'ES_CHILD_VERSION', '0.2.11' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -58,7 +58,7 @@ function es_child_ui_strings() {
 		'featured_label'      => 'Featured case',
 		'featured_cta'        => 'Read the case study',
 		'process_label'       => 'How I work',
-		'process_cta'         => 'See my process',
+		'process_cta'         => 'See the full process',
 		'work_label'          => 'Selected work',
 		'work_view_all'       => 'All work',
 		'work_view_case'      => 'View case study',
@@ -332,6 +332,47 @@ function es_home_process_steps_defaults() {
  */
 function es_home_process_steps() {
 	return apply_filters( 'es_home_process_steps', es_home_process_steps_defaults() );
+}
+
+/**
+ * Defaults del teaser de "How I Work" en Home (docs/HOW-I-WORK-CONTENT-
+ * SPEC.md §1A) — deliberadamente NO derivados de es_home_process_steps():
+ * el teaser agrupa los 6 pasos en 3 ideas con copy propio, escrito para
+ * ser más corto/genérico que cualquier paso individual, no una selección
+ * de frases de los pasos. Mismo criterio de "Home nunca se rompe": si
+ * algún día se agrega un campo editable para esto, cae acá como default.
+ *
+ * @return array{headline:string,lead:string,groups:array<int,array{title:string,text:string}>}
+ */
+function es_home_process_teaser_defaults() {
+	return array(
+		'headline' => "I don't start with interfaces. I start by understanding the system.",
+		'lead'     => 'The result should make sense for the people using it, and for the system that has to carry it.',
+		'groups'   => array(
+			array(
+				'title' => 'Understand',
+				'text'  => 'See how people, information and goals actually connect.',
+			),
+			array(
+				'title' => 'Explore',
+				'text'  => 'Test ideas and challenge assumptions before committing to one.',
+			),
+			array(
+				'title' => 'Improve',
+				'text'  => 'Build something that works — and keeps working.',
+			),
+		),
+	);
+}
+
+/**
+ * El teaser ya pasado por el filtro 'es_home_process_teaser' (con los
+ * defaults de arriba) — mismo patrón que es_home_process_steps().
+ *
+ * @return array
+ */
+function es_home_process_teaser() {
+	return apply_filters( 'es_home_process_teaser', es_home_process_teaser_defaults() );
 }
 
 /**

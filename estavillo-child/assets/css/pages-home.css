@@ -65,80 +65,72 @@
 	}
 }
 
-/* ---------- how I work (proceso) ---------- */
+/* ---------- how I work (proceso) — teaser compacto ----------
+   Reescrito para docs/HOW-I-WORK-CONTENT-SPEC.md §1A: ya no reproduce la
+   grilla de 6 pasos (ver template-parts/how-i-work-detail.php /
+   la versión Gutenberg de la página dedicada para eso) — es un preview
+   de 3 ideas, deliberadamente más liviano. "No debe dominar la Home ni
+   competir con Featured/Selected Work": sin bordes pesados, sin números
+   por idea, sin ícono/ilustración, tipografía notablemente más chica que
+   el título de Featured Case o el hero. */
 
-.es-process__grid {
+.es-process-teaser__headline {
+	max-width: 46ch;
+	margin: 28px 0 10px;
+	font-family: var(--es-serif);
+	font-size: clamp(19px, 2.1vw, 25px);
+	font-weight: 500;
+	line-height: 1.35;
+	letter-spacing: -0.005em;
+	color: var(--es-ink);
+}
+
+.es-process-teaser__lead {
+	max-width: 52ch;
+	margin: 0 0 clamp(24px, 3vw, 36px);
+	font-size: 14.5px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+}
+
+.es-process-teaser__row {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	gap: clamp(22px, 2.8vw, 36px) clamp(24px, 3vw, 40px);
+	gap: 20px clamp(24px, 3vw, 40px);
 }
 
-.es-process__step {
+.es-process-teaser__group {
+	padding-top: 14px;
 	border-top: 1px solid var(--es-line);
-	padding-top: 20px;
 }
 
-/* fila de cabecera del paso: número + slot de ícono reservado. Reservar el
-   slot ahora garantiza que sumar íconos / motion / ilustración a futuro NO
-   cambie el layout de la sección. */
-.es-process__head {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-	margin-bottom: 14px;
-}
-
-.es-process__num {
+.es-process-teaser__group-title {
+	margin: 0 0 6px;
 	font-family: var(--es-mono);
 	font-size: 12px;
-	color: var(--es-accent);
-}
-
-.es-process__icon {
-	width: 26px;
-	height: 26px;
-	flex: none;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	color: var(--es-accent);
-}
-
-/* placeholder sutil mientras no hay ícono (marca el lugar sin recargar) */
-.es-process__icon--empty {
-	border: 1px dashed var(--es-line-strong);
-	border-radius: 6px;
-	opacity: 0.4;
-}
-
-.es-process__title {
-	margin: 0 0 8px;
-	font-size: 17.5px;
 	font-weight: 600;
-	letter-spacing: -0.005em;
-	color: var(--es-ink);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--es-accent);
 }
 
-.es-process__text {
+.es-process-teaser__group-text {
 	margin: 0;
-	font-size: 14px;
-	line-height: 1.6;
+	font-size: 13.5px;
+	line-height: 1.55;
 	color: var(--es-ink-3);
 }
 
-@media (max-width: 680px) {
-	.es-process__grid {
+/* Tablet: sigue horizontal — recién colapsa en mobile, y ahí con
+   espaciado chico a propósito (nunca la sensación de "sección larga"
+   que tenía la grilla de 6). */
+@media (max-width: 560px) {
+	.es-process-teaser__row {
 		grid-template-columns: 1fr;
-	}
-}
-
-@media (max-width: 900px) and (min-width: 681px) {
-	.es-process__grid {
-		grid-template-columns: repeat(2, 1fr);
+		gap: 16px;
 	}
 }
 

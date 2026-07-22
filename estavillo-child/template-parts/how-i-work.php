@@ -1,8 +1,15 @@
 <?php
 /**
- * How I work — teaser de proceso (6 pasos).
+ * How I work — teaser compacto en Home.
  *
- * CONTENIDO PLACEHOLDER (Home v4). Editable vía filtro 'es_home_process_steps'.
+ * Reescrito para docs/HOW-I-WORK-CONTENT-SPEC.md §1A: ya no es una
+ * versión más chica de la grilla de 6 pasos (esa grilla se retira de acá
+ * por completo) — es un preview genuino de 3 ideas (Understand/Explore/
+ * Improve), con su propio copy (es_home_process_teaser(), functions.php),
+ * deliberadamente distinto del copy de cada uno de los 6 pasos
+ * individuales. La página dedicada (how-i-work-detail.php / la versión
+ * Gutenberg de templates/page-how-i-work.php) sigue siendo la única
+ * fuente de los 6 pasos completos.
  *
  * @package estavillo-child
  */
@@ -13,19 +20,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $es_num = isset( $args['num'] ) ? $args['num'] : '01';
 
-/*
- * Teaser compacto a propósito: solo título+texto+ícono, aunque el paso
- * tenga 'why'/'example'/'tools' cargados — esos 3 campos opcionales solo
- * los muestra la página dedicada (how-i-work-detail.php). Datos y default
- * compartidos vía es_home_process_steps() (functions.php), así que el
- * teaser y la página dedicada siempre ven el mismo contenido base.
- */
-$es_steps = es_home_process_steps();
-
-$es_process_url = apply_filters( 'es_home_process_url', '#process' );
+$es_teaser       = es_home_process_teaser();
+$es_process_url  = apply_filters( 'es_home_process_url', '#process' );
 ?>
 
-<section class="es-section es-process" id="process">
+<section class="es-section es-process-teaser" id="process">
 	<div class="es-container">
 		<div class="es-section-head" data-es-reveal>
 			<div class="es-section-head__title">
@@ -38,20 +37,26 @@ $es_process_url = apply_filters( 'es_home_process_url', '#process' );
 			</a>
 		</div>
 
-		<ol class="es-process__grid">
-			<?php foreach ( $es_steps as $es_i => $es_step ) : ?>
-				<li class="es-process__step" data-es-reveal style="--es-reveal-delay: <?php echo esc_attr( ( $es_i % 3 ) * 80 ); ?>ms">
-					<div class="es-process__head">
-						<span class="es-process__num"><?php echo esc_html( sprintf( '%02d', $es_i + 1 ) ); ?></span>
-						<?php $es_icon_markup = es_process_step_icon_markup( $es_step ); ?>
-						<span class="es-process__icon<?php echo '' === $es_icon_markup ? ' es-process__icon--empty' : ''; ?>" aria-hidden="true">
-							<?php echo $es_icon_markup; // phpcs:ignore -- ya pasado por wp_kses en es_process_step_icon_markup(). ?>
-						</span>
-					</div>
-					<h3 class="es-process__title"><?php echo esc_html( $es_step['title'] ); ?></h3>
-					<p class="es-process__text"><?php echo esc_html( $es_step['text'] ); ?></p>
-				</li>
-			<?php endforeach; ?>
-		</ol>
+		<?php if ( ! empty( $es_teaser['headline'] ) ) : ?>
+			<h3 class="es-process-teaser__headline" data-es-reveal><?php echo esc_html( $es_teaser['headline'] ); ?></h3>
+		<?php endif; ?>
+
+		<?php if ( ! empty( $es_teaser['lead'] ) ) : ?>
+			<p class="es-process-teaser__lead" data-es-reveal><?php echo esc_html( $es_teaser['lead'] ); ?></p>
+		<?php endif; ?>
+
+		<?php if ( ! empty( $es_teaser['groups'] ) && is_array( $es_teaser['groups'] ) ) : ?>
+			<ol class="es-process-teaser__row" data-es-reveal>
+				<?php foreach ( $es_teaser['groups'] as $es_group ) : ?>
+					<?php if ( empty( $es_group['title'] ) ) { continue; } ?>
+					<li class="es-process-teaser__group">
+						<h4 class="es-process-teaser__group-title"><?php echo esc_html( $es_group['title'] ); ?></h4>
+						<?php if ( ! empty( $es_group['text'] ) ) : ?>
+							<p class="es-process-teaser__group-text"><?php echo esc_html( $es_group['text'] ); ?></p>
+						<?php endif; ?>
+					</li>
+				<?php endforeach; ?>
+			</ol>
+		<?php endif; ?>
 	</div>
 </section>
