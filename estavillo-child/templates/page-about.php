@@ -47,19 +47,30 @@ if ( function_exists( 'wp_body_open' ) ) {
 			)
 		);
 
-		get_template_part( 'template-parts/about-content' );
-
-		while ( have_posts() ) :
+		/**
+		 * Gutenberg migration (architecture ticket, in progress): the About
+		 * page body is meant to become real, per-language editable Page
+		 * content — the same the_content() pattern single-es_case_study.php
+		 * already uses — but until the real English/Spanish pages are
+		 * populated and approved, this stays an EXPLICIT, mutually
+		 * exclusive branch: real content → the_content(); no real content →
+		 * the existing template-parts/about-content.php fallback (same
+		 * theme-default content it always rendered). Never both in the
+		 * same request, so nothing double-renders once real content goes
+		 * live. Do not remove the fallback branch until both languages are
+		 * live and this has been explicitly approved — see docs/BACKLOG.md.
+		 */
+		$es_about_content = '';
+		if ( have_posts() ) :
 			the_post();
-			$es_page_content = trim( get_the_content() );
-			if ( '' !== $es_page_content ) :
-				?>
-				<section class="es-section es-page-content">
-					<div class="es-container"><?php the_content(); ?></div>
-				</section>
-				<?php
-			endif;
-		endwhile;
+			$es_about_content = trim( get_the_content() );
+		endif;
+
+		if ( '' !== $es_about_content ) :
+			the_content();
+		else :
+			get_template_part( 'template-parts/about-content' );
+		endif;
 		?>
 	</main>
 

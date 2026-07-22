@@ -34,5 +34,29 @@ function es_child_register_block_styles() {
 			'label' => __( 'Checkmark List', 'estavillo-child' ),
 		)
 	);
+
+	/**
+	 * About-page Gutenberg migration: opt-in lightweight style for the
+	 * existing estavillo/case-details block (accessible native
+	 * <details>/<summary>, already used by Case Studies). Case Studies
+	 * keep their current bordered/filled look — this is a NEW, separate
+	 * style choice in the block's own Styles panel, not a change to the
+	 * block's default appearance. CSS lives in assets/css/pages.css
+	 * (`.es-case-details.is-style-light`), the same stylesheet already
+	 * scoped to the 4 fixed pages — not in case-study.css, so About never
+	 * needs to load that stylesheet just for this one block style.
+	 * register_block_style() only records the style association (it
+	 * doesn't require the block type to already be registered), so this
+	 * is harmlessly inert if the "Estavillo Portfolio Core" plugin is
+	 * ever deactivated — same "no fatal if the plugin is off" contract
+	 * as the rest of the theme/plugin boundary.
+	 */
+	register_block_style(
+		'estavillo/case-details',
+		array(
+			'name'  => 'light',
+			'label' => __( 'Light (no box, hairline only)', 'estavillo-child' ),
+		)
+	);
 }
 add_action( 'init', 'es_child_register_block_styles' );

@@ -819,3 +819,201 @@
 	background: var(--es-block);
 	border-bottom-color: var(--es-block-line);
 }
+
+/* =========================================================================
+   About page — Gutenberg migration (architecture ticket)
+   -------------------------------------------------------------------------
+   New CSS needed ONLY because Gutenberg's native block markup differs from
+   the PHP-generated markup it replaces — no visual redesign, no change to
+   colors/typography/spacing tokens anywhere else on the site.
+
+   1. estavillo/case-details "Light" style: the same already-approved
+      lightweight hairline disclosure from the About-page correction
+      ticket, ported onto the block's OWN class names (.es-case-details,
+      not .es-about-details, which stays exactly as it was for the legacy
+      PHP fallback). Fully self-contained — not a delta over
+      case-study.css — so About never needs to load that stylesheet, and
+      Case Studies keep their current bordered/filled .es-case-details
+      appearance completely untouched (opt-in via the block's own Styles
+      panel; the default/unstyled look is unaffected).
+   2. core/button parity with the existing .es-btn pill CTA — core's own
+      button markup differs structurally (wrapper div + its own link
+      classes) from the hand-written <a class="es-btn">, so this
+      reproduces the same look via a compound selector, scoped to the
+      "es-btn" Additional CSS Class added on the block in the editor.
+   3. core/columns parity with the existing Education 2-column grid + its
+      title-alignment fix, scoped to the About page's Education section.
+   4. core/image parity for the portrait — once a real photo replaces the
+      empty placeholder block, this keeps the same 3:4 frame the old
+      dashed placeholder box used, so the layout doesn't jump/reflow.
+   ========================================================================= */
+
+/* ---------- 1. estavillo/case-details — Light style (About only) ---------- */
+
+.es-case-details.is-style-light {
+	border: none;
+	background: none;
+}
+
+.es-case-details.is-style-light summary {
+	list-style: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 14px 0;
+	font-family: var(--es-mono);
+	font-size: 13px;
+	font-weight: 500;
+	letter-spacing: 0.03em;
+	color: var(--es-ink-2);
+	border-bottom: 1px solid var(--es-line);
+	transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.es-case-details.is-style-light summary::-webkit-details-marker {
+	display: none;
+}
+
+.es-case-details.is-style-light summary:hover {
+	color: var(--es-ink);
+	border-color: var(--es-line-strong);
+}
+
+.es-case-details.is-style-light summary:focus-visible {
+	outline: 2px solid var(--es-accent);
+	outline-offset: 2px;
+}
+
+.es-case-details.is-style-light summary::after {
+	content: '+';
+	color: var(--es-accent);
+	font-size: 15px;
+	line-height: 1;
+	flex: none;
+}
+
+.es-case-details.is-style-light[open] summary::after {
+	content: '−';
+}
+
+.es-case-details.is-style-light > .es-case-details__body {
+	padding-top: 16px;
+}
+
+/* Size: "nested" (one Experience/Earlier Experience entry's Key
+   contributions) reads smaller than "group" (the whole Earlier
+   Experience / Other Certifications section) — same distinction the
+   previous ticket's .es-about-details--nested/--group made, driven here
+   by ambient context instead of a second class an editor has to
+   remember to add correctly. */
+.es-exp-item .es-case-details.is-style-light {
+	margin-top: 8px;
+	max-width: 62ch;
+}
+
+.es-exp-item .es-case-details.is-style-light summary {
+	font-size: 12px;
+}
+
+#earlier-experience .es-case-details.is-style-light,
+#other-certifications .es-case-details.is-style-light {
+	max-width: 720px;
+}
+
+/* ---------- 2. core/button — Resume/CV CTA parity with .es-btn ----------
+   .es-btn__arrow already has its color rule in components.css (bare class
+   selector, no scoping) — the arrow inside the button's text needs no new
+   CSS here, only the pill/link chrome around it. */
+
+.wp-block-button.es-btn > .wp-block-button__link {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	padding: 15px 26px;
+	border: 1px solid var(--es-accent-dim);
+	border-radius: 40px;
+	background: transparent;
+	font-family: var(--es-sans);
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--es-ink) !important;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease,
+		gap 0.2s var(--es-ease);
+}
+
+.wp-block-button.es-btn > .wp-block-button__link:hover,
+.wp-block-button.es-btn > .wp-block-button__link:focus-visible,
+.wp-block-button.es-btn > .wp-block-button__link:active {
+	color: var(--es-ink) !important;
+	background: var(--es-accent-soft);
+	border: 1px solid var(--es-accent);
+	box-shadow: none;
+}
+
+.wp-block-button.es-btn > .wp-block-button__link:hover {
+	gap: 18px;
+}
+
+/* ---------- 3. core/columns — Education 2-col grid + alignment fix ----------
+   core/columns ships its own flex-based layout CSS; this replaces it with
+   the theme's existing 2-col grid (same values as .es-grid--2) scoped
+   tightly to the About page's Education section so it can never affect
+   Columns used anywhere else. Each core/column already carries the
+   existing "es-cred" Additional CSS Class directly (same element, not a
+   nested one), so the existing .es-cred / .es-cred:first-child rules
+   already apply as-is — the only genuinely new behavior needed here is
+   resetting the SECOND cell of the first row too (same alignment bug
+   fixed for the PHP version in the previous correction ticket: without
+   this, the second title starts lower than the first), reverted at the
+   same ≤680px breakpoint so mobile keeps a divider between the two
+   stacked entries. */
+
+.es-about-page__education .wp-block-columns {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: clamp(16px, 2vw, 24px);
+}
+
+.es-about-page__education .wp-block-columns > .wp-block-column.es-cred:nth-child(-n+2) {
+	padding-top: 0;
+	border-top: none;
+}
+
+@media (max-width: 680px) {
+	.es-about-page__education .wp-block-columns {
+		grid-template-columns: 1fr;
+	}
+
+	.es-about-page__education .wp-block-columns > .wp-block-column.es-cred:nth-child(-n+2) {
+		padding-top: 20px;
+		border-top: 1px solid var(--es-line);
+	}
+
+	.es-about-page__education .wp-block-columns > .wp-block-column.es-cred:first-child {
+		padding-top: 0;
+		border-top: none;
+	}
+}
+
+/* ---------- 4. core/image — portrait frame parity ----------
+   Reproduces the 3:4 frame the old dashed placeholder box used, once a
+   real photo is inserted. Zero effect while the block is still empty —
+   an unpicked core/image renders nothing on the frontend (no url, no
+   invented placeholder graphic), matching the "do not leave a visual
+   placeholder" correction exactly. */
+
+.es-about__portrait .wp-block-image {
+	margin: 0;
+}
+
+.es-about__portrait .wp-block-image img {
+	display: block;
+	width: 100%;
+	aspect-ratio: 3 / 4;
+	object-fit: cover;
+	border-radius: var(--es-radius);
+}
