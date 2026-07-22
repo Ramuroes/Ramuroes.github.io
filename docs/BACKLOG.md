@@ -427,6 +427,77 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   Home page, same template) once real content is ready — mechanical setup
   step in wp-admin, no code required (see `EDITABILITY-PLAN.md`).
 
+- **P1 — How I Work strategy defined, not yet implemented.** Full content,
+  interaction model, and Gutenberg architecture for both the Home teaser
+  and the dedicated How I Work page are planned in
+  `docs/HOW-I-WORK-STRATEGY.md` — six moves renamed for precision (closing
+  two real gaps against the "Core Positioning" brief: exploring
+  alternatives, and testing with users), Home teaser regrouped into three
+  ideas (Understand/Explore/Improve) instead of reproducing the six-card
+  grid, a new expandable-detail schema (adds `ai_help`/`human_judgment`,
+  reuses the already-fixed `estavillo/case-details` disclosure), a large
+  editorial illustration family (replacing the current small abstract
+  icons), and an MVP/future motion split. No new custom Gutenberg block
+  needed — reuses `core/image` (Media-Library-driven, same as About's
+  portrait fix) + `core/heading`/`core/paragraph` + `estavillo/case-details`
+  + a new Pattern, following the same block-vs-pattern reasoning already
+  applied to About's Hobbies. Several open decisions (grouping split,
+  three copy renames, illustration production, AI band wording) need
+  explicit sign-off before implementation — see the strategy doc's §13.
+  Not started.
+
+## How I Work — Phase 2 (planned, not started)
+
+Every item below is intentionally **not implemented** — captured here so
+none of it gets lost, picked up only after the How I Work strategy above
+is approved and built. See `docs/HOW-I-WORK-STRATEGY.md` for the current
+process-page work; these are the adjacent/downstream items raised
+alongside it.
+
+- **P2** — Case-study architecture inspired by editorial senior
+  portfolios (a stronger visual/structural reference point than the
+  current case template, once more real cases exist to test it against).
+- **P2** — Narrative project titles (move away from purely descriptive
+  case names toward titles with a point of view), once enough cases exist
+  to make the pattern worth establishing.
+- **P2** — Annotated product screens within case studies (callouts on
+  real UI, not just prose describing it).
+- **P2** — Case-specific structures rather than one rigid case template —
+  let each case's own shape drive its section order/composition instead
+  of forcing every case through the same 13/17-section skeleton.
+- **P2** — Document AI decisions, limitations, and validation *within*
+  individual case studies (not just the site-wide How I Work AI band) —
+  where AI was used on that specific project, what its limits were, how
+  output was validated.
+- **P2** — Metrics and evidence: a consistent, honest way to present real
+  numbers/outcomes per case once they exist (never invented placeholders).
+- **P2** — Testimonials and proof of collaboration (quotes, references,
+  or other third-party evidence of real work with real people/teams).
+- **P2** — Future "Capabilities / What I Do" section (site-wide, not
+  case-specific) — scope and placement not yet defined.
+- **P2** — Future Tools placement — a real, honest list of tools used
+  (distinct from the How I Work AI band, which is about the *role* AI
+  plays, not a product list).
+- **P3** — Client/company logo treatment — only once real, permissioned
+  logos exist to show; do not build the component ahead of real assets.
+- **P3** — Typographic motion exploration (site-wide direction, not
+  scoped to any one page yet).
+- **P2** — How I Work video script and storyboard — a future richer
+  medium for the same Core Positioning narrative; script/storyboard only
+  for now, no video production.
+- **P1** — Spanish How I Work version, once the English content and
+  Gutenberg architecture in `docs/HOW-I-WORK-STRATEGY.md` are implemented
+  and approved — same "no invented translation" rule already applied to
+  About's Spanish content (still pending separately).
+- **P2** — Relationships between process steps and related cases — the
+  `related_case` field noted in the strategy doc's expandable-content
+  schema is deferred until this exists; needs a real cross-linking model
+  between How I Work moves and Case Study posts, not a hardcoded guess.
+- **P2** — Future Home refinement, once How I Work (page + teaser) is
+  approved and live — Home's own How I Work section may need a follow-up
+  pass after the full page's final direction is settled, since the teaser
+  is designed to point at it.
+
 Editability priority order (for reference, full detail in
 `EDITABILITY-PLAN.md`):
 
