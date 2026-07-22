@@ -877,13 +877,14 @@
 }
 
 .es-case-details.is-style-light summary {
+	position: relative;
 	list-style: none;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 16px;
-	padding: 14px 0;
+	padding: 14px 26px 14px 0;
 	font-family: var(--es-mono);
 	font-size: 13px;
 	font-weight: 500;
@@ -907,24 +908,54 @@
 	outline-offset: 2px;
 }
 
+/* Regression fix: the +/− indicator used to be a single text glyph swapped
+   via `content: '+'` / `content: '−'` — a discrete change, so the
+   micro-animation the earlier .es-about-details version had (a smooth
+   rotate) was lost in the Gutenberg port. Restored here as two fixed-size
+   bars forming a "+": ::before is the constant horizontal bar (this is
+   also the resting "−" shape), ::after is the vertical bar, which rotates
+   flat onto ::before when open. Absolutely positioned (not flex items),
+   so neither the rotation nor the open/closed swap ever shifts the
+   summary text or the row's height/width — only `transform` animates,
+   nothing that triggers layout. Same var(--accent) token as before, so
+   dark/light both just work. */
+.es-case-details.is-style-light summary::before,
 .es-case-details.is-style-light summary::after {
-	content: '+';
-	color: var(--es-accent);
-	font-size: 15px;
-	line-height: 1;
-	flex: none;
+	content: '';
+	position: absolute;
+	top: 50%;
+	right: 2px;
+	width: 10px;
+	height: 1.5px;
+	background: var(--es-accent);
+	transition: transform 0.2s ease;
+}
+
+.es-case-details.is-style-light summary::before {
+	transform: translateY(-50%);
+}
+
+.es-case-details.is-style-light summary::after {
+	transform: translateY(-50%) rotate(90deg);
 }
 
 /* Direct-child combinator is deliberate (round-3 fix): without it this
    also matched any NESTED "Key contributions" summary sitting inside an
    OPEN outer details (e.g. Earlier Experience's "Show N earlier roles")
    even while that nested one was still closed — every nested summary
-   showed "−" as soon as its ancestor opened, regardless of its own
-   [open] state. <summary> is always the details element's own first
-   child per the HTML spec, so ">" correctly scopes this to the [open]
-   element's OWN summary only. */
+   showed the open state as soon as its ancestor opened, regardless of
+   its own [open] state. <summary> is always the details element's own
+   first child per the HTML spec, so ">" correctly scopes this to the
+   [open] element's OWN summary only. */
 .es-case-details.is-style-light[open] > summary::after {
-	content: '−';
+	transform: translateY(-50%) rotate(0deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-case-details.is-style-light summary::before,
+	.es-case-details.is-style-light summary::after {
+		transition: none;
+	}
 }
 
 .es-case-details.is-style-light > .es-case-details__body {
