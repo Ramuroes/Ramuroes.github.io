@@ -14,9 +14,11 @@ implementation pass (matching the phased approach already used for About).
 filtered through `es_home_process_steps()`, shared by both surfaces) is in
 better shape than the visual treatment suggests. Each of the 6 steps
 already carries `title`, `text` (short description), `icon_key`, `why`,
-`example`, `tools` — four of the schema fields this ticket asks for already
-exist; only `ai_help`, `human_judgment`, and a structured `related_case`
-link are genuinely missing (see §6).
+`example`, `tools` — three of the final schema's seven fields (§6) already
+exist under different names (`why` → Why it matters, `tools` → What I may
+do, `example` → Example from my work); the four genuinely new fields are
+**How AI can help**, **What requires human judgment**, **What success
+might look like**, and **Related case**.
 
 **Home teaser** (`template-parts/how-i-work.php` → `.es-process__grid`,
 `pages-home.css`): a 3-column, 6-card grid — number + small icon slot +
@@ -59,7 +61,7 @@ anywhere today. New work, not a modification of something existing.
 
 ---
 
-## 2. Proposed final narrative
+## 2. Proposed final narrative (revised)
 
 Anchor line, used verbatim (not paraphrased) in at least two places:
 
@@ -79,6 +81,43 @@ Anchor line, used verbatim (not paraphrased) in at least two places:
   polish, AI accelerating without replacing judgment. Design Thinking/Lean
   UX/Service Design/Agile/Sprints are named at most once, in passing, as
   informing influences — never as a labeled methodology grid.
+
+**The missing dimension, now integrated**: the page must communicate that
+this process connects three things, not one — user needs, operational
+reality, and business goals. A short explicit statement makes this
+concrete instead of implicit:
+
+> "This isn't only about how something looks or feels — it's about
+> whether it works for the person using it, the system carrying it, and
+> the goals it's meant to support."
+
+This line (or an edited version of it) sits directly under the anchor
+line, before the 6 moves begin. It sets up the **balanced model** that
+should be legible throughout the page, not stated once and forgotten:
+
+- **user value** — does it work for the person actually using it;
+- **business viability** — does it serve a real product or business
+  objective;
+- **operational reality** — does it hold up under how the organization
+  actually runs, not an idealized version of it;
+- **technical feasibility** — can it actually be built and maintained
+  with the constraints that exist;
+- **responsible and accessible design** — is it usable, honest, and
+  accountable for who it affects.
+
+**Language discipline** (applies everywhere business/product language
+appears — the 6 moves, the expandable schema, the AI band): sober,
+specific, falsifiable. Preferred vocabulary: *business goals, product
+objectives, measurable outcomes, operational impact, reduce friction,
+reduce errors, improve adoption, reduce unnecessary dependency,
+accelerate decision-making, avoid unnecessary complexity, improve
+efficiency, sustainable improvement.* Never: *massive growth, guaranteed
+ROI, exponential results, game-changing, 10x, world-class* — or any
+unfalsifiable claim of revenue growth or guaranteed return. The
+difference in practice: "this can reduce how often a quote gets
+re-checked by hand" is allowed; "this will boost revenue" is not — the
+first is a plausible, observable operational effect; the second is a
+promise no design process can honestly make on its own.
 
 ---
 
@@ -102,6 +141,55 @@ brief (explicitly naming exploration-of-alternatives and
 testing-with-users). This is the recommendation; final copy sign-off is
 listed in §13.
 
+**Final six moves — draft short descriptions**, each now carrying the
+business/product dimension throughout (not as a bolted-on sentence, and
+never as a 7th step). These are drafts for the always-visible `text`
+field (§6), written to the same sober-language rules as §2:
+
+**01 — Understand the system.** I start by mapping how the system
+actually works — the people, information, constraints, and product or
+business goals involved — not just the interface. Understanding
+operational reality and business context early reduces the risk of
+solving the wrong problem later.
+
+**02 — Find the real problem.** From that map, I look for the specific
+point where user pain, operational friction, and barriers to product or
+business objectives actually meet — not a general list of issues. Naming
+the real problem precisely is what keeps the rest of the work from
+becoming decoration.
+
+**03 — Gather evidence.** I build a case with whatever evidence is
+available and relevant — interviews, observation, workflows, documents,
+and product data such as errors, time, or adoption. Evidence turns a
+debate about opinions into a decision grounded in what's actually
+happening.
+
+**04 — Explore and challenge.** Before committing to one direction, I
+generate alternatives and challenge assumptions — comparing potential
+value, effort, risk, and feasibility for each. This keeps a plan honest
+about what it depends on and what it costs.
+
+**05 — Design practical solutions.** Not every problem needs a new
+interface — sometimes the strongest move is fixing what's underneath it.
+When a solution is the right call, I design it to hold up under real
+conditions: usability and accessibility alongside business viability,
+technical feasibility, maintainability, and the organization's actual
+constraints.
+
+**06 — Test, learn and iterate.** I treat a first version as a
+hypothesis, evaluated against both user experience and relevant
+outcomes — task success, errors, time, adoption, support load, or
+progress toward a product goal. What "wrong" would look like is defined
+before shipping, so the next version is actually better, not just
+different.
+
+Each draft stays within the 1-2 sentence budget already set for the
+always-visible surface (§6) — the fuller KPI/methods/risk detail belongs
+inside the expandable panel, not here. The process is still described as
+adaptable and non-linear: no language above implies a fixed linear
+handoff between moves, and the page's supporting paragraph (§5, item 2)
+states this explicitly before the sequence begins.
+
 ---
 
 ## 4. Home content structure
@@ -113,12 +201,24 @@ component:
 2. One-sentence lead statement — the anchor line from §2, editorial serif
    treatment (reuse the `.es-about-page__text`-style large-intro
    treatment already established, not a new type scale).
-3. **Three grouped ideas** (not six cards): Understand / Explore /
+3. **One bridging line**, immediately under the anchor line, connecting
+   people/systems/outcomes without naming business or KPIs — draft:
+   *"The result should make sense for the people using it, and for the
+   system that has to carry it."* This is the one place Home gestures at
+   "outcomes" at all — in plain language, not the balanced-model
+   vocabulary from §2 (which stays on the full page).
+4. **Three grouped ideas** (not six cards): Understand / Explore /
    Improve, each rendered as a compact block — short label + one
    supporting line, **no illustration, no icon, no expandable detail, no
-   number-per-move**. Deliberately lighter than anything else on the
-   page.
-4. One CTA, reusing the existing `.es-link-arrow` component: "See the
+   number-per-move, no business language, no KPI mentions**. Deliberately
+   lighter than anything else on the page. Draft supporting lines (revised
+   to reflect people+systems, not just UX activity):
+   - **Understand** — "See how people, information and goals actually
+     connect."
+   - **Explore** — "Test ideas and challenge assumptions before
+     committing to one."
+   - **Improve** — "Build something that works — and keeps working."
+5. One CTA, reusing the existing `.es-link-arrow` component: "See the
    full process →", linking to the How I Work page.
 
 **Recommended grouping** (2-2-2, each pair sharing one real relationship):
@@ -165,28 +265,29 @@ needs a `<details>`, it doesn't belong on Home.
 
 ---
 
-## 6. Expandable content schema
+## 6. Expandable content schema (final)
 
 Per move, always-visible surface stays minimal (number, illustration,
 title, short description) — everything else moves inside one collapsed
-`<details>` panel, reusing `estavillo/case-details` (`is-style-light`):
+`<details>` panel, reusing `estavillo/case-details` (`is-style-light`).
+Final field set and order, replacing the previous draft:
 
 | Field | Status | Notes |
 |---|---|---|
 | `title` | exists | unchanged |
-| `text` (short description) | exists | stays 1-2 sentences, always visible |
+| `text` (short description) | exists | stays 1-2 sentences, always visible — draft copy per move is in §3 |
 | `illustration` | **replaces** `icon_key` | see §7 — no longer a small abstract glyph |
-| `why` | exists | **moves inside** the expandable panel (currently always-visible; see §13 for the alternative of keeping it visible) |
-| `methods` | **renames** `tools` | same data, broader framing — "methods or activities," not just tool names; stays a short comma list or becomes a real `core/list` if migrated to Gutenberg (see §10) |
-| `ai_help` | **new** | 1-2 sentences: how AI concretely helps at this specific move (not generic) |
-| `human_judgment` | **new** | 1-2 sentences: what stays human-only at this specific move |
-| `example` | exists | stays free text for now |
-| `related_case` | **new, optional** | a link to a real Case Study post; text-only for now (no case exists yet that's tagged per-move) — see backlog item "relationships between process steps and related cases" |
+| **Why it matters** | exists (`why`) | **moves inside** the expandable panel (currently always-visible; see §13, decision 4) |
+| **What I may do** | **renames** `tools`/`methods` | broader than a tool list — the deliberate/methods/activities that may apply, phrased as *may*, not a mandatory checklist, matching "adaptable, non-linear" (§3); stays a short list (comma list or real `core/list`, see §10) |
+| **How AI can help** | **new** (`ai_help`) | 1-2 sentences, specific to this move — must also name a **limit or how the output gets validated** (e.g. "…every AI-synthesized finding is still reviewed by a person before it counts as evidence"), not just what AI does. Ties directly into §9. |
+| **What requires human judgment** | **new** (`human_judgment`) | 1-2 sentences: what stays human-only at this specific move |
+| **Example from my work** | **renames** `example` | same data, same free-text field, renamed for tone |
+| **What success might look like** | **new** (`success_signals`) | describes **possible observable improvements, not guarantees** — see the sober-language rule in §2. Example vocabulary to draw from: clearer decision-making, fewer errors, reduced operational friction, improved accessibility, faster task completion, better adoption, less dependency on one person, progress toward a relevant product goal. Never a number/percentage unless it comes from a real, evidenced case (§13, decision 11). |
+| **Related case, when available** | **new, optional** (`related_case`) | a link to a real Case Study post; text-only for now (no case exists yet that's tagged per-move) — see backlog item "relationships between process steps and related cases" |
 
-`why`/`methods`/`ai_help`/`human_judgment`/`example` are all optional per
-move (empty fields simply don't render their block, same convention
-already used everywhere else in this codebase) — no move is required to
-fill all five.
+Every field below `text` is optional per move (an empty field simply
+doesn't render, same convention used everywhere else in this codebase) —
+no move is required to fill all seven.
 
 ---
 
@@ -281,13 +382,22 @@ only.
 
 ---
 
-## 9. AI integration model
+## 9. AI integration model (revised placement + per-move reinforcement)
 
 A **dedicated short band** after the 6 moves, not a 7th step and not a
 logo list. Rationale: scattering AI mentions silently through the 6 moves
 would under-communicate it (the ticket asks for a clear, quotable
 statement), while adding it as step 7 would misrepresent it as one more
 sequential phase rather than something that runs through all of them.
+**Placement detail, to keep it from reading as a 7th step visually**:
+the band should NOT reuse the numbered-move layout (no `07`, no
+marker-column, no illustration in the same slot/size as the six
+illustrations) — it gets its own distinct treatment (e.g. a full-width
+statement band with a different background tint, or a pull-quote
+treatment already used elsewhere on the site), so it's visually legible
+as a *layer underneath* the six moves, not a seventh item in the same
+list. This is a layout instruction for whoever builds it, not yet a CSS
+decision.
 
 Content:
 
@@ -303,9 +413,16 @@ No logos, no tool grid here — that's a separate, already-flagged future
 item ("future Tools placement," §12). This band is about the *role* AI
 plays, not which products are used.
 
-The per-move `ai_help`/`human_judgment` fields (§6) reinforce this same
-message at the granular level, inside each move's expandable detail —
-consistent with "transversal," never contradicting the band's framing.
+**Per-move reinforcement (this is where "referenced inside individual
+moves… with clear limits and validation" actually happens)**: the band
+states the general principle once; the per-move **How AI can help**
+field (§6) is where it becomes concrete and falsifiable — each instance
+should name where AI helped *and* how the result was checked (a limit,
+a review step, a human sign-off), not just a capability claim. A field
+that only says what AI can do, with no limit or validation named, doesn't
+meet this bar and should be rewritten before publishing. This keeps the
+band's promise ("human judgment defines the direction") demonstrated at
+the move level, not just asserted once at the top.
 
 ---
 
@@ -319,10 +436,9 @@ varied prose content is better served by real, individually composed
 Gutenberg blocks or a Pattern, the same way About's Experience entries
 were built** (not crammed into one block's array attribute).
 
-How I Work's 6 moves are prose-heavy across 5 optional fields
-(why/methods/ai_help/human_judgment/example) — closer to About's
-Experience entries than to Hobbies' short label+icon pairs. Recommended
-architecture, **requiring no new custom block**:
+How I Work's 6 moves are prose-heavy across 7 optional fields (§6) —
+closer to About's Experience entries than to Hobbies' short label+icon
+pairs. Recommended architecture, **requiring no new custom block**:
 
 - **Illustration slot**: real `core/image`, empty by default, replaced via
   Media Library — same precedent as the About portrait fix (no invented
@@ -351,6 +467,94 @@ architecture, **requiring no new custom block**:
   styled structurally. No new block or pattern strictly required, though
   a small convenience Pattern wouldn't hurt.
 
+### Exact nested block structure for one process move
+
+The gap in the previous draft: leaving illustration/title/description/
+disclosure as loose sibling blocks would list every one of them as a
+separate top-level row in List View — six moves × four-plus rows each,
+with nothing showing they belong together. Fixed by wrapping each move in
+**one outer `core/group`**, so List View shows one collapsible node per
+move (`Group (Move 01)`) containing everything else as its children —
+this is the actual requirement ("clearly grouped Gutenberg unit… not an
+unstructured collection of loose blocks"), not just a visual nicety.
+
+Proposed structure (shown for move 01; identical shape for 02-06, this is
+exactly what the Pattern above pre-composes):
+
+```html
+<!-- wp:group {"tagName":"article","className":"es-process-move","anchor":"understand-the-system"} -->
+<article class="wp-block-group es-process-move" id="understand-the-system">
+
+  <!-- wp:group {"className":"es-process-move__marker"} -->
+  <div class="wp-block-group es-process-move__marker">
+
+    <!-- wp:paragraph {"className":"es-process-move__num"} -->
+    <p class="es-process-move__num">01</p>
+    <!-- /wp:paragraph -->
+
+    <!-- wp:image {"sizeSlug":"large","linkDestination":"none","className":"es-process-move__illustration"} /-->
+
+  <!-- /wp:group -->
+
+  <!-- wp:group {"className":"es-process-move__body"} -->
+  <div class="wp-block-group es-process-move__body">
+
+    <!-- wp:heading {"level":3,"className":"es-process-move__title"} -->
+    <h3>Understand the system</h3>
+    <!-- /wp:heading -->
+
+    <!-- wp:paragraph {"className":"es-process-move__text"} -->
+    <p>I start by mapping how the system actually works…</p>
+    <!-- /wp:paragraph -->
+
+    <!-- wp:estavillo/case-details {"summary":"More on this move","className":"is-style-light"} -->
+
+      <!-- wp:heading {"level":4} --><h4>Why it matters</h4><!-- /wp:heading -->
+      <!-- wp:paragraph --><p>…</p><!-- /wp:paragraph -->
+
+      <!-- wp:heading {"level":4} --><h4>What I may do</h4><!-- /wp:heading -->
+      <!-- wp:list --><ul><li>…</li></ul><!-- /wp:list -->
+
+      <!-- wp:heading {"level":4} --><h4>How AI can help</h4><!-- /wp:heading -->
+      <!-- wp:paragraph --><p>…(including the limit/validation, §9)</p><!-- /wp:paragraph -->
+
+      <!-- wp:heading {"level":4} --><h4>What requires human judgment</h4><!-- /wp:heading -->
+      <!-- wp:paragraph --><p>…</p><!-- /wp:paragraph -->
+
+      <!-- wp:heading {"level":4} --><h4>Example from my work</h4><!-- /wp:heading -->
+      <!-- wp:paragraph --><p>…</p><!-- /wp:paragraph -->
+
+      <!-- wp:heading {"level":4} --><h4>What success might look like</h4><!-- /wp:heading -->
+      <!-- wp:paragraph --><p>…(observable, not a guarantee — §6)</p><!-- /wp:paragraph -->
+
+      <!-- wp:heading {"level":4} --><h4>Related case</h4><!-- /wp:heading -->
+      <!-- wp:paragraph --><p>…(when available)</p><!-- /wp:paragraph -->
+
+    <!-- /wp:estavillo/case-details -->
+
+  <!-- /wp:group -->
+
+<!-- /wp:group -->
+```
+
+Why `core/heading` (h4) per field rather than a bold inline label (the
+`.es-process-detail__note-label` span the *current* PHP page uses):
+each field becomes its own visible, semantic row in List View — both the
+editor benefit this ticket asks for, and a real accessibility win
+(screen-reader users get actual heading navigation inside the panel, not
+a bolded run of text). `summary="More on this move"` is a placeholder
+string — low-stakes wording, not listed as a blocking open decision.
+
+Every element inside the `core/group`/`core/columns` family here follows
+the already-proven rule from the About round-3 fix: **no className
+combined with a width/other risky attribute on the same block** — widths
+(if the marker/body ever need explicit ones instead of flex-basis
+defaults) go on a `core/columns`+`core/column` pair with no className on
+the column itself, exactly as done for About's Portrait/Intro and
+Education sections. This structure has not been tested against the real
+parser yet (no code was touched for this ticket) — that validation is
+part of the eventual implementation pass, not this document.
+
 **Migration path**: How I Work's data currently lives in PHP
 (`es_home_process_steps_defaults()` + the Portfolio Content admin
 fields). Migrating to Gutenberg should follow the exact explicit-fallback
@@ -364,6 +568,21 @@ architecture only.
 ---
 
 ## 11. Accessibility considerations
+
+**Stated principle** (appears once on the page — as a line inside the
+Design practical solutions move, §3/§6, not as a separate badge or
+section, and not repeated elsewhere):
+
+> "Accessibility, clarity, and maintainability are considered from the
+> beginning — not added as a final compliance layer."
+
+This is a description of *when in the process* accessibility is
+considered, not a credential. **Do not** describe Ramiro as an
+accessibility specialist, and do not claim formal accessibility expertise,
+certification, or audit experience anywhere on the page — none has been
+established in this repository, and the difference between "I consider
+accessibility from the start" (true, honest, supportable) and "I am an
+accessibility expert" (an unestablished claim) matters and must not blur.
 
 - Native `<details>/<summary>` for every expandable panel — keyboard
   operable with zero custom ARIA, exactly as already proven on About.
@@ -416,43 +635,173 @@ explicitly requested for the backlog in this ticket:
 - Relationships between process steps and related cases
 - Future Home refinement after How I Work is approved
 
+This round adds four more, requested explicitly for the business/product
+dimension:
+
+- Explicit treatment of business outcomes in case studies
+- Operational metrics and KPIs (folded into the existing "Metrics and
+  evidence" item, reworded to name this explicitly)
+- Accessibility review across the portfolio (broader than this one page)
+- Future motion exploration (broader than the "Typographic motion
+  exploration" item already present)
+
 (Full entries with context are in `docs/BACKLOG.md`; not duplicated here
 to avoid the two files drifting out of sync.)
 
 ---
 
-## 13. Open decisions requiring approval
+## 13. Open decisions requiring approval (revised format)
 
-1. **Home grouping split**: 2-2-2 (recommended, §4) vs. 3-1-2 — confirm
-   before implementation.
-2. **Grouping labels**: "Understand / Explore / Improve" as given, or a
-   different set of three words — ticket says "explore," treating this
-   document's choice as a proposal, not final.
-3. **Three copy renames** (§3): "Find the real problem," "Explore and
-   challenge," "Test, learn and iterate" — need explicit sign-off before
-   the data model changes.
-4. **`why` field placement**: moved fully inside the expandable panel
-   (recommended, §6) vs. kept as a separate always-visible line above the
-   expandable detail (its current behavior). Affects visual density on
-   the always-visible surface.
-5. **Illustration production**: who draws the six illustrations and on
-   what timeline — AI-assisted draft + human refinement (matching the
-   hobby-icon precedent) is recommended as the *process*, but scheduling
-   is outside this document.
-6. **`related_case` field**: implemented now as a plain optional text/URL
-   field, or deferred entirely until the backlog item "relationships
-   between process steps and related cases" is picked up. Recommendation:
-   defer — no case exists yet that's meaningfully tagged per-move.
-7. **AI band copy**: this document drafts the structure and the anchor
-   line; final sentence-level wording is an editorial decision, not
-   assumed.
-8. **Active-step scroll-spy**: confirm it's in scope for the MVP pass —
-   it is the one genuinely new interaction pattern (small vanilla JS,
-   IntersectionObserver) rather than a reuse of something that already
-   exists; everything else in §8's MVP list reuses proven mechanisms.
-9. **Closing CTA to a Case Study** (§5, item 5): confirm whether to wire
-   this now (linking generically to Work/Selected Work) or hold until a
-   specific case is the intended reference.
+Each decision below states the question, the recommendation, the
+alternative actually considered, the real trade-off, and whether it
+blocks starting implementation.
+
+1. **Home grouping split.**
+   - *Question*: group the six moves 2-2-2 or 3-1-2 under
+     Understand/Explore/Improve?
+   - *Recommendation*: 2-2-2 (§4) — every group carries two real moves,
+     none reads as an afterthought.
+   - *Alternative*: 3-1-2 (Understand=01-03, Explore=04 alone,
+     Improve=05-06) — maps more literally onto research/diverge/build.
+   - *Trade-off*: 3-1-2 is a cleaner phase-mapping; 2-2-2 is more visually
+     balanced and gives "Explore" real substance on Home instead of
+     standing in for one move.
+   - *Blocks implementation*: **yes** — determines the Home teaser's
+     actual content grouping.
+
+2. **Grouping labels.**
+   - *Question*: keep "Understand / Explore / Improve," or use different
+     words?
+   - *Recommendation*: keep as given — short, plain, no jargon, already
+     matches the ticket's own wording.
+   - *Alternative*: none proposed; ticket explicitly invited review but
+     no stronger alternative surfaced during this pass.
+   - *Trade-off*: none identified.
+   - *Blocks implementation*: **no** — low-risk default, can ship as-is.
+
+3. **Three move-name renames** ("Find the real problem," "Explore and
+   challenge," "Test, learn and iterate").
+   - *Question*: adopt these over the current defaults ("Find the real
+     bottleneck," "Challenge assumptions," "Iterate with purpose")?
+   - *Status*: **resolved this round** — this ticket's own §2 restated
+     these exact three names as the working set, which is taken as
+     confirmation. No longer open.
+   - *Blocks implementation*: **no** — settled.
+
+4. **`why` (Why it matters) field placement.**
+   - *Question*: move fully inside the expandable panel (this document's
+     recommendation, §6), or keep it as a separate always-visible line
+     above the expandable detail (its current behavior on the live PHP
+     page)?
+   - *Recommendation*: move inside — keeps the always-visible surface to
+     number/illustration/title/description only, consistent with "not a
+     services grid."
+   - *Alternative*: keep visible — "why it matters" is arguably the most
+     persuasive single line per move and some visitors won't expand
+     anything.
+   - *Trade-off*: visible-by-default is more persuasive but busier;
+     inside-the-panel is cleaner but requires a click to reach the
+     strongest line.
+   - *Blocks implementation*: **yes** — changes the always-visible layout.
+
+5. **Illustration production.**
+   - *Question*: who draws the six illustrations, and on what timeline?
+   - *Recommendation*: AI-assisted drafting + human review/refinement,
+     reusing the exact hobby-icon precedent (draft, approve, normalize
+     into `assets/`).
+   - *Alternative*: commission hand-drawn illustration from scratch.
+   - *Trade-off*: AI-assisted is faster and cheaper but needs careful
+     human art-direction to hit "coherent perspective and proportions"
+     across all six; commissioned work is slower/costlier but may need
+     less iteration to reach visual consistency.
+   - *Blocks implementation*: **yes** — the full page cannot ship with
+     the current small icons per the ticket's own critique, and nothing
+     else in this phase depends on resolving it first, so it blocks only
+     the illustration work specifically, not the rest of the page.
+
+6. **`related_case` field.**
+   - *Question*: implement now as a plain optional text/URL field, or
+     defer until real per-move case relationships exist?
+   - *Recommendation*: defer — no case is meaningfully tagged per-move
+     yet (see backlog: "relationships between process steps and related
+     cases").
+   - *Alternative*: ship the empty field now so it's ready whenever a
+     case exists.
+   - *Trade-off*: shipping empty costs nothing but adds an unused field;
+     deferring keeps the schema exactly matched to real content.
+   - *Blocks implementation*: **no** — either choice is compatible with
+     shipping the rest of the page.
+
+7. **AI band copy.**
+   - *Question*: is the drafted structure (§9) and anchor line final?
+   - *Recommendation*: structure and anchor line are solid; the 2-3
+     supporting sentences are a starting draft, not final copy.
+   - *Alternative*: n/a — this is a wording pass, not a structural fork.
+   - *Trade-off*: n/a.
+   - *Blocks implementation*: **yes** — final sentence-level wording
+     needed before the band can be built.
+
+8. **Active-step scroll-spy.**
+   - *Question*: is the IntersectionObserver-driven rail highlight in
+     scope for MVP?
+   - *Recommendation*: include it — small, vanilla, no new dependency,
+     purely supplementary (§11), consistent with the "restrained
+     enhancements" framing.
+   - *Alternative*: drop it from MVP, ship the static rail only, revisit
+     later.
+   - *Trade-off*: it's the one genuinely new interaction pattern in this
+     phase (everything else in §8's MVP list reuses an existing
+     mechanism) — small added build cost for a real "coherent sequence"
+     signal while scrolling.
+   - *Blocks implementation*: **no** — page functions correctly without
+     it; can be added or deferred independently.
+
+9. **Closing CTA to a Case Study.**
+   - *Question*: wire the closing CTA now (generic link to Work/Selected
+     Work) or hold until a specific case is the intended reference?
+   - *Recommendation*: wire it generically now, repoint later — matches
+     how other CTAs on this site already degrade gracefully.
+   - *Alternative*: omit the CTA entirely until a specific case is ready.
+   - *Trade-off*: a generic link risks feeling like a placeholder;
+     omitting it entirely loses a natural exit point from the page.
+   - *Blocks implementation*: **no** — page reads fine either way.
+
+10. **Tone calibration for business/product language** (new this round).
+    - *Question*: how much business/product framing is enough to satisfy
+      "connects user needs, operational reality and business goals"
+      without drifting toward "aggressive marketing copy" (explicitly
+      ruled out)?
+    - *Recommendation*: err conservative — prefer qualitative, falsifiable
+      language (§2's vocabulary list) over any number/KPI mention unless
+      grounded in a real, evidenced case; when in doubt, cut the business
+      language rather than add more.
+    - *Alternative*: lean more explicitly commercial (name specific KPI
+      categories more assertively per move) to make the business
+      relevance unmissable.
+    - *Trade-off*: conservative framing risks under-communicating the
+      business dimension to a hiring manager skimming; more assertive
+      framing risks the exact "inflated claims" problem the ticket warns
+      against.
+    - *Blocks implementation*: **yes** — affects final copy tone across
+      §3, §4, §6, and §9 simultaneously; should be resolved once, not
+      re-litigated per section.
+
+11. **"What success might look like" — generic or case-specific.**
+    - *Question*: ship the generic example vocabulary drafted in §6 as
+      final copy, or hold each move's version until it can be grounded
+      in a real project outcome?
+    - *Recommendation*: ship the generic drafts now (they're honest,
+      observable-improvement language, not invented numbers); replace
+      per-move with something case-specific only once a real, evidenced
+      example exists — never invent a number or outcome to fill the
+      field.
+    - *Alternative*: leave the field blank per move until real outcomes
+      exist for all six, shipping it later as a batch.
+    - *Trade-off*: shipping generic language now is more complete at
+      launch but slightly less concrete; leaving it blank is more
+      conservative but leaves a visibly empty field in 6 places at once.
+    - *Blocks implementation*: **no** — generic drafted language is
+      ready to ship as-is if approved.
 
 No further action until these are resolved. Stopping here per the
 instruction — Home, How I Work, the plugin, the theme, Gutenberg content,

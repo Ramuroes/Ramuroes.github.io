@@ -469,8 +469,16 @@ alongside it.
   individual case studies (not just the site-wide How I Work AI band) —
   where AI was used on that specific project, what its limits were, how
   output was validated.
-- **P2** — Metrics and evidence: a consistent, honest way to present real
-  numbers/outcomes per case once they exist (never invented placeholders).
+- **P2** — Explicit treatment of business outcomes in case studies —
+  distinct from raw metrics below: narrating *why* an outcome mattered to
+  the product/business/operational context it happened in, using the same
+  sober-language rules as the How I Work strategy (`docs/HOW-I-WORK-STRATEGY.md`
+  §2) — never inflated claims, never invented numbers.
+- **P2** — Metrics and evidence, including operational metrics and KPIs:
+  a consistent, honest way to present real numbers/outcomes per case once
+  they exist (task success, errors, time, adoption, support load, or
+  progress toward a stated product goal) — never invented placeholders,
+  never a number without a real source.
 - **P2** — Testimonials and proof of collaboration (quotes, references,
   or other third-party evidence of real work with real people/teams).
 - **P2** — Future "Capabilities / What I Do" section (site-wide, not
@@ -480,8 +488,18 @@ alongside it.
   plays, not a product list).
 - **P3** — Client/company logo treatment — only once real, permissioned
   logos exist to show; do not build the component ahead of real assets.
+- **P2** — Accessibility review across the portfolio — a full pass over
+  every page (not just How I Work's own principle in
+  `docs/HOW-I-WORK-STRATEGY.md` §11), checking real keyboard/focus/
+  contrast/motion behavior site-wide once enough pages are stable to make
+  a single audit worthwhile, rather than re-litigating it page by page.
 - **P3** — Typographic motion exploration (site-wide direction, not
   scoped to any one page yet).
+- **P3** — Future motion exploration beyond How I Work's MVP list (see
+  `docs/HOW-I-WORK-STRATEGY.md` §8 "Future") — illustration video/
+  Lottie-style sequences, scroll-scrubbed/pinned animation, cursor-follow
+  or parallax effects; explicitly deferred past the MVP pass for both How
+  I Work and any other page that might want it later.
 - **P2** — How I Work video script and storyboard — a future richer
   medium for the same Core Positioning narrative; script/storyboard only
   for now, no video production.
