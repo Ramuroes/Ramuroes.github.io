@@ -56,9 +56,9 @@ return <<<'CONTENT'
 <p class="es-process-teaser__lead">The result should make sense for the people using it, and for the system that has to carry it.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:columns {"metadata":{"name":"Concepts"}} -->
-<div class="wp-block-columns"><!-- wp:column {"className":"es-process-teaser__group","metadata":{"name":"Understand"}} -->
-<div class="wp-block-column es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":1,"context":"home"} /-->
+<!-- wp:estavillo/how-i-work-teaser {"desktopLayout":"stacked","illustrationSize":"medium","metadata":{"name":"Concepts"}} -->
+<!-- wp:group {"className":"es-process-teaser__group","metadata":{"name":"Understand"}} -->
+<div class="wp-block-group es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":1,"context":"home"} /-->
 
 <!-- wp:heading {"level":4,"className":"es-process-teaser__group-title"} -->
 <h4 class="wp-block-heading es-process-teaser__group-title">Understand</h4>
@@ -67,10 +67,10 @@ return <<<'CONTENT'
 <!-- wp:paragraph {"className":"es-process-teaser__group-text"} -->
 <p class="es-process-teaser__group-text">See how people, information and goals actually connect.</p>
 <!-- /wp:paragraph --></div>
-<!-- /wp:column -->
+<!-- /wp:group -->
 
-<!-- wp:column {"className":"es-process-teaser__group","metadata":{"name":"Explore"}} -->
-<div class="wp-block-column es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":4,"context":"home"} /-->
+<!-- wp:group {"className":"es-process-teaser__group","metadata":{"name":"Explore"}} -->
+<div class="wp-block-group es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":4,"context":"home"} /-->
 
 <!-- wp:heading {"level":4,"className":"es-process-teaser__group-title"} -->
 <h4 class="wp-block-heading es-process-teaser__group-title">Explore</h4>
@@ -79,10 +79,10 @@ return <<<'CONTENT'
 <!-- wp:paragraph {"className":"es-process-teaser__group-text"} -->
 <p class="es-process-teaser__group-text">Test ideas and challenge assumptions before committing to one.</p>
 <!-- /wp:paragraph --></div>
-<!-- /wp:column -->
+<!-- /wp:group -->
 
-<!-- wp:column {"className":"es-process-teaser__group","metadata":{"name":"Improve"}} -->
-<div class="wp-block-column es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":6,"context":"home"} /-->
+<!-- wp:group {"className":"es-process-teaser__group","metadata":{"name":"Improve"}} -->
+<div class="wp-block-group es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":6,"context":"home"} /-->
 
 <!-- wp:heading {"level":4,"className":"es-process-teaser__group-title"} -->
 <h4 class="wp-block-heading es-process-teaser__group-title">Improve</h4>
@@ -91,8 +91,8 @@ return <<<'CONTENT'
 <!-- wp:paragraph {"className":"es-process-teaser__group-text"} -->
 <p class="es-process-teaser__group-text">Build something that works &#8212; and keeps working.</p>
 <!-- /wp:paragraph --></div>
-<!-- /wp:column --></div>
-<!-- /wp:columns --></div>
+<!-- /wp:group -->
+<!-- /wp:estavillo/how-i-work-teaser --></div>
 <!-- /wp:group --></section>
 <!-- /wp:group -->
 CONTENT;

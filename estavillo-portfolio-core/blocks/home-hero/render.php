@@ -53,9 +53,20 @@ if ( '' !== $es_attr_mobile && isset( $es_mobile_choices[ $es_attr_mobile ] ) ) 
 } else {
 	$es_hero_mobile = 'network_constellation_subtle';
 }
+
+// Scroll behavior — 'standard' (default, la transición existente sin
+// cambios) o 'parallax' (opt-in: la capa del fondo animado queda sticky un
+// tramo acotado mientras el copy sube y se desvanece, luego el fondo se va).
+// Se emite como clase modificadora; toda la coreografía parallax vive en
+// hero.css detrás de esa clase + prefers-reduced-motion + un breakpoint de
+// desktop, así el default y mobile no cambian.
+$es_scroll_mode = isset( $attributes['scrollMode'] ) && 'parallax' === $attributes['scrollMode'] ? 'parallax' : 'standard';
+$es_hero_class  = 'es-hero es-hero--scroll-' . $es_scroll_mode;
 ?>
-<section <?php echo get_block_wrapper_attributes( array( 'class' => 'es-hero' ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- ya escapado por core. ?> data-hero-desktop="<?php echo esc_attr( $es_hero_desktop ); ?>" data-hero-mobile="<?php echo esc_attr( $es_hero_mobile ); ?>">
-	<div class="es-hero__visual" data-es-hero-map aria-hidden="true"></div>
+<section <?php echo get_block_wrapper_attributes( array( 'class' => $es_hero_class ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- ya escapado por core. ?> data-hero-desktop="<?php echo esc_attr( $es_hero_desktop ); ?>" data-hero-mobile="<?php echo esc_attr( $es_hero_mobile ); ?>" data-hero-scroll="<?php echo esc_attr( $es_scroll_mode ); ?>">
+	<div class="es-hero__bg">
+		<div class="es-hero__visual" data-es-hero-map aria-hidden="true"></div>
+	</div>
 
 	<div class="es-container es-hero__inner">
 		<div class="es-hero__content"><?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput -- InnerBlocks ya renderizados/sanitizados por core. ?></div>

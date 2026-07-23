@@ -1,18 +1,14 @@
 <?php
 /**
- * About teaser — retrato (placeholder) + párrafo editorial.
+ * About teaser — retrato (marco reservado) + párrafo editorial.
  *
- * Home migration ticket: 'es_home_about_text'/'es_home_about_portrait' ya
- * son EXACTAMENTE los mismos filtros que about-content.php usa para el
- * cuerpo real de la página About (puenteados por el plugin al mismo campo
- * de opción about_text/about_portrait — confirmado en
- * includes/home-content-options.php) — cero contenido duplicado, ya
- * comparten una única fuente. Lo único que faltaba: este teaser mostraba
- * el texto COMPLETO de About como un solo párrafo (con los saltos de
- * línea colapsados). Ahora usa es_about_intro_paragraphs() — la misma
- * función que la página About usa para partir su intro en párrafos — y
- * solo muestra el primero, un excerpt genuino en vez de una copia
- * independiente.
+ * Esta es la rama LEGACY FALLBACK de Home (página Home sin contenido
+ * Gutenberg). Refinement ticket §5: la Home About teaser ya NO sincroniza
+ * con la página About — en la rama Gutenberg se edita directo con bloques
+ * core (core/image + core/paragraph + CTA). Como el fallback no tiene
+ * edición por-página, muestra un default estático propio del tema
+ * (es_about_intro_default(), primer párrafo) — sin leer la página About ni
+ * ninguna opción/filtro de sincronización.
  *
  * @package estavillo-child
  */
@@ -23,13 +19,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $es_num = isset( $args['num'] ) ? $args['num'] : '04';
 
-// Mismo origen que el bloque estavillo/about-teaser-text: el primer
-// párrafo de intro EN VIVO de la página About Gutenberg (idioma actual),
-// con fallback legacy — ver inc/about-intro-source.php.
-$es_about_text = function_exists( 'es_home_about_intro' ) ? es_home_about_intro() : '';
+// Default estático del tema — primer párrafo del intro por defecto. Sin
+// sincronización con la página About (refinement ticket §5).
+$es_about_text = '';
+if ( function_exists( 'es_about_intro_default' ) ) {
+	$es_about_default = (string) es_about_intro_default();
+	$es_about_paras   = preg_split( '/\r\n\r\n|\n\n+/', trim( $es_about_default ) );
+	$es_about_text    = ! empty( $es_about_paras[0] ) ? trim( $es_about_paras[0] ) : trim( $es_about_default );
+}
 
 $es_about_url      = apply_filters( 'es_home_about_url', '#about' );
-$es_about_portrait = apply_filters( 'es_home_about_portrait', '' );
+$es_about_portrait = '';
 ?>
 
 <section class="es-section es-about" id="about">
@@ -50,7 +50,7 @@ $es_about_portrait = apply_filters( 'es_home_about_portrait', '' );
 					<h2 class="es-label"><?php echo esc_html( es__( 'about_label' ) ); ?></h2>
 				</div>
 			</div>
-			<p class="es-about__text" data-es-reveal><?php echo wp_kses_post( $es_about_text ); // es_home_about_intro() ya devuelve inline HTML seguro. ?></p>
+			<p class="es-about__text" data-es-reveal><?php echo esc_html( $es_about_text ); ?></p>
 			<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_about_url ); ?>" data-es-reveal>
 				<?php echo esc_html( es__( 'about_cta' ) ); ?>
 				<span class="es-link-arrow__icon" aria-hidden="true">&rarr;</span>

@@ -96,6 +96,22 @@
 							options: toOptions(VARIANTS.mobile),
 							onChange: function (v) { set({ mobileVariant: v }); },
 						})
+					),
+					el(
+						PanelBody,
+						{ title: __( 'Scroll behavior', 'estavillo-portfolio-core' ), initialOpen: false },
+						el('p', { style: { fontSize: '12px', opacity: 0.7, marginTop: 0 } },
+							__( 'Standard fades the hero as you scroll. Parallax keeps the animated background briefly anchored while the copy moves away (desktop only; mobile and reduced-motion always use the standard fade).', 'estavillo-portfolio-core' )
+						),
+						el(SelectControl, {
+							label: __( 'Transition', 'estavillo-portfolio-core' ),
+							value: a.scrollMode || 'standard',
+							options: [
+								{ label: __( 'Standard transition', 'estavillo-portfolio-core' ), value: 'standard' },
+								{ label: __( 'Parallax transition', 'estavillo-portfolio-core' ), value: 'parallax' },
+							],
+							onChange: function (v) { set({ scrollMode: v }); },
+						})
 					)
 				),
 				el(

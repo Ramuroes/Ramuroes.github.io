@@ -31,13 +31,22 @@
 	z-index: 0;
 }
 
-/* ---------- capa visual (SVG inyectado por hero-system-map.js) ---------- */
-
-.es-hero__visual {
+/* ---------- capa visual (SVG inyectado por hero-system-map.js) ----------
+   .es-hero__bg envuelve la capa visual: en modo STANDARD es la misma caja
+   de fondo de siempre (absolute inset:0, z-index:0) — visualmente idéntico
+   al hero anterior. En modo PARALLAX pasa a sticky (ver más abajo). El JS
+   sigue inyectando el SVG en .es-hero__visual[data-es-hero-map], sin
+   cambios. */
+.es-hero__bg {
 	position: absolute;
 	inset: 0;
 	z-index: 0;
 	pointer-events: none; /* la interacción se captura a nivel .es-hero */
+}
+
+.es-hero__visual {
+	position: absolute;
+	inset: 0;
 }
 
 .es-hero__visual svg {
@@ -323,7 +332,10 @@
    ========================================================================= */
 
 @media (prefers-reduced-motion: no-preference) {
-	.es-hero__content {
+	/* Modo STANDARD (default) y el hero PHP de fallback (sin la clase de
+	   modo): la coreografía suave de siempre. El :not() deja que el modo
+	   parallax defina su propia coreografía más abajo sin heredar ésta. */
+	.es-hero:not(.es-hero--scroll-parallax) .es-hero__content {
 		transform: translateY(calc(var(--es-hero-progress) * -48px));
 		opacity: calc(1 - var(--es-hero-progress) * 0.92);
 		will-change: transform, opacity;
@@ -331,10 +343,64 @@
 
 	/* El fondo permanece más que el texto: parallax leve hacia abajo y fade
 	   cuadrático (se va recién cerca del final del recorrido). */
-	.es-hero__visual {
+	.es-hero:not(.es-hero--scroll-parallax) .es-hero__visual {
 		transform: translateY(calc(var(--es-hero-progress) * 34px));
 		opacity: calc(1 - var(--es-hero-progress) * var(--es-hero-progress) * 0.7);
 		will-change: transform, opacity;
+	}
+}
+
+/* =========================================================================
+   Modo PARALLAX (opt-in, atributo scrollMode = parallax) — §2–4
+   -------------------------------------------------------------------------
+   Transición editorial más marcada: la capa del fondo animado (.es-hero__bg)
+   queda STICKY un tramo acotado mientras el copy sube y se desvanece PRIMERO;
+   el fondo permanece un poco más y se va cerca del final; How I Work entra a
+   continuación. Solo aplica en DESKTOP y con motion permitido — mobile y
+   reduced-motion caen al fade estándar / flujo normal (§4). Sin
+   background-attachment:fixed, sin snap, sin pin excesivo (el runway es la
+   propia altura del hero), sin librería, sin listener extra (reusa el mismo
+   --es-hero-progress del scroll rAF existente).
+
+   Progresión (tuneable con las custom properties de abajo):
+     --es-hero-copy-out : progreso al que el copy termina de desvanecerse.
+     --es-hero-bg-out   : progreso al que el fondo termina de desvanecerse.
+   Copy 0 → --es-hero-copy-out ; fondo --es-hero-copy-out → --es-hero-bg-out. */
+.es-hero--scroll-parallax {
+	--es-hero-copy-out: 0.55;
+	--es-hero-bg-out: 1;
+}
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+	/* overflow visible + sticky: la capa de fondo se ancla al top del
+	   viewport mientras el hero scrollea. margin-bottom negativo colapsa su
+	   espacio de layout para que el copy (z-index:1) quede encima. El
+	   overflow:hidden base rompería el sticky (atrapa el contenedor), por eso
+	   se libera solo en este modo/breakpoint. */
+	.es-hero--scroll-parallax {
+		overflow: visible;
+	}
+
+	.es-hero--scroll-parallax .es-hero__bg {
+		position: sticky;
+		top: 0;
+		height: 100vh;
+		margin-bottom: -100vh;
+	}
+
+	/* Copy: sube y se desvanece PRIMERO (antes que el fondo). Clamp para que
+	   la opacidad no baje de 0 aunque el progreso pase de copy-out. */
+	.es-hero--scroll-parallax .es-hero__content {
+		transform: translateY(calc(var(--es-hero-progress) * -72px));
+		opacity: calc(1 - clamp(0, calc(var(--es-hero-progress) / var(--es-hero-copy-out)), 1));
+		will-change: transform, opacity;
+	}
+
+	/* Fondo: se mantiene visible mientras el copy se va, y recién se desvanece
+	   entre copy-out y bg-out. */
+	.es-hero--scroll-parallax .es-hero__visual {
+		opacity: calc(1 - clamp(0, calc((var(--es-hero-progress) - var(--es-hero-copy-out)) / (var(--es-hero-bg-out) - var(--es-hero-copy-out))), 1));
+		will-change: opacity;
 	}
 }
 

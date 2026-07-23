@@ -35,8 +35,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 function es_home_blocks_list() {
 	return array(
 		'home-hero',
+		'how-i-work-teaser',
 		'featured-case',
 		'selected-work',
+		// DEPRECATED (refinement ticket §5): la Home About teaser usa
+		// core/image + core/paragraph directos. Estos dos siguen
+		// registrados solo por compatibilidad con contenido ya guardado —
+		// no usar en contenido nuevo (ver sus render.php).
 		'about-teaser-text',
 		'about-teaser-portrait',
 	);

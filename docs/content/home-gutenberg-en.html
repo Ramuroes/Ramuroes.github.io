@@ -8,20 +8,26 @@
 <!--    flagged yet they render the same placeholder cases the legacy -->
 <!--    Home always showed - never an empty section. -->
 <!-- -->
-<!-- 2. ABOUT PORTRAIT — the portrait block reads Portfolio Content -> -->
-<!--    About -> "Portrait image URL", the same field the About page -->
-<!--    uses. Until it is set, a clean reserved frame renders (no -->
-<!--    development markers); set the URL once and the photo appears -->
-<!--    here and on the About page at the same time. -->
+<!-- 2. ABOUT PORTRAIT — the About teaser now uses a plain, directly -->
+<!--    editable Image block (empty = a clean reserved frame, no dev -->
+<!--    marker). Click it and Upload/select the portrait. The teaser text -->
+<!--    and CTA are ordinary editable blocks too - nothing syncs from the -->
+<!--    About page anymore; edit it all here. -->
 <!-- -->
 <!-- 3. HERO — the copy below (eyebrow, headline, paragraph, both CTAs) -->
 <!--    is normal editable Gutenberg content inside the Home Hero block. -->
-<!--    The animated background and its desktop/mobile variants are NOT -->
-<!--    part of the content - they render automatically on the real site -->
-<!--    and are configured under Customize -> ESTAVILLO Theme Options. -->
+<!--    The animated background style (Inspector -> "Animated background") -->
+<!--    and the scroll transition (Inspector -> "Scroll behavior": -->
+<!--    Standard or Parallax) are block controls; the background animation -->
+<!--    itself renders on the real site. -->
+<!-- -->
+<!-- HOW I WORK teaser: the three concepts sit in one "How I Work — -->
+<!--    Teaser row" block whose Inspector ("Teaser layout") sets the -->
+<!--    desktop layout (illustration above / beside text) and the -->
+<!--    illustration size (Small/Medium/Large). -->
 <!-- ================================================================ -->
 
-<!-- wp:estavillo/home-hero -->
+<!-- wp:estavillo/home-hero {"scrollMode":"standard"} -->
 <!-- wp:paragraph {"className":"es-eyebrow es-hero__eyebrow"} -->
 <p class="es-eyebrow es-hero__eyebrow">Product Designer · Systems &amp; Operations</p>
 <!-- /wp:paragraph -->
@@ -71,9 +77,9 @@
 <p class="es-process-teaser__lead">The result should make sense for the people using it, and for the system that has to carry it.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:columns {"metadata":{"name":"Concepts"}} -->
-<div class="wp-block-columns"><!-- wp:column {"className":"es-process-teaser__group","metadata":{"name":"Understand"}} -->
-<div class="wp-block-column es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":1,"context":"home"} /-->
+<!-- wp:estavillo/how-i-work-teaser {"desktopLayout":"stacked","illustrationSize":"medium","metadata":{"name":"Concepts"}} -->
+<!-- wp:group {"className":"es-process-teaser__group","metadata":{"name":"Understand"}} -->
+<div class="wp-block-group es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":1,"context":"home"} /-->
 
 <!-- wp:heading {"level":4,"className":"es-process-teaser__group-title"} -->
 <h4 class="wp-block-heading es-process-teaser__group-title">Understand</h4>
@@ -82,10 +88,10 @@
 <!-- wp:paragraph {"className":"es-process-teaser__group-text"} -->
 <p class="es-process-teaser__group-text">See how people, information and goals actually connect.</p>
 <!-- /wp:paragraph --></div>
-<!-- /wp:column -->
+<!-- /wp:group -->
 
-<!-- wp:column {"className":"es-process-teaser__group","metadata":{"name":"Explore"}} -->
-<div class="wp-block-column es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":4,"context":"home"} /-->
+<!-- wp:group {"className":"es-process-teaser__group","metadata":{"name":"Explore"}} -->
+<div class="wp-block-group es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":4,"context":"home"} /-->
 
 <!-- wp:heading {"level":4,"className":"es-process-teaser__group-title"} -->
 <h4 class="wp-block-heading es-process-teaser__group-title">Explore</h4>
@@ -94,10 +100,10 @@
 <!-- wp:paragraph {"className":"es-process-teaser__group-text"} -->
 <p class="es-process-teaser__group-text">Test ideas and challenge assumptions before committing to one.</p>
 <!-- /wp:paragraph --></div>
-<!-- /wp:column -->
+<!-- /wp:group -->
 
-<!-- wp:column {"className":"es-process-teaser__group","metadata":{"name":"Improve"}} -->
-<div class="wp-block-column es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":6,"context":"home"} /-->
+<!-- wp:group {"className":"es-process-teaser__group","metadata":{"name":"Improve"}} -->
+<div class="wp-block-group es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":6,"context":"home"} /-->
 
 <!-- wp:heading {"level":4,"className":"es-process-teaser__group-title"} -->
 <h4 class="wp-block-heading es-process-teaser__group-title">Improve</h4>
@@ -106,8 +112,8 @@
 <!-- wp:paragraph {"className":"es-process-teaser__group-text"} -->
 <p class="es-process-teaser__group-text">Build something that works &#8212; and keeps working.</p>
 <!-- /wp:paragraph --></div>
-<!-- /wp:column --></div>
-<!-- /wp:columns --></div>
+<!-- /wp:group -->
+<!-- /wp:estavillo/how-i-work-teaser --></div>
 <!-- /wp:group --></section>
 <!-- /wp:group -->
 
@@ -155,7 +161,9 @@
 <section class="wp-block-group es-section es-about" id="about"><!-- wp:group {"className":"es-container"} -->
 <div class="wp-block-group es-container"><!-- wp:columns {"metadata":{"name":"Portrait + intro"}} -->
 <div class="wp-block-columns"><!-- wp:column {"width":"300px","metadata":{"name":"Portrait"}} -->
-<div class="wp-block-column" style="flex-basis:300px;flex-grow:0"><!-- wp:estavillo/about-teaser-portrait /--></div>
+<div class="wp-block-column" style="flex-basis:300px;flex-grow:0"><!-- wp:image {"className":"es-about__portrait"} -->
+<figure class="wp-block-image es-about__portrait"></figure>
+<!-- /wp:image --></div>
 <!-- /wp:column -->
 
 <!-- wp:column {"className":"es-about__body","metadata":{"name":"Intro"}} -->
@@ -171,7 +179,9 @@
 <!-- /wp:group --></div>
 <!-- /wp:group -->
 
-<!-- wp:estavillo/about-teaser-text /-->
+<!-- wp:paragraph {"className":"es-about__text"} -->
+<p class="es-about__text">Hi, I&#8217;m Ramiro Estavillo, a Product Designer and Industrial Designer based in Montevideo. I turn complex, often invisible processes into clearer, more usable systems &#8212; combining research, systems thinking and practical implementation.</p>
+<!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
 <p><a class="es-link-arrow es-link-arrow--quiet" href="#about">More about me &rarr;</a></p>
@@ -204,13 +214,15 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:group {"className":"es-footer-cta__actions"} -->
-<div class="wp-block-group es-footer-cta__actions"><!-- wp:paragraph -->
+<div class="wp-block-group es-footer-cta__actions"><!-- wp:group {"className":"es-footer-cta__contacts","layout":{"type":"flex","flexWrap":"wrap","verticalAlignment":"bottom"}} -->
+<div class="wp-block-group es-footer-cta__contacts"><!-- wp:paragraph -->
 <p><a class="es-footer-cta__email" href="mailto:hello@ramiroestavillo.com">hello@ramiroestavillo.com</a></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><a class="es-footer-cta__whatsapp" href="https://wa.me/59899892722" target="_blank" rel="noopener">WhatsApp</a></p>
-<!-- /wp:paragraph -->
+<p><a class="es-footer-cta__phone" href="https://wa.me/59899892722" target="_blank" rel="noopener">+598 99 892 722</a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
 
 <!-- wp:paragraph -->
 <p><a class="es-link-arrow es-link-arrow--quiet" href="#connect">All ways to connect &rarr;</a></p>

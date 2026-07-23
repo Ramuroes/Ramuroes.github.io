@@ -58,7 +58,9 @@ printf(
 	data-hero-desktop="<?php echo esc_attr( $es_hero_desktop ); ?>"
 	data-hero-mobile="<?php echo esc_attr( $es_hero_mobile ); ?>"
 >
-	<div class="es-hero__visual" data-es-hero-map aria-hidden="true"></div>
+	<div class="es-hero__bg">
+		<div class="es-hero__visual" data-es-hero-map aria-hidden="true"></div>
+	</div>
 
 	<div class="es-container es-hero__inner">
 		<div class="es-hero__content">

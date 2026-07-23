@@ -16,6 +16,10 @@
 		"mobileVariant": {
 			"type": "string",
 			"default": ""
+		},
+		"scrollMode": {
+			"type": "string",
+			"default": "standard"
 		}
 	},
 	"supports": {

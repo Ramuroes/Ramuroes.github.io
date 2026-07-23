@@ -139,33 +139,69 @@
 	margin: 0 0 12px;
 }
 
-/* Home migration ticket: the Gutenberg content path uses the
-   estavillo/how-i-work-illustration BLOCK (its render.php only passes
-   context/show_accents/decorative to es_how_work_illustration_svg(), never
-   a custom 'class') instead of calling that function directly with
-   class="es-process-teaser__group-illustration" the way the legacy PHP
-   fallback (template-parts/how-i-work.php) does. Real-render screenshot
-   review caught this: without this rule the block's own wrapper markup
-   (.how-work-illustration, always emitted regardless of the 'class' arg)
-   rendered at its unstyled 100%-width default (~150px) instead of the
-   approved compact 44px. Same visual result as the class-based rule
-   above, scoped to the block's actual wrapper so both paths match. */
+/* Refinement ticket §7: the illustration size is a preset (Small/Medium/
+   Large) driven by a single CSS var on the teaser row, so the estavillo/
+   how-i-work-teaser block's illustrationSize attribute maps to a class and
+   the three illustrations scale together. Small = the approved 44px.
+   Medium ≈ 1.35×, Large ≈ 1.7×. Tunable here without touching PHP/JS. */
+.es-process-teaser__row {
+	--es-illus-size: 44px;
+}
+
+.es-process-teaser__row--illus-medium {
+	--es-illus-size: 60px;
+}
+
+.es-process-teaser__row--illus-large {
+	--es-illus-size: 75px;
+}
+
+/* The block's own wrapper markup (.how-work-illustration) is what actually
+   sizes — the legacy PHP fallback keeps its own fixed 44px above. */
 .es-process-teaser__group .how-work-illustration {
-	width: 44px;
+	width: var(--es-illus-size, 44px);
 	margin: 0 0 12px;
 }
 
-/* Home revision ticket: the Gutenberg 3-up row is REAL core/columns (each
-   wp:column carries .es-process-teaser__group), because a plain wp:group
-   with the .es-process-teaser__row grid class does NOT survive the real-WP
-   cascade — the same documented failure as Connect's original two-column
-   layout — and stacked the three concepts vertically on the live site.
-   The __row grid CSS above stays untouched for the PHP fallback's <ol>;
-   this rule only matches the columns wrapper (ancestor-scoped, no layout
-   class on the columns block itself — same discipline as the Connect fix)
-   so the Gutenberg gap matches the approved grid gap. */
-.es-process-teaser .wp-block-columns {
-	gap: 20px clamp(24px, 3vw, 40px);
+/* Refinement ticket §6: desktop layout variant. The teaser row is the
+   estavillo/how-i-work-teaser block's OWN div (not a core/group), so
+   .es-process-teaser__row (grid, defined below) applies cleanly. "Side"
+   arranges each concept as illustration | (title + text) via grid, desktop
+   only — mobile always stacks (the row collapses to 1 column under 560px
+   and this rule is gated above that breakpoint, so tiny icons never sit
+   beside long text on phones). */
+@media (min-width: 561px) {
+	.es-process-teaser__row--side .es-process-teaser__group {
+		display: grid;
+		grid-template-columns: var(--es-illus-size, 44px) 1fr;
+		grid-template-rows: auto auto;
+		column-gap: 16px;
+		align-items: start;
+	}
+
+	.es-process-teaser__row--side .es-process-teaser__group > * {
+		margin: 0;
+	}
+
+	.es-process-teaser__row--side .es-process-teaser__group > .wp-block-estavillo-how-i-work-illustration {
+		grid-column: 1;
+		grid-row: 1 / 3;
+	}
+
+	/* the illustration keeps its own bottom margin off in side mode */
+	.es-process-teaser__row--side .es-process-teaser__group .how-work-illustration {
+		margin-bottom: 0;
+	}
+
+	.es-process-teaser__row--side .es-process-teaser__group-title {
+		grid-column: 2;
+		grid-row: 1;
+	}
+
+	.es-process-teaser__row--side .es-process-teaser__group-text {
+		grid-column: 2;
+		grid-row: 2;
+	}
 }
 
 /* Same story for the About teaser: .es-about__grid was a CSS grid on a
@@ -283,6 +319,35 @@
 	position: relative;
 }
 
+/* Refinement ticket §5: the Home About teaser now uses a real, directly
+   editable core/image (figure.es-about__portrait) instead of the dynamic
+   portrait block. Empty = a clean reserved frame (never a broken <img> or
+   a dev marker); once a real image is picked, :has(img) drops the frame
+   chrome and the photo fills a 3:4 crop. The :has() fallback (older
+   browsers) just keeps the 3:4 frame around the image — graceful. The
+   legacy PHP fallback still uses the .es-about__portrait DIV rule above. */
+figure.es-about__portrait {
+	margin: 0;
+	aspect-ratio: 3 / 4;
+	border: 1px dashed var(--es-line-strong);
+	border-radius: var(--es-radius);
+	background: var(--es-paper-2);
+	overflow: hidden;
+}
+
+figure.es-about__portrait img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+figure.es-about__portrait:has(img) {
+	aspect-ratio: auto;
+	border: none;
+	background: none;
+}
+
 .es-about__placeholder {
 	aspect-ratio: 3 / 4;
 }
@@ -353,19 +418,34 @@
 	color: var(--es-accent);
 }
 
+/* Correction ticket §9: el número de teléfono (link WhatsApp) tiene
+   jerarquía comparable al email — mismo tratamiento mono/tamaño — y ambos
+   viven en la misma fila (.es-footer-cta__contacts). El alias .__whatsapp
+   se mantiene mapeado a lo mismo por si quedó contenido guardado con la
+   clase vieja. */
+.es-footer-cta__phone,
 .es-footer-cta__whatsapp {
-	font-family: var(--es-sans);
-	font-size: clamp(14px, 1.3vw, 15px);
-	color: var(--es-ink-3);
+	font-family: var(--es-mono);
+	font-size: clamp(17px, 2.4vw, 24px);
+	color: var(--es-ink);
 	text-decoration: none;
-	border-bottom: 1px solid var(--es-line);
+	border-bottom: 1px solid var(--es-accent);
 	padding-bottom: 3px;
-	transition: color var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease;
+	transition: color var(--es-dur-fast) ease;
 }
 
+.es-footer-cta__phone:hover,
 .es-footer-cta__whatsapp:hover {
 	color: var(--es-accent);
-	border-color: var(--es-accent);
+}
+
+/* Email + teléfono al mismo nivel visual, en una fila; envuelven juntos y
+   se apilan naturalmente en mobile con gap compacto. */
+.es-footer-cta__contacts {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 14px clamp(28px, 5vw, 64px);
 }
 
 .es-footer-cta__actions {
@@ -373,6 +453,16 @@
 	align-items: center;
 	gap: 20px 28px;
 	flex-wrap: wrap;
+}
+
+/* mobile: email y teléfono se apilan (columna), gap compacto, alineados a
+   la izquierda — nunca forzados a una sola línea. */
+@media (max-width: 560px) {
+	.es-footer-cta__contacts {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 14px;
+	}
 }
 
 /* ---------- banda "intersection of" (legacy, sin uso en Home v1) ---------- */

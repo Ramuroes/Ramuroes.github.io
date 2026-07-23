@@ -1,16 +1,14 @@
 <?php
 /**
- * Render dinámico de estavillo/about-teaser-text.
+ * Render dinámico de estavillo/about-teaser-text — DEPRECATED.
  *
- * Sin atributos configurables — el texto real se lee EN VIVO de la página
- * About migrada a Gutenberg (su primer párrafo de intro, en el idioma
- * actual), vía es_home_about_intro() (child theme,
- * inc/about-intro-source.php). Esa función resuelve la página About del
- * idioma activo, parsea sus bloques y devuelve el primer párrafo real,
- * cayendo al sistema legacy (es_home_about_text) solo si la página no
- * tiene intro Gutenberg utilizable. Nunca copia el texto: lo lee en cada
- * render, así el teaser queda siempre sincronizado con la página About sin
- * mantenimiento manual ni copy propio de Home.
+ * Refinement ticket §5: la sincronización automática del About teaser con
+ * la página About dejó de ser deseada. La Home About teaser ahora se edita
+ * DIRECTO con bloques core (core/image + core/paragraph + CTA) — ver
+ * docs/content/home-gutenberg-en.html. Este bloque queda registrado solo
+ * por compatibilidad hacia atrás (contenido ya guardado que todavía lo
+ * tenga): renderiza un párrafo estático por defecto, SIN leer la página
+ * About ni ninguna opción/filtro. No usar en contenido nuevo.
  *
  * @package estavillo-portfolio-core
  * @var array $attributes Atributos del bloque (ninguno usado).
@@ -20,14 +18,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! function_exists( 'es_home_about_intro' ) ) {
-	return;
+$es_text = function_exists( 'es_about_intro_default' ) ? (string) es_about_intro_default() : '';
+if ( '' !== $es_text ) {
+	$es_paras = preg_split( '/\r\n\r\n|\n\n+/', trim( $es_text ) );
+	$es_text  = ! empty( $es_paras[0] ) ? trim( $es_paras[0] ) : trim( $es_text );
 }
 
-$es_teaser_text = es_home_about_intro();
-
-if ( '' === trim( (string) $es_teaser_text ) ) {
+if ( '' === $es_text ) {
 	return;
 }
 ?>
-<p <?php echo get_block_wrapper_attributes( array( 'class' => 'es-about__text' ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- ya escapado por core. ?>><?php echo wp_kses_post( $es_teaser_text ); // es_home_about_intro() ya devuelve inline HTML seguro. ?></p>
+<p <?php echo get_block_wrapper_attributes( array( 'class' => 'es-about__text' ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- ya escapado por core. ?>><?php echo esc_html( $es_text ); ?></p>
