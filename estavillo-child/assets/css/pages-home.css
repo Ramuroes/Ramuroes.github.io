@@ -139,6 +139,22 @@
 	margin: 0 0 12px;
 }
 
+/* Home migration ticket: the Gutenberg content path uses the
+   estavillo/how-i-work-illustration BLOCK (its render.php only passes
+   context/show_accents/decorative to es_how_work_illustration_svg(), never
+   a custom 'class') instead of calling that function directly with
+   class="es-process-teaser__group-illustration" the way the legacy PHP
+   fallback (template-parts/how-i-work.php) does. Real-render screenshot
+   review caught this: without this rule the block's own wrapper markup
+   (.how-work-illustration, always emitted regardless of the 'class' arg)
+   rendered at its unstyled 100%-width default (~150px) instead of the
+   approved compact 44px. Same visual result as the class-based rule
+   above, scoped to the block's actual wrapper so both paths match. */
+.es-process-teaser__group .how-work-illustration {
+	width: 44px;
+	margin: 0 0 12px;
+}
+
 .es-process-teaser__headline {
 	max-width: 46ch;
 	margin: 28px 0 10px;
@@ -294,6 +310,21 @@
 
 .es-footer-cta__email:hover {
 	color: var(--es-accent);
+}
+
+.es-footer-cta__whatsapp {
+	font-family: var(--es-sans);
+	font-size: clamp(14px, 1.3vw, 15px);
+	color: var(--es-ink-3);
+	text-decoration: none;
+	border-bottom: 1px solid var(--es-line);
+	padding-bottom: 3px;
+	transition: color var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease;
+}
+
+.es-footer-cta__whatsapp:hover {
+	color: var(--es-accent);
+	border-color: var(--es-accent);
 }
 
 .es-footer-cta__actions {

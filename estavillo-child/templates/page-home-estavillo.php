@@ -11,8 +11,17 @@
  * footer de Kadence — imprime el chrome propio de ESTAVILLO. El resto del sitio
  * sigue usando el header/footer de Kadence sin cambios.
  *
- * Compatible con Polylang (strings en "Estavillo Child") y con el editor:
- * el contenido de bloques de la página se imprime entre el hero y Featured.
+ * Home migration ticket: mismo patrón either/or que ya usan page-about.php/
+ * page-how-i-work.php/page-contact.php — si la página tiene contenido real
+ * de Gutenberg, ESE es el que se imprime (the_content()); si está vacía,
+ * cae al loop de template-parts de siempre (es_home_sections(), sin
+ * cambios). Nunca los dos a la vez. El Hero es la única excepción: se
+ * imprime SIEMPRE, fuera de este switch — mismo rol arquitectónico que
+ * template-parts/page-head.php en las otras 3 páginas (el fondo animado
+ * "system map" y sus variantes desktop/mobile no pasan por Gutenberg a
+ * propósito, ver docs/EDITABILITY-PLAN.md). El copy del Hero SÍ es
+ * editable, vía wp-admin → Portfolio Content → Hero (template-parts/
+ * hero-home.php), sin tocar este template.
  *
  * @package estavillo-child
  */
@@ -42,38 +51,35 @@ if ( function_exists( 'wp_body_open' ) ) {
 	<main id="top" class="es-main">
 
 		<?php
-		/*
-		 * Render data-driven de la narrativa de la home. El orden y las
-		 * secciones salen de es_home_sections() (filtrable) — reordenar o
-		 * sumar secciones no requiere tocar este template. A cada sección de
-		 * contenido (todas menos el hero) se le pasa su número correlativo
-		 * ('num'), así la numeración sigue el orden automáticamente.
-		 */
-		$es_section_num = 0;
-		foreach ( es_home_sections() as $es_key => $es_part ) {
-
-			if ( 'hero' === $es_key ) {
-				get_template_part( $es_part );
-
-				// Contenido de bloques del editor, si lo hay (entre hero y la 1ª sección).
-				while ( have_posts() ) :
-					the_post();
-					$es_page_content = trim( get_the_content() );
-					if ( '' !== $es_page_content ) :
-						?>
-						<section class="es-section es-page-content">
-							<div class="es-container"><?php the_content(); ?></div>
-						</section>
-						<?php
-					endif;
-				endwhile;
-
-				continue;
-			}
-
-			$es_section_num++;
-			get_template_part( $es_part, null, array( 'num' => sprintf( '%02d', $es_section_num ) ) );
+		$es_home_sections = es_home_sections();
+		if ( isset( $es_home_sections['hero'] ) ) {
+			get_template_part( $es_home_sections['hero'] );
 		}
+
+		/*
+		 * Either/or, igual que las otras 3 páginas fijas: contenido real de
+		 * Gutenberg (the_content()) o el loop de template-parts de siempre
+		 * (sin 'hero', ya impreso arriba). A cada sección de contenido se le
+		 * sigue pasando su número correlativo ('num') en la rama fallback.
+		 */
+		$es_home_content = '';
+		if ( have_posts() ) :
+			the_post();
+			$es_home_content = trim( get_the_content() );
+		endif;
+
+		if ( '' !== $es_home_content ) :
+			the_content();
+		else :
+			$es_section_num = 0;
+			foreach ( $es_home_sections as $es_key => $es_part ) {
+				if ( 'hero' === $es_key ) {
+					continue;
+				}
+				$es_section_num++;
+				get_template_part( $es_part, null, array( 'num' => sprintf( '%02d', $es_section_num ) ) );
+			}
+		endif;
 		?>
 
 	</main>

@@ -2,10 +2,18 @@
 /**
  * Hero de la home — system map animado detrás/al costado del copy.
  *
- * TODO EL COPY DE ESTE ARCHIVO ES PLACEHOLDER (tomado de los mockups).
- * El copy final se define después; es editable sin tocar el markup vía
- * los filtros es_home_hero_title / es_home_hero_lead / es_home_hero_*_url
- * (por ejemplo desde Code Snippets).
+ * Home migration ticket: todo el copy (eyebrow, título con palabras
+ * destacadas, párrafo, labels/URLs de las 2 CTA) ahora es editable desde
+ * wp-admin → Portfolio Content → Hero, vía los mismos filtros de siempre
+ * (es_home_hero_title / es_home_hero_lead / es_home_hero_*_url) más 3
+ * nuevos (es_home_hero_eyebrow / es_home_hero_cta_primary_label /
+ * es_home_hero_cta_secondary_label). Los labels de CTA seguían el sistema
+ * de UI strings (es__()) — ese sigue siendo el default de cada filtro, así
+ * que un campo vacío en el admin no cambia nada (incluida la traducción
+ * Polylang existente). El fondo animado (system map) y sus variantes
+ * desktop/mobile NO pasan por Gutenberg — siguen siendo 100% el sistema
+ * existente (es_get_option/es_hero_variants, Customizer), deliberadamente
+ * fuera de este ticket ("no redesign the animated background").
  *
  * @package estavillo-child
  */
@@ -13,6 +21,8 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+$es_hero_eyebrow = apply_filters( 'es_home_hero_eyebrow', es__( 'hero_eyebrow' ) );
 
 $es_hero_title = apply_filters(
 	'es_home_hero_title',
@@ -25,6 +35,9 @@ $es_hero_lead  = apply_filters(
 
 $es_hero_primary_url   = apply_filters( 'es_home_hero_primary_url', '#work' );
 $es_hero_secondary_url = apply_filters( 'es_home_hero_secondary_url', '#process' );
+
+$es_hero_cta_primary_label   = apply_filters( 'es_home_hero_cta_primary_label', es__( 'hero_cta_primary' ) );
+$es_hero_cta_secondary_label = apply_filters( 'es_home_hero_cta_secondary_label', es__( 'hero_cta_secondary' ) );
 
 $es_hero_desktop = es_get_option( 'es_hero_variant_desktop' );
 $es_hero_mobile  = es_get_option( 'es_hero_variant_mobile' );
@@ -51,7 +64,7 @@ printf(
 
 	<div class="es-container es-hero__inner">
 		<div class="es-hero__content">
-			<p class="es-eyebrow es-hero__eyebrow"><?php echo esc_html( es__( 'hero_eyebrow' ) ); ?></p>
+			<p class="es-eyebrow es-hero__eyebrow"><?php echo esc_html( $es_hero_eyebrow ); ?></p>
 
 			<h1 class="es-h1 es-hero__title">
 				<?php
@@ -69,11 +82,11 @@ printf(
 
 			<div class="es-hero__actions">
 				<a class="es-btn" href="<?php echo esc_url( $es_hero_primary_url ); ?>">
-					<?php echo esc_html( es__( 'hero_cta_primary' ) ); ?>
+					<?php echo esc_html( $es_hero_cta_primary_label ); ?>
 					<span class="es-btn__arrow" aria-hidden="true">&rarr;</span>
 				</a>
 				<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_hero_secondary_url ); ?>">
-					<?php echo esc_html( es__( 'hero_cta_secondary' ) ); ?>
+					<?php echo esc_html( $es_hero_cta_secondary_label ); ?>
 					<span class="es-live-dot" aria-hidden="true"></span>
 				</a>
 			</div>

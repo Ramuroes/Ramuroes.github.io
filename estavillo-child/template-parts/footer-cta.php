@@ -2,8 +2,11 @@
 /**
  * Connect — CTA de contacto "Let's talk." (sección 05).
  *
- * COPY PLACEHOLDER (Home v4). El email real se define vía el filtro
- * 'es_contact_email'; mientras esté vacío se muestra el tag {pending}.
+ * El email real se define vía el filtro 'es_contact_email'; mientras esté
+ * vacío se muestra el tag {pending}. Home migration ticket: sumó un
+ * segundo enlace opcional a WhatsApp (es_contact_whatsapp(), el mismo
+ * campo/número que ya usa la página Connect dedicada — no un "Phone"
+ * nuevo ni independiente) junto al email, solo si el campo tiene valor.
  *
  * @package estavillo-child
  */
@@ -19,6 +22,7 @@ $es_cta_lead  = apply_filters(
 	"I'm open to Product Design, Design Systems and UX Research roles — anywhere the goal is making a real system work better, not just look better. If that's what you're building, I'd like to hear about it."
 );
 $es_email       = es_contact_email();
+$es_whatsapp    = es_contact_whatsapp();
 $es_connect_url = apply_filters( 'es_home_connect_url', '#connect' );
 ?>
 
@@ -45,6 +49,11 @@ $es_connect_url = apply_filters( 'es_home_connect_url', '#connect' );
 				</a>
 			<?php else : ?>
 				<span class="es-placeholder__tag">{pending: email &rarr; filtro es_contact_email}</span>
+			<?php endif; ?>
+			<?php if ( ! empty( $es_whatsapp ) ) : ?>
+				<a class="es-footer-cta__whatsapp" href="https://wa.me/<?php echo esc_attr( es_phone_digits( $es_whatsapp ) ); ?>" target="_blank" rel="noopener">
+					<?php esc_html_e( 'WhatsApp', 'estavillo-child' ); ?>
+				</a>
 			<?php endif; ?>
 			<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_connect_url ); ?>">
 				<?php esc_html_e( 'All ways to connect', 'estavillo-child' ); ?>

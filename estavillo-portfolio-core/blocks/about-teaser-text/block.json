@@ -1,0 +1,17 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/about-teaser-text",
+	"title": "About teaser text",
+	"category": "estavillo-pages",
+	"icon": "admin-users",
+	"description": "El primer párrafo de la intro real de About (es_about_intro_paragraphs(), mismo filtro es_home_about_text que ya comparte la página About) — a diferencia de un Paragraph normal, este bloque SIEMPRE refleja el texto real de About en cada carga, sin copiar/pegar nada. Ningún bloque nativo puede hacer esto (un Paragraph guarda texto estático en post_content) — por eso es un bloque, no contenido plano.",
+	"keywords": [ "estavillo", "about", "home", "teaser" ],
+	"textdomain": "estavillo-portfolio-core",
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-pages-block-about-teaser-text",
+	"render": "file:./render.php"
+}

@@ -2,8 +2,17 @@
 /**
  * About teaser — retrato (placeholder) + párrafo editorial.
  *
- * CONTENIDO PLACEHOLDER (Home v4). Editable vía filtros 'es_home_about_text',
- * 'es_home_about_url' y 'es_home_about_portrait' (URL de imagen).
+ * Home migration ticket: 'es_home_about_text'/'es_home_about_portrait' ya
+ * son EXACTAMENTE los mismos filtros que about-content.php usa para el
+ * cuerpo real de la página About (puenteados por el plugin al mismo campo
+ * de opción about_text/about_portrait — confirmado en
+ * includes/home-content-options.php) — cero contenido duplicado, ya
+ * comparten una única fuente. Lo único que faltaba: este teaser mostraba
+ * el texto COMPLETO de About como un solo párrafo (con los saltos de
+ * línea colapsados). Ahora usa es_about_intro_paragraphs() — la misma
+ * función que la página About usa para partir su intro en párrafos — y
+ * solo muestra el primero, un excerpt genuino en vez de una copia
+ * independiente.
  *
  * @package estavillo-child
  */
@@ -14,10 +23,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $es_num = isset( $args['num'] ) ? $args['num'] : '04';
 
-$es_about_text = apply_filters(
-	'es_home_about_text',
-	'I hold a Bachelor\'s Degree in Industrial Design (Product Design) — not a past title, but the foundation this practice still runs on. It\'s why interfaces are never my starting point: the system behind them is, with products, services and operations treated as one connected structure, understood before any part of it changes. Research stays part of the decision itself, not a report attached to it afterward, and the goal is always the same — turn a complex, often invisible process into something practical enough to use. AI increasingly helps accelerate that research, synthesis and documentation, but the decisions themselves stay grounded in human judgment.'
-);
+$es_about_text_full = apply_filters( 'es_home_about_text', es_about_intro_default() );
+$es_about_paragraphs = es_about_intro_paragraphs( $es_about_text_full );
+$es_about_text       = ! empty( $es_about_paragraphs[0] ) ? $es_about_paragraphs[0] : $es_about_text_full;
+
 $es_about_url      = apply_filters( 'es_home_about_url', '#about' );
 $es_about_portrait = apply_filters( 'es_home_about_portrait', '' );
 ?>

@@ -1,0 +1,17 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/selected-work",
+	"title": "Selected Work",
+	"category": "estavillo-pages",
+	"icon": "grid-view",
+	"description": "Muestra los Case Studies marcados \"Show this case in Home → Selected Work\" (checkbox del CPT Case Study), en el orden del campo nativo \"Order\" — no hay nada que elegir/ordenar acá aparte de esos dos controles ya existentes en cada Case Study. Delega en la misma función del child theme que ya usaba template-parts/selected-work.php, así el fallback placeholder y el markup nunca se duplican.",
+	"keywords": [ "estavillo", "selected work", "case study", "home", "portfolio" ],
+	"textdomain": "estavillo-portfolio-core",
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-pages-block-selected-work",
+	"render": "file:./render.php"
+}

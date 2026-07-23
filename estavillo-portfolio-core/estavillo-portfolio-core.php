@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Estavillo Portfolio Core
  * Description: Editable content for the Estavillo portfolio — the Case Study CPT (Selected Work, Featured Case), a Home Content options page (About, How I Work, Connect, Header, Footer), and the "Estavillo Case Study" Gutenberg block library + Presupuestador patterns for editing cases visually. Decoupled from the theme via WordPress filters, so Home always falls back to its placeholder content if this plugin is deactivated or a field is left empty.
- * Version: 1.5.8
+ * Version: 1.5.9
  * Author: Ramiro Estavillo
  * Text Domain: estavillo-portfolio-core
  *
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_PORTFOLIO_CORE_VERSION', '1.5.8' );
+define( 'ES_PORTFOLIO_CORE_VERSION', '1.5.9' );
 define( 'ES_PORTFOLIO_CORE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ES_PORTFOLIO_CORE_URI', plugin_dir_url( __FILE__ ) );
 
@@ -25,6 +25,8 @@ require ES_PORTFOLIO_CORE_DIR . 'includes/case-patterns.php';
 require ES_PORTFOLIO_CORE_DIR . 'includes/about-blocks.php';
 require ES_PORTFOLIO_CORE_DIR . 'includes/how-i-work-patterns.php';
 require ES_PORTFOLIO_CORE_DIR . 'includes/how-i-work-blocks.php';
+require ES_PORTFOLIO_CORE_DIR . 'includes/home-blocks.php';
+require ES_PORTFOLIO_CORE_DIR . 'includes/home-patterns.php';
 
 /**
  * Al activar: registra el CPT/taxonomía antes de flushear, así las reglas
