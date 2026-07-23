@@ -58,6 +58,23 @@ function es_home_blocks_register() {
 			$v,
 			true
 		);
+
+		// El editor del Hero necesita el registro de variantes para poblar
+		// los dropdowns del Inspector. Se localiza desde el MISMO
+		// es_hero_variant_choices() del theme (única fuente de verdad, la
+		// que ya usan es_hero_variant_desktop/_mobile y el motor JS) — sin
+		// segundo registro. Inerte si el theme no está activo.
+		if ( 'home-hero' === $block && function_exists( 'es_hero_variant_choices' ) ) {
+			wp_localize_script(
+				$handle,
+				'EstavilloHeroVariants',
+				array(
+					'desktop' => es_hero_variant_choices( 'desktop' ),
+					'mobile'  => es_hero_variant_choices( 'mobile' ),
+				)
+			);
+		}
+
 		register_block_type( ES_PORTFOLIO_CORE_DIR . 'blocks/' . $block );
 	}
 }

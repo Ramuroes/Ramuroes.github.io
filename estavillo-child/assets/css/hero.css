@@ -11,6 +11,10 @@
 .es-hero {
 	position: relative;
 	overflow: hidden;
+	/* Progreso de scroll 0→1 que setea assets/js/hero-scroll.js mientras el
+	   hero está en viewport (rAF). Base 0 para que sin JS / con reduced
+	   motion el hero quede totalmente visible y estático. */
+	--es-hero-progress: 0;
 }
 
 /* transición suave hacia la sección siguiente: la constelación se disuelve en
@@ -260,6 +264,23 @@
       y el contenido editable queda texto + link puros, imposibles de
       invalidar. */
 
+/* CTA layout robusto (correction ticket): el grupo de CTAs usa layout flex
+   NATIVO de Gutenberg (is-layout-flex, emitido por core) para que
+   previsualice horizontal en el editor y quede lado a lado en el front sin
+   depender de que la clase suelta sobreviva la cascada. Esta regla refuerza
+   ese comportamiento en el front con especificidad de compuesto (gana sobre
+   .wp-block-group de Kadence y sobre el :where() de core), y mantiene el par
+   en fila en desktop Y tablet. En mobile no fuerza columna: flex-wrap deja
+   que envuelvan SOLO cuando no entran, con gap compacto y alineados a la
+   izquierda. */
+.wp-block-estavillo-home-hero .es-hero__actions {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 16px clamp(18px, 3vw, 34px);
+}
+
 .wp-block-estavillo-home-hero .es-hero__actions p {
 	margin: 0;
 }
@@ -284,5 +305,115 @@
 	.wp-block-estavillo-home-hero .es-link-arrow--quiet::after {
 		animation: none;
 		opacity: 1;
+	}
+}
+
+/* =========================================================================
+   Hero → How I Work — transición de scroll + indicador (correction ticket)
+   -------------------------------------------------------------------------
+   Restrained, editorial, NO cinematográfico. assets/js/hero-scroll.js setea
+   --es-hero-progress (0→1) por rAF SOLO mientras el hero está en viewport
+   (IntersectionObserver arranca/para el listener — sin listener permanente
+   pesado). Sin sticky-pin (evita pin excesivo / espacio vacío / snap): el
+   fondo "permanece" un instante vía un parallax sutil + fade tardío, y el
+   texto sube y se desvanece al acercarse How I Work, que entra como
+   contenido normal. Toda la coreografía va detrás de
+   prefers-reduced-motion: no-preference — con reduced motion el hero queda
+   completo, estático y en flujo normal.
+   ========================================================================= */
+
+@media (prefers-reduced-motion: no-preference) {
+	.es-hero__content {
+		transform: translateY(calc(var(--es-hero-progress) * -48px));
+		opacity: calc(1 - var(--es-hero-progress) * 0.92);
+		will-change: transform, opacity;
+	}
+
+	/* El fondo permanece más que el texto: parallax leve hacia abajo y fade
+	   cuadrático (se va recién cerca del final del recorrido). */
+	.es-hero__visual {
+		transform: translateY(calc(var(--es-hero-progress) * 34px));
+		opacity: calc(1 - var(--es-hero-progress) * var(--es-hero-progress) * 0.7);
+		will-change: transform, opacity;
+	}
+}
+
+/* ---------- indicador de scroll ---------- */
+
+.es-hero__scroll {
+	position: absolute;
+	left: 50%;
+	bottom: clamp(16px, 3vh, 30px);
+	transform: translateX(-50%);
+	z-index: 2;
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 9px;
+	color: var(--es-ink-3);
+	text-decoration: none;
+	font-family: var(--es-mono);
+	font-size: 10px;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	/* se desvanece con la transición para no competir con How I Work */
+	opacity: calc(1 - var(--es-hero-progress));
+	transition: color var(--es-dur-fast) ease;
+}
+
+.es-hero__scroll:hover,
+.es-hero__scroll:focus-visible {
+	color: var(--es-accent);
+}
+
+.es-hero__scroll-line {
+	position: relative;
+	width: 1px;
+	height: 42px;
+	overflow: hidden;
+	background: linear-gradient(to bottom, var(--es-line-strong), transparent);
+}
+
+/* punto de acento que "viaja" hacia abajo por la línea: la única animación,
+   sutil y en loop lento */
+.es-hero__scroll-line::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 1px;
+	height: 45%;
+	background: var(--es-accent);
+	opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.es-hero__scroll-line::after {
+		animation: es-hero-scroll-travel 2.6s ease-in-out infinite;
+	}
+}
+
+@keyframes es-hero-scroll-travel {
+	0% {
+		transform: translateY(-100%);
+		opacity: 0;
+	}
+	35% {
+		opacity: 1;
+	}
+	100% {
+		transform: translateY(230%);
+		opacity: 0;
+	}
+}
+
+/* mobile: se simplifica (solo la línea, sin label) para no ensuciar */
+@media (max-width: 680px) {
+	.es-hero__scroll-label {
+		display: none;
+	}
+
+	.es-hero__scroll-line {
+		height: 34px;
 	}
 }

@@ -23,9 +23,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $es_num = isset( $args['num'] ) ? $args['num'] : '04';
 
-$es_about_text_full = apply_filters( 'es_home_about_text', es_about_intro_default() );
-$es_about_paragraphs = es_about_intro_paragraphs( $es_about_text_full );
-$es_about_text       = ! empty( $es_about_paragraphs[0] ) ? $es_about_paragraphs[0] : $es_about_text_full;
+// Mismo origen que el bloque estavillo/about-teaser-text: el primer
+// párrafo de intro EN VIVO de la página About Gutenberg (idioma actual),
+// con fallback legacy — ver inc/about-intro-source.php.
+$es_about_text = function_exists( 'es_home_about_intro' ) ? es_home_about_intro() : '';
 
 $es_about_url      = apply_filters( 'es_home_about_url', '#about' );
 $es_about_portrait = apply_filters( 'es_home_about_portrait', '' );
@@ -49,7 +50,7 @@ $es_about_portrait = apply_filters( 'es_home_about_portrait', '' );
 					<h2 class="es-label"><?php echo esc_html( es__( 'about_label' ) ); ?></h2>
 				</div>
 			</div>
-			<p class="es-about__text" data-es-reveal><?php echo esc_html( $es_about_text ); ?></p>
+			<p class="es-about__text" data-es-reveal><?php echo wp_kses_post( $es_about_text ); // es_home_about_intro() ya devuelve inline HTML seguro. ?></p>
 			<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_about_url ); ?>" data-es-reveal>
 				<?php echo esc_html( es__( 'about_cta' ) ); ?>
 				<span class="es-link-arrow__icon" aria-hidden="true">&rarr;</span>

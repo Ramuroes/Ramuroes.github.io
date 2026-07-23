@@ -179,6 +179,20 @@ function es_child_enqueue_assets() {
 			)
 		);
 
+		// Transición de scroll del hero (fade del contenido + linger del
+		// fondo + click del indicador). Reduced-motion-safe adentro del
+		// propio script. Sin dependencias (lee/escribe una CSS var).
+		wp_enqueue_script(
+			'es-hero-scroll',
+			ES_CHILD_URI . '/assets/js/hero-scroll.js',
+			array(),
+			es_asset_ver( 'assets/js/hero-scroll.js' ),
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
+		);
+
 		// Config del hero expuesta a JS (fuente confiable además del
 		// data-attribute del template): la variante seleccionada llega al
 		// motor aunque un plugin de caché/optimización reescriba el HTML.

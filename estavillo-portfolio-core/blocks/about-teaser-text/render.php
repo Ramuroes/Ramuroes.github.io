@@ -2,16 +2,15 @@
 /**
  * Render dinámico de estavillo/about-teaser-text.
  *
- * Sin atributos configurables — el texto real vive en wp-admin →
- * Portfolio Content → About (campo about_text, puenteado al filtro
- * es_home_about_text por el propio plugin, includes/home-content-options.php).
- * Delega en es_about_intro_default()/es_about_intro_paragraphs() (child
- * theme, functions.php) — las MISMAS funciones que ya usa
- * template-parts/about-content.php (la página About real) y
- * template-parts/about-teaser.php (el fallback PHP de este mismo teaser)
- * — solo el PRIMER párrafo, como excerpt. Nunca copia el texto: lo lee en
- * cada render, así este bloque siempre queda sincronizado con la página
- * About sin mantenimiento manual.
+ * Sin atributos configurables — el texto real se lee EN VIVO de la página
+ * About migrada a Gutenberg (su primer párrafo de intro, en el idioma
+ * actual), vía es_home_about_intro() (child theme,
+ * inc/about-intro-source.php). Esa función resuelve la página About del
+ * idioma activo, parsea sus bloques y devuelve el primer párrafo real,
+ * cayendo al sistema legacy (es_home_about_text) solo si la página no
+ * tiene intro Gutenberg utilizable. Nunca copia el texto: lo lee en cada
+ * render, así el teaser queda siempre sincronizado con la página About sin
+ * mantenimiento manual ni copy propio de Home.
  *
  * @package estavillo-portfolio-core
  * @var array $attributes Atributos del bloque (ninguno usado).
@@ -21,16 +20,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! function_exists( 'es_about_intro_default' ) || ! function_exists( 'es_about_intro_paragraphs' ) ) {
+if ( ! function_exists( 'es_home_about_intro' ) ) {
 	return;
 }
 
-$es_about_text_full = apply_filters( 'es_home_about_text', es_about_intro_default() );
-$es_paragraphs       = es_about_intro_paragraphs( $es_about_text_full );
-$es_teaser_text      = ! empty( $es_paragraphs[0] ) ? $es_paragraphs[0] : $es_about_text_full;
+$es_teaser_text = es_home_about_intro();
 
 if ( '' === trim( (string) $es_teaser_text ) ) {
 	return;
 }
 ?>
-<p <?php echo get_block_wrapper_attributes( array( 'class' => 'es-about__text' ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- ya escapado por core. ?>><?php echo esc_html( $es_teaser_text ); ?></p>
+<p <?php echo get_block_wrapper_attributes( array( 'class' => 'es-about__text' ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- ya escapado por core. ?>><?php echo wp_kses_post( $es_teaser_text ); // es_home_about_intro() ya devuelve inline HTML seguro. ?></p>
