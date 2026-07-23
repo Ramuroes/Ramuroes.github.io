@@ -247,29 +247,6 @@ function es_portfolio_home_content_save() {
 
 	$data = es_portfolio_get_home_content();
 
-	// ---- Hero (Home migration ticket) ----
-	if ( isset( $_POST['es_hero_eyebrow'] ) ) {
-		$data['hero_eyebrow'] = sanitize_text_field( wp_unslash( $_POST['es_hero_eyebrow'] ) );
-	}
-	if ( isset( $_POST['es_hero_title'] ) ) {
-		$data['hero_title'] = wp_kses( wp_unslash( $_POST['es_hero_title'] ), array( 'em' => array( 'class' => array() ) ) );
-	}
-	if ( isset( $_POST['es_hero_lead'] ) ) {
-		$data['hero_lead'] = sanitize_textarea_field( wp_unslash( $_POST['es_hero_lead'] ) );
-	}
-	if ( isset( $_POST['es_hero_cta_primary_label'] ) ) {
-		$data['hero_cta_primary_label'] = sanitize_text_field( wp_unslash( $_POST['es_hero_cta_primary_label'] ) );
-	}
-	if ( isset( $_POST['es_hero_cta_primary_url'] ) ) {
-		$data['hero_cta_primary_url'] = esc_url_raw( wp_unslash( $_POST['es_hero_cta_primary_url'] ) );
-	}
-	if ( isset( $_POST['es_hero_cta_secondary_label'] ) ) {
-		$data['hero_cta_secondary_label'] = sanitize_text_field( wp_unslash( $_POST['es_hero_cta_secondary_label'] ) );
-	}
-	if ( isset( $_POST['es_hero_cta_secondary_url'] ) ) {
-		$data['hero_cta_secondary_url'] = esc_url_raw( wp_unslash( $_POST['es_hero_cta_secondary_url'] ) );
-	}
-
 	// ---- About ----
 	if ( isset( $_POST['es_about_text'] ) ) {
 		$data['about_text'] = sanitize_textarea_field( wp_unslash( $_POST['es_about_text'] ) );
@@ -512,40 +489,6 @@ function es_portfolio_home_content_page() {
 		<p><?php esc_html_e( 'Edit the singular sections shared across the site: Home, the Work/About/How I Work/Contact pages, and the header/footer. Leave a field blank to keep the current placeholder for that field — nothing here ever breaks a page.', 'estavillo-portfolio-core' ); ?></p>
 		<form method="post">
 			<?php wp_nonce_field( 'es_portfolio_home_content_save', 'es_portfolio_home_content_nonce' ); ?>
-
-			<h2><?php esc_html_e( 'Hero (Home)', 'estavillo-portfolio-core' ); ?></h2>
-			<p class="description"><?php esc_html_e( 'The animated background and its desktop/mobile variants are a separate system — see Customize → ESTAVILLO Theme Options. These fields only cover the Hero copy. Leave any field blank to keep its current placeholder.', 'estavillo-portfolio-core' ); ?></p>
-			<table class="form-table" role="presentation">
-				<tr>
-					<th scope="row"><label for="es_hero_eyebrow"><?php esc_html_e( 'Eyebrow', 'estavillo-portfolio-core' ); ?></label></th>
-					<td><input type="text" id="es_hero_eyebrow" name="es_hero_eyebrow" class="regular-text" value="<?php echo esc_attr( $data['hero_eyebrow'] ?? '' ); ?>"></td>
-				</tr>
-				<tr>
-					<th scope="row"><label for="es_hero_title"><?php esc_html_e( 'Headline', 'estavillo-portfolio-core' ); ?></label></th>
-					<td>
-						<textarea id="es_hero_title" name="es_hero_title" rows="3" class="large-text"><?php echo esc_textarea( $data['hero_title'] ?? '' ); ?></textarea>
-						<p class="description"><?php esc_html_e( 'The <em> tag is allowed to highlight words — add class="es-accent-word" on one <em> to render it in the accent color, same as the current placeholder.', 'estavillo-portfolio-core' ); ?></p>
-					</td>
-				</tr>
-				<tr>
-					<th scope="row"><label for="es_hero_lead"><?php esc_html_e( 'Supporting paragraph', 'estavillo-portfolio-core' ); ?></label></th>
-					<td><textarea id="es_hero_lead" name="es_hero_lead" rows="2" class="large-text"><?php echo esc_textarea( $data['hero_lead'] ?? '' ); ?></textarea></td>
-				</tr>
-				<tr>
-					<th scope="row"><label for="es_hero_cta_primary_label"><?php esc_html_e( 'Primary CTA', 'estavillo-portfolio-core' ); ?></label></th>
-					<td>
-						<input type="text" id="es_hero_cta_primary_label" name="es_hero_cta_primary_label" class="regular-text" value="<?php echo esc_attr( $data['hero_cta_primary_label'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Label', 'estavillo-portfolio-core' ); ?>">
-						<input type="url" id="es_hero_cta_primary_url" name="es_hero_cta_primary_url" class="regular-text" value="<?php echo esc_attr( $data['hero_cta_primary_url'] ?? '' ); ?>" placeholder="#work">
-					</td>
-				</tr>
-				<tr>
-					<th scope="row"><label for="es_hero_cta_secondary_label"><?php esc_html_e( 'Secondary CTA', 'estavillo-portfolio-core' ); ?></label></th>
-					<td>
-						<input type="text" id="es_hero_cta_secondary_label" name="es_hero_cta_secondary_label" class="regular-text" value="<?php echo esc_attr( $data['hero_cta_secondary_label'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Label', 'estavillo-portfolio-core' ); ?>">
-						<input type="url" id="es_hero_cta_secondary_url" name="es_hero_cta_secondary_url" class="regular-text" value="<?php echo esc_attr( $data['hero_cta_secondary_url'] ?? '' ); ?>" placeholder="#process">
-					</td>
-				</tr>
-			</table>
 
 			<h2><?php esc_html_e( 'About', 'estavillo-portfolio-core' ); ?></h2>
 			<table class="form-table" role="presentation">
@@ -902,57 +845,15 @@ function es_portfolio_home_content_page() {
 }
 
 /**
- * Puentes para Hero (Home migration ticket). Mismo principio "vacío no
- * pisa nada" que el resto del archivo — el fondo animado y sus variantes
- * desktop/mobile no pasan por acá, siguen siendo un theme_mod del
- * Customizer (es_get_option/es_hero_variants en inc/theme-options.php).
- */
-function es_portfolio_filter_hero_eyebrow( $default ) {
-	$data = es_portfolio_get_home_content();
-	return ! empty( $data['hero_eyebrow'] ) ? $data['hero_eyebrow'] : $default;
-}
-add_filter( 'es_home_hero_eyebrow', 'es_portfolio_filter_hero_eyebrow' );
-
-function es_portfolio_filter_hero_title( $default ) {
-	$data = es_portfolio_get_home_content();
-	return ! empty( $data['hero_title'] ) ? $data['hero_title'] : $default;
-}
-add_filter( 'es_home_hero_title', 'es_portfolio_filter_hero_title' );
-
-function es_portfolio_filter_hero_lead( $default ) {
-	$data = es_portfolio_get_home_content();
-	return ! empty( $data['hero_lead'] ) ? $data['hero_lead'] : $default;
-}
-add_filter( 'es_home_hero_lead', 'es_portfolio_filter_hero_lead' );
-
-function es_portfolio_filter_hero_cta_primary_label( $default ) {
-	$data = es_portfolio_get_home_content();
-	return ! empty( $data['hero_cta_primary_label'] ) ? $data['hero_cta_primary_label'] : $default;
-}
-add_filter( 'es_home_hero_cta_primary_label', 'es_portfolio_filter_hero_cta_primary_label' );
-
-function es_portfolio_filter_hero_primary_url( $default ) {
-	$data = es_portfolio_get_home_content();
-	return ! empty( $data['hero_cta_primary_url'] ) ? $data['hero_cta_primary_url'] : $default;
-}
-add_filter( 'es_home_hero_primary_url', 'es_portfolio_filter_hero_primary_url' );
-
-function es_portfolio_filter_hero_cta_secondary_label( $default ) {
-	$data = es_portfolio_get_home_content();
-	return ! empty( $data['hero_cta_secondary_label'] ) ? $data['hero_cta_secondary_label'] : $default;
-}
-add_filter( 'es_home_hero_cta_secondary_label', 'es_portfolio_filter_hero_cta_secondary_label' );
-
-function es_portfolio_filter_hero_secondary_url( $default ) {
-	$data = es_portfolio_get_home_content();
-	return ! empty( $data['hero_cta_secondary_url'] ) ? $data['hero_cta_secondary_url'] : $default;
-}
-add_filter( 'es_home_hero_secondary_url', 'es_portfolio_filter_hero_secondary_url' );
-
-/**
  * Puente hacia los filtros que YA existían en el tema (Home v1) para
  * About. No son filtros nuevos — ver el comentario de cabecera del
  * archivo. Cada callback solo pisa el default si el campo tiene valor.
+ *
+ * Nota Hero: el copy del Hero de Home NO tiene campos acá a propósito
+ * (revisión del ticket de Home) — es contenido Gutenberg real, editable
+ * inline en la página vía el bloque estavillo/home-hero. Solo las
+ * variantes del fondo animado siguen fuera de Gutenberg (Customizer,
+ * inc/theme-options.php del theme).
  */
 function es_portfolio_filter_about_text( $default ) {
 	$data = es_portfolio_get_home_content();

@@ -155,6 +155,47 @@
 	margin: 0 0 12px;
 }
 
+/* Home revision ticket: the Gutenberg 3-up row is REAL core/columns (each
+   wp:column carries .es-process-teaser__group), because a plain wp:group
+   with the .es-process-teaser__row grid class does NOT survive the real-WP
+   cascade — the same documented failure as Connect's original two-column
+   layout — and stacked the three concepts vertically on the live site.
+   The __row grid CSS above stays untouched for the PHP fallback's <ol>;
+   this rule only matches the columns wrapper (ancestor-scoped, no layout
+   class on the columns block itself — same discipline as the Connect fix)
+   so the Gutenberg gap matches the approved grid gap. */
+.es-process-teaser .wp-block-columns {
+	gap: 20px clamp(24px, 3vw, 40px);
+}
+
+/* Same story for the About teaser: .es-about__grid was a CSS grid on a
+   wp:group in the Gutenberg path — converted to real core/columns
+   (300px portrait column + growing body column, mirroring the fallback's
+   grid-template-columns: 300px 1fr). Gap/alignment scoped here; the
+   fallback's .es-about__grid rules stay untouched. The 900px stack
+   matches the fallback's own breakpoint (core's native stack only kicks
+   in at 781px, which would leave a 782–900px band with two columns where
+   the approved design already stacks). */
+.es-about .wp-block-columns {
+	gap: clamp(32px, 5vw, 72px);
+	align-items: flex-start;
+}
+
+@media (max-width: 900px) {
+	/* !important obligatorio: el CSS de core/columns fuerza
+	   flex-wrap: nowrap !important arriba de 782px, así que entre 782 y
+	   900 una regla normal pierde — mismo recurso que ya usa el fix
+	   equivalente de Connect (flex-basis con !important). */
+	.es-about .wp-block-columns {
+		flex-wrap: wrap !important;
+	}
+
+	.es-about .wp-block-columns .wp-block-column {
+		flex-basis: 100% !important;
+		flex-grow: 1;
+	}
+}
+
 .es-process-teaser__headline {
 	max-width: 46ch;
 	margin: 28px 0 10px;

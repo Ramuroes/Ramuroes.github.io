@@ -1,28 +1,49 @@
 <!-- ================================================================ -->
-<!-- ACTION REQUIRED BEFORE PUBLISHING -->
+<!-- BEFORE PUBLISHING — 3 notes -->
 <!-- -->
-<!-- 1. FEATURED CASE — the "Featured Case Studies" block below only shows -->
-<!--    something once a Case Study has "Feature this case on Home" -->
-<!--    checked (Case Studies → edit a case → Case details). Until then it -->
-<!--    renders an editor-only reminder and nothing on the front end. -->
+<!-- 1. FEATURED CASE / SELECTED WORK — these blocks read the Case Study -->
+<!--    CPT live: "Feature this case on Home" and "Show this case in -->
+<!--    Home -> Selected Work" checkboxes plus the native "Order" field -->
+<!--    (Case Studies -> edit a case -> Case details). With no case -->
+<!--    flagged yet they render the same placeholder cases the legacy -->
+<!--    Home always showed - never an empty section. -->
 <!-- -->
-<!-- 2. SELECTED WORK — the "Selected Work" block below only shows cases -->
-<!--    that have "Show this case in Home → Selected Work" checked, in -->
-<!--    the order of each case's native "Order" field. Same empty-state -->
-<!--    note as Featured Case until at least one case is checked. -->
+<!-- 2. ABOUT PORTRAIT — the portrait block reads Portfolio Content -> -->
+<!--    About -> "Portrait image URL", the same field the About page -->
+<!--    uses. Until it is set, a clean reserved frame renders (no -->
+<!--    development markers); set the URL once and the photo appears -->
+<!--    here and on the About page at the same time. -->
 <!-- -->
-<!-- 3. ABOUT PORTRAIT — the placeholder frame in "About teaser" below is -->
-<!--    a static asset marker, not a live block. Once a real portrait -->
-<!--    exists (wp-admin → Portfolio Content → About → "Portrait image -->
-<!--    URL", or directly in the Media Library here), delete the -->
-<!--    placeholder Group and insert a real Image block in its place. -->
-<!-- -->
-<!-- 4. LINKEDIN / INSTAGRAM in the Connect teaser use the site-wide -->
-<!--    "All ways to connect" link (points at the dedicated Connect page) -->
-<!--    rather than direct social links — no action needed unless that -->
-<!--    URL (wp-admin → Portfolio Content → Connect → "Connect link") -->
-<!--    needs to change. -->
+<!-- 3. HERO — the copy below (eyebrow, headline, paragraph, both CTAs) -->
+<!--    is normal editable Gutenberg content inside the Home Hero block. -->
+<!--    The animated background and its desktop/mobile variants are NOT -->
+<!--    part of the content - they render automatically on the real site -->
+<!--    and are configured under Customize -> ESTAVILLO Theme Options. -->
 <!-- ================================================================ -->
+
+<!-- wp:estavillo/home-hero -->
+<!-- wp:paragraph {"className":"es-eyebrow es-hero__eyebrow"} -->
+<p class="es-eyebrow es-hero__eyebrow">Product Designer · Systems &amp; Operations</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":1,"className":"es-h1 es-hero__title"} -->
+<h1 class="wp-block-heading es-h1 es-hero__title">I design systems that turn <em>complexity</em> into <em class="es-accent-word">clarity</em>.</h1>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"className":"es-lead es-hero__lead"} -->
+<p class="es-lead es-hero__lead">AI-assisted tools and workflows for real operations. From estimating to execution.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:group {"className":"es-hero__actions"} -->
+<div class="wp-block-group es-hero__actions"><!-- wp:paragraph -->
+<p><a class="es-btn" href="#work">View featured case</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a class="es-link-arrow es-link-arrow--quiet" href="#process">See how I work</a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+<!-- /wp:estavillo/home-hero -->
 
 <!-- wp:group {"tagName":"section","anchor":"process","className":"es-section es-process-teaser","metadata":{"name":"How I Work teaser"}} -->
 <section class="wp-block-group es-section es-process-teaser" id="process"><!-- wp:group {"className":"es-container"} -->
@@ -50,9 +71,9 @@
 <p class="es-process-teaser__lead">The result should make sense for the people using it, and for the system that has to carry it.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:group {"className":"es-process-teaser__row"} -->
-<div class="wp-block-group es-process-teaser__row"><!-- wp:group {"className":"es-process-teaser__group","metadata":{"name":"Understand"}} -->
-<div class="wp-block-group es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":1,"context":"home"} /-->
+<!-- wp:columns {"metadata":{"name":"Concepts"}} -->
+<div class="wp-block-columns"><!-- wp:column {"className":"es-process-teaser__group","metadata":{"name":"Understand"}} -->
+<div class="wp-block-column es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":1,"context":"home"} /-->
 
 <!-- wp:heading {"level":4,"className":"es-process-teaser__group-title"} -->
 <h4 class="wp-block-heading es-process-teaser__group-title">Understand</h4>
@@ -61,10 +82,10 @@
 <!-- wp:paragraph {"className":"es-process-teaser__group-text"} -->
 <p class="es-process-teaser__group-text">See how people, information and goals actually connect.</p>
 <!-- /wp:paragraph --></div>
-<!-- /wp:group -->
+<!-- /wp:column -->
 
-<!-- wp:group {"className":"es-process-teaser__group","metadata":{"name":"Explore"}} -->
-<div class="wp-block-group es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":4,"context":"home"} /-->
+<!-- wp:column {"className":"es-process-teaser__group","metadata":{"name":"Explore"}} -->
+<div class="wp-block-column es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":4,"context":"home"} /-->
 
 <!-- wp:heading {"level":4,"className":"es-process-teaser__group-title"} -->
 <h4 class="wp-block-heading es-process-teaser__group-title">Explore</h4>
@@ -73,10 +94,10 @@
 <!-- wp:paragraph {"className":"es-process-teaser__group-text"} -->
 <p class="es-process-teaser__group-text">Test ideas and challenge assumptions before committing to one.</p>
 <!-- /wp:paragraph --></div>
-<!-- /wp:group -->
+<!-- /wp:column -->
 
-<!-- wp:group {"className":"es-process-teaser__group","metadata":{"name":"Improve"}} -->
-<div class="wp-block-group es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":6,"context":"home"} /-->
+<!-- wp:column {"className":"es-process-teaser__group","metadata":{"name":"Improve"}} -->
+<div class="wp-block-column es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":6,"context":"home"} /-->
 
 <!-- wp:heading {"level":4,"className":"es-process-teaser__group-title"} -->
 <h4 class="wp-block-heading es-process-teaser__group-title">Improve</h4>
@@ -85,8 +106,8 @@
 <!-- wp:paragraph {"className":"es-process-teaser__group-text"} -->
 <p class="es-process-teaser__group-text">Build something that works &#8212; and keeps working.</p>
 <!-- /wp:paragraph --></div>
-<!-- /wp:group --></div>
-<!-- /wp:group --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns --></div>
 <!-- /wp:group --></section>
 <!-- /wp:group -->
 
@@ -131,17 +152,14 @@
 <!-- /wp:group -->
 
 <!-- wp:group {"tagName":"section","anchor":"about","className":"es-section es-about","metadata":{"name":"About teaser"}} -->
-<section class="wp-block-group es-section es-about" id="about"><!-- wp:group {"className":"es-container es-about__grid"} -->
-<div class="wp-block-group es-container es-about__grid"><!-- wp:group {"className":"es-about__portrait"} -->
-<div class="wp-block-group es-about__portrait"><!-- wp:group {"className":"es-placeholder es-about__placeholder"} -->
-<div class="wp-block-group es-placeholder es-about__placeholder"><!-- wp:paragraph {"className":"es-placeholder__tag"} -->
-<p class="es-placeholder__tag">{asset: retrato}</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:group --></div>
-<!-- /wp:group -->
+<section class="wp-block-group es-section es-about" id="about"><!-- wp:group {"className":"es-container"} -->
+<div class="wp-block-group es-container"><!-- wp:columns {"metadata":{"name":"Portrait + intro"}} -->
+<div class="wp-block-columns"><!-- wp:column {"width":"300px","metadata":{"name":"Portrait"}} -->
+<div class="wp-block-column" style="flex-basis:300px;flex-grow:0"><!-- wp:estavillo/about-teaser-portrait /--></div>
+<!-- /wp:column -->
 
-<!-- wp:group {"className":"es-about__body"} -->
-<div class="wp-block-group es-about__body"><!-- wp:group {"className":"es-section-head"} -->
+<!-- wp:column {"className":"es-about__body","metadata":{"name":"Intro"}} -->
+<div class="wp-block-column es-about__body"><!-- wp:group {"className":"es-section-head"} -->
 <div class="wp-block-group es-section-head"><!-- wp:group {"className":"es-section-head__title"} -->
 <div class="wp-block-group es-section-head__title"><!-- wp:paragraph {"className":"es-section-head__num"} -->
 <p class="es-section-head__num">04</p>
@@ -158,7 +176,8 @@
 <!-- wp:paragraph -->
 <p><a class="es-link-arrow es-link-arrow--quiet" href="#about">More about me &rarr;</a></p>
 <!-- /wp:paragraph --></div>
-<!-- /wp:group --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns --></div>
 <!-- /wp:group --></section>
 <!-- /wp:group -->
 

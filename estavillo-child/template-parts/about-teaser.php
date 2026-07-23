@@ -37,9 +37,8 @@ $es_about_portrait = apply_filters( 'es_home_about_portrait', '' );
 			<?php if ( ! empty( $es_about_portrait ) ) : ?>
 				<img src="<?php echo esc_url( $es_about_portrait ); ?>" alt="" loading="lazy" />
 			<?php else : ?>
-				<div class="es-placeholder es-about__placeholder" role="img" aria-label="<?php esc_attr_e( 'Placeholder for the editorial portrait', 'estavillo-child' ); ?>">
-					<span class="es-placeholder__tag">{asset: retrato}</span>
-				</div>
+				<?php // Marco reservado limpio, sin tag {asset:…} — alineado con estavillo/about-teaser-portrait (revisión de Home: sin marcadores de desarrollo visibles). ?>
+				<div class="es-placeholder es-about__placeholder" role="img" aria-label="<?php esc_attr_e( 'Reserved space for the editorial portrait', 'estavillo-child' ); ?>"></div>
 			<?php endif; ?>
 		</div>
 

@@ -2,18 +2,16 @@
 /**
  * Hero de la home — system map animado detrás/al costado del copy.
  *
- * Home migration ticket: todo el copy (eyebrow, título con palabras
- * destacadas, párrafo, labels/URLs de las 2 CTA) ahora es editable desde
- * wp-admin → Portfolio Content → Hero, vía los mismos filtros de siempre
- * (es_home_hero_title / es_home_hero_lead / es_home_hero_*_url) más 3
- * nuevos (es_home_hero_eyebrow / es_home_hero_cta_primary_label /
- * es_home_hero_cta_secondary_label). Los labels de CTA seguían el sistema
- * de UI strings (es__()) — ese sigue siendo el default de cada filtro, así
- * que un campo vacío en el admin no cambia nada (incluida la traducción
- * Polylang existente). El fondo animado (system map) y sus variantes
- * desktop/mobile NO pasan por Gutenberg — siguen siendo 100% el sistema
- * existente (es_get_option/es_hero_variants, Customizer), deliberadamente
- * fuera de este ticket ("no redesign the animated background").
+ * Home migration ticket (revisado): este archivo es solo la rama LEGACY
+ * FALLBACK (página Home sin contenido Gutenberg real). En la rama
+ * Gutenberg — el estado normal — el Hero entero lo arma el bloque
+ * estavillo/home-hero del plugin: el copy es InnerBlocks editable inline
+ * (guardado en post_content, sin depender de Portfolio Content) y el
+ * cascarón (fondo animado + variantes) lo emite su render.php reusando
+ * este mismo sistema (es_get_option/es_hero_variants, Customizer). Los
+ * apply_filters de abajo quedan como extension points a nivel código
+ * (defaults idénticos al comportamiento histórico, es__() incluido para
+ * la traducción Polylang) — ya no tienen UI de admin propia.
  *
  * @package estavillo-child
  */

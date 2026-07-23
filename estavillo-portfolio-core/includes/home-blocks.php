@@ -2,17 +2,19 @@
 /**
  * Librería de bloques Gutenberg "Estavillo — Home" — Home migration ticket.
  *
- * Tres bloques dinámicos, mismas convenciones que how-i-work-blocks.php/
- * about-blocks.php (bloque dinámico, render.php server-side, save() nulo,
- * JS del editor sin build step, ServerSideRender para el preview real).
- * Ninguno de los dos tiene atributos configurables: "qué caso se muestra"
- * ya es 100% resuelto por el CPT Case Study (casillas "Feature this case
- * on Home" / "Show in Home → Selected Work" + el campo nativo "Order",
- * estavillo-portfolio-core/includes/case-study-cpt.php) — estos bloques
- * son solo el puente Gutenberg hacia ese dato, delegando en las mismas
- * funciones del child theme que ya usaban los template-parts de Home
- * (es_home_featured_source()/es_home_selected_work_source()), así el
- * fallback placeholder y el markup nunca se duplican.
+ * Cinco bloques, mismas convenciones que how-i-work-blocks.php/
+ * about-blocks.php (bloque dinámico, render.php server-side, JS del
+ * editor sin build step, ServerSideRender para el preview real donde
+ * aplica). Cuatro son hoja sin atributos: "qué caso se muestra" ya es
+ * 100% resuelto por el CPT Case Study (casillas "Feature this case on
+ * Home" / "Show in Home → Selected Work" + el campo nativo "Order",
+ * includes/case-study-cpt.php) y el retrato del About teaser sale del
+ * campo compartido con la página About — estos bloques son solo el puente
+ * Gutenberg hacia ese dato, delegando en las mismas funciones del child
+ * theme que ya usaban los template-parts de Home, así el fallback
+ * placeholder y el markup nunca se duplican. El quinto (home-hero) es el
+ * híbrido tipo case-section: copy = InnerBlocks editable en post_content,
+ * cascarón (fondo animado + variantes del Customizer) = render.php.
  *
  * Reusa la categoría "Estavillo — Pages" ya registrada por
  * how-i-work-blocks.php (mismo slug 'estavillo-pages' — no hace falta
@@ -32,9 +34,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function es_home_blocks_list() {
 	return array(
+		'home-hero',
 		'featured-case',
 		'selected-work',
 		'about-teaser-text',
+		'about-teaser-portrait',
 	);
 }
 
@@ -73,14 +77,25 @@ function es_home_blocks_editor_theme_css() {
 		return;
 	}
 
-	$path = get_stylesheet_directory() . '/assets/css/pages-home.css';
-	if ( file_exists( $path ) ) {
-		wp_enqueue_style(
-			'es-editor-pages-home',
-			get_stylesheet_directory_uri() . '/assets/css/pages-home.css',
-			array(),
-			(string) filemtime( $path )
-		);
+	// base.css (tipografía es-h1/es-lead) y hero.css (copy del hero) se
+	// suman por el bloque home-hero — el copy del hero en el editor usa
+	// esas clases y sin ellas se vería como texto plano sin jerarquía.
+	$es_editor_css = array(
+		'es-editor-base'       => 'assets/css/base.css',
+		'es-editor-hero'       => 'assets/css/hero.css',
+		'es-editor-pages-home' => 'assets/css/pages-home.css',
+	);
+
+	foreach ( $es_editor_css as $es_handle => $es_rel ) {
+		$path = get_stylesheet_directory() . '/' . $es_rel;
+		if ( file_exists( $path ) ) {
+			wp_enqueue_style(
+				$es_handle,
+				get_stylesheet_directory_uri() . '/' . $es_rel,
+				array(),
+				(string) filemtime( $path )
+			);
+		}
 	}
 }
 add_action( 'enqueue_block_assets', 'es_home_blocks_editor_theme_css' );

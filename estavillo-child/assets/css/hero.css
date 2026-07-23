@@ -239,3 +239,50 @@
 		display: none;
 	}
 }
+
+/* ---------- hero como bloque Gutenberg (estavillo/home-hero) ----------
+   La rama Gutenberg de Home arma el hero con el bloque híbrido del plugin:
+   render.php emite este mismo cascarón (.es-hero + visual + variantes) y
+   el copy llega como InnerBlocks — así que todo lo de arriba aplica igual.
+   Las 3 reglas de abajo cubren solo las diferencias de markup del copy
+   como bloques, scopeadas a la clase que get_block_wrapper_attributes()
+   agrega al cascarón (nunca tocan el hero PHP del fallback):
+
+   1. Las CTAs viven cada una dentro de un <p> (core/paragraph) — sin
+      margen, para que el gap del flex de .es-hero__actions mande igual
+      que con los <a> sueltos del fallback.
+   2/3. La flecha del botón primario (.es-btn__arrow) y el punto "vivo"
+      (.es-live-dot) del secundario eran <span>s inline en el fallback —
+      dentro de RichText un span con clase no es un formato registrado y
+      puede no sobrevivir la edición, así que en la rama Gutenberg los
+      reproduce el CSS como ::after (mismo color de acento, mismo pulso,
+      espaciados por el mismo gap del inline-flex de cada componente),
+      y el contenido editable queda texto + link puros, imposibles de
+      invalidar. */
+
+.wp-block-estavillo-home-hero .es-hero__actions p {
+	margin: 0;
+}
+
+.wp-block-estavillo-home-hero .es-btn::after {
+	content: '\2192';
+	color: var(--es-accent);
+}
+
+.wp-block-estavillo-home-hero .es-link-arrow--quiet::after {
+	content: '';
+	width: 7px;
+	height: 7px;
+	flex: none;
+	border-radius: 50%;
+	background: var(--es-signal);
+	animation: es-pulse 2.6s ease-in-out infinite;
+	will-change: opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.wp-block-estavillo-home-hero .es-link-arrow--quiet::after {
+		animation: none;
+		opacity: 1;
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/home-hero",
+	"title": "Home Hero",
+	"category": "estavillo-pages",
+	"icon": "cover-image",
+	"description": "El Hero de la Home como bloque híbrido, mismo modelo probado que case-section: el CONTENIDO (eyebrow, titular con palabras destacadas, párrafo, CTAs) es InnerBlocks — contenido Gutenberg real, editable inline, guardado en post_content sin depender de Portfolio Content — y el CASCARÓN (la <section class=es-hero>, la capa del fondo animado y sus data-attributes de variante desktop/mobile del Customizer) lo emite render.php server-side. Así la animación sigue siendo 100% el sistema PHP/Customizer existente y el copy es 100% Gutenberg.",
+	"keywords": [ "estavillo", "hero", "home" ],
+	"textdomain": "estavillo-portfolio-core",
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-pages-block-home-hero",
+	"render": "file:./render.php"
+}
