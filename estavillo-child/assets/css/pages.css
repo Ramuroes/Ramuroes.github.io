@@ -760,80 +760,104 @@
 	text-align: right;
 }
 
-/* ---------- Connect — redesign (ticket Connect) ----------
-   Calm, premium, direct: eyebrow/H1/lead (page-head.php, unchanged
-   component) carry the whole editorial opening — nothing here repeats or
-   competes with that. Below it: an optional availability pill, then a
-   comfortable two-column composition (methods left, form right) that
-   stacks on mobile. No timeline, no FAQ, no testimonials — the simplest
-   page of the portfolio on purpose. */
+/* =========================================================================
+   Connect — revision ticket (visual/structural correction)
+   -------------------------------------------------------------------------
+   Supersedes both the original 3-column redesign AND the first Gutenberg
+   migration's button-row CSS (deleted below the fold in this same file's
+   history — see git log for template-parts/contact-content.php and
+   docs/content/connect-gutenberg-en.html for what changed and why).
 
-.es-contact-page__status {
-	margin-bottom: clamp(28px, 3.5vw, 40px);
+   Root causes of the real-WP failure this replaces:
+   1. The two-column composition was a plain core/group with a custom CSS
+      Grid on top of it. This is the EXACT failure mode already diagnosed
+      and fixed once before in this file for About's Education section
+      ("core/columns — Education 60/40" below): a CSS-Grid override on a
+      generic wrapper doesn't reliably survive the real Kadence-loaded
+      cascade, and this repo's synthetic test harness (only the vendored
+      @wordpress/block-library core CSS, no Kadence theme CSS) can't catch
+      that. Fixed the same way here: a REAL core/columns block with native
+      width attributes (42/58), styled purely by ancestor position — no
+      className added to core/columns itself, matching the Education fix.
+   2. The "floating near center" look is consistent with core/buttons'
+      cross-axis alignment defaulting to center in the real cascade (not
+      reproducible in the synthetic harness either) once each row shrink-
+      wrapped to its own content width. Fixed structurally, not by
+      patching alignment: contact rows are no longer core/button at all —
+      each is a plain core/group (block-level by default, no flex/shrink-
+      wrap ambiguity possible) containing two core/paragraph blocks (label,
+      value with a real inline link). Typography carries the hierarchy;
+      buttons never enter into it.
+
+   PHP fallback (template-parts/contact-content.php) and the Gutenberg
+   content (docs/content/connect-gutenberg-en.html) now emit IDENTICAL
+   markup/classes for the contact section — a deliberate change from the
+   first migration, which used <ul>/<li>/<a> for the fallback and
+   core/buttons for Gutenberg under the same class names and caused a real
+   duplicate-icon regression (see git history). One shared, simple markup
+   shape removes that whole risk category. */
+
+.es-contact-page .wp-block-columns {
+	column-gap: clamp(40px, 6vw, 88px);
+	row-gap: clamp(40px, 5vw, 56px);
+	align-items: flex-start;
 }
 
-.es-contact-page__layout {
-	display: grid;
-	grid-template-columns: 1.15fr 1fr;
-	gap: clamp(40px, 6vw, 88px);
-	align-items: start;
-}
+@media (max-width: 780px) {
+	.es-contact-page .wp-block-columns {
+		flex-wrap: wrap;
+	}
 
-@media (max-width: 900px) {
-	.es-contact-page__layout {
-		grid-template-columns: 1fr;
-		gap: clamp(36px, 6vw, 56px);
+	.es-contact-page .wp-block-columns > .wp-block-column {
+		flex-basis: 100% !important;
 	}
 }
 
-/* ---------- contact methods: icon + label + value, full row clickable ---------- */
+/* ---------- left column: editorial intro + contact list ---------- */
 
-.es-contact-methods {
-	list-style: none;
-	margin: 0;
-	padding: 0;
+.es-contact-intro {
+	margin-bottom: clamp(28px, 3.5vw, 40px);
 }
 
-.es-contact-methods__item + .es-contact-methods__item {
+.es-contact-intro__heading {
+	margin: 0 0 14px;
+}
+
+.es-contact-intro .es-accent-word {
+	color: var(--es-accent);
+}
+
+.es-contact-intro__lead {
+	max-width: 42ch;
+	margin: 0;
+	font-size: 16px;
+	line-height: 1.6;
+	color: var(--es-ink-2);
+}
+
+.es-contact-intro__availability {
+	max-width: 42ch;
+	margin: 10px 0 0;
+	font-size: 13.5px;
+	line-height: 1.6;
+	color: var(--es-ink-4);
+}
+
+.es-contact-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.es-contact-item {
+	padding: 18px 0;
+}
+
+.es-contact-item + .es-contact-item {
 	border-top: 1px solid var(--es-line);
 }
 
-.es-contact-method {
-	display: flex;
-	align-items: center;
-	gap: 16px;
-	padding: 16px 4px;
-	text-decoration: none;
-	color: inherit;
-}
-
-a.es-contact-method {
-	cursor: pointer;
-}
-
-.es-contact-method__icon {
-	display: flex;
-	flex: none;
-	align-items: center;
-	justify-content: center;
-	width: 22px;
-	height: 22px;
-	color: var(--es-ink-3);
-}
-
-.es-contact-method__icon svg {
-	width: 100%;
-	height: 100%;
-}
-
-.es-contact-method__text {
-	display: flex;
-	flex-direction: column;
-	gap: 3px;
-	min-width: 0;
-}
-
-.es-contact-method__label {
+.es-contact-item__label {
+	margin: 0 0 5px;
 	font-family: var(--es-mono);
 	font-size: 10.5px;
 	font-weight: 600;
@@ -842,47 +866,133 @@ a.es-contact-method {
 	color: var(--es-ink-4);
 }
 
-.es-contact-method__value {
+.es-contact-item__value {
+	margin: 0;
 	font-size: 15.5px;
+	line-height: 1.4;
 	color: var(--es-ink);
 	overflow-wrap: break-word;
 }
 
-.es-contact-method--pending .es-contact-method__value {
-	color: var(--es-ink-4);
+.es-contact-item__value a {
+	color: inherit;
+	text-decoration: none;
+	border-bottom: 1px solid var(--es-line-strong);
 }
 
 @media (hover: hover) and (pointer: fine) {
-	a.es-contact-method:hover .es-contact-method__icon,
-	a.es-contact-method:focus-visible .es-contact-method__icon {
+	.es-contact-item__value a:hover {
 		color: var(--es-accent);
+		border-bottom-color: var(--es-accent);
 	}
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	.es-contact-method__icon {
-		transition: color var(--es-dur-fast) ease;
+	.es-contact-item__value a {
+		transition: color var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease;
 	}
 }
 
-a.es-contact-method:focus-visible {
+.es-contact-item__value a:focus-visible {
 	outline: 2px solid var(--es-accent);
-	outline-offset: 2px;
-	border-radius: 3px;
+	outline-offset: 3px;
+	border-radius: 2px;
 }
 
-.es-contact-page__secondary {
+/* Email is the strongest value on the page per the approved direction —
+   larger and set in the mono/editorial voice already used for labels
+   elsewhere, so it reads as deliberate emphasis rather than a bigger
+   version of the same body text. */
+.es-contact-item--email .es-contact-item__value {
+	font-family: var(--es-mono);
+	font-size: clamp(17px, 1.8vw, 20px);
+	font-weight: 500;
+}
+
+/* Location is the one non-clickable item (plain text, no link, no hover/
+   focus states) — a real <p>, never a fake button. */
+.es-contact-item--location .es-contact-item__value a {
+	pointer-events: none;
+}
+
+/* ---------- optional per-item icon (block style toggle, off by default) ----------
+   "Contact — with icon" (is-style-contact-icon, registered in
+   inc/block-styles.php) adds a small inline mark before the label — never
+   reserved space, so an icon-free item never leaves a gap. Mask-image
+   keeps it tintable with currentColor like an inline SVG would be,
+   without embedding SVG markup inside a RichText field (no proven-safe
+   round-trip precedent for that in this codebase — see the button-era
+   comment this section replaces). */
+
+.is-style-contact-icon .es-contact-item__label {
 	display: flex;
-	flex-wrap: wrap;
-	gap: 16px 28px;
-	margin-top: 24px;
+	align-items: center;
+	gap: 7px;
 }
 
-/* ---------- contact form placeholder ----------
-   Same restrained "reserved, not yet real" visual language already used
-   for empty states elsewhere on this site (dashed border, reduced
-   opacity) — replace with a real form plugin shortcode/block, see the
-   HTML comment in template-parts/contact-content.php. */
+.is-style-contact-icon .es-contact-item__label::before {
+	content: "";
+	display: inline-block;
+	flex: none;
+	width: 13px;
+	height: 13px;
+	background-color: var(--es-ink-4);
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	mask-position: center;
+	-webkit-mask-size: contain;
+	mask-size: contain;
+}
+
+.is-style-contact-icon.es-contact-item--email .es-contact-item__label::before {
+	-webkit-mask-image: url(../icons/email.svg);
+	mask-image: url(../icons/email.svg);
+}
+
+.is-style-contact-icon.es-contact-item--whatsapp .es-contact-item__label::before {
+	-webkit-mask-image: url(../icons/whatsapp.svg);
+	mask-image: url(../icons/whatsapp.svg);
+}
+
+.is-style-contact-icon.es-contact-item--linkedin .es-contact-item__label::before {
+	-webkit-mask-image: url(../icons/linkedin.svg);
+	mask-image: url(../icons/linkedin.svg);
+}
+
+.is-style-contact-icon.es-contact-item--instagram .es-contact-item__label::before {
+	-webkit-mask-image: url(../icons/instagram.svg);
+	mask-image: url(../icons/instagram.svg);
+}
+
+.is-style-contact-icon.es-contact-item--location .es-contact-item__label::before {
+	-webkit-mask-image: url(../icons/location.svg);
+	mask-image: url(../icons/location.svg);
+}
+
+/* ---------- right column: "Send a message." + form ---------- */
+
+.es-contact-form__heading {
+	margin: 0 0 10px;
+}
+
+.es-contact-form .es-accent-word {
+	color: var(--es-accent);
+}
+
+.es-contact-form__lead {
+	max-width: 44ch;
+	margin: 0 0 clamp(24px, 3vw, 32px);
+	font-size: 15px;
+	line-height: 1.6;
+	color: var(--es-ink-2);
+}
+
+/* Placeholder — same restrained "reserved, not yet real" visual language
+   used for empty states elsewhere on this site (dashed border, reduced
+   opacity). Replace with a real Fluent Forms block/shortcode — see the
+   HTML comment in docs/content/connect-gutenberg-en.html and
+   docs/FLUENT-FORMS.md. */
 
 .es-contact-form-placeholder {
 	border: 1px dashed var(--es-line-strong);
@@ -896,6 +1006,98 @@ a.es-contact-method:focus-visible {
 	font-size: 14px;
 	line-height: 1.6;
 	color: var(--es-ink-3);
+}
+
+/* ---------- Fluent Forms — scoped support, Connect wrapper only ----------
+   Deliberately generic element selectors (input/textarea/label/button)
+   FIRST, so any form markup dropped into .es-contact-form looks correct
+   immediately, layered with Fluent Forms' own documented class names
+   (.fluentform, .ff-el-*, .ff-btn-submit) for extra polish once the real
+   plugin/block is present. Everything is scoped under .es-contact-form —
+   this file must never style Fluent Forms globally (a form used anywhere
+   else on the site, if that ever happens, is untouched by this block). */
+
+.es-contact-form form,
+.es-contact-form .fluentform form {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+.es-contact-form label,
+.es-contact-form .ff-el-input--label label {
+	display: block;
+	margin: 0 0 8px;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+}
+
+.es-contact-form input[type='text'],
+.es-contact-form input[type='email'],
+.es-contact-form textarea,
+.es-contact-form .ff-el-form-control {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 13px 14px;
+	background: var(--es-block, transparent);
+	border: 1px solid var(--es-line-strong);
+	border-radius: var(--es-radius-sm);
+	font-family: var(--es-sans);
+	font-size: 15px;
+	color: var(--es-ink);
+}
+
+.es-contact-form textarea,
+.es-contact-form .ff-el-form-control[rows] {
+	min-height: 140px;
+	resize: vertical;
+	line-height: 1.6;
+}
+
+.es-contact-form input::placeholder,
+.es-contact-form textarea::placeholder {
+	color: var(--es-ink-4);
+}
+
+.es-contact-form input:focus-visible,
+.es-contact-form textarea:focus-visible,
+.es-contact-form .ff-el-form-control:focus-visible {
+	outline: none;
+	border-color: var(--es-accent);
+	box-shadow: 0 0 0 3px var(--es-accent-soft);
+}
+
+.es-contact-form button[type='submit'],
+.es-contact-form .ff-btn-submit {
+	align-self: flex-start;
+	margin-top: 4px;
+	padding: 14px 28px;
+	border: 1px solid var(--es-accent-dim);
+	border-radius: 40px;
+	background: transparent;
+	font-family: var(--es-sans);
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--es-ink);
+	cursor: pointer;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.es-contact-form button[type='submit']:hover,
+	.es-contact-form .ff-btn-submit:hover {
+		background: var(--es-accent-soft);
+		border-color: var(--es-accent);
+	}
+}
+
+.es-contact-form button[type='submit']:focus-visible,
+.es-contact-form .ff-btn-submit:focus-visible {
+	outline: 2px solid var(--es-accent);
+	outline-offset: 2px;
 }
 
 /* ---------- Work: separación visual clara entre selected work y archive
@@ -1545,209 +1747,3 @@ a.es-contact-method:focus-visible {
 	color: var(--es-ink);
 }
 
-/* =========================================================================
-   Connect page — Gutenberg migration (ticket Connect)
-   -------------------------------------------------------------------------
-   New CSS needed ONLY because docs/content/connect-gutenberg-en.html's
-   native core/buttons + core/button markup differs from the PHP-generated
-   <ul>/<li>/<a> markup it replaces (template-parts/contact-content.php,
-   ".es-contact-methods" rule block above this file's "Connect: contact
-   methods" section — left completely untouched, it's still the legacy
-   fallback for as long as the Page has no real Gutenberg content). Same
-   "new selectors over the same --es-* tokens, no redesign" rule as every
-   other page migration in this file.
-
-   Reuses the exact "descendant-scoped .wp-block-button__link chrome +
-   double wrapper reset" technique already proven for the About page's CV
-   button (see "core/button — Resume/CV CTA parity" above): all visual
-   chrome lives on .wp-block-button__link (the real <a>, the whole row is
-   clickable by construction since that's the native element), and both
-   wrapper levels (.wp-block-buttons, .wp-block-button) are stripped of any
-   default border/background/padding so nothing ever doubles.
-
-   Icons are NOT inline SVG inside the block content — a full <svg><path>
-   tree inside a RichText field has no proven-safe round-trip precedent in
-   this codebase (unlike a bare one-level <span>, the CV arrow's proven
-   pattern, reused here for the label/value split). Instead each icon is a
-   CSS mask-image on a ::before pseudo-element, pointing at the real
-   Hobbies-family SVG files already shipped in assets/icons/ (one folder up
-   from this stylesheet) — zero markup risk, and still tintable with
-   currentColor (background-color: currentColor + mask) exactly like an
-   inline SVG would be, so the existing hover/focus color shift keeps
-   working unchanged. */
-
-.es-contact-page__methods {
-	display: flex;
-	flex-direction: column;
-}
-
-.wp-block-buttons.es-contact-methods {
-	display: flex;
-	flex-direction: column;
-	gap: 0;
-}
-
-.wp-block-buttons.es-contact-methods,
-.es-contact-methods > .wp-block-button {
-	border: none !important;
-	background: none !important;
-	border-radius: 0 !important;
-	padding: 0 !important;
-	box-shadow: none !important;
-}
-
-.es-contact-methods > .wp-block-button + .wp-block-button {
-	border-top: 1px solid var(--es-line);
-}
-
-.es-contact-methods > .wp-block-button > .wp-block-button__link {
-	display: flex;
-	align-items: center;
-	gap: 16px;
-	padding: 16px 4px 16px 42px;
-	position: relative;
-	font-family: var(--es-sans);
-	font-weight: 400;
-	font-size: 15.5px;
-	color: inherit;
-	text-decoration: none;
-	background: none;
-	border: none;
-	border-radius: 0;
-	cursor: pointer;
-}
-
-.es-contact-methods > .wp-block-button > .wp-block-button__link::before {
-	content: "";
-	position: absolute;
-	left: 4px;
-	top: 50%;
-	width: 22px;
-	height: 22px;
-	transform: translateY(-50%);
-	background-color: var(--es-ink-3);
-	-webkit-mask-repeat: no-repeat;
-	mask-repeat: no-repeat;
-	-webkit-mask-position: center;
-	mask-position: center;
-	-webkit-mask-size: contain;
-	mask-size: contain;
-}
-
-.es-contact-method--email > .wp-block-button__link::before {
-	-webkit-mask-image: url(../icons/email.svg);
-	mask-image: url(../icons/email.svg);
-}
-
-.es-contact-method--phone > .wp-block-button__link::before {
-	-webkit-mask-image: url(../icons/phone.svg);
-	mask-image: url(../icons/phone.svg);
-}
-
-.es-contact-method--whatsapp > .wp-block-button__link::before {
-	-webkit-mask-image: url(../icons/whatsapp.svg);
-	mask-image: url(../icons/whatsapp.svg);
-}
-
-.es-contact-method--linkedin > .wp-block-button__link::before {
-	-webkit-mask-image: url(../icons/linkedin.svg);
-	mask-image: url(../icons/linkedin.svg);
-}
-
-.es-contact-method--instagram > .wp-block-button__link::before {
-	-webkit-mask-image: url(../icons/instagram.svg);
-	mask-image: url(../icons/instagram.svg);
-}
-
-.wp-block-buttons.es-contact-methods .es-contact-method__label {
-	font-family: var(--es-mono);
-	font-size: 10.5px;
-	font-weight: 600;
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	color: var(--es-ink-4);
-}
-
-.wp-block-buttons.es-contact-methods .es-contact-method__value {
-	display: block;
-	font-size: 15.5px;
-	color: var(--es-ink);
-	overflow-wrap: break-word;
-}
-
-@media (hover: hover) and (pointer: fine) {
-	.es-contact-methods > .wp-block-button > .wp-block-button__link:hover::before,
-	.es-contact-methods > .wp-block-button > .wp-block-button__link:focus-visible::before {
-		background-color: var(--es-accent);
-	}
-}
-
-@media (prefers-reduced-motion: no-preference) {
-	.es-contact-methods > .wp-block-button > .wp-block-button__link::before {
-		transition: background-color var(--es-dur-fast) ease;
-	}
-}
-
-.es-contact-methods > .wp-block-button > .wp-block-button__link:focus-visible {
-	outline: 2px solid var(--es-accent);
-	outline-offset: 2px;
-	border-radius: 3px;
-}
-
-/* Location — the one non-clickable method (ticket only lists Phone/
-   WhatsApp/Email/LinkedIn/Instagram as clickable), a plain core/group, not
-   a button/link — same reasoning as .es-contact-method--static in the PHP
-   fallback: no fake interactive semantics on non-interactive content.
-   Scoped to .es-contact-method--location (the Gutenberg-only modifier
-   class, set only in docs/content/connect-gutenberg-en.html) rather than
-   the shared .es-contact-method--static — the PHP fallback's own Location
-   <span> also carries --static (for the same semantic reason) but already
-   renders its own real inline icon + row layout; a bare .es-contact-
-   method--static selector here would leak into that legacy markup too
-   (same class, different element) and both duplicate its icon and flip
-   its row to a column layout. --location never appears there, so it's the
-   only safe hook for markup exclusive to the real WP Page's Gutenberg
-   content. */
-
-.es-contact-method--location {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	gap: 3px;
-	padding: 16px 4px 16px 42px;
-	border-top: 1px solid var(--es-line);
-}
-
-.es-contact-method--location::before {
-	content: "";
-	position: absolute;
-	left: 4px;
-	top: 19px;
-	width: 22px;
-	height: 22px;
-	background-color: var(--es-ink-3);
-	-webkit-mask-image: url(../icons/location.svg);
-	mask-image: url(../icons/location.svg);
-	-webkit-mask-repeat: no-repeat;
-	mask-repeat: no-repeat;
-	-webkit-mask-position: center;
-	mask-position: center;
-	-webkit-mask-size: contain;
-	mask-size: contain;
-}
-
-.es-contact-method--location .es-contact-method__label {
-	font-family: var(--es-mono);
-	font-size: 10.5px;
-	font-weight: 600;
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
-	color: var(--es-ink-4);
-	margin: 0;
-}
-
-.es-contact-method--location .es-contact-method__value {
-	margin: 0;
-	font-size: 15.5px;
-	color: var(--es-ink);
-}

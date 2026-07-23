@@ -751,15 +751,17 @@ function es_portfolio_home_content_page() {
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="es_connect_status"><?php esc_html_e( 'Availability / status line (optional)', 'estavillo-portfolio-core' ); ?></label></th>
+					<th scope="row"><label for="es_connect_status"><?php esc_html_e( 'Availability line (optional)', 'estavillo-portfolio-core' ); ?></label></th>
 					<td>
-						<input type="text" id="es_connect_status" name="es_connect_status" class="regular-text" value="<?php echo esc_attr( $data['connect_status'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'e.g. Currently available — leave blank to hide the status pill', 'estavillo-portfolio-core' ); ?>">
+						<input type="text" id="es_connect_status" name="es_connect_status" class="regular-text" value="<?php echo esc_attr( $data['connect_status'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'e.g. Based in Uruguay — open to remote and international roles', 'estavillo-portfolio-core' ); ?>">
+						<p class="description"><?php esc_html_e( 'Connect page only — a restrained secondary line under "Let\'s talk.", not a status pill. Leave blank to hide it.', 'estavillo-portfolio-core' ); ?></p>
 					</td>
 				</tr>
 			</table>
 
 			<h2><?php esc_html_e( 'Connect page (dedicated)', 'estavillo-portfolio-core' ); ?></h2>
 			<p class="description"><?php esc_html_e( 'The standalone Connect/Contact page only — Home is never affected by these. Contact email above and Availability above are shared with this page too.', 'estavillo-portfolio-core' ); ?></p>
+			<p class="description"><strong><?php esc_html_e( 'Source-of-truth note (revision ticket):', 'estavillo-portfolio-core' ); ?></strong> <?php esc_html_e( 'Eyebrow/Title/Introduction below always feed the page-head (they render whether or not the WP Page has real Gutenberg content). Phone/WhatsApp/Country and Availability above only feed the legacy fallback body — once the Connect Page has real Gutenberg content (the normal state), its own static text and links are the source of truth for the two-column contact section and editing these fields will NOT change what visitors see. This is intentional, not a bug — see docs/content/connect-gutenberg-en.html.', 'estavillo-portfolio-core' ); ?></p>
 			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row"><label for="es_connect_eyebrow"><?php esc_html_e( 'Eyebrow', 'estavillo-portfolio-core' ); ?></label></th>
@@ -767,15 +769,18 @@ function es_portfolio_home_content_page() {
 				</tr>
 				<tr>
 					<th scope="row"><label for="es_connect_title"><?php esc_html_e( 'Title', 'estavillo-portfolio-core' ); ?></label></th>
-					<td><input type="text" id="es_connect_title" name="es_connect_title" class="large-text" value="<?php echo esc_attr( $data['connect_title'] ?? '' ); ?>" placeholder="Let's connect."></td>
+					<td><input type="text" id="es_connect_title" name="es_connect_title" class="large-text" value="<?php echo esc_attr( $data['connect_title'] ?? '' ); ?>" placeholder="Start a conversation."></td>
 				</tr>
 				<tr>
 					<th scope="row"><label for="es_connect_intro"><?php esc_html_e( 'Introduction', 'estavillo-portfolio-core' ); ?></label></th>
 					<td><textarea id="es_connect_intro" name="es_connect_intro" rows="3" class="large-text"><?php echo esc_textarea( $data['connect_intro'] ?? '' ); ?></textarea></td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="es_contact_phone"><?php esc_html_e( 'Phone', 'estavillo-portfolio-core' ); ?></label></th>
-					<td><input type="text" id="es_contact_phone" name="es_contact_phone" class="regular-text" value="<?php echo esc_attr( $data['contact_phone'] ?? '' ); ?>" placeholder="+598 99 892 722"></td>
+					<th scope="row"><label for="es_contact_phone"><?php esc_html_e( 'Phone (not shown on Connect)', 'estavillo-portfolio-core' ); ?></label></th>
+					<td>
+						<input type="text" id="es_contact_phone" name="es_contact_phone" class="regular-text" value="<?php echo esc_attr( $data['contact_phone'] ?? '' ); ?>" placeholder="+598 99 892 722">
+						<p class="description"><?php esc_html_e( 'Connect page now shows WhatsApp only (revision ticket — avoids showing the same number twice). Kept here for a future page that may need a separate phone row.', 'estavillo-portfolio-core' ); ?></p>
+					</td>
 				</tr>
 				<tr>
 					<th scope="row"><label for="es_contact_whatsapp"><?php esc_html_e( 'WhatsApp', 'estavillo-portfolio-core' ); ?></label></th>

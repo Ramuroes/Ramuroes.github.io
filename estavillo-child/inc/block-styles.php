@@ -58,5 +58,24 @@ function es_child_register_block_styles() {
 			'label' => __( 'Light (no box, hairline only)', 'estavillo-child' ),
 		)
 	);
+
+	/**
+	 * Connect page revision ticket: lets an editor opt a single contact
+	 * item (a core/group with an --email/--whatsapp/etc. modifier class,
+	 * see docs/content/connect-gutenberg-en.html) into showing its small
+	 * line icon, or leave it text-only (the default — no style applied).
+	 * Chosen over a removable icon element specifically because a missing
+	 * element risks stray indentation/empty space; a class toggle can't
+	 * leave anything behind since there was never a reserved slot for it.
+	 * CSS: assets/css/pages.css, `.is-style-contact-icon` combined with
+	 * each item's own --email/--whatsapp/etc. class.
+	 */
+	register_block_style(
+		'core/group',
+		array(
+			'name'  => 'contact-icon',
+			'label' => __( 'Contact — with icon', 'estavillo-child' ),
+		)
+	);
 }
 add_action( 'init', 'es_child_register_block_styles' );

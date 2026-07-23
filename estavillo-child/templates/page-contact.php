@@ -1,18 +1,24 @@
 <?php
 /**
  * Template Name: Estavillo — Contact
- * Description: Página Connect — Gutenberg migration (ticket Connect). El
- * H1 de esta página decía "Contact." mientras que nav/breadcrumb siempre
- * dijeron "Connect" — inconsistencia real, corregida acá: eyebrow "Get in
- * touch" + título "Let's connect." (es_connect_eyebrow/es_connect_title,
- * editables). page-head (eyebrow+H1+lead) se imprime SIEMPRE, tanto si la
- * Page ya tiene contenido Gutenberg real como si todavía cae al fallback
- * — mismo criterio que About/How I Work (ver ahí para el precedente): el
- * cuerpo de abajo (métodos de contacto + formulario) es la única parte
- * migrada, en una rama explícita either/or (real content -> the_content();
- * sin contenido real -> template-parts/contact-content.php). Antes esta
- * página imprimía contact-content.php SIEMPRE y además el post content
- * real si existía (nunca eran mutuamente excluyentes) — corregido acá.
+ * Description: Página Connect — Gutenberg migration (ticket Connect) +
+ * revisión visual/estructural (ticket Connect — revision). El H1 de esta
+ * página decía "Contact." mientras que nav/breadcrumb siempre dijeron
+ * "Connect" — inconsistencia real, corregida en el ticket original: eyebrow
+ * "Get in touch" + título (es_connect_eyebrow/es_connect_title, editables).
+ *
+ * Revisión: título por defecto pasa de "Let's connect." a "Start a
+ * conversation." — la página ya usa "Let's talk." más abajo (encabezado de
+ * la columna izquierda, dentro del cuerpo Gutenberg/fallback) y repetir
+ * "Let's" en dos lugares se sentía redundante. page-head (eyebrow+H1+lead)
+ * se sigue imprimiendo SIEMPRE — el ticket de revisión pide explícitamente
+ * "Preserve the approved page-head system", así que esta pieza NO se migra
+ * a bloques Gutenberg (sería inconsistente con About/How I Work/Work, que
+ * comparten el mismo componente) — solo cambia el copy por defecto. El
+ * cuerpo de abajo (layout de contacto de 2 columnas + formulario) sigue
+ * siendo la única parte migrada, en la misma rama explícita either/or de
+ * siempre (real content -> the_content(); sin contenido real ->
+ * template-parts/contact-content.php).
  *
  * Standalone igual que templates/page-home-estavillo.php: imprime su
  * propio wp_head()/wp_footer() y reusa el chrome ESTAVILLO.
@@ -50,8 +56,8 @@ if ( function_exists( 'wp_body_open' ) ) {
 			null,
 			array(
 				'eyebrow' => apply_filters( 'es_connect_eyebrow', 'Get in touch' ),
-				'title'   => apply_filters( 'es_connect_title', "Let's connect." ),
-				'lead'    => apply_filters( 'es_connect_intro', "If you'd like to discuss a product, a process, a collaboration or simply say hello, I'd be glad to hear from you." ),
+				'title'   => apply_filters( 'es_connect_title', 'Start a conversation.' ),
+				'lead'    => apply_filters( 'es_connect_intro', "I'm open to Product Design, Design Systems and UX Research roles — anywhere the goal is making a real system work better, not just look better." ),
 			)
 		);
 
