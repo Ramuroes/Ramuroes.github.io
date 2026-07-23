@@ -1209,16 +1209,17 @@
 }
 
 /* ---------- one process move — editorial section ----------
-   Deliberately NOT .es-section (no hairline border-bottom between moves):
-   generous whitespace alone separates them, so six in a row still reads
-   as six distinct "story sections," not the old uniform bordered list. */
+   No border between moves at all (removed a hairline border-top that
+   read as redundant on desktop — the generous padding already separates
+   sections — and as visually fragmenting on mobile, where the shorter
+   viewport puts consecutive rules closer together). Generous whitespace,
+   section numbering, and the illustration alone carry the separation
+   between six in a row; case-study separators and the disclosure's own
+   dividers are untouched (different classes entirely, see case-study.css
+   and .es-case-details below). */
 
 .es-process-move {
 	padding: clamp(56px, 7vw, 96px) 0;
-}
-
-.es-process-move + .es-process-move {
-	border-top: 1px solid var(--es-line);
 }
 
 .es-process-move__head {
@@ -1275,6 +1276,73 @@
    proportions (440:300) already come from the file, not a guess. */
 .es-process-move__row > .wp-block-column:first-child .how-work-illustration {
 	max-width: 460px;
+}
+
+/* ---------- green accent micro-interaction (full page only) ----------
+   Home's teaser icons only ever load pages-home.css (see
+   es_is_home_template() in inc/enqueue.php) — this file never reaches
+   Home at all, so nothing here can touch it; the existing whole-
+   illustration lift in pages-home.css is untouched and still the only
+   motion Home gets. This adds a second, more meaningful layer on top for
+   the full page: the four accent classes already inside each SVG (see
+   assets/images/how-i-work/*.svg) rest at a restrained opacity/scale and
+   settle fully into place on hover or keyboard focus within the move —
+   pointing at what the accent marks without the whole illustration
+   moving beyond its existing lift.
+
+   Gated identically to that existing lift (hover-capable + fine pointer
+   + motion allowed), so touch/mobile always shows the SVGs' normal full-
+   opacity accents (never depends on hover to be legible) and
+   prefers-reduced-motion always shows the same settled end state with no
+   transition — both simply because the resting DIM never applies outside
+   those three conditions, not via a separate override. */
+
+.how-work-illustration--page {
+	--how-work-accent-opacity: 0.55;
+	--how-work-accent-duration: 0.22s;
+	--how-work-accent-distance: 3px;
+	--how-work-illustration-lift: -2px;
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+	.how-work-illustration--page .how-work-svg__accent-path,
+	.how-work-illustration--page .how-work-svg__accent-node,
+	.how-work-illustration--page .how-work-svg__accent-fill {
+		transform-box: fill-box;
+		transform-origin: center;
+		opacity: var(--how-work-accent-opacity);
+		transform: scale(0.92) translateY(var(--how-work-accent-distance));
+		transition: opacity var(--how-work-accent-duration) ease, transform var(--how-work-accent-duration) ease;
+	}
+
+	.how-work-illustration--page .how-work-svg__accent-soft {
+		opacity: 0.8;
+		transition: opacity var(--how-work-accent-duration) ease;
+	}
+
+	.how-work-illustration--page:hover .how-work-svg__accent-path,
+	.how-work-illustration--page:hover .how-work-svg__accent-node,
+	.how-work-illustration--page:hover .how-work-svg__accent-fill,
+	.es-process-move:focus-within .how-work-illustration--page .how-work-svg__accent-path,
+	.es-process-move:focus-within .how-work-illustration--page .how-work-svg__accent-node,
+	.es-process-move:focus-within .how-work-illustration--page .how-work-svg__accent-fill {
+		opacity: 1;
+		transform: scale(1) translateY(0);
+	}
+
+	.how-work-illustration--page:hover .how-work-svg__accent-soft,
+	.es-process-move:focus-within .how-work-illustration--page .how-work-svg__accent-soft {
+		opacity: 1;
+	}
+
+	/* Keyboard parity with the existing mouse-only :hover lift in
+	   pages-home.css (untouched) — same -2px value, formalized as a
+	   variable here rather than duplicating the literal into that shared
+	   file. Specificity is higher than the shared :hover rule, so if both
+	   ever apply at once the result is identical (-2px either way). */
+	.es-process-move:focus-within .how-work-illustration--page {
+		transform: translateY(var(--how-work-illustration-lift));
+	}
 }
 
 /* Graceful degradation: estavillo/how-i-work-illustration prints nothing
@@ -1340,7 +1408,18 @@
    six moves' own — reuses the existing "contrast block" background
    already established for Featured Case (--es-block/--es-block-line),
    so it reads as a distinct layer under the sequence rather than one
-   more item inside it. */
+   more item inside it.
+
+   Polish pass: the statement and paragraph previously used mismatched
+   ch-based measures (46ch at ~30px serif vs. 62ch at 15px sans) that
+   happened to render the SAME nominal "generous" width in characters but
+   very different actual widths in px — the paragraph ended up visibly
+   narrower than the heading above it, reading as an unfinished second
+   column with nothing in it. Both now share one literal px measure so
+   the two lines up front look like one intentional, aligned block
+   instead of two differently-sized columns; an eyebrow gives the band
+   its own small heading-level identity before the statement, same
+   pattern as .es-hero__eyebrow/.es-page-head__eyebrow elsewhere. */
 
 .es-process-ai-band {
 	background: var(--es-block);
@@ -1349,8 +1428,12 @@
 	padding: clamp(48px, 6vw, 80px) 0;
 }
 
+.es-process-ai-band__eyebrow {
+	margin: 0 0 16px;
+}
+
 .es-process-ai-band__statement {
-	max-width: 46ch;
+	max-width: 640px;
 	margin: 0 0 20px;
 	font-family: var(--es-serif);
 	font-size: clamp(23px, 2.8vw, 34px);
@@ -1361,7 +1444,7 @@
 }
 
 .es-process-ai-band__text {
-	max-width: 62ch;
+	max-width: 640px;
 	margin: 0;
 	font-size: 15px;
 	line-height: 1.65;

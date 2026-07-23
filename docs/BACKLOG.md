@@ -233,6 +233,14 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
 - **P3** — Theme toggle: the header slot (`.es-nav__toggle`) is a
   placeholder only. Do not wire up functionality until light mode itself is
   actually implemented as a design system (colors, tokens, contrast pass).
+- **P3** — Global light-mode implementation and toggle: a real site-wide
+  pass (not just the `[data-theme='light']` token overrides that already
+  exist in `tokens.css` for future-compatibility) — a working toggle, a
+  contrast audit across every page, and validation this project hasn't
+  done yet (light mode is explicitly out of scope/unvalidated on How I
+  Work's polish pass, for example — see `docs/HOW-I-WORK-ILLUSTRATIONS.md`
+  and the asset-integration/polish commits). Do not start until requested
+  as its own ticket.
 
 ## Content / editability
 
@@ -270,6 +278,10 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
   started. Do not begin this migration inside an unrelated content
   ticket — it is large enough to be its own ticket, planned and reviewed
   on its own.
+- **P2** — About compact-layout refinements: a visual-polish pass over
+  About (spacing/hierarchy/separators) analogous to the one just done for
+  How I Work, once About's own open questions above are settled. Not
+  started — do not begin inside an unrelated How I Work ticket.
 - **Done (Sprint 3)** — **Selected Work** is now the first section
   converted to editable content: a "Case Study" custom post type, editable
   in wp-admin, with a hardcoded-placeholder fallback so Home never breaks
@@ -458,6 +470,16 @@ is approved and built. See `docs/HOW-I-WORK-STRATEGY.md` for the current
 process-page work; these are the adjacent/downstream items raised
 alongside it.
 
+- **P2** — Home teaser illustration sizing exploration: the three
+  Understand/Explore/Improve icons are deliberately restrained (44px) for
+  the MVP asset-integration pass — revisit only if the Home teaser itself
+  gets a dedicated design pass, not as a follow-on to How I Work's own
+  page work.
+- **P2** — Optional AI-band visual/illustration exploration: the
+  transversal AI band is text-only by design for MVP (no illustration, no
+  logo wall) — a future pass could explore a small abstract supporting
+  element IF it earns its place, per the same "no illustration merely to
+  fill space" principle already applied in the polish pass.
 - **P2** — Case-study architecture inspired by editorial senior
   portfolios (a stronger visual/structural reference point than the
   current case template, once more real cases exist to test it against).
