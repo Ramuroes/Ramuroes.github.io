@@ -1279,60 +1279,73 @@
 }
 
 /* ---------- green accent micro-interaction (full page only) ----------
+   MVP correction: the four accent classes' geometry doesn't sit perfectly
+   on the flattened base artwork (see docs/HOW-I-WORK-ILLUSTRATIONS.md) —
+   crisp, high-opacity green elements made that misalignment obvious. The
+   interaction now works as a soft atmospheric glow behind the
+   illustration instead of a precise overlay: .how-work-svg__accent-soft
+   is the only element that ever becomes visible, blurred and restrained.
+   .how-work-svg__accent-path/-node/-fill stay fully hidden at all
+   times — the option that makes the alignment issue least noticeable,
+   since a hidden shape can't look misplaced.
+
    Home's teaser icons only ever load pages-home.css (see
    es_is_home_template() in inc/enqueue.php) — this file never reaches
    Home at all, so nothing here can touch it; the existing whole-
    illustration lift in pages-home.css is untouched and still the only
-   motion Home gets. This adds a second, more meaningful layer on top for
-   the full page: the four accent classes already inside each SVG (see
-   assets/images/how-i-work/*.svg) rest at a restrained opacity/scale and
-   settle fully into place on hover or keyboard focus within the move —
-   pointing at what the accent marks without the whole illustration
-   moving beyond its existing lift.
+   motion Home gets.
 
-   Gated identically to that existing lift (hover-capable + fine pointer
-   + motion allowed), so touch/mobile always shows the SVGs' normal full-
-   opacity accents (never depends on hover to be legible) and
-   prefers-reduced-motion always shows the same settled end state with no
-   transition — both simply because the resting DIM never applies outside
-   those three conditions, not via a separate override. */
+   --how-work-accent-soft-opacity (pages-home.css, shared, unchanged) is
+   overridden here to 1 — full alpha baked into the fill itself — so the
+   NEW `opacity` property below is the only thing controlling how visible
+   the glow is. Stacking this ticket's opacity on top of the existing
+   0.12 baked-in alpha would multiply down to ~0.02, well under the
+   requested ~0.2 target and effectively invisible. */
 
 .how-work-illustration--page {
-	--how-work-accent-opacity: 0.55;
-	--how-work-accent-duration: 0.22s;
-	--how-work-accent-distance: 3px;
+	--how-work-accent-soft-opacity: 1;
+	--how-work-glow-opacity: 0.2;
+	--how-work-glow-scale-rest: 0.88;
+	--how-work-glow-scale-active: 1.05;
+	--how-work-glow-blur: 10px;
+	--how-work-glow-duration: 0.36s;
 	--how-work-illustration-lift: -2px;
 }
 
+/* Default state, every device, unconditionally: no visible green at all —
+   the base line drawing alone is already complete and legible (see the
+   accents-off screenshots from the asset-integration pass). */
+.how-work-illustration--page .how-work-svg__accent-path,
+.how-work-illustration--page .how-work-svg__accent-node,
+.how-work-illustration--page .how-work-svg__accent-fill,
+.how-work-illustration--page .how-work-svg__accent-soft {
+	opacity: 0;
+}
+
+/* Reduced motion: the glow's final, restrained state shown immediately
+   and permanently, no transition/scale — wins outright over the
+   hover-capable block below since that one requires
+   prefers-reduced-motion: no-preference to ever activate. */
+@media (prefers-reduced-motion: reduce) {
+	.how-work-illustration--page .how-work-svg__accent-soft {
+		opacity: var(--how-work-glow-opacity);
+		filter: blur(var(--how-work-glow-blur));
+	}
+}
+
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-	.how-work-illustration--page .how-work-svg__accent-path,
-	.how-work-illustration--page .how-work-svg__accent-node,
-	.how-work-illustration--page .how-work-svg__accent-fill {
+	.how-work-illustration--page .how-work-svg__accent-soft {
 		transform-box: fill-box;
 		transform-origin: center;
-		opacity: var(--how-work-accent-opacity);
-		transform: scale(0.92) translateY(var(--how-work-accent-distance));
-		transition: opacity var(--how-work-accent-duration) ease, transform var(--how-work-accent-duration) ease;
-	}
-
-	.how-work-illustration--page .how-work-svg__accent-soft {
-		opacity: 0.8;
-		transition: opacity var(--how-work-accent-duration) ease;
-	}
-
-	.how-work-illustration--page:hover .how-work-svg__accent-path,
-	.how-work-illustration--page:hover .how-work-svg__accent-node,
-	.how-work-illustration--page:hover .how-work-svg__accent-fill,
-	.es-process-move:focus-within .how-work-illustration--page .how-work-svg__accent-path,
-	.es-process-move:focus-within .how-work-illustration--page .how-work-svg__accent-node,
-	.es-process-move:focus-within .how-work-illustration--page .how-work-svg__accent-fill {
-		opacity: 1;
-		transform: scale(1) translateY(0);
+		filter: blur(var(--how-work-glow-blur));
+		transform: scale(var(--how-work-glow-scale-rest));
+		transition: opacity var(--how-work-glow-duration) ease-out, transform var(--how-work-glow-duration) ease-out;
 	}
 
 	.how-work-illustration--page:hover .how-work-svg__accent-soft,
 	.es-process-move:focus-within .how-work-illustration--page .how-work-svg__accent-soft {
-		opacity: 1;
+		opacity: var(--how-work-glow-opacity);
+		transform: scale(var(--how-work-glow-scale-active));
 	}
 
 	/* Keyboard parity with the existing mouse-only :hover lift in
