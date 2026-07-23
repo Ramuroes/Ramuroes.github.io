@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.11' );
+define( 'ES_CHILD_VERSION', '0.2.12' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -22,6 +22,7 @@ require ES_CHILD_DIR . '/inc/selected-work-fallback.php';
 require ES_CHILD_DIR . '/inc/featured-case-fallback.php';
 require ES_CHILD_DIR . '/inc/work-page-fallback.php';
 require ES_CHILD_DIR . '/inc/block-styles.php';
+require ES_CHILD_DIR . '/inc/how-i-work-illustrations.php';
 
 /**
  * Textdomain del child theme.

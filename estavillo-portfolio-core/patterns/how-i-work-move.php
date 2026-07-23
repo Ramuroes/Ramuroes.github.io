@@ -3,13 +3,12 @@
  * Pattern content — How I Work — Move.
  *
  * One reusable scaffold for a single "process move" section on the How I
- * Work page (docs/HOW-I-WORK-CONTENT-SPEC.md §6) — number + title, a real
- * empty core/image illustration slot (Media-Library-driven, same
- * precedent as the About portrait fix — no invented placeholder, no
- * server-side icon registry needed), short description, and the four
- * consolidated disclosure sections inside the existing estavillo/
- * case-details block (Why it matters / How I approach it / AI and human
- * judgment / In practice).
+ * Work page (docs/HOW-I-WORK-CONTENT-SPEC.md §6) — number + title, an
+ * estavillo/how-i-work-illustration block (defaults to step 1 — pick the
+ * real step for a new move from its Inspector "Step" control once one is
+ * added), short description, and the four consolidated disclosure sections
+ * inside the existing estavillo/case-details block (Why it matters / How I
+ * approach it / AI and human judgment / In practice).
  *
  * Only ONE pattern variant exists on purpose: illustration/text placement
  * alternates left-right on desktop purely via CSS
@@ -50,7 +49,7 @@ return <<<'CONTENT'
 
 <!-- wp:columns {"className":"es-process-move__row"} -->
 <div class="wp-block-columns es-process-move__row"><!-- wp:column {"width":"42%"} -->
-<div class="wp-block-column" style="flex-basis:42%"><!-- wp:image {"sizeSlug":"large","linkDestination":"none"} /--></div>
+<div class="wp-block-column" style="flex-basis:42%"><!-- wp:estavillo/how-i-work-illustration {"step":1} /--></div>
 <!-- /wp:column -->
 
 <!-- wp:column {"width":"58%"} -->

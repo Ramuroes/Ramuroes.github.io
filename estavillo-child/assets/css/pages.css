@@ -1269,27 +1269,23 @@
 	position: relative;
 }
 
-.es-process-move__row > .wp-block-column:first-child .wp-block-image {
-	margin: 0;
+/* The illustration itself (.how-work-illustration, shared base rules in
+   pages-home.css) sizes via width:100%/height:auto off its own SVG
+   viewBox — no aspect-ratio hardcoded here, since the real artwork's
+   proportions (440:300) already come from the file, not a guess. */
+.es-process-move__row > .wp-block-column:first-child .how-work-illustration {
+	max-width: 460px;
 }
 
-.es-process-move__row > .wp-block-column:first-child .wp-block-image img {
-	display: block;
-	width: 100%;
-	aspect-ratio: 1 / 1;
-	object-fit: cover;
-	border-radius: var(--es-radius);
-}
-
-/* Restrained placeholder while no illustration has been picked yet — an
-   empty core/image renders nothing at all (no img element), so this
-   styles the COLUMN itself, only while it has no image child. Same
-   dashed/reduced-opacity language already used for empty icon states
-   elsewhere on this site (.es-process__icon--empty and similar) — the
-   layout still reserves the full illustration proportion and stays
-   visually balanced with zero real artwork in place. */
-.es-process-move__row > .wp-block-column:first-child:not(:has(img)) {
-	aspect-ratio: 1 / 1;
+/* Graceful degradation: estavillo/how-i-work-illustration prints nothing
+   at all if the theme's renderer isn't available or a step fails to
+   resolve (see inc/how-i-work-illustrations.php) — the column is then
+   genuinely empty. Same dashed/reduced-opacity placeholder language
+   already used for empty icon states elsewhere on this site
+   (.es-process__icon--empty and similar), so a missing illustration still
+   reserves a balanced proportion instead of collapsing the layout. */
+.es-process-move__row > .wp-block-column:first-child:empty {
+	aspect-ratio: 22 / 15;
 	border: 1px dashed var(--es-line-strong);
 	border-radius: var(--es-radius);
 	opacity: 0.4;

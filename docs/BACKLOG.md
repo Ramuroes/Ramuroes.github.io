@@ -218,9 +218,13 @@ determines pickup order. See `ROADMAP.md` for how these map onto sprints.
 
 ## Design polish
 
-- **P1** — How I Work needs a future icon/motion treatment per step. Slots
-  are reserved (`.es-process__icon`, `.es-process__icon--empty`) — this
-  item is about designing and filling that slot, not changing layout.
+- ~~**P1** — How I Work needs a future icon/motion treatment per step.~~
+  **Done** — six approved illustrations integrated (asset-integration
+  ticket, see `docs/HOW-I-WORK-ILLUSTRATIONS.md`); the old `.es-process__icon`/
+  `.es-process__icon--empty` slots no longer exist, replaced by
+  `estavillo/how-i-work-illustration`. Richer motion beyond the MVP hover
+  stays tracked below ("Future motion exploration beyond How I Work's MVP
+  list").
 - **P1** — Footer needs a more intentional "ending" — it should read as a
   deliberate close to the page, not just a rule + links.
 - **P2** — Header alignment (logo / nav / language / toggle slot) is

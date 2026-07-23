@@ -11,6 +11,17 @@
  * Gutenberg de templates/page-how-i-work.php) sigue siendo la única
  * fuente de los 6 pasos completos.
  *
+ * Cada idea lleva una ilustración chica y secundaria (integración de
+ * assets — estavillo-how-i-work-staging.zip): Understand -> paso 1,
+ * Explore -> paso 4, Improve -> paso 6, elegidas a mano por orden de idea,
+ * no configurables desde wp-admin (es una decisión de layout, no de
+ * contenido — el copy de cada grupo sigue viniendo 100% de
+ * es_home_process_teaser()). Mismo renderer compartido que el bloque de
+ * Gutenberg de la página dedicada (es_how_work_illustration_svg(),
+ * inc/how-i-work-illustrations.php) — si el archivo SVG faltara, la
+ * función devuelve '' y el layout no se rompe, sin necesidad de manejar
+ * ese caso acá.
+ *
  * @package estavillo-child
  */
 
@@ -22,6 +33,7 @@ $es_num = isset( $args['num'] ) ? $args['num'] : '01';
 
 $es_teaser       = es_home_process_teaser();
 $es_process_url  = apply_filters( 'es_home_process_url', '#process' );
+$es_teaser_steps = array( 1, 4, 6 );
 ?>
 
 <section class="es-section es-process-teaser" id="process">
@@ -47,9 +59,26 @@ $es_process_url  = apply_filters( 'es_home_process_url', '#process' );
 
 		<?php if ( ! empty( $es_teaser['groups'] ) && is_array( $es_teaser['groups'] ) ) : ?>
 			<ol class="es-process-teaser__row" data-es-reveal>
-				<?php foreach ( $es_teaser['groups'] as $es_group ) : ?>
+				<?php foreach ( array_values( $es_teaser['groups'] ) as $es_i => $es_group ) : ?>
 					<?php if ( empty( $es_group['title'] ) ) { continue; } ?>
 					<li class="es-process-teaser__group">
+						<?php
+						$es_step = isset( $es_teaser_steps[ $es_i ] ) ? $es_teaser_steps[ $es_i ] : 0;
+						if ( $es_step && function_exists( 'es_how_work_illustration_svg' ) ) :
+							$es_illustration = es_how_work_illustration_svg(
+								$es_step,
+								array(
+									'context'      => 'home',
+									'show_accents' => true,
+									'decorative'   => true,
+									'class'        => 'es-process-teaser__group-illustration',
+								)
+							);
+							if ( '' !== $es_illustration ) :
+								echo $es_illustration; // phpcs:ignore WordPress.Security.EscapeOutput -- ya sanitizado en es_how_work_illustration_svg().
+							endif;
+						endif;
+						?>
 						<h4 class="es-process-teaser__group-title"><?php echo esc_html( $es_group['title'] ); ?></h4>
 						<?php if ( ! empty( $es_group['text'] ) ) : ?>
 							<p class="es-process-teaser__group-text"><?php echo esc_html( $es_group['text'] ); ?></p>

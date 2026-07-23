@@ -65,14 +65,79 @@
 	}
 }
 
+/* ---------- How I Work illustrations — shared base (Home + page) ----------
+   Used by both this teaser (three small, secondary icons) and the How I
+   Work page's estavillo/how-i-work-illustration block (one large
+   illustration per move, sized in pages.css) — one set of rules so the
+   token mapping and accent toggle only exist once. Loads on Home AND the
+   4 static pages (see inc/enqueue.php es_is_home_template() ||
+   es_is_estavillo_static_page()), unlike pages.css which is static-pages-only.
+
+   --es-signal/--es-signal-soft is the token family already used by the
+   hero system map for exactly this meaning ("the system: active/resolved
+   path, live signal" — see tokens.css §diagram semantics), fixed
+   regardless of the orange/green brand-accent Customizer toggle — the
+   right mapping for --how-work-accent, not --es-accent. The soft-circle
+   opacity is split into its own variable (not baked into a fixed rgba a
+   la --es-signal-soft) specifically so it can be tuned later without
+   touching the RGB triple or the six SVG files. */
+.how-work-illustration {
+	--how-work-line: var(--es-ink);
+	--how-work-accent: var(--es-signal);
+	--how-work-accent-soft-opacity: 0.12;
+	--how-work-accent-soft: rgba(88, 177, 131, var(--how-work-accent-soft-opacity));
+	display: block;
+}
+
+[data-theme='light'] .how-work-illustration {
+	--how-work-accent-soft: rgba(45, 106, 79, var(--how-work-accent-soft-opacity));
+}
+
+.how-work-illustration svg {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+/* showAccents = false (Inspector toggle / show_accents param): hide only
+   the four accent classes, never the base line drawing underneath. */
+.how-work-illustration--no-accents .how-work-svg__accent-path,
+.how-work-illustration--no-accents .how-work-svg__accent-node,
+.how-work-illustration--no-accents .how-work-svg__accent-fill,
+.how-work-illustration--no-accents .how-work-svg__accent-soft {
+	display: none;
+}
+
+/* MVP motion only: a restrained hover on the illustration itself, gated to
+   pointer devices that can actually hover and to prefers-reduced-motion:
+   no-preference. No autoplay/loop/scroll-linked motion this pass — see
+   docs/HOW-I-WORK-STRATEGY.md §motion (richer motion is a later phase). */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+	.how-work-illustration {
+		transition: transform var(--es-dur-fast) ease;
+	}
+
+	.how-work-illustration:hover {
+		transform: translateY(-2px);
+	}
+}
+
 /* ---------- how I work (proceso) — teaser compacto ----------
    Reescrito para docs/HOW-I-WORK-CONTENT-SPEC.md §1A: ya no reproduce la
    grilla de 6 pasos (ver template-parts/how-i-work-detail.php /
    la versión Gutenberg de la página dedicada para eso) — es un preview
    de 3 ideas, deliberadamente más liviano. "No debe dominar la Home ni
    competir con Featured/Selected Work": sin bordes pesados, sin números
-   por idea, sin ícono/ilustración, tipografía notablemente más chica que
-   el título de Featured Case o el hero. */
+   por idea, tipografía notablemente más chica que el título de Featured
+   Case o el hero. Cada idea SÍ lleva una ilustración chica y secundaria
+   (una de las seis piezas de How I Work, ver es_how_work_illustration_svg())
+   — restrained on purpose: nunca compite con el copy ni con Featured/
+   Selected Work. */
+
+.es-process-teaser__group-illustration {
+	width: 44px;
+	margin: 0 0 12px;
+}
 
 .es-process-teaser__headline {
 	max-width: 46ch;
