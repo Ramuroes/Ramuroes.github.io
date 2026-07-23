@@ -406,6 +406,28 @@ function es_portfolio_home_content_save() {
 		$data['connect_status'] = sanitize_text_field( wp_unslash( $_POST['es_connect_status'] ) );
 	}
 
+	// ---- Connect page (dedicated) — ticket Connect ----
+	// Eyebrow/title/intro son EXCLUSIVOS de la página dedicada — nunca los
+	// usa Home (que sigue con cta_title/cta_lead arriba, sin tocar).
+	if ( isset( $_POST['es_connect_eyebrow'] ) ) {
+		$data['connect_eyebrow'] = sanitize_text_field( wp_unslash( $_POST['es_connect_eyebrow'] ) );
+	}
+	if ( isset( $_POST['es_connect_title'] ) ) {
+		$data['connect_title'] = wp_kses( wp_unslash( $_POST['es_connect_title'] ), array( 'em' => array() ) );
+	}
+	if ( isset( $_POST['es_connect_intro'] ) ) {
+		$data['connect_intro'] = sanitize_textarea_field( wp_unslash( $_POST['es_connect_intro'] ) );
+	}
+	if ( isset( $_POST['es_contact_phone'] ) ) {
+		$data['contact_phone'] = sanitize_text_field( wp_unslash( $_POST['es_contact_phone'] ) );
+	}
+	if ( isset( $_POST['es_contact_whatsapp'] ) ) {
+		$data['contact_whatsapp'] = sanitize_text_field( wp_unslash( $_POST['es_contact_whatsapp'] ) );
+	}
+	if ( isset( $_POST['es_connect_country'] ) ) {
+		$data['connect_country'] = sanitize_text_field( wp_unslash( $_POST['es_connect_country'] ) );
+	}
+
 	// ---- Header (nav links) ----
 	if ( isset( $_POST['es_nav_link_label'] ) && is_array( $_POST['es_nav_link_label'] ) ) {
 		$labels = wp_unslash( $_POST['es_nav_link_label'] );
@@ -426,6 +448,9 @@ function es_portfolio_home_content_save() {
 	}
 	if ( isset( $_POST['es_social_behance'] ) ) {
 		$data['social_behance'] = esc_url_raw( wp_unslash( $_POST['es_social_behance'] ) );
+	}
+	if ( isset( $_POST['es_social_instagram'] ) ) {
+		$data['social_instagram'] = esc_url_raw( wp_unslash( $_POST['es_social_instagram'] ) );
 	}
 	if ( isset( $_POST['es_footer_location'] ) ) {
 		$data['footer_location'] = sanitize_text_field( wp_unslash( $_POST['es_footer_location'] ) );
@@ -698,6 +723,7 @@ function es_portfolio_home_content_page() {
 			</table>
 
 			<h2><?php esc_html_e( 'Connect', 'estavillo-portfolio-core' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'These fields feed Home\'s own CTA section only. For the dedicated Connect/Contact page (eyebrow, title, intro, phone, WhatsApp, country), see "Connect page (dedicated)" below.', 'estavillo-portfolio-core' ); ?></p>
 			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row"><label for="es_cta_title"><?php esc_html_e( 'Connect title', 'estavillo-portfolio-core' ); ?></label></th>
@@ -732,6 +758,38 @@ function es_portfolio_home_content_page() {
 				</tr>
 			</table>
 
+			<h2><?php esc_html_e( 'Connect page (dedicated)', 'estavillo-portfolio-core' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'The standalone Connect/Contact page only — Home is never affected by these. Contact email above and Availability above are shared with this page too.', 'estavillo-portfolio-core' ); ?></p>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><label for="es_connect_eyebrow"><?php esc_html_e( 'Eyebrow', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="text" id="es_connect_eyebrow" name="es_connect_eyebrow" class="regular-text" value="<?php echo esc_attr( $data['connect_eyebrow'] ?? '' ); ?>" placeholder="Get in touch"></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_connect_title"><?php esc_html_e( 'Title', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="text" id="es_connect_title" name="es_connect_title" class="large-text" value="<?php echo esc_attr( $data['connect_title'] ?? '' ); ?>" placeholder="Let's connect."></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_connect_intro"><?php esc_html_e( 'Introduction', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><textarea id="es_connect_intro" name="es_connect_intro" rows="3" class="large-text"><?php echo esc_textarea( $data['connect_intro'] ?? '' ); ?></textarea></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_contact_phone"><?php esc_html_e( 'Phone', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="text" id="es_contact_phone" name="es_contact_phone" class="regular-text" value="<?php echo esc_attr( $data['contact_phone'] ?? '' ); ?>" placeholder="+598 99 892 722"></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_contact_whatsapp"><?php esc_html_e( 'WhatsApp', 'estavillo-portfolio-core' ); ?></label></th>
+					<td>
+						<input type="text" id="es_contact_whatsapp" name="es_contact_whatsapp" class="regular-text" value="<?php echo esc_attr( $data['contact_whatsapp'] ?? '' ); ?>" placeholder="+598 99 892 722">
+						<p class="description"><?php esc_html_e( 'Any format is fine — only the digits are used to build the wa.me link.', 'estavillo-portfolio-core' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_connect_country"><?php esc_html_e( 'Country', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="text" id="es_connect_country" name="es_connect_country" class="regular-text" value="<?php echo esc_attr( $data['connect_country'] ?? '' ); ?>" placeholder="Uruguay"></td>
+				</tr>
+			</table>
+
 			<h2><?php esc_html_e( 'Header (navigation links)', 'estavillo-portfolio-core' ); ?></h2>
 			<p class="description"><?php esc_html_e( 'These 4 links are used in the header nav, the mobile menu, and the footer nav. Leave a row blank to keep its current label and URL.', 'estavillo-portfolio-core' ); ?></p>
 			<table class="form-table" role="presentation">
@@ -761,6 +819,13 @@ function es_portfolio_home_content_page() {
 				<tr>
 					<th scope="row"><label for="es_social_behance"><?php esc_html_e( 'Behance URL', 'estavillo-portfolio-core' ); ?></label></th>
 					<td><input type="url" id="es_social_behance" name="es_social_behance" class="regular-text" value="<?php echo esc_attr( $data['social_behance'] ?? '' ); ?>" placeholder="https://behance.net/..."></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_social_instagram"><?php esc_html_e( 'Instagram URL', 'estavillo-portfolio-core' ); ?></label></th>
+					<td>
+						<input type="url" id="es_social_instagram" name="es_social_instagram" class="regular-text" value="<?php echo esc_attr( $data['social_instagram'] ?? '' ); ?>" placeholder="https://instagram.com/...">
+						<p class="description"><?php esc_html_e( 'Also used by the dedicated Connect page.', 'estavillo-portfolio-core' ); ?></p>
+					</td>
 				</tr>
 				<tr>
 					<th scope="row"><label for="es_footer_location"><?php esc_html_e( 'Location', 'estavillo-portfolio-core' ); ?></label></th>
@@ -973,6 +1038,47 @@ function es_portfolio_filter_connect_status( $default ) {
 add_filter( 'es_connect_status', 'es_portfolio_filter_connect_status' );
 
 /**
+ * Puentes para la página Connect dedicada (ticket Connect). Exclusivos de
+ * esta página — Home sigue leyendo únicamente es_home_cta_title/_cta_lead
+ * de arriba, sin tocar.
+ */
+function es_portfolio_filter_connect_eyebrow( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['connect_eyebrow'] ) ? $data['connect_eyebrow'] : $default;
+}
+add_filter( 'es_connect_eyebrow', 'es_portfolio_filter_connect_eyebrow' );
+
+function es_portfolio_filter_connect_title( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['connect_title'] ) ? $data['connect_title'] : $default;
+}
+add_filter( 'es_connect_title', 'es_portfolio_filter_connect_title' );
+
+function es_portfolio_filter_connect_intro( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['connect_intro'] ) ? $data['connect_intro'] : $default;
+}
+add_filter( 'es_connect_intro', 'es_portfolio_filter_connect_intro' );
+
+function es_portfolio_filter_contact_phone( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['contact_phone'] ) ? $data['contact_phone'] : $default;
+}
+add_filter( 'es_contact_phone', 'es_portfolio_filter_contact_phone' );
+
+function es_portfolio_filter_contact_whatsapp( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['contact_whatsapp'] ) ? $data['contact_whatsapp'] : $default;
+}
+add_filter( 'es_contact_whatsapp', 'es_portfolio_filter_contact_whatsapp' );
+
+function es_portfolio_filter_connect_country( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['connect_country'] ) ? $data['connect_country'] : $default;
+}
+add_filter( 'es_connect_country', 'es_portfolio_filter_connect_country' );
+
+/**
  * Puente para Header: mismo merge por-item que How I Work. Un link sin
  * label editado no pisa nada y sigue mostrando ESE link puntual como
  * estaba (label + url originales) — así se puede editar uno solo sin
@@ -1014,6 +1120,9 @@ function es_portfolio_filter_social_links( $default ) {
 	}
 	if ( ! empty( $data['social_behance'] ) ) {
 		$default['Behance'] = $data['social_behance'];
+	}
+	if ( ! empty( $data['social_instagram'] ) ) {
+		$default['Instagram'] = $data['social_instagram'];
 	}
 	return $default;
 }

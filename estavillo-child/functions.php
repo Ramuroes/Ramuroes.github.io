@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.14' );
+define( 'ES_CHILD_VERSION', '0.2.15' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -83,6 +83,41 @@ function es_child_ui_strings() {
  */
 function es_contact_email() {
 	return apply_filters( 'es_contact_email', 'hello@ramiroestavillo.com' );
+}
+
+/**
+ * Teléfono de contacto (editable por filtro es_contact_phone) — mismo
+ * criterio que es_contact_email(): una sola función/campo, reusable por
+ * Connect hoy y por Footer más adelante si se decide mostrarlo ahí (ver
+ * docs/BACKLOG.md).
+ *
+ * @return string
+ */
+function es_contact_phone() {
+	return apply_filters( 'es_contact_phone', '+598 99 892 722' );
+}
+
+/**
+ * Número de WhatsApp (editable por filtro es_contact_whatsapp) — campo
+ * independiente del teléfono de arriba: mismo dato hoy, pero un número de
+ * WhatsApp de negocio podría diferir del teléfono directo más adelante.
+ *
+ * @return string
+ */
+function es_contact_whatsapp() {
+	return apply_filters( 'es_contact_whatsapp', '+598 99 892 722' );
+}
+
+/**
+ * Normaliza un número de teléfono/WhatsApp a solo dígitos, para construir
+ * enlaces tel:/wa.me sin depender de que el campo se haya guardado con o
+ * sin espacios/guiones/paréntesis.
+ *
+ * @param string $number Número tal como se guardó (formato libre).
+ * @return string Solo dígitos.
+ */
+function es_phone_digits( $number ) {
+	return preg_replace( '/[^0-9]/', '', (string) $number );
 }
 
 /**
@@ -599,6 +634,55 @@ function es_hobby_icon_choices() {
 function es_hobby_icon_svg( $key ) {
 	$key     = es_hobby_icon_resolve_key( $key );
 	$library = es_hobby_icon_library();
+	return isset( $library[ $key ] ) ? $library[ $key ] : '';
+}
+
+/**
+ * Íconos de método de contacto (Connect) — misma mecánica de archivo +
+ * cache estática que es_hobby_icon_library(), pero deliberadamente NO es
+ * la misma librería: acá la clave→ícono es fija (email siempre usa
+ * email.svg, nunca elegible desde wp-admin), así que no hace falta
+ * choices()/resolve_key() para alias — un select de icono por fila no
+ * tendría sentido cuando cada fila ya sabe cuál es su propio ícono.
+ *
+ * @return string[] clave canónica del método de contacto.
+ */
+function es_connect_icon_keys() {
+	return array( 'email', 'phone', 'whatsapp', 'linkedin', 'instagram', 'location' );
+}
+
+/**
+ * @return array<string,string> clave => markup SVG completo, leído de
+ *                               assets/icons/{clave}.svg.
+ */
+function es_connect_icon_library() {
+	static $library = null;
+	if ( null !== $library ) {
+		return $library;
+	}
+	$library = array();
+	$dir     = get_stylesheet_directory() . '/assets/icons/';
+	foreach ( es_connect_icon_keys() as $key ) {
+		$file = $dir . $key . '.svg';
+		if ( is_readable( $file ) ) {
+			$svg = file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- archivo local del propio tema, no remoto.
+			if ( is_string( $svg ) && '' !== $svg ) {
+				$library[ $key ] = trim( $svg );
+			}
+		}
+	}
+	return $library;
+}
+
+/**
+ * Markup SVG de un ícono de contacto por clave, o cadena vacía si no
+ * existe.
+ *
+ * @param string $key Una de es_connect_icon_keys().
+ * @return string
+ */
+function es_connect_icon_svg( $key ) {
+	$library = es_connect_icon_library();
 	return isset( $library[ $key ] ) ? $library[ $key ] : '';
 }
 

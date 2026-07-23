@@ -1,10 +1,18 @@
 <?php
 /**
  * Template Name: Estavillo — Contact
- * Description: Página de contacto dedicada — mismos datos "Connect" de
- * Home (título, lead, email) más los de Footer (redes, ubicación), todos
- * editables desde Home Content. Ningún filtro/campo nuevo — ver
- * template-parts/contact-content.php.
+ * Description: Página Connect — Gutenberg migration (ticket Connect). El
+ * H1 de esta página decía "Contact." mientras que nav/breadcrumb siempre
+ * dijeron "Connect" — inconsistencia real, corregida acá: eyebrow "Get in
+ * touch" + título "Let's connect." (es_connect_eyebrow/es_connect_title,
+ * editables). page-head (eyebrow+H1+lead) se imprime SIEMPRE, tanto si la
+ * Page ya tiene contenido Gutenberg real como si todavía cae al fallback
+ * — mismo criterio que About/How I Work (ver ahí para el precedente): el
+ * cuerpo de abajo (métodos de contacto + formulario) es la única parte
+ * migrada, en una rama explícita either/or (real content -> the_content();
+ * sin contenido real -> template-parts/contact-content.php). Antes esta
+ * página imprimía contact-content.php SIEMPRE y además el post content
+ * real si existía (nunca eran mutuamente excluyentes) — corregido acá.
  *
  * Standalone igual que templates/page-home-estavillo.php: imprime su
  * propio wp_head()/wp_footer() y reusa el chrome ESTAVILLO.
@@ -41,23 +49,23 @@ if ( function_exists( 'wp_body_open' ) ) {
 			'template-parts/page-head',
 			null,
 			array(
-				'title' => __( 'Contact.', 'estavillo-child' ),
+				'eyebrow' => apply_filters( 'es_connect_eyebrow', 'Get in touch' ),
+				'title'   => apply_filters( 'es_connect_title', "Let's connect." ),
+				'lead'    => apply_filters( 'es_connect_intro', "If you'd like to discuss a product, a process, a collaboration or simply say hello, I'd be glad to hear from you." ),
 			)
 		);
 
-		get_template_part( 'template-parts/contact-content' );
-
-		while ( have_posts() ) :
+		$es_connect_content = '';
+		if ( have_posts() ) :
 			the_post();
-			$es_page_content = trim( get_the_content() );
-			if ( '' !== $es_page_content ) :
-				?>
-				<section class="es-section es-page-content">
-					<div class="es-container"><?php the_content(); ?></div>
-				</section>
-				<?php
-			endif;
-		endwhile;
+			$es_connect_content = trim( get_the_content() );
+		endif;
+
+		if ( '' !== $es_connect_content ) :
+			the_content();
+		else :
+			get_template_part( 'template-parts/contact-content' );
+		endif;
 		?>
 	</main>
 
