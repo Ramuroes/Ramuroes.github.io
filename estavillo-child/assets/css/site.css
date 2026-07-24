@@ -38,6 +38,75 @@
 	}
 }
 
+/* Sticky option (Phase 5 §6): default is sticky (rules above). When the
+   global "Sticky header" toggle is off, the header sits in normal flow — no
+   pin, no jump, everything else unchanged. */
+.es-site-header--static {
+	position: static;
+}
+
+/* Anchor jumps clear the sticky header (no overlap with headings, §6). Gated
+   to the sticky body class so a static header adds no offset. scroll-margin on
+   the target sections works regardless of the scroll container; the admin bar
+   only affects logged-in editors, handled with a small extra offset. */
+.es-header-sticky :where( .es-hero, .es-section ) {
+	scroll-margin-top: 84px;
+}
+
+.admin-bar.es-header-sticky :where( .es-hero, .es-section ) {
+	scroll-margin-top: 116px;
+}
+
+/* Active navigation state (§5): green label + a small green dot, absolutely
+   positioned so it never shifts layout. Server-side (aria-current) — no scroll
+   tracking. Home stays neutral. */
+.es-nav__link {
+	position: relative;
+}
+
+.es-nav__link.is-active {
+	color: var(--es-ink) !important;
+}
+
+.es-nav__dot {
+	position: absolute;
+	left: 50%;
+	bottom: -3px;
+	width: 4px;
+	height: 4px;
+	transform: translateX(-50%);
+	border-radius: 50%;
+	background: var(--es-accent);
+	pointer-events: none;
+}
+
+/* optional wordmark logo image (text wordmark stays the default) */
+.es-nav__brand--logo {
+	display: inline-flex;
+	align-items: center;
+}
+
+.es-nav__logo {
+	display: block;
+	height: 22px;
+	width: auto;
+	max-width: 180px;
+}
+
+/* mobile menu active item: green label + inline dot (roomy rows, no shift
+   concern here). */
+.es-mobile-menu__link.is-active {
+	color: var(--es-accent) !important;
+}
+
+.es-mobile-menu__link.is-active .es-nav__dot {
+	position: static;
+	transform: none;
+	display: inline-block;
+	margin-left: 10px;
+	vertical-align: middle;
+}
+
 /* ---------- breadcrumbs (Home / [sección] / página o caso actual) ----------
    Usados en Case Study, Work, About, How I Work y Contact — nunca en Home
    (template-parts/breadcrumbs.php simplemente no se llama ahí). Movidos
@@ -419,47 +488,78 @@
 	}
 }
 
-/* ---------- footer ---------- */
+/* ---------- footer (Phase 5) ----------
+   Global footer, editorially restrained (dark, thin borders, mono meta — same
+   language as the header). Layout is a global option: three columns (default),
+   two, or compact, plus a standard/wide width and per-section visibility.
+   Reuses the site container + tokens; no cards, gradients or heavy icons. */
 
 .es-site-footer {
 	border-top: 1px solid var(--es-line);
 }
 
 .es-site-footer__inner {
-	padding-top: clamp(40px, 5vw, 60px);
+	padding-top: clamp(44px, 5vw, 64px);
 	padding-bottom: clamp(28px, 3.5vw, 40px);
+}
+
+/* wide width option (default stays the standard site container) */
+.es-site-footer--wide .es-site-footer__inner {
+	max-width: min(1320px, 92vw);
+}
+
+.es-site-footer__grid {
+	display: grid;
+	grid-template-columns: 1.4fr 1fr 1.2fr;
+	gap: clamp(28px, 5vw, 72px);
+	align-items: start;
+}
+
+/* two columns: identity spans the top, nav + contact sit below as two columns */
+.es-site-footer--two .es-site-footer__grid {
+	grid-template-columns: 1fr 1fr;
+}
+
+.es-site-footer--two .es-site-footer__col--identity {
+	grid-column: 1 / -1;
+}
+
+/* compact: a single tidy column */
+.es-site-footer--compact .es-site-footer__grid {
+	grid-template-columns: 1fr;
+	gap: clamp(18px, 3vw, 26px);
+}
+
+.es-site-footer__col {
 	display: flex;
 	flex-direction: column;
-	gap: clamp(16px, 2.4vw, 22px);
-}
-
-.es-site-footer__row {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	gap: 16px 24px;
-	flex-wrap: wrap;
-}
-
-.es-site-footer__row--meta {
-	border-top: 1px solid var(--es-line);
-	padding-top: clamp(16px, 2vw, 20px);
+	gap: 12px;
+	min-width: 0;
 }
 
 .es-site-footer__brand {
-	color: var(--es-ink-3);
-	font-size: 12px;
+	color: var(--es-ink-2);
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0.22em;
 }
 
+.es-site-footer__note {
+	margin: 0;
+	max-width: 34ch;
+	font-size: 13px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+}
+
+/* navigation column — vertical list, reuses the same links as the header */
 .es-site-footer__nav {
-	display: flex;
-	align-items: center;
-	gap: 20px;
-	flex-wrap: wrap;
+	gap: 10px;
 }
 
 .es-site-footer__nav a {
-	font-size: 13px;
+	width: fit-content;
+	font-size: 13.5px;
 	font-weight: 500;
 	color: var(--es-ink-3) !important;
 	text-decoration: none;
@@ -472,14 +572,87 @@
 	color: var(--es-ink) !important;
 }
 
+.es-site-footer__nav a[aria-current='page'] {
+	color: var(--es-accent) !important;
+}
+
 .es-site-footer__nav a:visited {
 	color: var(--es-ink-3) !important;
 }
 
-.es-site-footer__meta {
+/* contact + elsewhere column */
+.es-footer-contact,
+.es-footer-elsewhere {
 	display: flex;
+	flex-direction: column;
+	gap: 9px;
+}
+
+.es-footer-elsewhere {
+	margin-top: 14px;
+}
+
+.es-footer-contact__item {
+	display: inline-flex;
 	align-items: center;
-	gap: 18px;
+	gap: 9px;
+	width: fit-content;
+	font-size: 13.5px;
+	color: var(--es-ink-3) !important;
+	text-decoration: none;
+	transition: color 0.15s ease;
+}
+
+.es-footer-contact__item:hover,
+.es-footer-contact__item:focus-visible,
+.es-footer-contact__item:active {
+	color: var(--es-accent) !important;
+}
+
+.es-footer-contact__item:visited {
+	color: var(--es-ink-3) !important;
+}
+
+/* the two line icons stay secondary to the text; ≤2px nudge on hover (§13) */
+.es-footer-contact__icon {
+	flex: none;
+	color: var(--es-ink-4);
+	transition: transform 0.18s var(--es-ease), color 0.15s ease;
+}
+
+.es-footer-contact__item:hover .es-footer-contact__icon,
+.es-footer-contact__item:focus-visible .es-footer-contact__icon {
+	color: var(--es-accent);
+	transform: translateX(2px);
+}
+
+.es-footer-elsewhere a {
+	width: fit-content;
+	font-size: 13.5px;
+	color: var(--es-ink-3) !important;
+	text-decoration: none;
+	transition: color 0.15s ease;
+}
+
+.es-footer-elsewhere a:hover,
+.es-footer-elsewhere a:focus-visible,
+.es-footer-elsewhere a:active {
+	color: var(--es-accent) !important;
+}
+
+.es-footer-elsewhere a:visited {
+	color: var(--es-ink-3) !important;
+}
+
+/* base row — location + auto-year copyright, mono meta */
+.es-site-footer__base {
+	margin-top: clamp(28px, 4vw, 44px);
+	padding-top: clamp(16px, 2vw, 20px);
+	border-top: 1px solid var(--es-line);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px 24px;
 	flex-wrap: wrap;
 	font-family: var(--es-mono);
 	font-size: 11px;
@@ -487,18 +660,38 @@
 	color: var(--es-ink-4);
 }
 
-.es-site-footer__meta a {
-	color: var(--es-ink-4) !important;
-	text-decoration: none;
-	transition: color 0.15s ease;
+/* tablet: identity spans full width, nav + contact become two columns */
+@media (max-width: 900px) {
+	.es-site-footer--three .es-site-footer__grid {
+		grid-template-columns: 1fr 1fr;
+	}
+	.es-site-footer--three .es-site-footer__col--identity {
+		grid-column: 1 / -1;
+	}
 }
 
-.es-site-footer__meta a:hover,
-.es-site-footer__meta a:focus-visible,
-.es-site-footer__meta a:active {
-	color: var(--es-accent) !important;
+/* mobile: single column, clean stack, logical reading order */
+@media (max-width: 600px) {
+	.es-site-footer__grid {
+		grid-template-columns: 1fr !important;
+		gap: clamp(22px, 6vw, 32px);
+	}
+	.es-site-footer__col--identity {
+		grid-column: auto !important;
+	}
+	.es-site-footer__base {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+	}
 }
 
-.es-site-footer__meta a:visited {
-	color: var(--es-ink-4) !important;
+@media (prefers-reduced-motion: reduce) {
+	.es-footer-contact__icon {
+		transition: color 0.15s ease;
+	}
+	.es-footer-contact__item:hover .es-footer-contact__icon,
+	.es-footer-contact__item:focus-visible .es-footer-contact__icon {
+		transform: none;
+	}
 }

@@ -616,3 +616,55 @@ Editability priority order (for reference, full detail in
   `render.php` (emit the text, e.g. as `.es-hobby-item__text` or a
   `data-tooltip`), and a small CSS block for the reveal/popover. Keep it
   restrained so it never competes with the illustration grid.
+
+## Header & Footer (Phase 5) — routing rules, ownership, backlog
+
+**Where it's edited (one source of truth):** Case Studies → **Portfolio
+Content** (plugin `es_portfolio_home_content` option) → "Header — site
+identity", "Header (navigation links)", "Footer" sections. No second
+settings system; the Customizer keeps only accent/hero/font. Header/Footer
+are global template parts (`template-parts/site-header.php` /
+`site-footer.php`), never page content — they update everywhere at once
+(Home, Work, How I Work, About, Connect, Case Studies, EN + ES).
+
+**Navigation routing rules** (centralized in `es_nav_resolve_url()`,
+`inc/header-footer.php`):
+- A nav URL that is a bare in-page anchor (`#work`) → on Home stays `#work`
+  (in-page scroll); from any other page it becomes `HOME_URL + #work` so it
+  jumps to Home and then the section — never a dead local anchor.
+- A nav URL that is a real page URL/path → used as-is (already
+  language-correct; with Polylang, `home_url()`/permalinks resolve to the
+  current language natively — no guessed translated URLs).
+- Empty URL → Home URL (never an empty `href`).
+- The desktop header, mobile menu and footer nav all consume the same
+  `es_nav_links_display()` set (label + resolved url + show flag).
+
+**Active nav** is server-side (`es_nav_active_key()` / `es_nav_item_is_active()`):
+Work + Case Study singles → Work; How I Work page → How I Work; About page →
+About; Connect page → Connect; Home → neutral. Green label + a small
+absolutely-positioned dot (no layout shift), `aria-current="page"`.
+
+**Content ownership / Polylang:** the `es_portfolio_home_content` option is a
+single site-wide option, so all Header/Footer fields are **language-neutral**
+(phone, email, social URLs, location, logo, sticky, layout — one value shared
+EN/ES, never duplicated). Translatable nav labels keep coming from the theme's
+`es__()` strings, which are registered with Polylang (`pll_register_string`) —
+translate them in **Languages → Strings translations** (leave the Portfolio
+Content nav labels blank to keep the per-language versions). **Limitation:**
+Portfolio Content text fields (a custom nav label typed there, the footer
+note) are single-value; per-language variants for those specific fields are
+not supported without a larger multilingual-options architecture — documented,
+not built.
+
+### Backlog (not implemented in Phase 5)
+- **Complete light-mode visual system.** The header theme-toggle is still a
+  non-functional placeholder; light mode is a separate phase. *Light mode is
+  NOT complete.*
+- Optional animated Connect statement (footer/Connect) — restrained only.
+- Optional future header CTA (the header already leaves room for it).
+- Richer footer composition (extra columns / newsletter) — only if justified.
+- Optional social-icon expansion (line icons per network) — text-only for now.
+- Advanced Home section-aware active nav (scroll-spy) — deliberately avoided
+  (no heavy JS scroll tracking this phase; Home stays neutral).
+- Footer newsletter / form — only if later justified.
+- Per-language values for the custom nav label / footer note fields.

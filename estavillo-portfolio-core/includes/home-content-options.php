@@ -428,18 +428,61 @@ function es_portfolio_home_content_save() {
 		$data['connect_country'] = sanitize_text_field( wp_unslash( $_POST['es_connect_country'] ) );
 	}
 
+	// ---- Header — site identity + behaviour ----
+	if ( isset( $_POST['es_wordmark_text'] ) ) {
+		$data['wordmark_text'] = sanitize_text_field( wp_unslash( $_POST['es_wordmark_text'] ) );
+	}
+	if ( isset( $_POST['es_wordmark_url'] ) ) {
+		$data['wordmark_url'] = esc_url_raw( wp_unslash( $_POST['es_wordmark_url'] ) );
+	}
+	if ( isset( $_POST['es_wordmark_image'] ) ) {
+		$data['wordmark_image'] = esc_url_raw( wp_unslash( $_POST['es_wordmark_image'] ) );
+	}
+	// Checkbox: only trust its presence when the Header section was on the
+	// submitted form (a hidden marker) — an unchecked box posts nothing.
+	if ( isset( $_POST['es_hf_header'] ) ) {
+		$data['sticky_header'] = isset( $_POST['es_sticky_header'] ) ? '1' : '0';
+	}
+
 	// ---- Header (nav links) ----
 	if ( isset( $_POST['es_nav_link_label'] ) && is_array( $_POST['es_nav_link_label'] ) ) {
 		$labels = wp_unslash( $_POST['es_nav_link_label'] );
 		$urls   = isset( $_POST['es_nav_link_url'] ) && is_array( $_POST['es_nav_link_url'] ) ? wp_unslash( $_POST['es_nav_link_url'] ) : array();
+		$shows  = isset( $_POST['es_nav_link_show'] ) && is_array( $_POST['es_nav_link_show'] ) ? wp_unslash( $_POST['es_nav_link_show'] ) : array();
 		$links  = array();
 		foreach ( $labels as $i => $label ) {
 			$links[ $i ] = array(
 				'label' => sanitize_text_field( $label ),
 				'url'   => isset( $urls[ $i ] ) ? esc_url_raw( $urls[ $i ] ) : '',
+				'show'  => isset( $shows[ $i ] ),
 			);
 		}
 		$data['nav_links'] = $links;
+	}
+
+	// ---- Footer — content, contact name, layout, visibility ----
+	if ( isset( $_POST['es_footer_note'] ) ) {
+		$data['footer_note'] = sanitize_text_field( wp_unslash( $_POST['es_footer_note'] ) );
+	}
+	if ( isset( $_POST['es_footer_copyright_name'] ) ) {
+		$data['footer_copyright_name'] = sanitize_text_field( wp_unslash( $_POST['es_footer_copyright_name'] ) );
+	}
+	if ( isset( $_POST['es_footer_layout'] ) ) {
+		$es_layout             = sanitize_key( wp_unslash( $_POST['es_footer_layout'] ) );
+		$data['footer_layout'] = in_array( $es_layout, array( 'three', 'two', 'compact' ), true ) ? $es_layout : 'three';
+	}
+	if ( isset( $_POST['es_footer_width'] ) ) {
+		$es_width             = sanitize_key( wp_unslash( $_POST['es_footer_width'] ) );
+		$data['footer_width'] = in_array( $es_width, array( 'standard', 'wide' ), true ) ? $es_width : 'standard';
+	}
+	if ( isset( $_POST['es_hf_footer'] ) ) {
+		$es_vis_keys = array( 'nav', 'email', 'phone', 'whatsapp', 'linkedin', 'instagram', 'behance', 'location', 'note' );
+		$es_posted   = isset( $_POST['es_footer_show'] ) && is_array( $_POST['es_footer_show'] ) ? wp_unslash( $_POST['es_footer_show'] ) : array();
+		$es_vis      = array();
+		foreach ( $es_vis_keys as $es_vk ) {
+			$es_vis[ $es_vk ] = isset( $es_posted[ $es_vk ] );
+		}
+		$data['footer_visibility'] = $es_vis;
 	}
 
 	// ---- Footer (social links + location) ----
@@ -795,27 +838,90 @@ function es_portfolio_home_content_page() {
 				</tr>
 			</table>
 
+			<h2><?php esc_html_e( 'Header — site identity', 'estavillo-portfolio-core' ); ?></h2>
+			<input type="hidden" name="es_hf_header" value="1">
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><label for="es_wordmark_text"><?php esc_html_e( 'Wordmark text', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="text" id="es_wordmark_text" name="es_wordmark_text" class="regular-text" value="<?php echo esc_attr( $data['wordmark_text'] ?? '' ); ?>" placeholder="ESTAVILLO"></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_wordmark_url"><?php esc_html_e( 'Wordmark link URL', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="url" id="es_wordmark_url" name="es_wordmark_url" class="regular-text" value="<?php echo esc_attr( $data['wordmark_url'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Leave blank to link to the Home page', 'estavillo-portfolio-core' ); ?>"></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_wordmark_image"><?php esc_html_e( 'Logo image URL (optional)', 'estavillo-portfolio-core' ); ?></label></th>
+					<td>
+						<input type="url" id="es_wordmark_image" name="es_wordmark_image" class="regular-text" value="<?php echo esc_attr( $data['wordmark_image'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Leave blank to show the text wordmark', 'estavillo-portfolio-core' ); ?>">
+						<p class="description"><?php esc_html_e( 'When set, a logo image replaces the text wordmark in the header. The wordmark text above stays the accessible site name.', 'estavillo-portfolio-core' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Sticky header', 'estavillo-portfolio-core' ); ?></th>
+					<td><label><input type="checkbox" name="es_sticky_header" value="1" <?php checked( '0' !== ( $data['sticky_header'] ?? '1' ) ); ?>> <?php esc_html_e( 'Keep the header pinned while scrolling (default). Uncheck for a static header.', 'estavillo-portfolio-core' ); ?></label></td>
+				</tr>
+			</table>
+
 			<h2><?php esc_html_e( 'Header (navigation links)', 'estavillo-portfolio-core' ); ?></h2>
-			<p class="description"><?php esc_html_e( 'These 4 links are used in the header nav, the mobile menu, and the footer nav. Leave a row blank to keep its current label and URL.', 'estavillo-portfolio-core' ); ?></p>
+			<p class="description"><?php esc_html_e( 'Used by the header nav, the mobile menu and the footer nav (one shared set). URL can be an in-page anchor (e.g. #work) or a real page URL. Anchors work on Home and, from other pages, jump to Home + that section automatically. Uncheck "Show" to hide a link everywhere. Rows are pre-filled with the current labels.', 'estavillo-portfolio-core' ); ?></p>
 			<table class="form-table" role="presentation">
 				<?php
 				$es_nav_links_data = $data['nav_links'] ?? array();
+				$es_nav_defaults   = function_exists( 'es_nav_links' ) ? es_nav_links() : array();
 				for ( $i = 0; $i < 4; $i++ ) :
-					$es_link_label = $es_nav_links_data[ $i ]['label'] ?? '';
-					$es_link_url   = $es_nav_links_data[ $i ]['url'] ?? '';
+					$es_saved_row  = $es_nav_links_data[ $i ] ?? null;
+					$es_link_label = $es_saved_row['label'] ?? ( $es_nav_defaults[ $i ]['label'] ?? '' );
+					$es_link_url   = $es_saved_row['url'] ?? ( $es_nav_defaults[ $i ]['url'] ?? '' );
+					$es_link_show  = null === $es_saved_row ? true : ( array_key_exists( 'show', $es_saved_row ) ? ! empty( $es_saved_row['show'] ) : true );
 					?>
 					<tr>
 						<th scope="row"><?php echo esc_html( sprintf( __( 'Nav link %d', 'estavillo-portfolio-core' ), $i + 1 ) ); ?></th>
 						<td>
 							<input type="text" name="es_nav_link_label[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_link_label ); ?>" placeholder="<?php esc_attr_e( 'Label', 'estavillo-portfolio-core' ); ?>">
 							<input type="text" name="es_nav_link_url[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_link_url ); ?>" placeholder="<?php esc_attr_e( 'URL (e.g. #work or a real page URL)', 'estavillo-portfolio-core' ); ?>">
+							<label style="margin-left:8px"><input type="checkbox" name="es_nav_link_show[<?php echo esc_attr( $i ); ?>]" value="1" <?php checked( $es_link_show ); ?>> <?php esc_html_e( 'Show', 'estavillo-portfolio-core' ); ?></label>
 						</td>
 					</tr>
 				<?php endfor; ?>
 			</table>
 
 			<h2><?php esc_html_e( 'Footer', 'estavillo-portfolio-core' ); ?></h2>
-			<p class="description"><?php esc_html_e( 'Nav links and contact email are shared with Header and Connect above — only social links and location are footer-specific.', 'estavillo-portfolio-core' ); ?></p>
+			<p class="description"><?php esc_html_e( 'Contact email is shared with Connect above; phone and WhatsApp are shared with the Connect section (edit them under "Connect page (dedicated)"). Everything below is footer-specific.', 'estavillo-portfolio-core' ); ?></p>
+			<input type="hidden" name="es_hf_footer" value="1">
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><label for="es_footer_note"><?php esc_html_e( 'Footer note (optional)', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="text" id="es_footer_note" name="es_footer_note" class="large-text" value="<?php echo esc_attr( $data['footer_note'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Short line under the wordmark, e.g. Product Designer based in Montevideo. Leave blank to hide.', 'estavillo-portfolio-core' ); ?>"></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_footer_copyright_name"><?php esc_html_e( 'Copyright name', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="text" id="es_footer_copyright_name" name="es_footer_copyright_name" class="regular-text" value="<?php echo esc_attr( $data['footer_copyright_name'] ?? '' ); ?>" placeholder="Ramiro Estavillo">
+					<p class="description"><?php esc_html_e( 'Shown as “© [year] [name]” — the year updates automatically.', 'estavillo-portfolio-core' ); ?></p></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_footer_layout"><?php esc_html_e( 'Layout', 'estavillo-portfolio-core' ); ?></label></th>
+					<td>
+						<?php $es_fl = $data['footer_layout'] ?? 'three'; ?>
+						<select id="es_footer_layout" name="es_footer_layout">
+							<option value="three" <?php selected( $es_fl, 'three' ); ?>><?php esc_html_e( 'Three columns (default)', 'estavillo-portfolio-core' ); ?></option>
+							<option value="two" <?php selected( $es_fl, 'two' ); ?>><?php esc_html_e( 'Two columns', 'estavillo-portfolio-core' ); ?></option>
+							<option value="compact" <?php selected( $es_fl, 'compact' ); ?>><?php esc_html_e( 'Compact', 'estavillo-portfolio-core' ); ?></option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="es_footer_width"><?php esc_html_e( 'Width', 'estavillo-portfolio-core' ); ?></label></th>
+					<td>
+						<?php $es_fw = $data['footer_width'] ?? 'standard'; ?>
+						<select id="es_footer_width" name="es_footer_width">
+							<option value="standard" <?php selected( $es_fw, 'standard' ); ?>><?php esc_html_e( 'Standard site container (default)', 'estavillo-portfolio-core' ); ?></option>
+							<option value="wide" <?php selected( $es_fw, 'wide' ); ?>><?php esc_html_e( 'Wide container', 'estavillo-portfolio-core' ); ?></option>
+						</select>
+					</td>
+				</tr>
+			</table>
+
+			<h3><?php esc_html_e( 'Footer — social links & location', 'estavillo-portfolio-core' ); ?></h3>
 			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row"><label for="es_social_linkedin"><?php esc_html_e( 'LinkedIn URL', 'estavillo-portfolio-core' ); ?></label></th>
@@ -835,6 +941,26 @@ function es_portfolio_home_content_page() {
 				<tr>
 					<th scope="row"><label for="es_footer_location"><?php esc_html_e( 'Location', 'estavillo-portfolio-core' ); ?></label></th>
 					<td><input type="text" id="es_footer_location" name="es_footer_location" class="regular-text" value="<?php echo esc_attr( $data['footer_location'] ?? '' ); ?>" placeholder="Montevideo, Uruguay"></td>
+				</tr>
+			</table>
+
+			<h3><?php esc_html_e( 'Footer — visibility', 'estavillo-portfolio-core' ); ?></h3>
+			<p class="description"><?php esc_html_e( 'Hide any footer section. Items with no data of their own (e.g. an empty social URL) hide themselves automatically regardless.', 'estavillo-portfolio-core' ); ?></p>
+			<?php $es_vis = $data['footer_visibility'] ?? array(); ?>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Show sections', 'estavillo-portfolio-core' ); ?></th>
+					<td>
+					<label style="display:inline-block;min-width:150px"><input type="checkbox" name="es_footer_show[nav]" value="1" <?php checked( ! isset( $es_vis['nav'] ) || ! empty( $es_vis['nav'] ) ); ?>> Navigation</label>
+					<label style="display:inline-block;min-width:150px"><input type="checkbox" name="es_footer_show[email]" value="1" <?php checked( ! isset( $es_vis['email'] ) || ! empty( $es_vis['email'] ) ); ?>> Email</label>
+					<label style="display:inline-block;min-width:150px"><input type="checkbox" name="es_footer_show[phone]" value="1" <?php checked( ! isset( $es_vis['phone'] ) || ! empty( $es_vis['phone'] ) ); ?>> Phone</label>
+					<label style="display:inline-block;min-width:150px"><input type="checkbox" name="es_footer_show[whatsapp]" value="1" <?php checked( ! isset( $es_vis['whatsapp'] ) || ! empty( $es_vis['whatsapp'] ) ); ?>> WhatsApp</label>
+					<label style="display:inline-block;min-width:150px"><input type="checkbox" name="es_footer_show[linkedin]" value="1" <?php checked( ! isset( $es_vis['linkedin'] ) || ! empty( $es_vis['linkedin'] ) ); ?>> LinkedIn</label>
+					<label style="display:inline-block;min-width:150px"><input type="checkbox" name="es_footer_show[instagram]" value="1" <?php checked( ! isset( $es_vis['instagram'] ) || ! empty( $es_vis['instagram'] ) ); ?>> Instagram</label>
+					<label style="display:inline-block;min-width:150px"><input type="checkbox" name="es_footer_show[behance]" value="1" <?php checked( ! isset( $es_vis['behance'] ) || ! empty( $es_vis['behance'] ) ); ?>> Behance</label>
+					<label style="display:inline-block;min-width:150px"><input type="checkbox" name="es_footer_show[location]" value="1" <?php checked( ! isset( $es_vis['location'] ) || ! empty( $es_vis['location'] ) ); ?>> Location</label>
+					<label style="display:inline-block;min-width:150px"><input type="checkbox" name="es_footer_show[note]" value="1" <?php checked( ! isset( $es_vis['note'] ) || ! empty( $es_vis['note'] ) ); ?>> Footer note</label>
+					</td>
 				</tr>
 			</table>
 
@@ -1113,6 +1239,8 @@ function es_portfolio_filter_nav_links( $default ) {
 		$merged[ $i ] = array(
 			'label' => $custom_link['label'],
 			'url'   => ! empty( $custom_link['url'] ) ? $custom_link['url'] : $default_url,
+			// Absent 'show' (older saved data, pre-Phase 5) = visible.
+			'show'  => ! array_key_exists( 'show', $custom_link ) || ! empty( $custom_link['show'] ),
 		);
 	}
 	return $merged;
@@ -1144,3 +1272,70 @@ function es_portfolio_filter_footer_location( $default ) {
 	return ! empty( $data['footer_location'] ) ? $data['footer_location'] : $default;
 }
 add_filter( 'es_footer_location', 'es_portfolio_filter_footer_location' );
+
+/**
+ * Phase 5 — Header/Footer global settings bridges. Same "empty never overrides
+ * the theme default" principle as every filter above: a blank field leaves the
+ * theme's own default in place. All language-neutral (one global value).
+ */
+function es_portfolio_filter_wordmark_text( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['wordmark_text'] ) ? $data['wordmark_text'] : $default;
+}
+add_filter( 'es_wordmark_text', 'es_portfolio_filter_wordmark_text' );
+
+function es_portfolio_filter_wordmark_url( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['wordmark_url'] ) ? $data['wordmark_url'] : $default;
+}
+add_filter( 'es_wordmark_url', 'es_portfolio_filter_wordmark_url' );
+
+function es_portfolio_filter_wordmark_image( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['wordmark_image'] ) ? $data['wordmark_image'] : $default;
+}
+add_filter( 'es_wordmark_image', 'es_portfolio_filter_wordmark_image' );
+
+function es_portfolio_filter_sticky_header( $default ) {
+	$data = es_portfolio_get_home_content();
+	// Only override once the Header section was saved at least once; until then
+	// keep the theme default (sticky enabled).
+	if ( ! array_key_exists( 'sticky_header', $data ) ) {
+		return $default;
+	}
+	return '0' !== $data['sticky_header'];
+}
+add_filter( 'es_sticky_header', 'es_portfolio_filter_sticky_header' );
+
+function es_portfolio_filter_footer_note( $default ) {
+	$data = es_portfolio_get_home_content();
+	return isset( $data['footer_note'] ) && '' !== $data['footer_note'] ? $data['footer_note'] : $default;
+}
+add_filter( 'es_footer_note', 'es_portfolio_filter_footer_note' );
+
+function es_portfolio_filter_footer_copyright_name( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['footer_copyright_name'] ) ? $data['footer_copyright_name'] : $default;
+}
+add_filter( 'es_footer_copyright_name', 'es_portfolio_filter_footer_copyright_name' );
+
+function es_portfolio_filter_footer_layout( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['footer_layout'] ) ? $data['footer_layout'] : $default;
+}
+add_filter( 'es_footer_layout', 'es_portfolio_filter_footer_layout' );
+
+function es_portfolio_filter_footer_width( $default ) {
+	$data = es_portfolio_get_home_content();
+	return ! empty( $data['footer_width'] ) ? $data['footer_width'] : $default;
+}
+add_filter( 'es_footer_width', 'es_portfolio_filter_footer_width' );
+
+function es_portfolio_filter_footer_visibility( $default ) {
+	$data = es_portfolio_get_home_content();
+	if ( isset( $data['footer_visibility'] ) && is_array( $data['footer_visibility'] ) ) {
+		return array_merge( (array) $default, $data['footer_visibility'] );
+	}
+	return $default;
+}
+add_filter( 'es_footer_visibility', 'es_portfolio_filter_footer_visibility' );
