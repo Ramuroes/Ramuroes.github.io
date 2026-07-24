@@ -83,10 +83,14 @@
 }
 
 /* la flecha generada: decorativa, acompaña al texto; lo ÚNICO que se mueve.
-   translateX (no gap) → no recalcula el layout del texto contiguo. */
+   translateX (no gap) → no recalcula el layout del texto contiguo. color:
+   currentColor la ata SIEMPRE al color del texto del link → cuando el texto
+   pasa al verde en hover/focus-visible, la flecha lo hace con él (nunca queda
+   una flecha de otro color). */
 .es-link-arrow::after {
 	content: '\2192';
 	display: inline-block;
+	color: currentColor;
 	transition: transform 0.18s var(--es-ease);
 	will-change: transform;
 }
@@ -121,6 +125,21 @@
 }
 
 .es-link-arrow:visited {
+	color: var(--es-accent) !important;
+}
+
+/* Verde consistente en hover Y focus-visible, para TODOS los CTAs con flecha
+   (plain, --quiet, .es-featured__cta) — UNA sola regla reusable, no una por
+   sección. El scope .es-page sube la especificidad a (0,3,0) para ganarle a
+   cualquier color de link definido a nivel de sección o por Kadence sin
+   depender de reglas one-off; el !important es el mismo recurso targeted que
+   ya usa el resto del chrome (Kadence emite a:hover con su propio !important,
+   ver site.css). La flecha ::after (currentColor) sigue este color. Antes el
+   verde vivía en reglas por variante a (0,2,0) y en :focus (no focus-visible),
+   así que un color de link por sección de igual/mayor peso podía dejar el
+   texto sin pasar al verde aunque la flecha sí se moviera. */
+.es-page .es-link-arrow:hover,
+.es-page .es-link-arrow:focus-visible {
 	color: var(--es-accent) !important;
 }
 

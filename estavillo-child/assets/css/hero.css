@@ -72,6 +72,12 @@
 	padding-top: clamp(56px, 8vw, 110px);
 	padding-bottom: clamp(56px, 8vw, 100px);
 	min-height: min(78vh, 760px);
+	/* svh = "small viewport height" (chrome del navegador expandido): garantiza
+	   que el hero nunca reclame más del 78% del alto REALMENTE disponible, así
+	   los CTAs / el indicador no quedan tapados por el chrome en pantallas
+	   bajas. Fallback en vh arriba para navegadores sin svh. No uso dvh acá a
+	   propósito: cambiaría el alto durante el scroll en mobile (jank). */
+	min-height: min(78svh, 760px);
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -127,6 +133,44 @@
 	   sitio), solo su posición dentro del stack del hero. */
 	.es-hero__actions .es-link-arrow--quiet {
 		padding-left: 26px;
+	}
+}
+
+/* ---------- desktop de poca altura (short-screen) ----------
+   En desktops bajos (1366×768, 1440×800, 1280×720, laptops con la admin bar
+   de WP o toolbars del navegador que reducen el alto útil), el padding
+   vertical grande del hero + el header sticky de 66px podían empujar los CTAs
+   o el indicador de scroll fuera del viewport visible. Acá se COMPACTA solo el
+   espaciado vertical (padding + gaps) — NO se escala el hero entero — y solo
+   en pantallas anchas Y bajas. El min-height sigue en 78svh, así que el hero
+   queda más corto que el viewport y How I Work asoma. El desktop alto normal
+   (max-height > 820) no se toca; mobile tampoco (su min-height ya es 0). */
+@media (min-width: 1024px) and (max-height: 820px) {
+	.es-hero__inner {
+		padding-top: clamp(40px, 7vh, 72px);
+		padding-bottom: clamp(36px, 6vh, 60px);
+	}
+
+	.es-hero__eyebrow {
+		margin-bottom: 18px;
+	}
+
+	.es-hero__title {
+		margin-bottom: 18px;
+	}
+
+	.es-hero__lead {
+		margin-bottom: 26px;
+	}
+}
+
+/* Muy bajo (~720p): además, reducir apenas el headline para dar aire a copy
+   más largo (p. ej. el titular en español) sin escalar el hero completo.
+   .es-hero__title (hero.css, cargado después de base.css) gana sobre .es-h1
+   por orden de fuente a igual especificidad. */
+@media (min-width: 1024px) and (max-height: 740px) {
+	.es-hero__title {
+		font-size: clamp(38px, 4.6vw, 58px);
 	}
 }
 
@@ -497,5 +541,22 @@
 
 	.es-hero__scroll-line {
 		height: 34px;
+	}
+}
+
+/* desktop bajo (short-screen): el indicador de scroll se vuelve MENOS
+   prominente (línea más corta, pegado abajo, gap chico) para no acercarse a
+   los CTAs cuando el hero se compacta — sigue VISIBLE (nunca se oculta antes
+   que contenido importante, §2). Va acá, DESPUÉS de las reglas base del
+   indicador, para ganarles por orden de fuente (un @media no agrega
+   especificidad). */
+@media (min-width: 1024px) and (max-height: 820px) {
+	.es-hero__scroll {
+		bottom: clamp(10px, 1.8vh, 20px);
+		gap: 6px;
+	}
+
+	.es-hero__scroll-line {
+		height: 28px;
 	}
 }
