@@ -53,21 +53,60 @@
 	color: var(--es-accent);
 }
 
-/* ---------- link con flecha ---------- */
+/* ---------- link con flecha ----------
+   Microinteracción ESTÁNDAR (correction ticket §7): un único lenguaje para
+   todos los CTAs direccionales de la Home ("See the full process", "Read the
+   case study", "All work", "More about me", "All ways to connect", etc.),
+   copiado del CTA que ya funcionaba bien en las cards de Selected Work
+   (.es-card__cta / .es-card__arrow):
+
+     · reposo    → texto en su color normal, flecha en su posición normal;
+     · hover /
+       focus-visible → texto al verde de identidad + la flecha se desliza
+       apenas a la derecha (3px, transform — NO gap → sin salto de layout),
+       transición corta y contenida (~180ms).
+
+   La flecha es SIEMPRE una sola, generada por CSS (::after): así el copy
+   editable de Gutenberg queda texto puro (sin &rarr; ni <span> frágiles que
+   se dupliquen o se pierdan al editar) y nunca hay flecha doble. El hero se
+   excluye (su link secundario lleva un punto "vivo", no flecha — ver más
+   abajo y hero.css). */
 
 .es-link-arrow {
 	display: inline-flex;
 	align-items: center;
-	gap: 10px;
+	gap: 8px;
 	font-size: 15px;
 	font-weight: 600;
 	color: var(--es-accent) !important;
 	text-decoration: none;
-	transition: gap 0.2s var(--es-ease);
 }
 
-.es-link-arrow:hover {
-	gap: 16px;
+/* la flecha generada: decorativa, acompaña al texto; lo ÚNICO que se mueve.
+   translateX (no gap) → no recalcula el layout del texto contiguo. */
+.es-link-arrow::after {
+	content: '\2192';
+	display: inline-block;
+	transition: transform 0.18s var(--es-ease);
+	will-change: transform;
+}
+
+.es-link-arrow:hover::after,
+.es-link-arrow:focus-visible::after {
+	transform: translateX(3px);
+}
+
+/* reduced motion: sin desplazamiento de la flecha; el color y el foco siguen
+   dando la señal de interacción (§8). */
+@media (prefers-reduced-motion: reduce) {
+	.es-link-arrow::after {
+		transition: none;
+	}
+
+	.es-link-arrow:hover::after,
+	.es-link-arrow:focus-visible::after {
+		transform: none;
+	}
 }
 
 /* verde de identidad en todos los estados interactivos (aplica a plain y quiet;
@@ -89,7 +128,7 @@
 	font-weight: 500;
 	font-size: 14.5px;
 	color: var(--es-ink-2) !important;
-	transition: color var(--es-dur-fast) ease, gap 0.2s var(--es-ease);
+	transition: color var(--es-dur-fast) ease;
 }
 
 .es-link-arrow--quiet:hover,
@@ -115,6 +154,15 @@
 
 .es-link-arrow--quiet:visited {
 	color: var(--es-ink-2) !important;
+}
+
+/* El hero se excluye de la flecha generada: su link secundario ("See how I
+   work") lleva un punto "vivo" (señal verde que respira), NO una flecha — el
+   bloque lo dibuja con su propio ::after de mayor especificidad, y el fallback
+   PHP usa un <span class="es-live-dot">. Sin esta regla el fallback mostraría
+   punto + flecha. */
+.es-hero .es-link-arrow::after {
+	content: none;
 }
 
 /* Featured Case CTA ("Read the case study"): usa el markup existente
@@ -303,12 +351,6 @@
 .es-card:hover .es-card__arrow,
 .es-card:focus-visible .es-card__arrow {
 	transform: translateX(4px);
-}
-
-/* icono de flecha en los link-arrow (el desplazamiento del texto lo da el gap
-   del propio .es-link-arrow; el icono acompaña sin doble movimiento) */
-.es-link-arrow__icon {
-	display: inline-block;
 }
 
 /* meta row (label + kicker) para las cards de Selected Work */

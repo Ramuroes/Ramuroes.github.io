@@ -44,7 +44,7 @@ return <<<'CONTENT'
 <!-- /wp:group -->
 
 <!-- wp:paragraph -->
-<p><a class="es-link-arrow es-link-arrow--quiet" href="#process">See the full process &rarr;</a></p>
+<p><a class="es-link-arrow es-link-arrow--quiet" href="#process">See the full process</a></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
 

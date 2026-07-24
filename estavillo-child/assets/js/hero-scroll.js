@@ -52,6 +52,11 @@
 		// 0 at the top of the hero, 1 once it has scrolled ~one hero-height up.
 		var scrolled = Math.min(Math.max(-rect.top, 0), h);
 		hero.style.setProperty('--es-hero-progress', (scrolled / h).toFixed(3));
+		// Raw scrolled distance in px. Parallax mode (hero.css) counter-
+		// translates the background layer by this amount so it stays visually
+		// ANCHORED from the first scroll movement (no sticky, no
+		// background-attachment:fixed). Standard mode ignores it.
+		hero.style.setProperty('--es-hero-scroll-px', scrolled.toFixed(1) + 'px');
 	}
 
 	function onScroll() {
@@ -76,6 +81,12 @@
 		}
 		// Settle so nothing snaps back when the hero leaves the viewport.
 		hero.style.setProperty('--es-hero-progress', settleValue);
+		// Scrolled-past (settle '1') → the parallax bg is already faded to ~0,
+		// so its transform is moot; back at the top (settle '0') → reset the
+		// anchor offset so the bg sits in its natural place again.
+		if (settleValue === '0') {
+			hero.style.setProperty('--es-hero-scroll-px', '0px');
+		}
 	}
 
 	if ('IntersectionObserver' in window) {

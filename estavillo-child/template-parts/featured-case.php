@@ -48,7 +48,6 @@ $es_featured_tag = ! empty( $es_featured['placeholder_label'] ) ? $es_featured['
 				<?php endif; ?>
 				<a class="es-link-arrow es-featured__cta" href="<?php echo esc_url( $es_featured['url'] ); ?>">
 					<?php echo esc_html( es__( 'featured_cta' ) ); ?>
-					<span class="es-link-arrow__icon" aria-hidden="true">&rarr;</span>
 				</a>
 			</div>
 

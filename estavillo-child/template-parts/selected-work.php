@@ -35,7 +35,6 @@ $es_wide = array_shift( $es_cases );
 			</div>
 			<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_view_all_url ); ?>">
 				<?php echo esc_html( es__( 'work_view_all' ) ); ?>
-				<span class="es-link-arrow__icon" aria-hidden="true">&rarr;</span>
 			</a>
 		</div>
 

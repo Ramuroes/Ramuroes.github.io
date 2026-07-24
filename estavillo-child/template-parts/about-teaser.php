@@ -53,7 +53,6 @@ $es_about_portrait = '';
 			<p class="es-about__text" data-es-reveal><?php echo esc_html( $es_about_text ); ?></p>
 			<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_about_url ); ?>" data-es-reveal>
 				<?php echo esc_html( es__( 'about_cta' ) ); ?>
-				<span class="es-link-arrow__icon" aria-hidden="true">&rarr;</span>
 			</a>
 		</div>
 	</div>

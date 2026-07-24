@@ -60,7 +60,6 @@ $es_connect_url = apply_filters( 'es_home_connect_url', '#connect' );
 			</div>
 			<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_connect_url ); ?>">
 				<?php esc_html_e( 'All ways to connect', 'estavillo-child' ); ?>
-				<span class="es-link-arrow__icon" aria-hidden="true">&rarr;</span>
 			</a>
 		</div>
 	</div>

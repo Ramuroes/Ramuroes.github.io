@@ -32,11 +32,12 @@
 }
 
 /* ---------- capa visual (SVG inyectado por hero-system-map.js) ----------
-   .es-hero__bg envuelve la capa visual: en modo STANDARD es la misma caja
-   de fondo de siempre (absolute inset:0, z-index:0) — visualmente idéntico
-   al hero anterior. En modo PARALLAX pasa a sticky (ver más abajo). El JS
-   sigue inyectando el SVG en .es-hero__visual[data-es-hero-map], sin
-   cambios. */
+   .es-hero__bg envuelve la capa visual: SIEMPRE la misma caja de fondo
+   (absolute inset:0, z-index:0), en STANDARD y en PARALLAX. En modo PARALLAX
+   (desktop) esta capa se ancla con un transform contra-scroll (no sticky, no
+   background-attachment:fixed — ver §2–4 más abajo), pero sigue siendo un
+   hijo absoluto recortado por el overflow:hidden del hero. El JS sigue
+   inyectando el SVG en .es-hero__visual[data-es-hero-map], sin cambios. */
 .es-hero__bg {
 	position: absolute;
 	inset: 0;
@@ -353,54 +354,69 @@
 /* =========================================================================
    Modo PARALLAX (opt-in, atributo scrollMode = parallax) — §2–4
    -------------------------------------------------------------------------
-   Transición editorial más marcada: la capa del fondo animado (.es-hero__bg)
-   queda STICKY un tramo acotado mientras el copy sube y se desvanece PRIMERO;
-   el fondo permanece un poco más y se va cerca del final; How I Work entra a
-   continuación. Solo aplica en DESKTOP y con motion permitido — mobile y
-   reduced-motion caen al fade estándar / flujo normal (§4). Sin
-   background-attachment:fixed, sin snap, sin pin excesivo (el runway es la
-   propia altura del hero), sin librería, sin listener extra (reusa el mismo
-   --es-hero-progress del scroll rAF existente).
+   Corrección (correction ticket §2–3). El fondo animado debe sentirse
+   ANCLADO desde el primer movimiento de scroll — nunca "se mueve con el
+   texto y después se traba". Se logra con un transform CONTRA-SCROLL, no con
+   sticky: hero-scroll.js publica --es-hero-scroll-px (los px scrolleados) y
+   la capa de fondo se traslada esa misma cantidad hacia abajo, quedando
+   visualmente fija respecto al viewport mientras el hero sube. El copy tiene
+   su PROPIO transform + fade (sube y se va PRIMERO); el fondo tiene su PROPIO
+   transform (anclaje) + su PROPIA opacidad — nunca comparten el transform.
 
-   Progresión (tuneable con las custom properties de abajo):
+   El fondo sigue siendo un hijo `absolute` recortado por el `overflow:hidden`
+   base del hero (ya NO se libera a overflow:visible, ya NO hay sticky ni
+   margin negativo). Ese recorte ocurre en el borde inferior del hero, justo
+   donde vive el gradiente .es-hero::after (transparent → papel), que funde la
+   constelación con el papel EN ese borde → sin corte/sombra horizontal y sin
+   el "salto" que dejaba el borde duro del sticky (§3). La opacidad del fondo
+   llega a ~0 antes de que How I Work domine (~90%), así que abajo no queda
+   ninguna arista.
+
+   Sin background-attachment:fixed, sin snap, sin pin, sin librería, sin
+   listener extra. Solo DESKTOP + motion permitido; mobile y reduced-motion
+   caen al fade estándar / flujo normal (§4).
+
+   Progresión (tuneable):
      --es-hero-copy-out : progreso al que el copy termina de desvanecerse.
-     --es-hero-bg-out   : progreso al que el fondo termina de desvanecerse.
-   Copy 0 → --es-hero-copy-out ; fondo --es-hero-copy-out → --es-hero-bg-out. */
+     --es-hero-bg-out   : progreso al que el fondo llega a ~0. */
 .es-hero--scroll-parallax {
 	--es-hero-copy-out: 0.55;
-	--es-hero-bg-out: 1;
+	--es-hero-bg-out: 0.86;
+}
+
+/* Mobile / tablet: SIN anclaje ni sticky (evita saltos de viewport, §4). Fade
+   simplificado — el mismo lenguaje que el modo standard. */
+@media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+	.es-hero--scroll-parallax .es-hero__content {
+		transform: translateY(calc(var(--es-hero-progress) * -48px));
+		opacity: calc(1 - var(--es-hero-progress) * 0.92);
+		will-change: transform, opacity;
+	}
+
+	.es-hero--scroll-parallax .es-hero__visual {
+		transform: translateY(calc(var(--es-hero-progress) * 34px));
+		opacity: calc(1 - var(--es-hero-progress) * var(--es-hero-progress) * 0.7);
+		will-change: transform, opacity;
+	}
 }
 
 @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-	/* overflow visible + sticky: la capa de fondo se ancla al top del
-	   viewport mientras el hero scrollea. margin-bottom negativo colapsa su
-	   espacio de layout para que el copy (z-index:1) quede encima. El
-	   overflow:hidden base rompería el sticky (atrapa el contenedor), por eso
-	   se libera solo en este modo/breakpoint. */
-	.es-hero--scroll-parallax {
-		overflow: visible;
-	}
-
-	.es-hero--scroll-parallax .es-hero__bg {
-		position: sticky;
-		top: 0;
-		height: 100vh;
-		margin-bottom: -100vh;
-	}
-
-	/* Copy: sube y se desvanece PRIMERO (antes que el fondo). Clamp para que
-	   la opacidad no baje de 0 aunque el progreso pase de copy-out. */
+	/* Copy: transform + fade PROPIOS. Sube y se desvanece PRIMERO (clamp para
+	   que la opacidad no baje de 0 aunque el progreso pase de copy-out). */
 	.es-hero--scroll-parallax .es-hero__content {
 		transform: translateY(calc(var(--es-hero-progress) * -72px));
 		opacity: calc(1 - clamp(0, calc(var(--es-hero-progress) / var(--es-hero-copy-out)), 1));
 		will-change: transform, opacity;
 	}
 
-	/* Fondo: se mantiene visible mientras el copy se va, y recién se desvanece
-	   entre copy-out y bg-out. */
-	.es-hero--scroll-parallax .es-hero__visual {
-		opacity: calc(1 - clamp(0, calc((var(--es-hero-progress) - var(--es-hero-copy-out)) / (var(--es-hero-bg-out) - var(--es-hero-copy-out))), 1));
-		will-change: opacity;
+	/* Fondo: transform de ANCLAJE (contra-scroll en px, lo setea el JS) +
+	   opacidad PROPIA. No hereda el transform del copy. La opacidad baja muy
+	   sutil al principio y llega a ~0 en --es-hero-bg-out (~90%): el fondo
+	   permanece fijo mientras se desvanece de forma progresiva. */
+	.es-hero--scroll-parallax .es-hero__bg {
+		transform: translateY(var(--es-hero-scroll-px, 0px));
+		opacity: clamp(0, calc(1.04 - var(--es-hero-progress) / var(--es-hero-bg-out)), 1);
+		will-change: transform, opacity;
 	}
 }
 

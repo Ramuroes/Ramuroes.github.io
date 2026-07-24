@@ -45,7 +45,6 @@ $es_teaser_steps = array( 1, 4, 6 );
 			</div>
 			<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_process_url ); ?>">
 				<?php echo esc_html( es__( 'process_cta' ) ); ?>
-				<span class="es-link-arrow__icon" aria-hidden="true">&rarr;</span>
 			</a>
 		</div>
 
