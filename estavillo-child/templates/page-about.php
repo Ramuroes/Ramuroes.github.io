@@ -38,11 +38,20 @@ if ( function_exists( 'wp_body_open' ) ) {
 
 	<main id="top" class="es-main">
 		<?php
+		/*
+		 * Polish ticket §5 — editorial hierarchy. The breadcrumb already says
+		 * "About" and the H1 says "About me.", so echoing "About" a third time
+		 * in the eyebrow was redundant. The eyebrow now carries a distinct
+		 * role: the professional-identity kicker (same positioning line as the
+		 * Home hero), so each level reads differently — breadcrumb = location,
+		 * eyebrow = identity, H1 = page title. About-page only; the shared
+		 * es__('about_label') string (Home About teaser) is left untouched.
+		 */
 		get_template_part(
 			'template-parts/page-head',
 			null,
 			array(
-				'eyebrow' => es__( 'about_label' ),
+				'eyebrow' => __( 'Product Designer · Systems & Operations', 'estavillo-child' ),
 				'title'   => __( 'About me.', 'estavillo-child' ),
 			)
 		);

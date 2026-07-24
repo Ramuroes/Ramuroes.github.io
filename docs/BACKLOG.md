@@ -599,3 +599,20 @@ Editability priority order (for reference, full detail in
 - **P0** — Adopt the ticket-based workflow documented in this `docs/`
   folder for all future work; avoid large token-heavy redesign prompts
   (see `DECISIONS.md`).
+
+## About — future capabilities
+
+- **P3 — Optional per-hobby description / tooltip.** Assessed during the
+  About polish ticket (§4); **not implemented** by design (the hobbies
+  section and its illustration system are approved and were left untouched).
+  The architecture already supports it: `estavillo/hobby-list` stores each
+  hobby as an open object in its `items` attribute (`{label, icon, …}` —
+  `block.json` types it as a plain object), and the legacy PHP fallback
+  (`template-parts/about-content.php`) already reads an optional
+  `text`/description per hobby (`.es-hobby-item__text`). So a future
+  expandable description or tooltip/popover can be added per hobby **without
+  a new block and without a data migration** — only three touch points would
+  change: the block `edit.js` (add a textarea control per item), the block
+  `render.php` (emit the text, e.g. as `.es-hobby-item__text` or a
+  `data-tooltip`), and a small CSS block for the reveal/popover. Keep it
+  restrained so it never competes with the illustration grid.

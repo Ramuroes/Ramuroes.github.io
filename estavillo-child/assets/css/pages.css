@@ -477,6 +477,11 @@
 
 .es-about-details--group {
 	max-width: 720px;
+	/* Polish ticket §1–2: the legacy-fallback group disclosures now sit inside
+	   their parent section (Experience / Education), so they get the same quiet
+	   top gap as the Gutenberg .es-about-group — reads as a continuation of the
+	   section, not a new chapter. */
+	margin-top: clamp(28px, 3.5vw, 40px);
 }
 
 .es-about-details--group summary {
@@ -636,16 +641,25 @@
 
 /* ---------- About: Languages ---------- */
 
+/* Polish ticket §3: compact multi-column layout. The three languages sit
+   side by side on desktop (one per column), each showing the language over
+   its level — far less vertical space than the previous wrapping row, and
+   the levels line up in a clean column. Mobile stacks to one column,
+   naturally, without reducing readability. */
 .es-lang-list {
 	list-style: none;
 	margin: 0;
 	padding: 0;
-	display: flex;
-	flex-wrap: wrap;
-	gap: 10px 28px;
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 16px clamp(24px, 4vw, 56px);
+	max-width: 620px;
 }
 
 .es-lang-item {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
 	font-size: 14.5px;
 	color: var(--es-ink-2);
 }
@@ -655,7 +669,14 @@
 	font-size: 11px;
 	letter-spacing: 0.03em;
 	color: var(--es-ink-4);
-	margin-left: 6px;
+	margin-left: 0;
+}
+
+@media (max-width: 680px) {
+	.es-lang-list {
+		grid-template-columns: 1fr;
+		gap: 14px;
+	}
 }
 
 /* ---------- About: hobbies / intereses ----------
@@ -1246,9 +1267,17 @@
 	font-size: 12px;
 }
 
-#earlier-experience .es-case-details.is-style-light,
-#other-certifications .es-case-details.is-style-light {
+/* Group-level disclosures ("Earlier experience" inside Experience, "Other
+   certifications" inside Education). Polish ticket §1–2: they now live INSIDE
+   their parent section (no longer standalone numbered sections), so they're
+   scoped by their own .es-about-group class instead of the old section IDs —
+   the class travels with the block, so an editor can move them without losing
+   the treatment. The top margin sets them apart from the content above so the
+   disclosure reads as a quiet continuation of the section (a timeline
+   continuation in Experience), not a new chapter. */
+.es-case-details.is-style-light.es-about-group {
 	max-width: 720px;
+	margin-top: clamp(28px, 3.5vw, 40px);
 }
 
 /* ---------- 2. core/button — Resume/CV CTA parity with .es-btn ----------

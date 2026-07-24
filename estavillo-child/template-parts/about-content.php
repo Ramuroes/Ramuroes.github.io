@@ -72,7 +72,7 @@ $es_hobbies          = es_about_hobbies_visible();
 	</div>
 </section>
 
-<?php if ( ! empty( $es_exp_selected ) ) : ?>
+<?php if ( ! empty( $es_exp_selected ) || ! empty( $es_exp_previous ) ) : ?>
 <section class="es-section es-about-page__experience" id="experience">
 	<div class="es-container">
 		<div class="es-section-head" data-es-reveal>
@@ -81,57 +81,40 @@ $es_hobbies          = es_about_hobbies_visible();
 				<h2 class="es-label"><?php esc_html_e( 'Experience', 'estavillo-child' ); ?></h2>
 			</div>
 		</div>
+		<?php if ( ! empty( $es_exp_selected ) ) : ?>
 		<div class="es-exp-list">
 			<?php foreach ( $es_exp_selected as $es_exp ) : ?>
 				<?php es_about_render_experience_item( $es_exp ); ?>
 			<?php endforeach; ?>
 		</div>
-	</div>
-</section>
-<?php endif; ?>
-
-<?php if ( ! empty( $es_exp_previous ) ) : ?>
-<section class="es-section es-about-page__experience-previous" id="earlier-experience">
-	<div class="es-container">
-		<div class="es-section-head" data-es-reveal>
-			<div class="es-section-head__title">
-				<span class="es-section-head__num">03</span>
-				<h2 class="es-label"><?php esc_html_e( 'Earlier Experience', 'estavillo-child' ); ?></h2>
-			</div>
-		</div>
-		<details class="es-about-details es-about-details--group">
-			<summary>
-				<?php
-				echo esc_html(
-					sprintf(
-						/* translators: %d: number of earlier roles */
-						_n( 'Show %d earlier role', 'Show %d earlier roles', count( $es_exp_previous ), 'estavillo-child' ),
-						count( $es_exp_previous )
-					)
-				);
-				?>
-			</summary>
+		<?php endif; ?>
+		<?php if ( ! empty( $es_exp_previous ) ) : ?>
+		<?php // Polish ticket §1: earlier roles are a continuation of Experience (a disclosure), not a separate numbered section. ?>
+		<details class="es-about-details es-about-details--group" data-es-reveal>
+			<summary><?php esc_html_e( 'Earlier experience', 'estavillo-child' ); ?></summary>
 			<div class="es-about-details__body">
-				<div class="es-exp-list">
+				<div class="es-exp-list es-exp-list--earlier">
 					<?php foreach ( $es_exp_previous as $es_exp ) : ?>
 						<?php es_about_render_experience_item( $es_exp, true ); ?>
 					<?php endforeach; ?>
 				</div>
 			</div>
 		</details>
+		<?php endif; ?>
 	</div>
 </section>
 <?php endif; ?>
 
-<?php if ( ! empty( $es_education ) ) : ?>
+<?php if ( ! empty( $es_education ) || ! empty( $es_certs_other ) ) : ?>
 <section class="es-section es-about-page__education" id="education">
 	<div class="es-container">
 		<div class="es-section-head" data-es-reveal>
 			<div class="es-section-head__title">
-				<span class="es-section-head__num">04</span>
-				<h2 class="es-label"><?php esc_html_e( 'Education & certificates', 'estavillo-child' ); ?></h2>
+				<span class="es-section-head__num">03</span>
+				<h2 class="es-label"><?php esc_html_e( 'Education & Certifications', 'estavillo-child' ); ?></h2>
 			</div>
 		</div>
+		<?php if ( ! empty( $es_education ) ) : ?>
 		<div class="es-grid es-grid--2">
 			<?php foreach ( $es_education as $es_i => $es_entry ) : ?>
 				<?php if ( empty( $es_entry['title'] ) ) { continue; } ?>
@@ -155,31 +138,12 @@ $es_hobbies          = es_about_hobbies_visible();
 				</div>
 			<?php endforeach; ?>
 		</div>
-	</div>
-</section>
-<?php endif; ?>
+		<?php endif; ?>
 
-<?php if ( ! empty( $es_certs_other ) ) : ?>
-<section class="es-section es-about-page__certifications" id="other-certifications">
-	<div class="es-container">
-		<div class="es-section-head" data-es-reveal>
-			<div class="es-section-head__title">
-				<span class="es-section-head__num">05</span>
-				<h2 class="es-label"><?php esc_html_e( 'Other Certifications', 'estavillo-child' ); ?></h2>
-			</div>
-		</div>
-		<details class="es-about-details es-about-details--group">
-			<summary>
-				<?php
-				echo esc_html(
-					sprintf(
-						/* translators: %d: number of certifications */
-						_n( 'Show %d certification', 'Show %d certifications', count( $es_certs_other ), 'estavillo-child' ),
-						count( $es_certs_other )
-					)
-				);
-				?>
-			</summary>
+		<?php if ( ! empty( $es_certs_other ) ) : ?>
+		<?php // Polish ticket §2: other certifications stay inside Education (a disclosure), not a separate numbered section. ?>
+		<details class="es-about-details es-about-details--group" data-es-reveal>
+			<summary><?php esc_html_e( 'Other certifications', 'estavillo-child' ); ?></summary>
 			<div class="es-about-details__body">
 				<ul class="es-cert-list">
 					<?php foreach ( $es_certs_other as $es_cert ) : ?>
@@ -206,6 +170,7 @@ $es_hobbies          = es_about_hobbies_visible();
 				</ul>
 			</div>
 		</details>
+		<?php endif; ?>
 	</div>
 </section>
 <?php endif; ?>
@@ -215,7 +180,7 @@ $es_hobbies          = es_about_hobbies_visible();
 	<div class="es-container">
 		<div class="es-section-head" data-es-reveal>
 			<div class="es-section-head__title">
-				<span class="es-section-head__num">06</span>
+				<span class="es-section-head__num">04</span>
 				<h2 class="es-label"><?php esc_html_e( 'Languages', 'estavillo-child' ); ?></h2>
 			</div>
 		</div>
@@ -239,7 +204,7 @@ $es_hobbies          = es_about_hobbies_visible();
 	<div class="es-container">
 		<div class="es-section-head" data-es-reveal>
 			<div class="es-section-head__title">
-				<span class="es-section-head__num">07</span>
+				<span class="es-section-head__num">05</span>
 				<h2 class="es-label"><?php esc_html_e( 'Hobbies & interests', 'estavillo-child' ); ?></h2>
 			</div>
 		</div>
