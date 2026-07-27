@@ -61,7 +61,7 @@ $es_featured_tag = ! empty( $es_featured['placeholder_label'] ) ? $es_featured['
 			</div>
 		<?php endif; ?>
 		<a class="es-link-arrow es-featured__cta" href="<?php echo esc_url( $es_featured['url'] ); ?>">
-			<?php esc_html_e( 'Read the case study', 'estavillo-portfolio-core' ); ?>
+			<?php echo esc_html( es_portfolio_theme_string( 'featured_cta', __( 'Read the case study', 'estavillo-portfolio-core' ) ) ); ?>
 		</a>
 	</div>
 

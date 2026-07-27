@@ -93,7 +93,7 @@ $es_wide     = array_shift( $es_selected );
 		<div class="es-section-head" data-es-reveal>
 			<div class="es-section-head__title">
 				<span class="es-section-head__num">02</span>
-				<h2 class="es-label"><?php esc_html_e( 'Archive / older work', 'estavillo-child' ); ?></h2>
+				<h2 class="es-label"><?php echo esc_html( es__( 'work_archive_label' ) ); ?></h2>
 			</div>
 		</div>
 

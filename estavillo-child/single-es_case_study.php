@@ -115,7 +115,7 @@ if ( function_exists( 'wp_body_open' ) ) {
 			?>
 			<?php get_template_part( 'template-parts/breadcrumbs', null, array( 'trail' => $es_breadcrumb_trail ) ); ?>
 			<?php if ( ! empty( $es_case_index ) ) : ?>
-				<nav class="es-case-index" aria-label="<?php esc_attr_e( 'Case sections', 'estavillo-child' ); ?>">
+				<nav class="es-case-index" aria-label="<?php echo esc_attr( es__( 'case_sections_aria' ) ); ?>">
 					<div class="es-case-index__inner">
 						<?php foreach ( $es_case_index as $es_index_item ) : ?>
 							<a class="es-case-index__link" href="<?php echo esc_url( $es_index_item['href'] ); ?>"><?php echo esc_html( $es_index_item['label'] ); ?></a>
@@ -162,7 +162,7 @@ if ( function_exists( 'wp_body_open' ) ) {
 								<?php the_post_thumbnail( 'large' ); ?>
 							</div>
 						<?php else : ?>
-							<div class="es-placeholder es-case__media es-case__placeholder" role="img" aria-label="<?php esc_attr_e( 'Placeholder for the case visual', 'estavillo-child' ); ?>">
+							<div class="es-placeholder es-case__media es-case__placeholder" role="img" aria-label="<?php echo esc_attr( es__( 'case_media_ph_aria' ) ); ?>">
 								<span class="es-placeholder__tag">{asset: <?php echo esc_html( sanitize_title( get_the_title() ) ); ?>}</span>
 							</div>
 						<?php endif; ?>

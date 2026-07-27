@@ -34,3 +34,26 @@ function es_portfolio_pll_post_types( $post_types ) {
 	return $post_types;
 }
 add_filter( 'pll_get_post_types', 'es_portfolio_pll_post_types' );
+
+/**
+ * Spanish-parity phase: a handful of dynamic blocks (Featured Case, Home
+ * Hero, Selected Work) render a few shared frontend strings (CTA labels,
+ * a11y labels) that already exist as Polylang-registered strings in the
+ * theme's es_child_ui_strings() (see estavillo-child/functions.php). Reusing
+ * the SAME key through the theme's es__() — guarded, same pattern already
+ * used elsewhere in this plugin (function_exists( 'es_home_selected_work_source' )
+ * etc.) — keeps one Polylang string per concept instead of a second,
+ * independently-translated copy living only in the plugin. If the theme
+ * (or its es__()) is ever unavailable, $fallback keeps the block rendering
+ * in English exactly as before this phase.
+ *
+ * @param string $key      Key in the theme's es_child_ui_strings().
+ * @param string $fallback English fallback if es__() isn't available.
+ * @return string
+ */
+function es_portfolio_theme_string( $key, $fallback ) {
+	if ( function_exists( 'es__' ) ) {
+		return es__( $key );
+	}
+	return $fallback;
+}

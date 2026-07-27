@@ -93,8 +93,8 @@ printf(
 		</div>
 	</div>
 
-	<a class="es-hero__scroll" href="#process" aria-label="<?php esc_attr_e( 'Scroll to How I work', 'estavillo-child' ); ?>">
-		<span class="es-hero__scroll-label"><?php esc_html_e( 'Scroll', 'estavillo-child' ); ?></span>
+	<a class="es-hero__scroll" href="#process" aria-label="<?php echo esc_attr( es__( 'scroll_aria' ) ); ?>">
+		<span class="es-hero__scroll-label"><?php echo esc_html( es__( 'scroll_label' ) ); ?></span>
 		<span class="es-hero__scroll-line" aria-hidden="true"></span>
 	</a>
 </section>

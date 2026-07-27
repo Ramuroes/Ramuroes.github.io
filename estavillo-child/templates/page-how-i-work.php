@@ -49,8 +49,8 @@ if ( function_exists( 'wp_body_open' ) ) {
 			null,
 			array(
 				'eyebrow' => es__( 'process_label' ),
-				'title'   => __( 'How I work.', 'estavillo-child' ),
-				'lead'    => __( "I don't start with interfaces. I start by understanding the system.", 'estavillo-child' ),
+				'title'   => es__( 'how_title' ),
+				'lead'    => es__( 'how_lead' ),
 			)
 		);
 

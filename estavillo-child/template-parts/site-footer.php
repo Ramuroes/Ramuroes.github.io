@@ -78,7 +78,7 @@ $es_has_elsewhere = ! empty( $es_social_visible );
 			</div>
 
 			<?php if ( $es_show_nav ) : ?>
-				<nav class="es-site-footer__col es-site-footer__col--nav es-site-footer__nav" aria-label="<?php esc_attr_e( 'Footer', 'estavillo-child' ); ?>">
+				<nav class="es-site-footer__col es-site-footer__col--nav es-site-footer__nav" aria-label="<?php echo esc_attr( es__( 'nav_aria_footer' ) ); ?>">
 					<?php foreach ( $es_links as $es_link ) : ?>
 						<a href="<?php echo esc_url( $es_link['url'] ); ?>"<?php echo es_nav_item_is_active( $es_link ) ? ' aria-current="page"' : ''; ?>><?php echo esc_html( $es_link['label'] ); ?></a>
 					<?php endforeach; ?>
@@ -93,15 +93,15 @@ $es_has_elsewhere = ! empty( $es_social_visible );
 								<a class="es-footer-contact__item" href="mailto:<?php echo esc_attr( antispambot( $es_email ) ); ?>"><?php echo esc_html( antispambot( $es_email ) ); ?></a>
 							<?php endif; ?>
 							<?php if ( $es_show_phone ) : ?>
-								<a class="es-footer-contact__item" href="tel:+<?php echo esc_attr( es_phone_digits( $es_phone ) ); ?>" aria-label="<?php echo esc_attr( $es_name ? sprintf( __( 'Call %s', 'estavillo-child' ), $es_name ) : __( 'Call by phone', 'estavillo-child' ) ); ?>">
+								<a class="es-footer-contact__item" href="tel:+<?php echo esc_attr( es_phone_digits( $es_phone ) ); ?>" aria-label="<?php echo esc_attr( $es_name ? sprintf( es__( 'footer_call_named' ), $es_name ) : es__( 'footer_call_generic' ) ); ?>">
 									<?php echo es_footer_icon( 'phone' ); // phpcs:ignore WordPress.Security.EscapeOutput -- theme-authored SVG. ?>
 									<span><?php echo esc_html( $es_phone ); ?></span>
 								</a>
 							<?php endif; ?>
 							<?php if ( $es_show_whatsapp ) : ?>
-								<a class="es-footer-contact__item" href="https://wa.me/<?php echo esc_attr( es_phone_digits( $es_whatsapp ) ); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr( $es_name ? sprintf( __( 'Contact %s on WhatsApp', 'estavillo-child' ), $es_name ) : __( 'Contact on WhatsApp', 'estavillo-child' ) ); ?>">
+								<a class="es-footer-contact__item" href="https://wa.me/<?php echo esc_attr( es_phone_digits( $es_whatsapp ) ); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr( $es_name ? sprintf( es__( 'footer_wa_named' ), $es_name ) : es__( 'footer_wa_generic' ) ); ?>">
 									<?php echo es_footer_icon( 'whatsapp' ); // phpcs:ignore WordPress.Security.EscapeOutput -- theme-authored SVG. ?>
-									<span><?php esc_html_e( 'WhatsApp', 'estavillo-child' ); ?></span>
+									<span><?php echo esc_html( es__( 'whatsapp_label' ) ); ?></span>
 								</a>
 							<?php endif; ?>
 						</div>

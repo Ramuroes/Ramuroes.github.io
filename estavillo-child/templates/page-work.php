@@ -47,8 +47,8 @@ if ( function_exists( 'wp_body_open' ) ) {
 			null,
 			array(
 				'eyebrow' => es__( 'work_label' ),
-				'title'   => __( 'Work.', 'estavillo-child' ),
-				'lead'    => __( 'A selection of product and systems design work, from live decision tools to earlier academic and legacy projects.', 'estavillo-child' ),
+				'title'   => es__( 'work_title' ),
+				'lead'    => es__( 'work_lead' ),
 			)
 		);
 

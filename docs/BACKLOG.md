@@ -668,3 +668,17 @@ not built.
   (no heavy JS scroll tracking this phase; Home stays neutral).
 - Footer newsletter / form — only if later justified.
 - Per-language values for the custom nav label / footer note fields.
+
+## Spanish-parity phase
+
+Full content-ownership rules, EN/ES page matrix, recommended Polylang string
+values and known limitations now live in `docs/MULTILINGUAL-PARITY.md` — read
+that file before touching bilingual content. Summary: Home/About/How I
+Work/Connect now have paired `*-gutenberg-es.html` source files
+(`docs/content/`); Header/Footer/breadcrumb/shared-CTA strings were wired
+through the existing `es__()`/Polylang mechanism (previously several used raw
+`__()` with no `.mo` pipeline, so they never actually varied by language —
+fixed as part of this phase). The Presupuestador/Workshop Quoting System case
+still has no Spanish translation (documented, not fabricated — see
+`docs/MULTILINGUAL-PARITY.md` §5). The Work page still has no Gutenberg
+content file in either language (pre-existing gap, unrelated to this phase).

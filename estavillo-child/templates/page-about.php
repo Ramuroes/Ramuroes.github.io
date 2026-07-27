@@ -51,8 +51,8 @@ if ( function_exists( 'wp_body_open' ) ) {
 			'template-parts/page-head',
 			null,
 			array(
-				'eyebrow' => __( 'Product Designer · Systems & Operations', 'estavillo-child' ),
-				'title'   => __( 'About me.', 'estavillo-child' ),
+				'eyebrow' => es__( 'about_eyebrow' ),
+				'title'   => es__( 'about_title' ),
 			)
 		);
 

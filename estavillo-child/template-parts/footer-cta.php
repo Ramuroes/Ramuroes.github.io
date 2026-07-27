@@ -59,7 +59,7 @@ $es_connect_url = apply_filters( 'es_home_connect_url', '#connect' );
 				<?php endif; ?>
 			</div>
 			<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_connect_url ); ?>">
-				<?php esc_html_e( 'All ways to connect', 'estavillo-child' ); ?>
+				<?php echo esc_html( es__( 'connect_cta_all' ) ); ?>
 			</a>
 		</div>
 	</div>

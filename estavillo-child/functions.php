@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.24' );
+define( 'ES_CHILD_VERSION', '0.2.25' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -74,6 +74,41 @@ function es_child_ui_strings() {
 		'case_meta_role'      => 'Role',
 		'case_meta_tools'     => 'Tools',
 		'case_meta_period'    => 'Period',
+		// Spanish-parity phase — global chrome + a11y strings that were
+		// previously raw __()/hardcoded (no .mo pipeline exists, so they
+		// never actually varied by language). Routed through Polylang
+		// string translation like every other shared label above.
+		'breadcrumb_home'     => 'Home',
+		'nav_aria_main'       => 'Main',
+		'nav_aria_footer'     => 'Footer',
+		'nav_aria_mobile'     => 'Mobile',
+		'menu_label'          => 'Menu',
+		'menu_open'           => 'Open menu',
+		'menu_close'          => 'Close menu',
+		'theme_toggle_title'  => 'Light / dark — coming soon',
+		'scroll_label'        => 'Scroll',
+		'scroll_aria'         => 'Scroll to How I work',
+		'whatsapp_label'      => 'WhatsApp',
+		'footer_call_generic' => 'Call by phone',
+		'footer_call_named'   => 'Call %s',
+		'footer_wa_generic'   => 'Contact on WhatsApp',
+		'footer_wa_named'     => 'Contact %s on WhatsApp',
+		'case_sections_aria'  => 'Case sections',
+		'case_media_ph_aria'  => 'Placeholder for the case visual',
+		'connect_cta_all'     => 'All ways to connect',
+		// Page-head eyebrow/H1/lead — deliberately outside the migrated
+		// Gutenberg body (shared page-head component), so these need the
+		// same Polylang-string mechanism as nav labels, not raw __().
+		'about_eyebrow'       => 'Product Designer · Systems & Operations',
+		'about_title'         => 'About me.',
+		'how_title'           => 'How I work.',
+		'how_lead'            => "I don't start with interfaces. I start by understanding the system.",
+		'work_title'          => 'Work.',
+		'work_lead'           => 'A selection of product and systems design work, from live decision tools to earlier academic and legacy projects.',
+		'work_archive_label'  => 'Archive / older work',
+		'connect_eyebrow'     => 'Get in touch',
+		'connect_title'       => 'Start a conversation.',
+		'connect_lead'        => "I'm open to Product Design, Design Systems and UX Research roles — anywhere the goal is making a real system work better, not just look better.",
 	);
 }
 
@@ -214,7 +249,7 @@ function es_nav_links() {
 function es_breadcrumb_trail( $nav_label_key = '', $current_label = '' ) {
 	$trail = array(
 		array(
-			'label' => __( 'Home', 'estavillo-child' ),
+			'label' => es__( 'breadcrumb_home' ),
 			'url'   => home_url( '/' ),
 		),
 	);

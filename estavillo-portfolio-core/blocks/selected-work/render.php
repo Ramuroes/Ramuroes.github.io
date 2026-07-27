@@ -58,7 +58,7 @@ $es_wide = array_shift( $es_cases );
 						<?php endforeach; ?>
 					</div>
 				<?php endif; ?>
-				<span class="es-card__cta"><?php esc_html_e( 'View case study', 'estavillo-portfolio-core' ); ?> <span class="es-card__arrow" aria-hidden="true">&rarr;</span></span>
+				<span class="es-card__cta"><?php echo esc_html( es_portfolio_theme_string( 'work_view_case', __( 'View case study', 'estavillo-portfolio-core' ) ) ); ?> <span class="es-card__arrow" aria-hidden="true">&rarr;</span></span>
 			</div>
 		</a>
 	<?php endif; ?>
@@ -77,7 +77,7 @@ $es_wide = array_shift( $es_cases );
 						</div>
 						<div class="es-card__title"><?php echo esc_html( $es_case['title'] ); ?></div>
 						<div class="es-card__excerpt"><?php echo esc_html( $es_case['excerpt'] ); ?></div>
-						<span class="es-card__cta"><?php esc_html_e( 'View case study', 'estavillo-portfolio-core' ); ?> <span class="es-card__arrow" aria-hidden="true">&rarr;</span></span>
+						<span class="es-card__cta"><?php echo esc_html( es_portfolio_theme_string( 'work_view_case', __( 'View case study', 'estavillo-portfolio-core' ) ) ); ?> <span class="es-card__arrow" aria-hidden="true">&rarr;</span></span>
 					</div>
 				</a>
 			<?php endforeach; ?>

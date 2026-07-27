@@ -55,9 +55,9 @@ if ( function_exists( 'wp_body_open' ) ) {
 			'template-parts/page-head',
 			null,
 			array(
-				'eyebrow' => apply_filters( 'es_connect_eyebrow', 'Get in touch' ),
-				'title'   => apply_filters( 'es_connect_title', 'Start a conversation.' ),
-				'lead'    => apply_filters( 'es_connect_intro', "I'm open to Product Design, Design Systems and UX Research roles — anywhere the goal is making a real system work better, not just look better." ),
+				'eyebrow' => apply_filters( 'es_connect_eyebrow', es__( 'connect_eyebrow' ) ),
+				'title'   => apply_filters( 'es_connect_title', es__( 'connect_title' ) ),
+				'lead'    => apply_filters( 'es_connect_intro', es__( 'connect_lead' ) ),
 			)
 		);
 

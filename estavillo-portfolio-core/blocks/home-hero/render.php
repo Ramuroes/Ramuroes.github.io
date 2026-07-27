@@ -72,8 +72,8 @@ $es_hero_class  = 'es-hero es-hero--scroll-' . $es_scroll_mode;
 		<div class="es-hero__content"><?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput -- InnerBlocks ya renderizados/sanitizados por core. ?></div>
 	</div>
 
-	<a class="es-hero__scroll" href="#process" aria-label="<?php esc_attr_e( 'Scroll to How I work', 'estavillo-portfolio-core' ); ?>">
-		<span class="es-hero__scroll-label"><?php esc_html_e( 'Scroll', 'estavillo-portfolio-core' ); ?></span>
+	<a class="es-hero__scroll" href="#process" aria-label="<?php echo esc_attr( es_portfolio_theme_string( 'scroll_aria', __( 'Scroll to How I work', 'estavillo-portfolio-core' ) ) ); ?>">
+		<span class="es-hero__scroll-label"><?php echo esc_html( es_portfolio_theme_string( 'scroll_label', __( 'Scroll', 'estavillo-portfolio-core' ) ) ); ?></span>
 		<span class="es-hero__scroll-line" aria-hidden="true"></span>
 	</a>
 </section>
