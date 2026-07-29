@@ -116,6 +116,14 @@ function es_child_enqueue_assets() {
 	wp_enqueue_style( 'es-layout', ES_CHILD_URI . '/assets/css/layout.css', array( 'es-base' ), es_asset_ver( 'assets/css/layout.css' ) );
 	wp_enqueue_style( 'es-components', ES_CHILD_URI . '/assets/css/components.css', array( 'es-layout' ), es_asset_ver( 'assets/css/components.css' ) );
 
+	// Global dark-mode layer (site-wide, every template — Kadence-native
+	// contexts included). Inert unless body.es-theme-dark is present (see
+	// inc/theme-dark-mode.php): same "always loaded, no-op until its class/
+	// scope is active" principle as es-tokens/es-base above. Enqueued last
+	// among the theme's own stylesheets so its source order can win ties
+	// against Kadence's own CSS for the Kadence-native selectors it targets.
+	wp_enqueue_style( 'es-theme-dark', ES_CHILD_URI . '/assets/css/theme-dark.css', array( 'es-components' ), es_asset_ver( 'assets/css/theme-dark.css' ) );
+
 	// Chrome ESTAVILLO (header + menú mobile + footer): lo comparten la
 	// Home, el single de Case Study y las 4 páginas fijas nuevas (Work /
 	// About / How I Work / Contact) — todas usan template-parts/site-header

@@ -499,6 +499,14 @@ function es_portfolio_home_content_save() {
 		$data['footer_location'] = sanitize_text_field( wp_unslash( $_POST['es_footer_location'] ) );
 	}
 
+	// ---- Appearance — Portfolio dark mode ----
+	// Same "hidden marker" gating as Header/Footer above: only trust the
+	// checkbox's absence as "explicitly turned off" when this section was
+	// actually on the submitted form.
+	if ( isset( $_POST['es_theme_appearance'] ) ) {
+		$data['theme_dark_mode'] = isset( $_POST['es_theme_dark_mode'] ) ? '1' : '0';
+	}
+
 	update_option( 'es_portfolio_home_content', $data );
 	add_action( 'admin_notices', 'es_portfolio_home_content_saved_notice' );
 }
@@ -964,6 +972,43 @@ function es_portfolio_home_content_page() {
 				</tr>
 			</table>
 
+			<h2><?php esc_html_e( 'Appearance — Portfolio dark mode', 'estavillo-portfolio-core' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'The global switch for the portfolio-wide dark visual system. Disabled by default: the public site keeps its current behavior unchanged. When Enabled, every template — including generic pages, single posts, archives, search and 404 — renders dark, consistently, in both English and Spanish.', 'estavillo-portfolio-core' ); ?></p>
+			<input type="hidden" name="es_theme_appearance" value="1">
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Portfolio dark mode', 'estavillo-portfolio-core' ); ?></th>
+					<td>
+						<label><input type="checkbox" name="es_theme_dark_mode" value="1" <?php checked( '1' === ( $data['theme_dark_mode'] ?? '0' ) ); ?>> <?php esc_html_e( 'Enabled — apply dark mode site-wide for every visitor.', 'estavillo-portfolio-core' ); ?></label>
+						<p class="description"><?php esc_html_e( 'Leave unchecked (Disabled) until the content migration is finished and this is ready to go live for everyone. Use "Preview dark mode" below to review it safely first — previewing does not change this setting.', 'estavillo-portfolio-core' ); ?></p>
+					</td>
+				</tr>
+				<?php if ( function_exists( 'es_theme_dark_mode_enabled' ) && ! es_theme_dark_mode_enabled() ) : ?>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Preview (administrators only)', 'estavillo-portfolio-core' ); ?></th>
+						<td>
+							<?php if ( function_exists( 'es_theme_dark_preview_cookie_present' ) && es_theme_dark_preview_cookie_present() ) : ?>
+								<p>
+									<strong><?php esc_html_e( "You're currently previewing dark mode.", 'estavillo-portfolio-core' ); ?></strong>
+									<?php esc_html_e( 'Only your browser sees it — visitors still see the current site.', 'estavillo-portfolio-core' ); ?>
+								</p>
+								<?php if ( function_exists( 'es_theme_dark_preview_url' ) ) : ?>
+									<a class="button" href="<?php echo esc_url( es_theme_dark_preview_url( 'off', home_url( '/' ) ) ); ?>"><?php esc_html_e( 'Exit dark preview', 'estavillo-portfolio-core' ); ?></a>
+								<?php endif; ?>
+							<?php elseif ( function_exists( 'es_theme_dark_preview_url' ) ) : ?>
+								<a class="button button-secondary" href="<?php echo esc_url( es_theme_dark_preview_url( 'on', home_url( '/' ) ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Preview dark mode →', 'estavillo-portfolio-core' ); ?></a>
+								<p class="description"><?php esc_html_e( 'Opens the live site in a new tab, dark for you only (admin capability required). A matching "Exit dark preview" link is also always available in the admin toolbar on the front end.', 'estavillo-portfolio-core' ); ?></p>
+							<?php endif; ?>
+						</td>
+					</tr>
+				<?php else : ?>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Preview', 'estavillo-portfolio-core' ); ?></th>
+						<td><p class="description"><?php esc_html_e( 'Dark mode is already Enabled for every visitor — there is nothing left to preview.', 'estavillo-portfolio-core' ); ?></p></td>
+					</tr>
+				<?php endif; ?>
+			</table>
+
 			<?php submit_button( __( 'Save Portfolio Content', 'estavillo-portfolio-core' ), 'primary', 'es_portfolio_home_content_submit' ); ?>
 		</form>
 	</div>
@@ -1339,3 +1384,21 @@ function es_portfolio_filter_footer_visibility( $default ) {
 	return $default;
 }
 add_filter( 'es_footer_visibility', 'es_portfolio_filter_footer_visibility' );
+
+/**
+ * Portfolio dark mode — global switch bridge. Same "only override once the
+ * section was saved at least once" guard as sticky_header above; until
+ * then (and always, if never checked) the theme default wins, which is
+ * Disabled (see es_theme_dark_mode_enabled() in the theme).
+ *
+ * @param bool $default Theme default (false — Disabled).
+ * @return bool
+ */
+function es_portfolio_filter_theme_dark_mode( $default ) {
+	$data = es_portfolio_get_home_content();
+	if ( ! array_key_exists( 'theme_dark_mode', $data ) ) {
+		return $default;
+	}
+	return '1' === $data['theme_dark_mode'];
+}
+add_filter( 'es_theme_dark_mode', 'es_portfolio_filter_theme_dark_mode' );

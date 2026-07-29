@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.25' );
+define( 'ES_CHILD_VERSION', '0.2.26' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -24,6 +24,7 @@ require ES_CHILD_DIR . '/inc/work-page-fallback.php';
 require ES_CHILD_DIR . '/inc/block-styles.php';
 require ES_CHILD_DIR . '/inc/how-i-work-illustrations.php';
 require ES_CHILD_DIR . '/inc/header-footer.php';
+require ES_CHILD_DIR . '/inc/theme-dark-mode.php';
 
 /**
  * Textdomain del child theme.

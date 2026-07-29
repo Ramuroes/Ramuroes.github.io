@@ -1,0 +1,420 @@
+/* =========================================================================
+   ESTAVILLO — Global dark mode (portfolio-wide toggle)
+   -------------------------------------------------------------------------
+   Every single selector in this file is prefixed with body.es-theme-dark.
+   With that class absent (the default — see inc/theme-dark-mode.php,
+   "Portfolio dark mode" = Disabled), this entire stylesheet is a no-op:
+   zero effect on the public site, exactly like tokens.css/base.css already
+   are outside .es-page (see inc/enqueue.php).
+
+   WHY THIS FILE EXISTS: .es-page (base.css) already renders dark — it has
+   since Home v1 — but only inside the six "standalone" ESTAVILLO templates
+   (Home, Work, About, How I Work, Connect, single Case Study), which print
+   their own <head>/<body> and never call get_header()/get_footer(). Any
+   other context (a generic Gutenberg Page without one of those templates,
+   a single blog post, an archive, search results, 404) renders through
+   Kadence's own native templates and chrome, which this child theme never
+   overrides — so it never picked up the --es-* tokens at all. This file
+   is the missing coverage for exactly those native-Kadence contexts, using
+   the SAME tokens and the SAME treatment patterns already approved inside
+   .es-page (border+radius frames from case-study.css, the input pattern
+   from pages.css's Connect form, etc.) — nothing new invented.
+
+   RULES:
+   - Tokens only (var(--es-*) from tokens.css). No new colors.
+   - No filter/invert/grayscale/brightness on ANY image — ever. Light
+     diagrams (e.g. Trazur screenshots) get the same integrated border +
+     radius + figure-background treatment already used in case-study.css,
+     never a pixel-level filter.
+   - Never touch .wp-lightbox-container / the native block-library
+     lightbox markup — this file only sets background/color/border, never
+     display/position/transform on lightbox elements.
+   - Selectors target generic HTML5 landmarks + common WP/Kadence/
+     Gutenberg class conventions (not verified against a live Kadence
+     install from this repo — see docs/DARK-MODE.md, "Known limitations").
+   - Specificity: body.es-theme-dark on every rule (0,1,1 minimum) plus
+     source order (enqueued last, after Kadence's own stylesheet — see
+     inc/enqueue.php) is the whole strategy here; no !important anywhere
+     in this file. If real-Kadence QA finds a spot this doesn't reach
+     (a more specific Kadence selector, or an inline style from a Kadence
+     Customizer color setting), raise that selector's specificity here
+     first — reach for !important only as a last resort, and only for
+     that one selector.
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   BASE — html/body/selection/focus
+   ---------------------------------------------------------------------- */
+
+html.es-theme-dark {
+	color-scheme: dark;
+}
+
+body.es-theme-dark {
+	background: var(--es-paper);
+	color: var(--es-ink);
+}
+
+body.es-theme-dark ::selection {
+	background: var(--es-accent);
+	color: var(--es-paper);
+}
+
+body.es-theme-dark :focus-visible {
+	outline: 2px solid var(--es-accent);
+	outline-offset: 3px;
+}
+
+/* -------------------------------------------------------------------------
+   ESTRUCTURA — Kadence-native chrome (header / nav / footer / containers)
+   Broad landmark + common Kadence class coverage. .es-page's own header/
+   footer (site-header.php/site-footer.php) already render dark unrelated
+   to this file — these rules simply don't collide with them.
+   ---------------------------------------------------------------------- */
+
+body.es-theme-dark .site,
+body.es-theme-dark .site-content,
+body.es-theme-dark .content-area,
+body.es-theme-dark #content,
+body.es-theme-dark #primary,
+body.es-theme-dark .wp-site-blocks,
+body.es-theme-dark main {
+	background: var(--es-paper);
+	color: var(--es-ink);
+}
+
+body.es-theme-dark .site-header,
+body.es-theme-dark header.site-header,
+body.es-theme-dark .site-footer,
+body.es-theme-dark footer.site-footer,
+body.es-theme-dark .site-main > header,
+body.es-theme-dark .entry-header {
+	background: var(--es-paper-2);
+	color: var(--es-ink);
+	border-color: var(--es-line);
+}
+
+body.es-theme-dark .site-header a,
+body.es-theme-dark .site-footer a,
+body.es-theme-dark .main-navigation a,
+body.es-theme-dark nav a {
+	color: var(--es-ink-2);
+}
+
+body.es-theme-dark .site-header a:hover,
+body.es-theme-dark .site-footer a:hover,
+body.es-theme-dark .main-navigation a:hover,
+body.es-theme-dark nav a:hover,
+body.es-theme-dark .site-header a:focus-visible,
+body.es-theme-dark .main-navigation a:focus-visible {
+	color: var(--es-accent);
+}
+
+/* Mobile menu / off-canvas drawers (Kadence's own, not the ESTAVILLO one) */
+body.es-theme-dark .fl-mobile-nav-wrap,
+body.es-theme-dark .mobile-menu-container,
+body.es-theme-dark .popup-mobile-menu {
+	background: var(--es-paper-2);
+	color: var(--es-ink);
+}
+
+body.es-theme-dark .widget-area,
+body.es-theme-dark .sidebar,
+body.es-theme-dark aside.widget-area {
+	background: var(--es-paper-2);
+	color: var(--es-ink-2);
+	border-color: var(--es-line);
+}
+
+body.es-theme-dark .widget-title {
+	color: var(--es-ink);
+}
+
+body.es-theme-dark hr,
+body.es-theme-dark .wp-block-separator {
+	border-color: var(--es-line);
+	background-color: var(--es-line);
+	color: var(--es-line);
+}
+
+/* Breadcrumbs emitted outside the ESTAVILLO templates (e.g. a Kadence or
+   SEO-plugin breadcrumb trail on a generic page). The ESTAVILLO
+   breadcrumbs (template-parts/breadcrumbs.php) already render dark inside
+   .es-page and are untouched by this rule. */
+body.es-theme-dark .breadcrumbs,
+body.es-theme-dark .breadcrumb-trail,
+body.es-theme-dark [class*='breadcrumb'] {
+	color: var(--es-ink-3);
+}
+
+body.es-theme-dark .breadcrumbs a,
+body.es-theme-dark .breadcrumb-trail a,
+body.es-theme-dark [class*='breadcrumb'] a {
+	color: var(--es-ink-2);
+}
+
+/* -------------------------------------------------------------------------
+   CONTENIDO — headings, text, links, lists, quotes, tables, figures
+   ---------------------------------------------------------------------- */
+
+body.es-theme-dark h1,
+body.es-theme-dark h2,
+body.es-theme-dark h3,
+body.es-theme-dark h4,
+body.es-theme-dark h5,
+body.es-theme-dark h6 {
+	color: var(--es-ink);
+}
+
+body.es-theme-dark p,
+body.es-theme-dark li,
+body.es-theme-dark dt,
+body.es-theme-dark dd {
+	color: var(--es-ink-2);
+}
+
+body.es-theme-dark a {
+	color: var(--es-accent);
+}
+
+body.es-theme-dark a:hover,
+body.es-theme-dark a:focus-visible {
+	color: var(--es-accent);
+	opacity: 0.85;
+}
+
+body.es-theme-dark blockquote,
+body.es-theme-dark .wp-block-quote {
+	color: var(--es-ink-2);
+	border-color: var(--es-line-strong);
+}
+
+body.es-theme-dark blockquote cite,
+body.es-theme-dark .wp-block-quote cite {
+	color: var(--es-ink-3);
+}
+
+body.es-theme-dark code,
+body.es-theme-dark kbd,
+body.es-theme-dark samp,
+body.es-theme-dark pre,
+body.es-theme-dark .wp-block-code,
+body.es-theme-dark .wp-block-preformatted {
+	background: var(--es-block);
+	color: var(--es-ink-2);
+	border-color: var(--es-line);
+}
+
+body.es-theme-dark figcaption,
+body.es-theme-dark .wp-element-caption,
+body.es-theme-dark .wp-block-image figcaption,
+body.es-theme-dark .gallery-caption {
+	color: var(--es-ink-3);
+}
+
+/* Tables — same border/padding language as .es-case__body .wp-block-table
+   (case-study.css), reused verbatim for tables outside .es-page. */
+body.es-theme-dark table,
+body.es-theme-dark .wp-block-table table {
+	border-color: var(--es-line);
+}
+
+body.es-theme-dark th,
+body.es-theme-dark td,
+body.es-theme-dark .wp-block-table th,
+body.es-theme-dark .wp-block-table td {
+	border: 1px solid var(--es-line);
+	color: var(--es-ink-2);
+}
+
+body.es-theme-dark th,
+body.es-theme-dark .wp-block-table th {
+	color: var(--es-ink);
+	background: var(--es-surface);
+}
+
+body.es-theme-dark tbody tr:nth-child(even) td {
+	background: var(--es-paper-2);
+}
+
+/* Buttons — reuse the existing .es-btn look-and-feel for any core/button
+   rendered outside .es-page (e.g. a generic page), without redefining a
+   second button system. */
+body.es-theme-dark .wp-block-button__link {
+	background: var(--es-accent);
+	color: var(--es-paper);
+	border-radius: var(--es-radius-sm);
+}
+
+body.es-theme-dark .wp-block-button.is-style-outline .wp-block-button__link {
+	background: transparent;
+	color: var(--es-accent);
+	border: 1px solid var(--es-accent);
+}
+
+/* Figures / images — INTEGRATED FRAME ONLY. Never a filter, never inverted,
+   never darkened — a light Trazur screenshot must read exactly as
+   designed. This mirrors .es-case__body .es-case-figure img (case-study.css). */
+body.es-theme-dark .wp-block-image img,
+body.es-theme-dark .wp-block-gallery img,
+body.es-theme-dark .entry-content img,
+body.es-theme-dark figure img {
+	background: var(--es-surface);
+	border: 1px solid var(--es-line);
+	border-radius: var(--es-radius);
+}
+
+/* Icon/logo SVGs and any image explicitly marked decorative/borderless
+   must NOT get the frame above (it would look like a broken box around a
+   line icon). Opt out with .es-no-frame or common "no border" contexts. */
+body.es-theme-dark .wp-block-image.es-no-frame img,
+body.es-theme-dark .es-nav__logo,
+body.es-theme-dark svg {
+	background: none;
+	border: none;
+}
+
+body.es-theme-dark .wp-caption,
+body.es-theme-dark .alignleft.wp-caption,
+body.es-theme-dark .alignright.wp-caption {
+	background: transparent;
+}
+
+/* -------------------------------------------------------------------------
+   FORMULARIOS — same visual language as .es-contact-form (pages.css)
+   ---------------------------------------------------------------------- */
+
+body.es-theme-dark input:not([type='checkbox']):not([type='radio']),
+body.es-theme-dark textarea,
+body.es-theme-dark select {
+	background: var(--es-block);
+	color: var(--es-ink);
+	border: 1px solid var(--es-line-strong);
+	border-radius: var(--es-radius-sm);
+}
+
+body.es-theme-dark label {
+	color: var(--es-ink-3);
+}
+
+body.es-theme-dark input::placeholder,
+body.es-theme-dark textarea::placeholder {
+	color: var(--es-ink-4);
+	opacity: 1;
+}
+
+/* Matches the base rule's :not() pair so this wins the specificity tie
+   (two :not([attr]) clauses outweigh a single :focus-visible otherwise —
+   confirmed by the dark-mode-validate.mjs harness). */
+body.es-theme-dark input:not([type='checkbox']):not([type='radio']):focus-visible,
+body.es-theme-dark textarea:focus-visible,
+body.es-theme-dark select:focus-visible {
+	outline: none;
+	border-color: var(--es-accent);
+	box-shadow: 0 0 0 3px var(--es-accent-soft);
+}
+
+body.es-theme-dark input:disabled,
+body.es-theme-dark textarea:disabled,
+body.es-theme-dark select:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+
+body.es-theme-dark .wpcf7-not-valid,
+body.es-theme-dark .ff-el-is-error input,
+body.es-theme-dark .wp-block-search__input {
+	border-color: var(--es-line-strong);
+}
+
+/* Autofill — only the safe, widely-supported technique (no fragile hacks):
+   a long transition delay defeats the browser's forced light autofill
+   background without !important abuse or vendor-specific overrides beyond
+   the two prefixes every evergreen browser already needs for this. */
+body.es-theme-dark input:-webkit-autofill,
+body.es-theme-dark input:-webkit-autofill:hover,
+body.es-theme-dark input:-webkit-autofill:focus {
+	-webkit-text-fill-color: var(--es-ink);
+	transition: background-color 600000s 0s, color 600000s 0s;
+}
+
+/* -------------------------------------------------------------------------
+   GUTENBERG — core blocks not already covered above
+   ---------------------------------------------------------------------- */
+
+body.es-theme-dark .wp-block-group.has-background,
+body.es-theme-dark .wp-block-columns.has-background {
+	background: var(--es-surface);
+}
+
+body.es-theme-dark .wp-block-details,
+body.es-theme-dark details {
+	border-color: var(--es-line);
+	color: var(--es-ink-2);
+}
+
+body.es-theme-dark .wp-block-details summary,
+body.es-theme-dark details summary {
+	color: var(--es-ink);
+}
+
+body.es-theme-dark .wp-block-pullquote {
+	border-color: var(--es-line-strong);
+	color: var(--es-ink);
+}
+
+body.es-theme-dark .wp-block-cover {
+	background: var(--es-block);
+}
+
+body.es-theme-dark .wp-block-embed {
+	background: var(--es-surface);
+}
+
+/* -------------------------------------------------------------------------
+   TEMPLATES — archive / search / 404 / pagination / comments
+   ---------------------------------------------------------------------- */
+
+body.es-theme-dark .page-header,
+body.es-theme-dark .archive-title,
+body.es-theme-dark .page-title {
+	color: var(--es-ink);
+	border-color: var(--es-line);
+}
+
+body.es-theme-dark .search-form,
+body.es-theme-dark .wp-block-search {
+	color: var(--es-ink-2);
+}
+
+body.es-theme-dark .error-404 .page-content,
+body.es-theme-dark .no-results {
+	color: var(--es-ink-2);
+}
+
+body.es-theme-dark .nav-links,
+body.es-theme-dark .pagination,
+body.es-theme-dark .page-numbers {
+	color: var(--es-ink-3);
+	border-color: var(--es-line);
+}
+
+body.es-theme-dark .page-numbers.current {
+	background: var(--es-accent);
+	color: var(--es-paper);
+}
+
+body.es-theme-dark .comment-list,
+body.es-theme-dark .comment-body,
+body.es-theme-dark .comment-respond {
+	background: transparent;
+	color: var(--es-ink-2);
+	border-color: var(--es-line);
+}
+
+body.es-theme-dark .comment-form input,
+body.es-theme-dark .comment-form textarea {
+	background: var(--es-block);
+	color: var(--es-ink);
+	border-color: var(--es-line-strong);
+}
