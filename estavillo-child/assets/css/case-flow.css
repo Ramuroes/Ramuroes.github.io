@@ -282,15 +282,29 @@
    toquen justo los bordes, el lado debe ser C/√2, o sea un inset de
    (1 - 0.7071)/2 ≈ 14.6%. El texto NO se rota (va encima, sin transform),
    así que se lee normal; el padding grande lo mantiene dentro del área
-   inscripta del rombo. */
+   inscripta del rombo.
+
+   El padding es en PX, no en %, a propósito: un padding porcentual se
+   resuelve contra el ancho del CONTENEDOR (el <li>), no contra el propio
+   ancho de la caja — con max-width:190px la caja queda fija en 190px pero
+   el <li> puede ser mucho más ancho (por ej. ~770px en tablet, layout
+   vertical de una sola columna todavía). Ahí el padding porcentual salía
+   enorme (146px+) y el propio min-content de esa altura forzaba a la caja
+   a crecer muy por encima de max-width para no recortar el texto — el
+   rombo aparecía gigante en tablet. Fijo en px no depende del contenedor:
+   la caja siempre resuelve exactamente a 190×190 (o menos, en una pantalla
+   angosta al extremo). */
 .es-flow__item--decision .es-flow__shape {
 	display: grid;
 	place-items: center;
-	aspect-ratio: 1.2 / 1;
+	/* TIENE que ser 1/1: el inset de 14.6% de abajo sólo da un rombo de
+	   lados iguales si la caja que lo contiene es cuadrada. Un 1.2/1 acá
+	   rompe la geometría por eje y el rombo sale un rectángulo girado. */
+	aspect-ratio: 1 / 1;
 	width: 100%;
-	max-width: 210px;
+	max-width: 190px;
 	margin-inline: auto;
-	padding: 19% 22%;
+	padding: 36px 40px;
 	border: 0;
 	border-radius: 0;
 	background: none;
@@ -422,13 +436,27 @@
 
 .es-flow__more {
 	display: none; /* sólo aparece cuando el JS convierte el panel en popover/acordeón */
+	align-items: center;
+	gap: 6px;
 	margin-top: 10px;
 	font-family: var(--es-mono);
 	font-size: 10.5px;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
 	color: var(--es-ink-4);
-	transition: color var(--es-dur-fast) var(--es-ease);
+	transition: color var(--es-dur-fast) var(--es-ease), border-color var(--es-dur-fast) var(--es-ease), background-color var(--es-dur-fast) var(--es-ease);
+}
+
+.es-flow__more-icon {
+	flex: none;
+	width: 10px;
+	height: 10px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.6;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	transition: transform var(--es-dur-fast) var(--es-ease);
 }
 
 /* ---------- ramas de una decisión (estructura, siempre visibles) ---------- */
@@ -527,8 +555,26 @@
    ENHANCED — a partir de acá manda el JS (.is-enhanced)
    ========================================================================= */
 
+/* Mobile/tablet: sin hover, esto ES el desplegable — se ve como un control
+   (chip con borde), no como una línea de texto más, y gira el ícono al
+   abrirse. En desktop (media query de abajo) vuelve a texto simple porque
+   ahí el hover ya hace ese trabajo. */
 .es-flow.is-enhanced .es-flow__more {
-	display: block;
+	display: inline-flex;
+	padding: 7px 12px;
+	border: 1px solid var(--es-line-strong);
+	border-radius: 999px;
+	background: var(--es-paper-2);
+	color: var(--es-ink-3);
+}
+
+.es-flow.is-enhanced .es-flow__item.is-open .es-flow__more {
+	border-color: var(--es-accent);
+	color: var(--es-accent);
+}
+
+.es-flow.is-enhanced .es-flow__item.is-open .es-flow__more-icon {
+	transform: rotate(180deg);
 }
 
 .es-flow.is-enhanced .es-flow__close {
@@ -719,6 +765,15 @@
 
 	.es-flow__text {
 		font-size: 12.5px;
+	}
+
+	/* El hover ya es la señal de "esto se abre" en desktop: el chip con
+	   borde vuelve a ser texto simple con su flechita, sin fondo/borde. */
+	.es-flow.is-enhanced .es-flow__more {
+		padding: 0;
+		border: 0;
+		border-radius: 0;
+		background: none;
 	}
 
 	.es-flow__branches {

@@ -221,7 +221,21 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 							<?php endif; ?>
 
 							<?php if ( $es_has_panel && '' !== $es_detail ) : ?>
-								<span class="es-flow__more"><?php echo esc_html( $es_detail ); ?></span>
+								<?php
+								/*
+								 * En mobile no hay hover: esto es el ÚNICO indicador de que
+								 * el nodo se puede abrir, así que lleva un ícono de flecha
+								 * (no sólo texto) y gira al abrirse — misma lógica que un
+								 * desplegable. El <button> ya cubre toda la tarjeta como
+								 * área táctil; esto es la señal visual, no un segundo target.
+								 */
+								?>
+								<span class="es-flow__more">
+									<span class="es-flow__more-label"><?php echo esc_html( $es_detail ); ?></span>
+									<svg class="es-flow__more-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+										<polyline points="2.5,4.5 6,8 9.5,4.5" />
+									</svg>
+								</span>
 							<?php endif; ?>
 						</span>
 					</<?php echo esc_html( $es_tag ); ?>>
