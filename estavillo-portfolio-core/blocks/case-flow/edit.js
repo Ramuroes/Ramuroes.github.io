@@ -23,6 +23,7 @@
 	var PanelBody = wp.components.PanelBody;
 	var TextControl = wp.components.TextControl;
 	var SelectControl = wp.components.SelectControl;
+	var ToggleControl = wp.components.ToggleControl;
 
 	var KINDS = [
 		{ label: __('Step', 'estavillo-portfolio-core'), value: 'step' },
@@ -143,6 +144,14 @@
 								set({ stepLabel: v });
 							},
 						}),
+						el(TextControl, {
+							label: __('(IA) legend', 'estavillo-portfolio-core'),
+							help: __('Shown once under the flow, only if a node is marked as an AI point.', 'estavillo-portfolio-core'),
+							value: a.aiLegend,
+							onChange: function (v) {
+								set({ aiLegend: v });
+							},
+						}),
 						el(SelectControl, {
 							label: __('Density', 'estavillo-portfolio-core'),
 							value: a.density,
@@ -210,34 +219,57 @@
 												},
 											})
 										),
-										el('span', { className: 'es-flow__shape', 'aria-hidden': 'true' }),
+										el(TextControl, {
+											label: __('Label on the incoming arrow', 'estavillo-portfolio-core'),
+											help: __('e.g. "Main entry to the site". Blank = no label.', 'estavillo-portfolio-core'),
+											value: node.edgeLabel || '',
+											onChange: function (v) {
+												updateNode(i, { edgeLabel: v });
+											},
+										}),
+										el(ToggleControl, {
+											label: __('AI intervention point (IA)', 'estavillo-portfolio-core'),
+											checked: !!node.ai,
+											onChange: function (v) {
+												updateNode(i, { ai: v });
+											},
+										}),
+										el(
+											'span',
+											{ className: 'es-flow__shape' },
+											el(
+												'span',
+												{ className: 'es-flow__shape-inner' },
+												el(RichText, {
+													tagName: 'span',
+													className: 'es-flow__num',
+													placeholder: '01',
+													value: node.num || '',
+													allowedFormats: [],
+													onChange: function (v) {
+														updateNode(i, { num: v });
+													},
+												}),
+												el(RichText, {
+													tagName: 'span',
+													className: 'es-flow__title',
+													placeholder: __('Node title…', 'estavillo-portfolio-core'),
+													value: node.title || '',
+													allowedFormats: [],
+													onChange: function (v) {
+														updateNode(i, { title: v });
+													},
+												})
+											),
+											node.ai ? el('span', { className: 'es-flow__ai' }, el('span', { 'aria-hidden': 'true' }, 'IA')) : null
+										),
 										el(
 											'span',
 											{ className: 'es-flow__body' },
 											el(RichText, {
 												tagName: 'span',
-												className: 'es-flow__num',
-												placeholder: '01',
-												value: node.num || '',
-												allowedFormats: [],
-												onChange: function (v) {
-													updateNode(i, { num: v });
-												},
-											}),
-											el(RichText, {
-												tagName: 'span',
-												className: 'es-flow__title',
-												placeholder: __('Node title…', 'estavillo-portfolio-core'),
-												value: node.title || '',
-												allowedFormats: [],
-												onChange: function (v) {
-													updateNode(i, { title: v });
-												},
-											}),
-											el(RichText, {
-												tagName: 'span',
 												className: 'es-flow__text',
-												placeholder: __('One short line shown on the node…', 'estavillo-portfolio-core'),
+												placeholder: __('Short description, shown under the shape…', 'estavillo-portfolio-core'),
 												value: node.text || '',
 												allowedFormats: ['core/italic'],
 												onChange: function (v) {
@@ -279,6 +311,8 @@
 									num: '',
 									title: '',
 									text: '',
+									edgeLabel: '',
+									ai: false,
 									detail: [],
 									branches: [],
 								}),

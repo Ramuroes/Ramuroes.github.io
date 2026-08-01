@@ -25,11 +25,9 @@
    ========================================================================= */
 
 .es-flow {
-	--es-flow-shape: 13px;
 	--es-flow-gutter: 34px;
 	--es-flow-gap: 28px;
 	--es-flow-node-bg: var(--es-surface);
-	--es-flow-node-line: var(--es-line);
 	--es-flow-mark: var(--es-ink-4);
 
 	position: relative;
@@ -124,22 +122,27 @@
 	gap: var(--es-flow-gap);
 }
 
+/* Una caja por paso, a lo ancho. El conector corre ENTRE las cajas, no en
+   una columna lateral: ahora la forma ES la caja (como en el diagrama de
+   referencia), así que ya no hay un punto en un gutter que conectar. */
 .es-flow__item {
 	position: relative;
-	display: grid;
-	grid-template-columns: var(--es-flow-gutter) minmax(0, 1fr);
-	align-items: start;
+	display: block;
 }
 
 /* ---------- riel + conector SVG ----------
    El svg trae los dos paths (horizontal y vertical) y cada layout muestra
    el suyo: un solo markup sirve para los dos ejes, siempre vectorial. */
 
+/* El riel cuelga de LA FORMA, así que se centra sobre ella por CSS puro,
+   sin conocer su altura: sirve igual para un rectángulo de una línea, un
+   título de dos líneas o un rombo mucho más alto. */
 .es-flow__rail {
 	position: absolute;
-	left: 0;
+	left: 50%;
+	transform: translateX(-50%);
 	bottom: 100%;
-	width: var(--es-flow-gutter);
+	width: 22px;
 	height: var(--es-flow-gap);
 	pointer-events: none;
 }
@@ -149,6 +152,22 @@
 	width: 100%;
 	height: 100%;
 	overflow: visible;
+}
+
+/* etiqueta sobre la flecha ("Acceso principal al sitio", "Elige forma de
+   pago…") — igual que el diagrama de referencia. En mobile va al costado
+   del riel vertical; en desktop, encima de la línea horizontal. */
+.es-flow__edge {
+	position: absolute;
+	left: calc(50% + 16px);
+	bottom: calc(100% + 6px);
+	width: max-content;
+	max-width: 24ch;
+	font-family: var(--es-mono);
+	font-size: 9.5px;
+	line-height: 1.4;
+	letter-spacing: 0.06em;
+	color: var(--es-ink-4);
 }
 
 .es-flow__line,
@@ -194,66 +213,147 @@
 
 .es-flow__node {
 	position: relative;
-	grid-column: 2;
 }
 
+/* El trigger ya NO es la caja visible: es sólo el área interactiva. La
+   caja es .es-flow__shape (pastilla / rectángulo / rombo), igual que en el
+   diagrama de referencia, y la descripción va afuera y debajo. */
 .es-flow__trigger {
 	position: relative;
-	/* flex-column, no 'block': el contenido de un <button> se centra
-	   verticalmente por defecto, y con la tarjeta estirada en la grilla de
-	   desktop eso dejaba el texto flotando en el medio con un hueco enorme
-	   arriba y abajo. Con flex-column + justify-content:flex-start el texto
-	   arranca siempre pegado arriba, en las dos orientaciones. */
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
 	width: 100%;
 	margin: 0;
-	padding: 16px 18px;
-	border: 1px solid var(--es-flow-node-line);
-	border-radius: var(--es-radius);
-	background: var(--es-flow-node-bg);
+	padding: 0;
+	border: 0;
+	background: none;
 	font: inherit;
 	color: inherit;
 	text-align: left;
 	cursor: pointer;
-	transition: border-color var(--es-dur-fast) var(--es-ease),
-		background-color var(--es-dur-fast) var(--es-ease),
-		transform var(--es-dur-fast) var(--es-ease);
 }
 
 .es-flow__trigger--static {
 	cursor: default;
 }
 
-/* la forma vive en la columna del marcador, alineada con el riel */
+/* ---------- LA FORMA (la caja del diagrama) ---------- */
+
 .es-flow__shape {
+	position: relative;
+	display: block;
+	padding: 13px 16px;
+	/* el riel sale fuera de la caja: nunca recortarlo */
+	overflow: visible;
+	border: 1px solid var(--es-flow-mark);
+	border-radius: var(--es-radius-sm);
+	background: var(--es-flow-node-bg);
+	transition: border-color var(--es-dur-fast) var(--es-ease),
+		background-color var(--es-dur-fast) var(--es-ease),
+		transform var(--es-dur-fast) var(--es-ease);
+}
+
+.es-flow__shape-inner {
+	display: block;
+}
+
+/* pastilla — inicio y fin */
+.es-flow__item--start .es-flow__shape,
+.es-flow__item--end .es-flow__shape {
+	border-radius: 999px;
+	text-align: center;
+	background: var(--es-flow-mark);
+	border-color: var(--es-flow-mark);
+}
+
+.es-flow__item--start .es-flow__title,
+.es-flow__item--end .es-flow__title {
+	color: var(--es-paper);
+}
+
+/* hito — rectángulo con esquina marcada */
+.es-flow__item--milestone .es-flow__shape {
+	border-left-width: 3px;
+}
+
+/* rombo — decisión.
+   Un cuadrado rotado 45° dentro de una caja cuadrada: para que sus vértices
+   toquen justo los bordes, el lado debe ser C/√2, o sea un inset de
+   (1 - 0.7071)/2 ≈ 14.6%. El texto NO se rota (va encima, sin transform),
+   así que se lee normal; el padding grande lo mantiene dentro del área
+   inscripta del rombo. */
+.es-flow__item--decision .es-flow__shape {
+	display: grid;
+	place-items: center;
+	aspect-ratio: 1.2 / 1;
+	width: 100%;
+	max-width: 210px;
+	margin-inline: auto;
+	padding: 19% 22%;
+	border: 0;
+	border-radius: 0;
+	background: none;
+	text-align: center;
+}
+
+.es-flow__item--decision .es-flow__shape::before {
+	content: '';
 	position: absolute;
-	top: 22px;
-	left: calc(var(--es-flow-gutter) * -1);
-	width: var(--es-flow-shape);
-	height: var(--es-flow-shape);
-	border: 1.5px solid var(--es-flow-mark);
-	border-radius: 50%;
-	background: var(--es-paper);
-	transform: translateX(calc(var(--es-flow-gutter) / 2 - var(--es-flow-shape) / 2));
+	inset: 14.6%;
+	border: 1px solid var(--es-flow-mark);
+	border-radius: 3px;
+	background: var(--es-flow-node-bg);
+	transform: rotate(45deg);
 	transition: border-color var(--es-dur-fast) var(--es-ease),
 		background-color var(--es-dur-fast) var(--es-ease);
 }
 
-/* decisión = rombo (cuadrado rotado), no un círculo más */
-.es-flow__item--decision .es-flow__shape {
-	border-radius: 2px;
-	transform: translateX(calc(var(--es-flow-gutter) / 2 - var(--es-flow-shape) / 2)) rotate(45deg);
+.es-flow__item--decision .es-flow__shape-inner {
+	position: relative; /* encima del rombo */
 }
 
-.es-flow__item--start .es-flow__shape,
-.es-flow__item--end .es-flow__shape {
-	background: var(--es-flow-mark);
+/* marcador (IA) */
+.es-flow__ai {
+	position: absolute;
+	top: -9px;
+	right: -9px;
+	z-index: 2;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 22px;
+	height: 22px;
+	padding: 0 5px;
+	border: 1px solid var(--es-signal);
+	border-radius: 999px;
+	background: var(--es-paper);
+	font-family: var(--es-mono);
+	font-size: 9.5px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	color: var(--es-signal);
 }
 
-.es-flow__item--milestone .es-flow__shape {
-	border-radius: 3px;
+.es-flow__item--decision .es-flow__ai {
+	top: 8%;
+	right: 8%;
+}
+
+.es-flow__ai--legend {
+	position: static;
+	margin-right: 4px;
+}
+
+.es-flow__legend {
+	display: flex;
+	align-items: center;
+	margin: 22px 0 0;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	line-height: 1.5;
+	letter-spacing: 0.04em;
+	color: var(--es-ink-4);
 }
 
 /* acentos semánticos — tokens de diagrama ya existentes */
@@ -276,34 +376,47 @@
 
 /* ---------- contenido del nodo ---------- */
 
+/* el cuerpo va AFUERA de la forma, como las descripciones del diagrama */
 .es-flow__body {
 	display: block;
+	padding: 8px 2px 0;
 }
 
 .es-flow__num {
 	display: block;
-	margin-bottom: 6px;
+	margin-bottom: 4px;
 	font-family: var(--es-mono);
-	font-size: 10.5px;
+	font-size: 9.5px;
 	font-weight: 500;
 	letter-spacing: 0.18em;
 	color: var(--es-flow-mark);
 }
 
+.es-flow__item--start .es-flow__num,
+.es-flow__item--end .es-flow__num {
+	display: none; /* inicio y fin no se numeran, igual que en el diagrama */
+}
+
 .es-flow__title {
 	display: block;
 	font-family: var(--es-sans);
-	font-size: 15px;
+	font-size: 14px;
 	font-weight: 600;
-	line-height: 1.35;
+	line-height: 1.3;
 	color: var(--es-ink);
+}
+
+.es-flow__item--decision .es-flow__title {
+	font-size: 12.5px;
+	line-height: 1.25;
 }
 
 .es-flow__text {
 	display: block;
-	margin-top: 6px;
-	font-size: 13.5px;
-	line-height: 1.6;
+	font-size: 12.5px;
+	line-height: 1.55;
+	/* ink-4 daba 3.87:1 sobre el papel — abajo del piso de 4.5:1 para
+	   texto normal. ink-3 es el token muted que sí pasa (5.7:1). */
 	color: var(--es-ink-3);
 }
 
@@ -443,24 +556,30 @@
 	}
 }
 
-.es-flow.is-enhanced .es-flow__trigger:hover,
-.es-flow.is-enhanced .es-flow__trigger:focus-visible {
-	border-color: var(--es-line-strong);
-	background: var(--es-surface-2);
-}
-
 .es-flow.is-enhanced .es-flow__trigger:hover .es-flow__more,
 .es-flow.is-enhanced .es-flow__trigger:focus-visible .es-flow__more {
 	color: var(--es-accent);
 }
 
-.es-flow.is-enhanced .es-flow__item.is-open .es-flow__trigger {
-	border-color: var(--es-flow-mark);
+/* hover / abierto: la FORMA reacciona (no una tarjeta que ya no existe) */
+.es-flow.is-enhanced .es-flow__trigger:hover .es-flow__shape,
+.es-flow.is-enhanced .es-flow__trigger:focus-visible .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item.is-open .es-flow__shape {
+	background: var(--es-surface-2);
 }
 
-.es-flow.is-enhanced .es-flow__item.is-open .es-flow__shape {
+.es-flow.is-enhanced .es-flow__trigger:hover .es-flow__item--decision .es-flow__shape,
+.es-flow__item--decision .es-flow__trigger:hover .es-flow__shape::before,
+.es-flow__item--decision .es-flow__trigger:focus-visible .es-flow__shape::before,
+.es-flow__item--decision.is-open .es-flow__shape::before {
+	background: var(--es-surface-2);
+}
+
+/* inicio/fin son sólidos: no se aclaran, se realzan apenas */
+.es-flow.is-enhanced .es-flow__item--start .es-flow__trigger:hover .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--end .es-flow__trigger:hover .es-flow__shape {
 	background: var(--es-flow-mark);
-	border-color: var(--es-flow-mark);
+	filter: brightness(1.12);
 }
 
 /* foco de teclado: el mismo anillo verde del resto del sitio (base.css) */
@@ -518,7 +637,7 @@
 	.es-flow__track {
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 26px var(--es-flow-col);
+		gap: 46px var(--es-flow-col);
 		/* cada tarjeta con su altura natural y todas alineadas arriba: con
 		   'stretch' un nodo de decisión (que suma sus ramas debajo) estiraba
 		   toda la fila y los pasos quedaban como cajas casi vacías. */
@@ -544,11 +663,13 @@
 	   y nodo queden sobre el mismo eje. Con height:30px la línea caía 15px
 	   arriba del centro real y el spine se leía como guiones sueltos. */
 	.es-flow__rail {
-		left: calc(var(--es-flow-col) * -1);
+		left: auto;
+		right: 100%;
+		top: 50%;
 		bottom: auto;
-		top: 0;
+		transform: translateY(-50%);
 		width: var(--es-flow-col);
-		height: 29px;
+		height: 22px;
 	}
 
 	.es-flow__line--v,
@@ -566,28 +687,18 @@
 		display: flex;
 		flex-direction: column;
 		flex: 1;
-		padding-top: 30px; /* deja el carril de las formas arriba */
 	}
 
-	/* En horizontal la forma va ARRIBA de la tarjeta, sobre la línea del
-	   conector. OJO con el sistema de referencia: .es-flow__shape vive
-	   DENTRO del <button>, así que su containing block es la tarjeta, no
-	   el nodo — por eso el valor es negativo. Con top:-22px el centro de
-	   la forma queda en (top de la tarjeta - 15.5px) = (top del item +
-	   14.5px), exactamente el centro del riel de 29px. Un valor positivo
-	   la metía adentro de la tarjeta y desalineaba todo el spine. */
-	.es-flow__shape {
-		top: -22px;
+	/* La etiqueta va ARRIBA de la caja, no sobre la línea: el gap entre
+	   columnas es de 26px y ahí no entra "Acceso principal al sitio" sin
+	   pisar la caja siguiente. Arriba y alineada a la izquierda se lee
+	   limpio y sigue diciendo qué pasa ANTES de este paso. */
+	.es-flow__edge {
 		left: 0;
-		transform: none;
-	}
-
-	.es-flow__item--decision .es-flow__shape {
-		transform: rotate(45deg);
-	}
-
-	.es-flow__trigger {
-		padding: 15px 16px;
+		right: auto;
+		bottom: calc(100% + 7px);
+		max-width: 100%;
+		text-align: left;
 	}
 
 	/* El flujo termina arriba a la derecha (último nodo de la última fila),

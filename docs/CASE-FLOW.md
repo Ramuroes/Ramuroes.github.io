@@ -62,12 +62,31 @@ matches the real site.
       "num":    "01",
       "title":  "Homepage",
       "text":   "One short line shown on the node.",
+      "edgeLabel":"Main entry to the site",                    // → label on the incoming arrow
+      "ai":     true,                                          // → (IA) badge on the shape
       "detail":  [ { "label": "Pain point", "text": "…" } ],   // → popover rows
       "branches":[ { "label": "Yes", "text": "…" } ]           // → decision yes/no
     }
   ]
 }
 ```
+
+### Shape vocabulary
+
+`kind` maps to a real flowchart shape, matching the reference diagram:
+
+| `kind` | Shape | Used for |
+|---|---|---|
+| `start` / `end` | **Pastilla** (stadium, filled) | Inicio / Fin |
+| `step` | **Rectángulo** | A process step |
+| `decision` | **Rombo** (true 45°-rotated square, text unrotated inside) | A yes/no question |
+| `milestone` | Rectangle with a thick left edge | A checkpoint |
+
+Boxes are connected by **inline-SVG lines with arrowheads**; the
+description sits *outside and below* each shape, and `edgeLabel` prints
+above the incoming arrow — the same reading order as the reference PNG.
+The `(IA)` badge marks assistant touchpoints and prints its legend once
+at the foot of the flow (`aiLegend`), only if at least one node uses it.
 
 **Why `detail` is a label/text array and not fixed fields.** The ticket
 lists description / UX reasoning / pain point / opportunity / AI
@@ -93,6 +112,9 @@ Insert **Case Flow** (Estavillo Case Study category). Then:
 | Colour accent | "Accent" select on the node — Signal (green) / Decision (orange) / Muted |
 | Node order | ↑ / ↓ buttons on the node |
 | Add / remove a node | "Add node" at the end; trash icon on a node |
+| Label on the incoming arrow | "Label on the incoming arrow" on the node (blank = none) |
+| Mark a node as an AI touchpoint | "AI intervention point (IA)" toggle on the node |
+| The (IA) legend wording | Inspector → Flow labels → "(IA) legend" |
 | Popover content | "Detail rows" on the node — each row is a Label + Text; add/reorder/remove freely |
 | Decision yes/no | "Branches" on the node — Branch label + Outcome |
 | Start / end markers | Inspector → Flow labels (blank = hidden) |
@@ -108,12 +130,11 @@ horizontal switch and the progress indicator are all derived.
 query until 680px, so the phone experience is what the component is
 written for first.
 
-- **Mobile (base):** vertical editorial narrative. One card per step,
-  marker column on the left with the vertical connector, sticky `01/08`
-  progress indicator that tracks the step in view, detail expands as an
-  in-flow card (never a popover), 44px+ touch targets, no horizontal
-  scroll. Same two-column marker/body idea already used by
-  `.es-process-detail` on How I Work.
+- **Mobile (base):** vertical editorial narrative. One shape per step at
+  full width, the connector running vertically between shapes, a sticky
+  `01/12` progress indicator that tracks the step in view, detail expands
+  as an in-flow card (never a popover), 44px+ touch targets, no horizontal
+  scroll.
 - **Tablet (≥680px):** same vertical narrative with more air; branches
   move side by side to use the width.
 - **Desktop (≥1024px):** horizontal reading, laid out as a 3-column grid
@@ -159,6 +180,13 @@ server always emits the detail panels *visible*; the JS adds
 accordions. With JS blocked or broken the whole flow — every node, every
 detail row, every branch — reads top to bottom as a static document.
 Verified in the harness with the script removed.
+
+**Connector alignment** — the connector is a child of the *shape*, not of
+the list item, so `top:50%` / `left:50%` centres it on whatever that shape
+happens to be: a one-line rectangle, a two-line title, or a much taller
+diamond. There is no height constant anywhere. An earlier version hung it
+off the list item and needed a magic number that silently broke the moment
+a title wrapped.
 
 **Performance** — ~4 KB of vanilla JS, no framework, no dependency, no
 build step. Inline SVG (two paths per connector, `non-scaling-stroke`,

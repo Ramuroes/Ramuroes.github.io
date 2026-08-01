@@ -19,6 +19,7 @@
 		"detailLabel": { "type": "string", "default": "Details" },
 		"closeLabel": { "type": "string", "default": "Close" },
 		"stepLabel": { "type": "string", "default": "Step" },
+		"aiLegend": { "type": "string", "default": "" },
 		"density": { "type": "string", "default": "comfortable" }
 	},
 	"supports": {

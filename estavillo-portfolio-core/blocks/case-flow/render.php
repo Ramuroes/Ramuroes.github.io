@@ -96,6 +96,7 @@ $es_end     = trim( (string) ( $attributes['endLabel'] ?? '' ) );
 $es_detail  = trim( (string) ( $attributes['detailLabel'] ?? '' ) );
 $es_close   = trim( (string) ( $attributes['closeLabel'] ?? '' ) );
 $es_step_lb = trim( (string) ( $attributes['stepLabel'] ?? '' ) );
+$es_ai_legend = trim( (string) ( $attributes['aiLegend'] ?? '' ) );
 $es_density = sanitize_key( (string) ( $attributes['density'] ?? 'comfortable' ) );
 $es_density = in_array( $es_density, array( 'comfortable', 'compact' ), true ) ? $es_density : 'comfortable';
 
@@ -150,10 +151,6 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 			?>
 			<li class="es-flow__item es-flow__item--<?php echo esc_attr( $es_kind ); ?><?php echo esc_attr( $es_accent ); ?>" data-es-flow-item data-es-flow-index="<?php echo esc_attr( (string) ( $es_i + 1 ) ); ?>">
 
-				<?php if ( $es_i > 0 ) : ?>
-					<div class="es-flow__rail" aria-hidden="true"><?php echo es_flow_connector_svg(); // phpcs:ignore WordPress.Security.EscapeOutput -- SVG del propio plugin, sin dato de usuario. ?></div>
-				<?php endif; ?>
-
 				<div class="es-flow__node">
 					<?php
 					// El trigger es un <button> real sólo si hay detalle que
@@ -166,20 +163,59 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 						: ' class="es-flow__trigger es-flow__trigger--static"';
 					?>
 					<<?php echo $es_tag . $es_attrs; // phpcs:ignore WordPress.Security.EscapeOutput -- tag de whitelist + atributos ya escapados. ?>>
-						<span class="es-flow__shape" aria-hidden="true"></span>
+						<?php
+						// LA FORMA ES LA CAJA. Igual que en el diagrama de
+						// referencia: pastilla (inicio/fin), rectángulo (paso)
+						// o rombo (decisión) con el título ADENTRO; la
+						// descripción va afuera, debajo, en tinta apagada.
+						?>
+						<span class="es-flow__shape">
+							<?php if ( $es_i > 0 ) : ?>
+								<?php
+								/*
+								 * El conector es hijo de LA FORMA, no del <li>. Así queda
+								 * centrado sobre la forma por CSS puro (top:50% / left:50%)
+								 * sin ningún número mágico, y sigue estando bien tanto en un
+								 * rectángulo de una línea como en un rombo mucho más alto o
+								 * en un título que envuelve a dos líneas. Cuando colgaba del
+								 * <li> había que adivinar la altura y se desalineaba.
+								 */
+								$es_edge = trim( (string) ( $es_node['edgeLabel'] ?? '' ) );
+								?>
+								<span class="es-flow__rail" aria-hidden="true">
+									<?php echo es_flow_connector_svg(); // phpcs:ignore WordPress.Security.EscapeOutput -- SVG del propio plugin, sin dato de usuario. ?>
+								</span>
+								<?php if ( '' !== $es_edge ) : ?>
+									<?php
+									/*
+									 * La etiqueta de la flecha es hermana del riel, no hija:
+									 * el riel está centrado verticalmente sobre la forma, así
+									 * que cualquier cosa adentro caía ENCIMA de la caja. Como
+									 * hija de la forma puede colocarse arriba de ella y no
+									 * pisa ni el número ni el título.
+									 */
+									?>
+									<span class="es-flow__edge"><?php echo esc_html( $es_edge ); ?></span>
+								<?php endif; ?>
+							<?php endif; ?>
+							<span class="es-flow__shape-inner">
+								<?php if ( '' !== $es_num ) : ?>
+									<span class="es-flow__num">
+										<?php if ( '' !== $es_step_lb ) : ?>
+											<span class="es-visually-hidden"><?php echo esc_html( $es_step_lb ); ?> </span>
+										<?php endif; ?>
+										<?php echo esc_html( $es_num ); ?>
+									</span>
+								<?php endif; ?>
+								<span class="es-flow__title"><?php echo wp_kses_post( $es_title ); ?></span>
+							</span>
+							<?php if ( ! empty( $es_node['ai'] ) ) : ?>
+								<?php // Marcador (IA) del diagrama de referencia: punto donde interviene el asistente. La leyenda al pie lo explica una sola vez. ?>
+								<span class="es-flow__ai" title="<?php echo esc_attr( $es_ai_legend ); ?>"><span class="es-visually-hidden"><?php echo esc_html( $es_ai_legend ); ?></span><span aria-hidden="true">IA</span></span>
+							<?php endif; ?>
+						</span>
 
 						<span class="es-flow__body">
-							<?php if ( '' !== $es_num ) : ?>
-								<span class="es-flow__num">
-									<?php if ( '' !== $es_step_lb ) : ?>
-										<span class="es-visually-hidden"><?php echo esc_html( $es_step_lb ); ?> </span>
-									<?php endif; ?>
-									<?php echo esc_html( $es_num ); ?>
-								</span>
-							<?php endif; ?>
-
-							<span class="es-flow__title"><?php echo wp_kses_post( $es_title ); ?></span>
-
 							<?php if ( '' !== $es_text ) : ?>
 								<span class="es-flow__text"><?php echo wp_kses_post( $es_text ); ?></span>
 							<?php endif; ?>
@@ -227,5 +263,20 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 
 	<?php if ( '' !== $es_end ) : ?>
 		<p class="es-flow__marker es-flow__marker--end"><span><?php echo esc_html( $es_end ); ?></span></p>
+	<?php endif; ?>
+
+	<?php
+	// Leyenda del marcador (IA), una sola vez al pie — igual que el diagrama
+	// de referencia. Sólo se imprime si algún nodo realmente lo usa.
+	$es_uses_ai = false;
+	foreach ( $es_nodes as $es_n ) {
+		if ( ! empty( $es_n['ai'] ) ) {
+			$es_uses_ai = true;
+			break;
+		}
+	}
+	?>
+	<?php if ( $es_uses_ai && '' !== $es_ai_legend ) : ?>
+		<p class="es-flow__legend"><span class="es-flow__ai es-flow__ai--legend" aria-hidden="true">IA</span> <?php echo esc_html( $es_ai_legend ); ?></p>
 	<?php endif; ?>
 </div>
