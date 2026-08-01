@@ -220,5 +220,28 @@ function es_child_enqueue_assets() {
 	if ( es_is_case_study_single() ) {
 		wp_enqueue_style( 'es-case-study', ES_CHILD_URI . '/assets/css/case-study.css', array( 'es-site' ), es_asset_ver( 'assets/css/case-study.css' ) );
 	}
+
+	/*
+	 * Case Flow (.es-flow): componente del design system, no exclusivo del
+	 * Case Study — puede vivir en cualquier página con contenido Gutenberg
+	 * (roadmap: User Journey, Service Blueprint, System Diagram...). Por eso
+	 * la condición no es "¿es un case study?" sino has_block(): se carga
+	 * exactamente donde el bloque está y en ningún otro lado, sin importar
+	 * la plantilla. El JS es 100% opcional (progressive enhancement — ver el
+	 * docblock de case-flow.js): si no cargara, el flujo se sigue leyendo.
+	 */
+	if ( is_singular() && has_block( 'estavillo/case-flow' ) ) {
+		wp_enqueue_style( 'es-case-flow', ES_CHILD_URI . '/assets/css/case-flow.css', array( 'es-components' ), es_asset_ver( 'assets/css/case-flow.css' ) );
+		wp_enqueue_script(
+			'es-case-flow',
+			ES_CHILD_URI . '/assets/js/case-flow.js',
+			array(),
+			es_asset_ver( 'assets/js/case-flow.js' ),
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'es_child_enqueue_assets' );

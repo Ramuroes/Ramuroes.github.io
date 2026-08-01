@@ -1,0 +1,728 @@
+/* =========================================================================
+   ESTAVILLO — Case Flow (.es-flow)
+   -------------------------------------------------------------------------
+   Componente de flujo de proceso del design system. Lo emite el bloque
+   estavillo/case-flow (plugin) — este archivo es la ÚNICA fuente de su
+   presentación, igual que case-study.css es la de .es-case-*.
+
+   MOBILE-FIRST DE VERDAD, no un desktop encogido: el layout base (sin
+   media query) es la narrativa editorial vertical — una tarjeta por paso,
+   columna de marcador a la izquierda con el riel vertical, indicador de
+   progreso sticky, detalle desplegable a lo alto. El flujo horizontal con
+   popovers recién aparece en >=1024px, donde hay ancho real para leerlo.
+   Es el mismo criterio de dos columnas marcador/cuerpo que ya usa
+   .es-process-detail (pages.css) en How I Work — no un lenguaje nuevo.
+
+   TOKENS: 100% var(--es-*) de tokens.css. Ni un color, radio, tipografía
+   o duración literal. 'signal' (verde) y 'decision' (naranja) son los
+   tokens semánticos de diagrama que la marca ya define — verde = camino
+   del sistema, naranja = el punto de juicio humano.
+
+   PROGRESSIVE ENHANCEMENT: por defecto (sin JS) los paneles de detalle
+   son bloques estáticos visibles — el flujo entero se lee. El JS agrega
+   .is-enhanced al contenedor y recién ahí se vuelven colapsables/popover.
+   Todo lo que esconde contenido está bajo .is-enhanced, nunca en la base.
+   ========================================================================= */
+
+.es-flow {
+	--es-flow-shape: 13px;
+	--es-flow-gutter: 34px;
+	--es-flow-gap: 28px;
+	--es-flow-node-bg: var(--es-surface);
+	--es-flow-node-line: var(--es-line);
+	--es-flow-mark: var(--es-ink-4);
+
+	position: relative;
+	margin: clamp(32px, 4.5vw, 52px) 0;
+	color: var(--es-ink-2);
+}
+
+.es-flow--compact {
+	--es-flow-gap: 18px;
+}
+
+/* ---------- marcadores de inicio / fin ---------- */
+
+.es-flow__marker {
+	margin: 0;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	font-weight: 500;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+}
+
+.es-flow__marker span {
+	display: inline-flex;
+	align-items: center;
+	gap: 9px;
+	padding: 7px 13px;
+	border: 1px solid var(--es-line);
+	border-radius: 999px;
+	background: var(--es-paper-2);
+}
+
+.es-flow__marker span::before {
+	content: '';
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--es-signal);
+}
+
+.es-flow__marker--end span::before {
+	background: var(--es-ink-4);
+}
+
+.es-flow__marker--start {
+	margin-bottom: var(--es-flow-gap);
+}
+
+.es-flow__marker--end {
+	margin-top: var(--es-flow-gap);
+}
+
+/* ---------- indicador de progreso (sólo mobile) ----------
+   sticky respecto al viewport: .es-flow no declara overflow, así que
+   ningún ancestro del componente rompe el sticky (misma lección que el
+   bug de .es-page → ver base.css). */
+
+.es-flow__progress {
+	position: sticky;
+	top: 76px;
+	z-index: 2;
+	width: max-content;
+	margin: 0 0 14px;
+	padding: 5px 11px;
+	border: 1px solid var(--es-line);
+	border-radius: 999px;
+	background: var(--es-paper-2);
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	color: var(--es-ink-3);
+}
+
+.es-flow__progress-current {
+	color: var(--es-ink);
+}
+
+.es-flow__progress-sep {
+	margin: 0 2px;
+	color: var(--es-ink-4);
+}
+
+/* ---------- track ---------- */
+
+.es-flow__track {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--es-flow-gap);
+}
+
+.es-flow__item {
+	position: relative;
+	display: grid;
+	grid-template-columns: var(--es-flow-gutter) minmax(0, 1fr);
+	align-items: start;
+}
+
+/* ---------- riel + conector SVG ----------
+   El svg trae los dos paths (horizontal y vertical) y cada layout muestra
+   el suyo: un solo markup sirve para los dos ejes, siempre vectorial. */
+
+.es-flow__rail {
+	position: absolute;
+	left: 0;
+	bottom: 100%;
+	width: var(--es-flow-gutter);
+	height: var(--es-flow-gap);
+	pointer-events: none;
+}
+
+.es-flow__connector {
+	display: block;
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+}
+
+.es-flow__line,
+.es-flow__head {
+	fill: none;
+	stroke: var(--es-line-strong);
+	stroke-width: 1.25;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+/* base (mobile) = eje vertical */
+.es-flow__line--h,
+.es-flow__head--h {
+	display: none;
+}
+
+/* “las líneas se dibujan una vez al cargar” — una sola pasada, sin loop */
+.es-flow__line {
+	stroke-dasharray: 100;
+	stroke-dashoffset: 100;
+	animation: es-flow-draw var(--es-dur-slow) var(--es-ease) forwards;
+}
+
+.es-flow__head {
+	opacity: 0;
+	animation: es-flow-fade var(--es-dur) var(--es-ease) var(--es-dur-fast) forwards;
+}
+
+@keyframes es-flow-draw {
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+@keyframes es-flow-fade {
+	to {
+		opacity: 1;
+	}
+}
+
+/* ---------- nodo ---------- */
+
+.es-flow__node {
+	position: relative;
+	grid-column: 2;
+}
+
+.es-flow__trigger {
+	position: relative;
+	/* flex-column, no 'block': el contenido de un <button> se centra
+	   verticalmente por defecto, y con la tarjeta estirada en la grilla de
+	   desktop eso dejaba el texto flotando en el medio con un hueco enorme
+	   arriba y abajo. Con flex-column + justify-content:flex-start el texto
+	   arranca siempre pegado arriba, en las dos orientaciones. */
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	width: 100%;
+	margin: 0;
+	padding: 16px 18px;
+	border: 1px solid var(--es-flow-node-line);
+	border-radius: var(--es-radius);
+	background: var(--es-flow-node-bg);
+	font: inherit;
+	color: inherit;
+	text-align: left;
+	cursor: pointer;
+	transition: border-color var(--es-dur-fast) var(--es-ease),
+		background-color var(--es-dur-fast) var(--es-ease),
+		transform var(--es-dur-fast) var(--es-ease);
+}
+
+.es-flow__trigger--static {
+	cursor: default;
+}
+
+/* la forma vive en la columna del marcador, alineada con el riel */
+.es-flow__shape {
+	position: absolute;
+	top: 22px;
+	left: calc(var(--es-flow-gutter) * -1);
+	width: var(--es-flow-shape);
+	height: var(--es-flow-shape);
+	border: 1.5px solid var(--es-flow-mark);
+	border-radius: 50%;
+	background: var(--es-paper);
+	transform: translateX(calc(var(--es-flow-gutter) / 2 - var(--es-flow-shape) / 2));
+	transition: border-color var(--es-dur-fast) var(--es-ease),
+		background-color var(--es-dur-fast) var(--es-ease);
+}
+
+/* decisión = rombo (cuadrado rotado), no un círculo más */
+.es-flow__item--decision .es-flow__shape {
+	border-radius: 2px;
+	transform: translateX(calc(var(--es-flow-gutter) / 2 - var(--es-flow-shape) / 2)) rotate(45deg);
+}
+
+.es-flow__item--start .es-flow__shape,
+.es-flow__item--end .es-flow__shape {
+	background: var(--es-flow-mark);
+}
+
+.es-flow__item--milestone .es-flow__shape {
+	border-radius: 3px;
+}
+
+/* acentos semánticos — tokens de diagrama ya existentes */
+.es-flow__item.is-accent-signal {
+	--es-flow-mark: var(--es-signal);
+}
+
+.es-flow__item.is-accent-decision {
+	--es-flow-mark: var(--es-decision);
+}
+
+.es-flow__item.is-accent-muted {
+	--es-flow-mark: var(--es-ink-4);
+	color: var(--es-ink-3);
+}
+
+.es-flow__item--decision {
+	--es-flow-mark: var(--es-decision);
+}
+
+/* ---------- contenido del nodo ---------- */
+
+.es-flow__body {
+	display: block;
+}
+
+.es-flow__num {
+	display: block;
+	margin-bottom: 6px;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	font-weight: 500;
+	letter-spacing: 0.18em;
+	color: var(--es-flow-mark);
+}
+
+.es-flow__title {
+	display: block;
+	font-family: var(--es-sans);
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.35;
+	color: var(--es-ink);
+}
+
+.es-flow__text {
+	display: block;
+	margin-top: 6px;
+	font-size: 13.5px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+}
+
+.es-flow__more {
+	display: none; /* sólo aparece cuando el JS convierte el panel en popover/acordeón */
+	margin-top: 10px;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+	transition: color var(--es-dur-fast) var(--es-ease);
+}
+
+/* ---------- ramas de una decisión (estructura, siempre visibles) ---------- */
+
+.es-flow__branches {
+	list-style: none;
+	margin: 10px 0 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.es-flow__branch {
+	display: flex;
+	align-items: baseline;
+	gap: 10px;
+	padding: 9px 12px;
+	border: 1px dashed var(--es-line);
+	border-radius: var(--es-radius-sm);
+	background: var(--es-paper-2);
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.es-flow__branch-label {
+	flex: none;
+	font-family: var(--es-mono);
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--es-decision);
+}
+
+.es-flow__branch-text {
+	color: var(--es-ink-3);
+}
+
+/* ---------- panel de detalle ----------
+   BASE = visible y estático: esto es lo que ve alguien sin JS. */
+
+.es-flow__panel {
+	margin-top: 12px;
+	padding: 14px 16px;
+	border: 1px solid var(--es-line);
+	border-radius: var(--es-radius-sm);
+	background: var(--es-paper-2);
+}
+
+.es-flow__detail {
+	margin: 0;
+	display: grid;
+	gap: 10px;
+}
+
+.es-flow__detail dt {
+	font-family: var(--es-mono);
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--es-flow-mark);
+}
+
+.es-flow__detail dd {
+	margin: 3px 0 0;
+	font-size: 13.5px;
+	line-height: 1.6;
+	color: var(--es-ink-2);
+}
+
+.es-flow__close {
+	display: none; /* sólo con JS */
+	margin-top: 12px;
+	padding: 7px 12px;
+	border: 1px solid var(--es-line-strong);
+	border-radius: 999px;
+	background: transparent;
+	font-family: var(--es-mono);
+	font-size: 10px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--es-ink-3);
+	cursor: pointer;
+	transition: color var(--es-dur-fast) var(--es-ease), border-color var(--es-dur-fast) var(--es-ease);
+}
+
+.es-flow__close:hover,
+.es-flow__close:focus-visible {
+	color: var(--es-accent);
+	border-color: var(--es-accent);
+}
+
+/* =========================================================================
+   ENHANCED — a partir de acá manda el JS (.is-enhanced)
+   ========================================================================= */
+
+.es-flow.is-enhanced .es-flow__more {
+	display: block;
+}
+
+.es-flow.is-enhanced .es-flow__close {
+	display: inline-block;
+}
+
+/* mobile: el panel se colapsa como acordeón (no popover) */
+.es-flow.is-enhanced .es-flow__panel {
+	display: none;
+}
+
+.es-flow.is-enhanced .es-flow__item.is-open .es-flow__panel {
+	display: block;
+	animation: es-flow-in var(--es-dur) var(--es-ease) both;
+}
+
+@keyframes es-flow-in {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+.es-flow.is-enhanced .es-flow__trigger:hover,
+.es-flow.is-enhanced .es-flow__trigger:focus-visible {
+	border-color: var(--es-line-strong);
+	background: var(--es-surface-2);
+}
+
+.es-flow.is-enhanced .es-flow__trigger:hover .es-flow__more,
+.es-flow.is-enhanced .es-flow__trigger:focus-visible .es-flow__more {
+	color: var(--es-accent);
+}
+
+.es-flow.is-enhanced .es-flow__item.is-open .es-flow__trigger {
+	border-color: var(--es-flow-mark);
+}
+
+.es-flow.is-enhanced .es-flow__item.is-open .es-flow__shape {
+	background: var(--es-flow-mark);
+	border-color: var(--es-flow-mark);
+}
+
+/* foco de teclado: el mismo anillo verde del resto del sitio (base.css) */
+.es-flow__trigger:focus-visible,
+.es-flow__close:focus-visible {
+	outline: 2px solid var(--es-accent);
+	outline-offset: 3px;
+}
+
+/* =========================================================================
+   TABLET (>=680px) — misma narrativa vertical, más aire y medida de lectura
+   ========================================================================= */
+
+@media (min-width: 680px) {
+	.es-flow {
+		--es-flow-gutter: 44px;
+		--es-flow-gap: 30px;
+	}
+
+	.es-flow__title {
+		font-size: 16px;
+	}
+
+	.es-flow__branches {
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+
+	.es-flow__branch {
+		flex: 1 1 220px;
+	}
+}
+
+/* =========================================================================
+   DESKTOP (>=1024px) — flujo horizontal con popovers
+   ========================================================================= */
+
+@media (min-width: 1024px) {
+	.es-flow {
+		--es-flow-gap: 0px;
+		--es-flow-col: 26px; /* ancho del conector entre nodos */
+	}
+
+	/* el progreso 01/08 es una affordance de scroll mobile: no aplica acá */
+	.es-flow__progress {
+		display: none;
+	}
+
+	/* Grilla, no una fila con scroll: un flujo de 6-9 pasos entra ENTERO en
+	   el ancho editorial repartido en filas de 3/4, y se lee de un vistazo.
+	   Una fila con overflow-x escondería la mitad del proceso detrás de un
+	   gesto de scroll — "desktop presenta el proceso con claridad" pesa más
+	   que la pureza de una sola línea horizontal. Sin overflow en ningún
+	   eje: cero riesgo de overflow horizontal de página. */
+	.es-flow__track {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 26px var(--es-flow-col);
+		/* cada tarjeta con su altura natural y todas alineadas arriba: con
+		   'stretch' un nodo de decisión (que suma sus ramas debajo) estiraba
+		   toda la fila y los pasos quedaban como cajas casi vacías. */
+		align-items: start;
+	}
+
+	.es-flow__item {
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+	}
+
+	/* El conector entra en el gap de la grilla, a la izquierda del nodo.
+	   El primero de cada fila no lleva (no viene de su izquierda), así el
+	   salto de fila se lee limpio. */
+	.es-flow__item:nth-child(3n + 1) .es-flow__rail {
+		display: none;
+	}
+
+	/* Riel horizontal en el gap de la grilla. La ALTURA importa: la línea
+	   se dibuja al 50% del svg, así que height debe ser exactamente el
+	   doble del centro de la forma (8px + 13px/2 ≈ 14.5px) para que línea
+	   y nodo queden sobre el mismo eje. Con height:30px la línea caía 15px
+	   arriba del centro real y el spine se leía como guiones sueltos. */
+	.es-flow__rail {
+		left: calc(var(--es-flow-col) * -1);
+		bottom: auto;
+		top: 0;
+		width: var(--es-flow-col);
+		height: 29px;
+	}
+
+	.es-flow__line--v,
+	.es-flow__head--v {
+		display: none;
+	}
+
+	.es-flow__line--h,
+	.es-flow__head--h {
+		display: block;
+	}
+
+	.es-flow__node {
+		grid-column: auto;
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		padding-top: 30px; /* deja el carril de las formas arriba */
+	}
+
+	/* En horizontal la forma va ARRIBA de la tarjeta, sobre la línea del
+	   conector. OJO con el sistema de referencia: .es-flow__shape vive
+	   DENTRO del <button>, así que su containing block es la tarjeta, no
+	   el nodo — por eso el valor es negativo. Con top:-22px el centro de
+	   la forma queda en (top de la tarjeta - 15.5px) = (top del item +
+	   14.5px), exactamente el centro del riel de 29px. Un valor positivo
+	   la metía adentro de la tarjeta y desalineaba todo el spine. */
+	.es-flow__shape {
+		top: -22px;
+		left: 0;
+		transform: none;
+	}
+
+	.es-flow__item--decision .es-flow__shape {
+		transform: rotate(45deg);
+	}
+
+	.es-flow__trigger {
+		padding: 15px 16px;
+	}
+
+	/* El flujo termina arriba a la derecha (último nodo de la última fila),
+	   así que el marcador de fin acompaña ahí: alineado a la izquierda
+	   quedaba debajo del nodo 05 y contradecía la lectura del recorrido. */
+	.es-flow__marker--end {
+		text-align: right;
+	}
+
+	.es-flow.is-enhanced .es-flow__trigger:hover,
+	.es-flow.is-enhanced .es-flow__trigger:focus-visible {
+		transform: translateY(-2px);
+	}
+
+	.es-flow__title {
+		font-size: 14.5px;
+	}
+
+	.es-flow__text {
+		font-size: 12.5px;
+	}
+
+	.es-flow__branches {
+		flex-direction: column;
+		gap: 6px;
+		margin-top: 8px;
+	}
+
+	.es-flow__branch {
+		flex: none;
+		flex-direction: column;
+		gap: 3px;
+		padding: 7px 10px;
+		font-size: 12px;
+	}
+
+	/* --- POPOVER --- */
+	.es-flow.is-enhanced .es-flow__panel {
+		position: absolute;
+		top: calc(100% + 10px);
+		left: 50%;
+		z-index: 5;
+		width: max-content;
+		max-width: min(320px, 78vw);
+		/* --es-flow-shift lo escribe el JS para que el popover nunca se
+		   salga del viewport (clamp real, no una apuesta de CSS). */
+		transform: translateX(calc(-50% + var(--es-flow-shift, 0px)));
+		border-color: var(--es-line-strong);
+		background: var(--es-surface);
+		box-shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.75);
+	}
+
+	/* Reveal corto a propósito: un popover de hover con los 0.4s de --es-dur
+	   se siente lento y se lo ve "lavado" mientras entra. --es-dur-fast es
+	   el token pensado justo para microinteracciones como esta. */
+	.es-flow.is-enhanced .es-flow__item.is-open .es-flow__panel {
+		animation: es-flow-pop var(--es-dur-fast) var(--es-ease) both;
+	}
+
+	/* pico del popover */
+	.es-flow.is-enhanced .es-flow__panel::before {
+		content: '';
+		position: absolute;
+		bottom: 100%;
+		left: calc(50% - 5px - var(--es-flow-shift, 0px));
+		border: 5px solid transparent;
+		border-bottom-color: var(--es-line-strong);
+	}
+
+	@keyframes es-flow-pop {
+		from {
+			opacity: 0;
+			transform: translateX(calc(-50% + var(--es-flow-shift, 0px))) translateY(-5px);
+		}
+		to {
+			opacity: 1;
+			transform: translateX(calc(-50% + var(--es-flow-shift, 0px))) translateY(0);
+		}
+	}
+
+	/* el último nodo abre el popover hacia arriba si no hay aire abajo */
+	.es-flow.is-enhanced .es-flow__item.is-flip .es-flow__panel {
+		top: auto;
+		bottom: calc(100% + 10px);
+	}
+
+	.es-flow.is-enhanced .es-flow__item.is-flip .es-flow__panel::before {
+		bottom: auto;
+		top: 100%;
+		border-bottom-color: transparent;
+		border-top-color: var(--es-line-strong);
+	}
+}
+
+/* =========================================================================
+   DESKTOP ANCHO (>=1280px) — 4 por fila
+   ========================================================================= */
+
+@media (min-width: 1280px) {
+	.es-flow__track {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+
+	/* se recalcula cuál es el primero de cada fila */
+	.es-flow__item:nth-child(3n + 1) .es-flow__rail {
+		display: block;
+	}
+
+	.es-flow__item:nth-child(4n + 1) .es-flow__rail {
+		display: none;
+	}
+}
+
+/* =========================================================================
+   REDUCED MOTION — se apaga todo lo animado, nada de contenido se pierde
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+	.es-flow__line {
+		stroke-dasharray: none;
+		stroke-dashoffset: 0;
+		animation: none;
+	}
+
+	.es-flow__head {
+		opacity: 1;
+		animation: none;
+	}
+
+	.es-flow.is-enhanced .es-flow__item.is-open .es-flow__panel {
+		animation: none;
+	}
+
+	.es-flow.is-enhanced .es-flow__trigger:hover,
+	.es-flow.is-enhanced .es-flow__trigger:focus-visible {
+		transform: none;
+	}
+}

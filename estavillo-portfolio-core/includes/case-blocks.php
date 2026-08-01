@@ -56,6 +56,7 @@ function es_case_blocks_list() {
 		'case-status',
 		'case-quote',
 		'case-details',
+		'case-flow',
 	);
 }
 
@@ -138,6 +139,7 @@ function es_case_blocks_editor_theme_css() {
 	$theme_css = array(
 		'es-editor-tokens'     => 'assets/css/tokens.css',
 		'es-editor-case-study' => 'assets/css/case-study.css',
+		'es-editor-case-flow'  => 'assets/css/case-flow.css',
 	);
 
 	foreach ( $theme_css as $handle => $rel ) {

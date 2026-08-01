@@ -109,7 +109,7 @@ entradas de contenido más el póster están genuinamente pendientes, no
 | 5 | `trazur-wireframe-baja-fidelidad-inscripcion` | `#prototipado` | Wireframe Balsamiq, pantalla de inscripción | Ninguna — wireframe sin datos reales. |
 | 6 | `trazur-wireframe-media-fidelidad-cursado` | `#prototipado` | Wireframe Relume, pantalla de cursado | Ninguna. |
 | 7 | `trazur-mockup-alta-fidelidad-confirmacion` | `#prototipado` | Mockup hi-fi, confirmación de curso aprobado (misma imagen usada como hero — ver nota abajo) | Usar datos de ejemplo/semilla (nombre, % de progreso), no datos de un alumno real. |
-| 8 | `trazur-flujo-ideal` | `#propuesta` | Diagrama de flujo ideal propuesto | Ninguna. |
+| ~~8~~ | ~~`trazur-flujo-ideal`~~ | `#propuesta` | **Ya no hace falta imagen** — el flujo ideal ahora es el componente interactivo `estavillo/case-flow`, editable desde Gutenberg (ver `docs/CASE-FLOW.md`). | — |
 | 9 | *(imagen destacada nativa, no está en el cuerpo)* | Hero | Composición mano + celular + vaca (mismo mockup hi-fi que #7) | Igual que #7. |
 | — | Póster (`trazur-poster-tdg-2025.pdf`) | `#poster` (botón) | Póster oficial del Trabajo de Grado | Revisar que no incluya datos internos sensibles antes de subirlo a la Biblioteca de medios. |
 
@@ -168,9 +168,14 @@ explícitamente:
 - Ningún hallazgo, herramienta, meta, dato de persona, etapa del
   journey o próximo paso del PDF fue eliminado — todo está representado
   en algún capítulo.
-- Journey Map y Flujo ideal se mantienen como imagen (`case-figure`,
-  variante `wide`) — no se reconstruyeron en HTML, según la política de
-  imágenes aprobada.
+- El **Journey Map** se mantiene como imagen (`case-figure`, variante
+  `wide`) — no se reconstruyó en HTML, según la política de imágenes
+  aprobada.
+- El **Flujo ideal** SÍ se reconstruyó: dejó de ser un `case-figure`
+  pendiente y pasó a ser el bloque interactivo `estavillo/case-flow`
+  (nodos, decisiones, ramas y popovers editables desde Gutenberg). Esto
+  revierte a propósito, y sólo para este diagrama, la política anterior
+  de "todo diagrama es una imagen" — ver `docs/CASE-FLOW.md`.
 
 ---
 

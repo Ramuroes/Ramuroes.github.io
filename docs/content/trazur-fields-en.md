@@ -105,7 +105,7 @@ pending here beyond what `trazur-fields-es.md` already lists.
 | 5 | `trazur-wireframe-baja-fidelidad-inscripcion` | `#prototyping` | Pending | None — wireframe, no real data. |
 | 6 | `trazur-wireframe-media-fidelidad-cursado` | `#prototyping` | Pending | None. |
 | 7 | `trazur-mockup-alta-fidelidad-confirmacion` | `#prototyping` | Pending | Use seeded/example data (name, progress %), not a real learner's data. Same image proposed for the hero — see note below. |
-| 8 | `trazur-flujo-ideal` | `#proposal` | Pending | None. |
+| ~~8~~ | ~~`trazur-flujo-ideal`~~ | `#proposal` | **No image needed anymore** — the ideal flow is now the interactive `estavillo/case-flow` block, editable in Gutenberg (see `docs/CASE-FLOW.md`). | — |
 | 9 | *(native featured image, not in the body)* | Hero | Pending | Same as #7 — same source photo reused for the hero, as in the Spanish version. |
 | — | Poster (`trazur-poster-tdg-2025.pdf`) | `#poster` (button) | Pending | Review for sensitive internal data before uploading. If the poster itself is only in Spanish, decide whether an English case should link to it as-is or need its own version — flagged below. |
 

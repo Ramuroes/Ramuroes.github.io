@@ -1,0 +1,31 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/case-flow",
+	"title": "Case Flow",
+	"category": "estavillo-case",
+	"icon": "randomize",
+	"description": "Flujo de proceso interactivo y editable (.es-flow): nodos, decisiones, ramas, conectores SVG y popovers editoriales. Sirve para Process Flow, User Journey, Service Blueprint, Decision Tree, IA Workflow y System Diagram — la forma la define el dato, no el markup.",
+	"keywords": [ "estavillo", "flow", "flujo", "process", "journey", "blueprint", "decision", "diagram" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"nodes": {
+			"type": "array",
+			"default": [],
+			"items": { "type": "object" }
+		},
+		"startLabel": { "type": "string", "default": "" },
+		"endLabel": { "type": "string", "default": "" },
+		"detailLabel": { "type": "string", "default": "Details" },
+		"closeLabel": { "type": "string", "default": "Close" },
+		"stepLabel": { "type": "string", "default": "Step" },
+		"density": { "type": "string", "default": "comfortable" }
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-case-block-case-flow",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}
