@@ -849,12 +849,26 @@
 	max-width: 66ch;
 }
 
-/* ---------- decision cards (evidencia / trade-off / resultado) ---------- */
+/* ---------- decision cards (hallazgo → decisión de diseño) ----------
+   Cada card es un razonamiento en dos pasos, no una fila de tabla: antes
+   el hallazgo y la decisión compartían un único <dl> de dos columnas
+   (auto 1fr — label angosta a la izquierda, texto a la derecha), así que
+   "Hallazgo" y "Decisión de diseño" quedaban con el mismo peso visual y
+   el párrafo se leía angosto. Ahora son dos <dl> independientes,
+   apilados verticalmente, con un conector entre ambos — el hallazgo se
+   ve como evidencia (label apagada), la decisión se ve como la acción
+   resultante (label en acento, borde izquierdo sutil). El mismo cambio
+   de layout aplica a cualquier instancia del bloque (incluida la de
+   Presupuestador con sus propias etiquetas Task/Reviewed by) — es una
+   corrección de jerarquía, no contenido específico de un caso. */
 
 .es-case__body .es-case-decisions {
 	display: grid;
-	/* auto-fit: 2, 3 o 4 cards llenan la fila — mismo criterio que stats */
-	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	/* 2×2 para las 4 cards típicas de este bloque — compacto y fácil de
+	   escanear, en vez de auto-fit estirando 3-4 cards angostas en una
+	   sola fila. Con un número impar de items (3, Presupuestador) el
+	   último queda solo en su fila, que sigue siendo legible. */
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 1px;
 	background: var(--es-line);
 	border: 1px solid var(--es-line);
@@ -863,10 +877,28 @@
 
 .es-case__body .es-case-decision {
 	background: var(--es-paper-2);
-	padding: clamp(22px, 2.4vw, 28px);
+	padding: clamp(24px, 2.6vw, 32px);
 	display: flex;
 	flex-direction: column;
-	gap: 14px;
+	gap: 16px;
+	transition: box-shadow var(--es-dur-fast) var(--es-ease);
+}
+
+/* Con un número impar de items (Presupuestador, 3) la última card queda
+   sola en la segunda fila: sin esta regla, la celda vacía de al lado
+   mostraba el fondo --es-line del grid como si fuera una card en blanco
+   rota. :last-child:nth-child(odd) matchea sólo cuando el último item
+   es también el impar final de una fila de a 2 — se estira a todo el
+   ancho en vez de dejar un hueco. Con un total par (4, Trazur) nunca
+   aplica, la grilla 2×2 queda intacta. */
+.es-case__body .es-case-decision:last-child:nth-child(odd) {
+	grid-column: 1 / -1;
+}
+
+.es-case__body .es-case-decision__head {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
 }
 
 .es-case__body .es-case-decision__num {
@@ -885,33 +917,112 @@
 	margin: 0;
 }
 
-.es-case__body .es-case-decision__row {
-	display: grid;
-	grid-template-columns: auto 1fr;
-	gap: 6px 12px;
+.es-case__body .es-case-decision__pair {
 	margin: 0;
 	font-size: 13.5px;
-	line-height: 1.5;
+	line-height: 1.6;
+	max-width: 46ch;
 }
 
-.es-case__body .es-case-decision__row dt {
+.es-case__body .es-case-decision__pair dt {
 	font-family: var(--es-mono);
 	font-size: 10px;
-	font-weight: 500;
-	letter-spacing: 0.06em;
+	font-weight: 600;
+	letter-spacing: 0.1em;
 	text-transform: uppercase;
-	color: var(--es-ink-4);
-	padding-top: 2px;
+	margin: 0 0 6px;
 }
 
-.es-case__body .es-case-decision__row dd {
+.es-case__body .es-case-decision__pair dd {
 	margin: 0;
+}
+
+/* hallazgo — evidencia: label apagada, texto secundario */
+.es-case__body .es-case-decision__pair--finding dt {
+	color: var(--es-ink-4);
+}
+
+.es-case__body .es-case-decision__pair--finding dd {
+	color: var(--es-ink-3);
+}
+
+/* decisión — la acción resultante: label en acento, texto más fuerte que
+   el hallazgo, borde izquierdo sutil (nunca una superficie rellena — eso
+   se vería como un botón/CTA, no como texto). */
+.es-case__body .es-case-decision__pair--decision {
+	padding-left: 12px;
+	border-left: 2px solid var(--es-accent);
+}
+
+.es-case__body .es-case-decision__pair--decision dt {
+	color: var(--es-accent);
+}
+
+.es-case__body .es-case-decision__pair--decision dd {
 	color: var(--es-ink-2);
+}
+
+/* conector — línea corta con una punta hacia abajo, deliberadamente
+   chico: la jerarquía ya la dan las etiquetas/colores, esto es sólo el
+   gesto "de acá sale esto". Puramente decorativo (aria-hidden en el
+   render), así que no interrumpe la lectura hallazgo → decisión de un
+   lector de pantalla, que ya la tiene por el orden real del DOM. */
+.es-case__body .es-case-decision__connector {
+	position: relative;
+	width: 1px;
+	height: 18px;
+	margin-left: 2px;
+	background: var(--es-line-strong);
+	transition: background-color var(--es-dur-fast) var(--es-ease);
+}
+
+.es-case__body .es-case-decision__connector::after {
+	content: '';
+	position: absolute;
+	left: 50%;
+	bottom: -1px;
+	transform: translateX(-50%);
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	border-top: 5px solid var(--es-line-strong);
+	transition: border-top-color var(--es-dur-fast) var(--es-ease);
+}
+
+/* hover + foco de teclado (card es tabindex="0", mismo patrón que
+   .es-hobby-item / .es-findings__row): refuerza el borde de la card y
+   resalta el conector — nada se mueve, nada se oculta, todo el
+   contenido ya estaba visible. El anillo de foco es el token global
+   (base.css, [tabindex]:focus-visible); acá sólo se agrega el realce. */
+.es-case__body .es-case-decision:hover,
+.es-case__body .es-case-decision:focus-visible {
+	box-shadow: inset 0 0 0 1px var(--es-line-strong);
+}
+
+.es-case__body .es-case-decision:hover .es-case-decision__connector,
+.es-case__body .es-case-decision:focus-visible .es-case-decision__connector {
+	background: var(--es-accent);
+}
+
+.es-case__body .es-case-decision:hover .es-case-decision__connector::after,
+.es-case__body .es-case-decision:focus-visible .es-case-decision__connector::after {
+	border-top-color: var(--es-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-case__body .es-case-decision,
+	.es-case__body .es-case-decision__connector,
+	.es-case__body .es-case-decision__connector::after {
+		transition: none;
+	}
 }
 
 @media (max-width: 767px) {
 	.es-case__body .es-case-decisions {
 		grid-template-columns: 1fr;
+	}
+
+	.es-case__body .es-case-decision__pair {
+		max-width: none;
 	}
 }
 
