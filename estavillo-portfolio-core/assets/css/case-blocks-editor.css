@@ -124,6 +124,13 @@
 	margin: 0 0 14px;
 }
 
+/* fila marcada como no-visible (case-findings-list): atenuada en el
+   editor para que se note que no va a salir en el frontend, sin
+   esconderla del todo — sigue siendo editable. */
+.editor-styles-wrapper .es-caseb-row--hidden {
+	opacity: 0.4;
+}
+
 /* regiones de case-split-content/media: LEGACY (ver case-blocks.php) —
    contorno sutil para que un post viejo con estos bloques siga siendo
    reconocible/editable al abrir en el editor. Contenido nuevo no los usa. */

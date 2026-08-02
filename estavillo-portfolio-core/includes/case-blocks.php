@@ -57,6 +57,7 @@ function es_case_blocks_list() {
 		'case-quote',
 		'case-details',
 		'case-flow',
+		'case-findings-list',
 	);
 }
 
