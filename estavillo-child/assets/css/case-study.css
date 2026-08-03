@@ -104,9 +104,17 @@
 }
 
 /* ---------- hero del caso: grilla editorial 2 columnas en desktop ----------
-   Izquierda: eyebrow/título/extracto/tags/meta, texto siempre alineado a la
+   Izquierda: eyebrow/título/extracto/tags, texto siempre alineado a la
    izquierda (nunca centrado). Derecha: imagen destacada o placeholder.
-   Mobile (<1000px): una sola columna apilada, imagen debajo del texto. */
+   Mobile (<1000px): una sola columna apilada, imagen debajo del texto.
+
+   La metadata del proyecto (Status/Role/Period/Tools) YA NO vive acá
+   adentro — es un bloque hermano después de que esta grilla cierra (ver
+   .es-case__meta-wrap más abajo, y el comentario en el template). Antes
+   vivía dentro de .es-case__hero-content: en mobile eso significaba que
+   el orden real del DOM era texto→METADATA→imagen, así que la imagen
+   quedaba después de todo el bloque técnico. Sacarla de acá es lo que
+   arregla ese orden, estructuralmente — no un truco de CSS. */
 
 .es-case__hero {
 	display: grid;
@@ -133,6 +141,18 @@
 	.es-case__hero-content {
 		max-width: none;
 	}
+
+	/* Las 3 opciones de Hero text width (Editorial/Wide/Full) son una
+	   decisión de DESKTOP — en mobile "diferentes medidas angostas" no
+	   tienen sentido (el ticket lo pide explícito): siempre el ancho
+	   normal de contenido mobile, sin importar cuál esté elegida. Sin
+	   este reset, .es-lead (base.css) le seguiría poniendo max-width:46ch
+	   al extracto acá, más angosto que la columna real en un mobile/
+	   tablet grande (~600-680px) — la misma "columna angosta huérfana"
+	   del bug original, sólo que en mobile en vez de en full-width. */
+	.es-case__excerpt {
+		max-width: none;
+	}
 }
 
 .es-case__kicker {
@@ -154,13 +174,39 @@
 	margin-bottom: 28px;
 }
 
+/* ---------- metadata del proyecto: bloque propio después de la imagen ----------
+   Ya no es hija del hero — ver el comentario arriba de .es-case__hero y el
+   del template. Mismo container que el hero (--es-max-w, vía .es-container
+   en el propio .es-case__meta-wrap), para que el borde izquierdo siga
+   alineado con el título/imagen de arriba en vez de saltar al ancho del
+   cuerpo del caso.
+
+   Desktop: 3 columnas en el orden real del DOM (Status/Role/Period), con
+   Tools ocupando su propia fila completa abajo — no una grilla 4-up ni
+   2×2 teóricamente simétrica, a propósito: Tools es sistemáticamente el
+   campo más largo (una lista de herramientas), y en una columna de 1/4 o
+   1/2 de ancho se ve desproporcionado frente a Status/Role/Period, que
+   son cortos. Con una fila propia a ancho completo, envuelve prolijo sin
+   importar cuántas herramientas tenga la lista. Si falta algún campo
+   (Status/Role/Period son todos opcionales) el resto simplemente se
+   corre a la izquierda — grid-column en vez de grid-template-areas, así
+   no depende de que las 4 claves existan siempre. */
+
+.es-case__meta-wrap {
+	margin: clamp(28px, 4vw, 44px) auto clamp(40px, 5.5vw, 64px);
+}
+
 .es-case__meta {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 20px 32px;
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 22px 32px;
 	margin: 0;
 	border-top: 1px solid var(--es-line);
-	padding-top: 26px;
+	padding-top: 24px;
+}
+
+.es-case__meta-item--tools {
+	grid-column: 1 / -1;
 }
 
 .es-case__meta-item dt {
@@ -177,6 +223,30 @@
 	margin: 0;
 	font-size: 14px;
 	color: var(--es-ink-2);
+}
+
+/* mobile: una columna, cada entrada separada por un divisor sutil (no un
+   hueco enorme) — la primera no lleva borde/padding arriba, ya tiene el
+   de .es-case__meta justo encima. */
+@media (max-width: 999px) {
+	.es-case__meta {
+		grid-template-columns: 1fr;
+		gap: 16px;
+	}
+
+	.es-case__meta-item--tools {
+		grid-column: auto;
+	}
+
+	.es-case__meta-item {
+		padding-top: 14px;
+		border-top: 1px solid var(--es-line);
+	}
+
+	.es-case__meta-item:first-child {
+		padding-top: 0;
+		border-top: 0;
+	}
 }
 
 /* ---------- media (imagen destacada o placeholder): columna derecha del hero ---------- */
@@ -263,6 +333,67 @@
 
 	.es-case__hero--stacked .es-case__hero-media .es-case__media {
 		aspect-ratio: 21 / 9;
+	}
+}
+
+/* ---------- ancho de texto del hero (opt-in, "Hero text width" en el meta box) ----------
+   Independiente del layout de imagen de arriba — se combina con
+   cualquiera de las 4 variantes. 'editorial' no necesita reglas propias
+   (es exactamente el default de .es-case__hero-content, 560px, y el
+   max-width:46ch heredado de .es-lead para el extracto): sigue
+   emitiéndose como clase por prolijidad/uniformidad, pero no hay nada
+   que sobreescribir.
+
+   IMPORTANTE — orden en el archivo: este bloque va DESPUÉS de las
+   variantes de layout de arriba a propósito. .es-case__hero--stacked ya
+   le saca el max-width a .es-case__hero-content con la MISMA
+   especificidad (dos clases) que las reglas de acá abajo — si
+   'stacked' + 'editorial' se combinan, la de acá (más tardía en el
+   archivo) tiene que ganar para que 'editorial' realmente angoste el
+   texto de vuelta. Si este bloque viviera arriba de las variantes,
+   'stacked' ganaría siempre por orden de aparición y 'editorial' nunca
+   podría angostar un hero apilado. */
+
+@media (min-width: 1000px) {
+	/* Sí hace falta esta regla, aunque el VALOR sea igual al default sin
+	   clase: .es-case__hero--stacked .es-case__hero-content ya le pone
+	   max-width:none con la misma especificidad (dos clases) — sin este
+	   override explícito, 'stacked' + 'editorial' combinados ganaban
+	   siempre por 'stacked' (aparece antes en el archivo), y "Editorial"
+	   dejaba de angostar nada en un hero apilado. Confirmado con el
+	   harness: sin esta regla, content quedaba en 1044px en vez de 560. */
+	.es-case__hero--text-editorial .es-case__hero-content {
+		max-width: 560px;
+	}
+
+	.es-case__hero--text-wide .es-case__hero-content {
+		max-width: none;
+	}
+
+	/* ~65-75% de un container de 1140px son ~740-855px; 65ch a este
+	   tamaño de fuente ronda los 520-580px — más angosto que ese cálculo
+	   puramente numérico, pero es la medida que de verdad se sigue
+	   leyendo como un párrafo editorial en vez de una franja de texto
+	   corrida de punta a punta. En un hero split (donde .es-case__hero-
+	   content ya es sólo la mitad del container) el grid track manda de
+	   todos modos vía minmax(0, …) — este tope nunca fuerza overflow. */
+	.es-case__hero--text-wide .es-case__excerpt {
+		max-width: 65ch;
+	}
+
+	.es-case__hero--text-full .es-case__hero-content {
+		max-width: none;
+	}
+
+	/* Full container: el título/tags SÍ van de punta a punta (ya lo hacen
+	   solos en cuanto se libera hero-content, .es-h1 no tiene max-width
+	   propio). El resumen puede — el ticket lo permite explícito — seguir
+	   usando una medida de lectura, más generosa que 'wide', mientras
+	   arranque en el mismo borde izquierdo que el título: nunca un
+	   remanente angosto de la grilla split, sólo una decisión editorial
+	   consciente. */
+	.es-case__hero--text-full .es-case__excerpt {
+		max-width: 75ch;
 	}
 }
 

@@ -38,8 +38,26 @@ function es_case_hero_layout_choices() {
 	return array(
 		'split-right' => __( 'Split — image right (default)', 'estavillo-portfolio-core' ),
 		'split-left'  => __( 'Split — image left', 'estavillo-portfolio-core' ),
-		'compact'     => __( 'Compact — horizontal image, shorter frame', 'estavillo-portfolio-core' ),
-		'stacked'     => __( 'Stacked — text first, image below (full width)', 'estavillo-portfolio-core' ),
+		'compact'     => __( 'Compact — horizontal image, shorter frame (legacy)', 'estavillo-portfolio-core' ),
+		'stacked'     => __( 'Stacked — full-width image', 'estavillo-portfolio-core' ),
+	);
+}
+
+/**
+ * Anchos de texto del hero, independientes del layout de imagen. Un caso
+ * guardado ANTES de que este campo existiera no tiene este meta — el
+ * template (single-es_case_study.php) resuelve ese caso a un default que
+ * depende del hero layout ya guardado, para no cambiarle la composición
+ * visual a un caso publicado sin que nadie lo haya pedido (ver el
+ * comentario junto a $es_hero_text_width en el template).
+ *
+ * @return array<string,string> valor => label legible.
+ */
+function es_case_hero_text_width_choices() {
+	return array(
+		'editorial' => __( 'Editorial — controlled reading measure (default)', 'estavillo-portfolio-core' ),
+		'wide'      => __( 'Wide — title uses most of the container, summary ~65–75%', 'estavillo-portfolio-core' ),
+		'full'      => __( 'Full container — eyebrow, title, summary and tags use the complete width', 'estavillo-portfolio-core' ),
 	);
 }
 
@@ -129,6 +147,15 @@ function es_case_study_render_meta_box( $post ) {
 	if ( ! $hero_layout ) {
 		$hero_layout = 'split-right';
 	}
+	$hero_text_width = get_post_meta( $post->ID, '_es_case_hero_text_width', true );
+	if ( ! array_key_exists( $hero_text_width, es_case_hero_text_width_choices() ) ) {
+		// Mismo fallback que el template del frontend: un caso guardado
+		// antes de que este campo existiera con layout 'stacked' ya
+		// renderizaba el texto sin el tope de 560px (ver CSS) — 'wide' es
+		// el equivalente visual real, no 'editorial'. Cualquier otro
+		// layout SÍ tenía ese tope, así que 'editorial' es su equivalente.
+		$hero_text_width = ( 'stacked' === $hero_layout ) ? 'wide' : 'editorial';
+	}
 	$show_on_home_raw  = get_post_meta( $post->ID, '_es_case_show_on_home', true );
 	$show_on_home      = ( '' === $show_on_home_raw ) ? true : ( '1' === $show_on_home_raw );
 	$featured          = '1' === get_post_meta( $post->ID, '_es_case_featured', true );
@@ -178,6 +205,15 @@ function es_case_study_render_meta_box( $post ) {
 			<?php endforeach; ?>
 		</select>
 		<span class="description"><?php esc_html_e( 'Controls how the title/excerpt block and the featured image are arranged on this case\'s single page. Safe to change any time — no other field is affected.', 'estavillo-portfolio-core' ); ?></span>
+	</p>
+	<p>
+		<label for="es_case_hero_text_width"><strong><?php esc_html_e( 'Hero text width', 'estavillo-portfolio-core' ); ?></strong></label><br>
+		<select id="es_case_hero_text_width" name="es_case_hero_text_width">
+			<?php foreach ( es_case_hero_text_width_choices() as $es_width_key => $es_width_label ) : ?>
+				<option value="<?php echo esc_attr( $es_width_key ); ?>" <?php selected( $hero_text_width, $es_width_key ); ?>><?php echo esc_html( $es_width_label ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<span class="description"><?php esc_html_e( 'Independent from Hero layout above — this only controls how wide the eyebrow/title/summary/tags block reads, not where the image sits. "Wide" is the recommended choice together with the "Stacked — full-width image" hero layout.', 'estavillo-portfolio-core' ); ?></span>
 	</p>
 	<p>
 		<label>
@@ -240,6 +276,18 @@ function es_save_case_study_meta( $post_id ) {
 			$es_hero_layout_choice = 'split-right';
 		}
 		update_post_meta( $post_id, '_es_case_hero_layout', $es_hero_layout_choice );
+	}
+
+	// Mismo criterio whitelist-o-default que hero_layout arriba. El
+	// fallback que depende del layout (para posts guardados ANTES de que
+	// este campo existiera) vive en el template del frontend, no acá: acá
+	// el <select> siempre manda un valor explícito al guardar.
+	if ( isset( $_POST['es_case_hero_text_width'] ) ) {
+		$es_hero_text_width_choice = sanitize_key( wp_unslash( $_POST['es_case_hero_text_width'] ) );
+		if ( ! array_key_exists( $es_hero_text_width_choice, es_case_hero_text_width_choices() ) ) {
+			$es_hero_text_width_choice = 'editorial';
+		}
+		update_post_meta( $post_id, '_es_case_hero_text_width', $es_hero_text_width_choice );
 	}
 
 	update_post_meta( $post_id, '_es_case_show_on_home', isset( $_POST['es_case_show_on_home'] ) ? '1' : '0' );

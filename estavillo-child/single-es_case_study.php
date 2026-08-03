@@ -74,12 +74,17 @@ if ( function_exists( 'wp_body_open' ) ) {
 				$es_case_tags = array();
 			}
 
+			// Orden pedido: Status, Role, Period, Tools — Tools al final
+			// porque es sistemáticamente el campo más largo (una lista de
+			// herramientas), así que le conviene ser el último en leerse y,
+			// en desktop, el que ocupa la fila propia de la grilla (ver
+			// .es-case__meta en case-study.css).
 			$es_case_meta = array_filter(
 				array(
 					'status' => get_post_meta( $es_case_id, '_es_case_label', true ),
 					'role'   => get_post_meta( $es_case_id, '_es_case_role', true ),
-					'tools'  => get_post_meta( $es_case_id, '_es_case_tools', true ),
 					'period' => get_post_meta( $es_case_id, '_es_case_period', true ),
+					'tools'  => get_post_meta( $es_case_id, '_es_case_tools', true ),
 				)
 			);
 
@@ -87,6 +92,29 @@ if ( function_exists( 'wp_body_open' ) ) {
 			// suma clase modificadora — cero riesgo para casos ya publicados.
 			$es_hero_layout       = get_post_meta( $es_case_id, '_es_case_hero_layout', true );
 			$es_hero_layout_class = ( $es_hero_layout && 'split-right' !== $es_hero_layout ) ? ' es-case__hero--' . sanitize_html_class( $es_hero_layout ) : '';
+
+			/*
+			 * Ancho de texto del hero (campo nuevo, independiente del layout
+			 * de imagen). Un caso guardado ANTES de que este campo existiera
+			 * no tiene este meta — en vez de asumir 'editorial' para TODOS,
+			 * el fallback depende del layout ya guardado:
+			 *   - layout 'stacked': el CSS de --stacked ya le sacaba el
+			 *     max-width:560px al bloque de texto (Sprint mega, hero
+			 *     options) — su equivalente visual real es 'wide', no
+			 *     'editorial'. Asumir 'editorial' ahí angostaría de golpe un
+			 *     caso ya publicado sin que nadie lo haya pedido.
+			 *   - cualquier otro layout: el texto SÍ estaba topeado a
+			 *     560px — 'editorial' es su equivalente exacto.
+			 * Casos nuevos siempre guardan un valor explícito (ver el
+			 * <select> del meta box), así que este fallback sólo importa
+			 * para posts pre-existentes al momento de este cambio.
+			 */
+			$es_hero_text_width_choices = array( 'editorial', 'wide', 'full' );
+			$es_hero_text_width         = get_post_meta( $es_case_id, '_es_case_hero_text_width', true );
+			if ( ! in_array( $es_hero_text_width, $es_hero_text_width_choices, true ) ) {
+				$es_hero_text_width = ( 'stacked' === $es_hero_layout ) ? 'wide' : 'editorial';
+			}
+			$es_hero_text_width_class = ' es-case__hero--text-' . sanitize_html_class( $es_hero_text_width );
 
 			// Breadcrumbs: Home / Work / título del caso (helper compartido,
 			// ver functions.php → es_breadcrumb_trail() — también usado por
@@ -124,7 +152,7 @@ if ( function_exists( 'wp_body_open' ) ) {
 				</nav>
 			<?php endif; ?>
 			<article class="es-section es-case">
-				<div class="es-container es-case__hero<?php echo esc_attr( $es_hero_layout_class ); ?>" data-es-reveal>
+				<div class="es-container es-case__hero<?php echo esc_attr( $es_hero_layout_class . $es_hero_text_width_class ); ?>" data-es-reveal>
 					<div class="es-case__hero-content">
 						<?php if ( ! empty( $es_case_kicker ) ) : ?>
 							<p class="es-eyebrow es-case__kicker"><?php echo esc_html( $es_case_kicker ); ?></p>
@@ -143,17 +171,6 @@ if ( function_exists( 'wp_body_open' ) ) {
 								<?php endforeach; ?>
 							</div>
 						<?php endif; ?>
-
-						<?php if ( ! empty( $es_case_meta ) ) : ?>
-							<dl class="es-case__meta">
-								<?php foreach ( $es_case_meta as $es_meta_key => $es_meta_value ) : ?>
-									<div class="es-case__meta-item">
-										<dt><?php echo esc_html( es__( 'case_meta_' . $es_meta_key ) ); ?></dt>
-										<dd><?php echo esc_html( $es_meta_value ); ?></dd>
-									</div>
-								<?php endforeach; ?>
-							</dl>
-						<?php endif; ?>
 					</div>
 
 					<div class="es-case__hero-media">
@@ -168,6 +185,36 @@ if ( function_exists( 'wp_body_open' ) ) {
 						<?php endif; ?>
 					</div>
 				</div>
+
+				<?php
+				/*
+				 * Metadata del proyecto: HERMANA del hero, no hija — antes vivía
+				 * dentro de .es-case__hero-content (la columna de texto del
+				 * grid), así que en mobile el orden real del DOM era
+				 * eyebrow→título→resumen→tags→METADATA→imagen: la imagen
+				 * quedaba después de todo el bloque técnico (Status/Role/
+				 * Tools/Period), perdiendo el impulso visual de entrada al
+				 * caso. Sacándola del grid del hero y poniéndola acá, el
+				 * orden en TODOS los layouts (split o stacked, mobile o
+				 * desktop) es siempre eyebrow→título→resumen→tags→imagen→
+				 * metadata→cuerpo — estructural, no por un truco de 'order'
+				 * en flex/grid. Mismo container que el hero (--es-max-w), no
+				 * el container ancho del cuerpo — todavía se lee como parte
+				 * de la introducción del proyecto, no como el cuerpo.
+				 */
+				?>
+				<?php if ( ! empty( $es_case_meta ) ) : ?>
+					<div class="es-container es-case__meta-wrap">
+						<dl class="es-case__meta">
+							<?php foreach ( $es_case_meta as $es_meta_key => $es_meta_value ) : ?>
+								<div class="es-case__meta-item es-case__meta-item--<?php echo esc_attr( $es_meta_key ); ?>">
+									<dt><?php echo esc_html( es__( 'case_meta_' . $es_meta_key ) ); ?></dt>
+									<dd><?php echo esc_html( $es_meta_value ); ?></dd>
+								</div>
+							<?php endforeach; ?>
+						</dl>
+					</div>
+				<?php endif; ?>
 
 				<?php
 				// es-container--case: el body del caso usa el container ancho
