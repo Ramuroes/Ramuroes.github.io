@@ -27,8 +27,15 @@
 .es-flow {
 	--es-flow-gutter: 34px;
 	--es-flow-gap: 28px;
+	/* Espacio entre las pastillas de inicio/fin y el resto del flujo.
+	   Deliberadamente SEPARADA de --es-flow-gap: esa variable pasa a valer
+	   0 en el grid de desktop (el conector ya hace de separador entre
+	   filas), y si el marcador compartiera esa variable quedaría pegado
+	   a "Inicio" — exactamente el bug que corrige este ticket. */
+	--es-flow-marker-gap: 20px;
 	--es-flow-node-bg: var(--es-surface);
 	--es-flow-mark: var(--es-ink-4);
+	--es-flow-mark-2: var(--es-signal-2);
 
 	position: relative;
 	margin: clamp(32px, 4.5vw, 52px) 0;
@@ -41,7 +48,13 @@
 
 /* ---------- marcadores de inicio / fin ---------- */
 
-.es-flow__marker {
+/* .es-flow vive dentro de .es-case__body, cuya tipografía de prosa fuerza
+   "p { margin: 0 }" con especificidad (0,1,1) — más alta que una sola
+   clase (0,1,0). Sin el prefijo ".es-flow" de acá en más, ESA regla global
+   le ganaba a --marker-gap/margin-left:auto de abajo y los marcadores
+   quedaban con margen 0 pese al valor que se les asignara (mismo tipo de
+   fuga que "li + li" más arriba). */
+.es-flow .es-flow__marker {
 	margin: 0;
 	font-family: var(--es-mono);
 	font-size: 10.5px;
@@ -73,12 +86,12 @@
 	background: var(--es-ink-4);
 }
 
-.es-flow__marker--start {
-	margin-bottom: var(--es-flow-gap);
+.es-flow .es-flow__marker--start {
+	margin-bottom: var(--es-flow-marker-gap);
 }
 
-.es-flow__marker--end {
-	margin-top: var(--es-flow-gap);
+.es-flow .es-flow__marker--end {
+	margin-top: var(--es-flow-marker-gap);
 }
 
 /* ---------- indicador de progreso (sólo mobile) ----------
@@ -86,7 +99,14 @@
    ningún ancestro del componente rompe el sticky (misma lección que el
    bug de .es-page → ver base.css). */
 
-.es-flow__progress {
+/* .es-flow-prefijado a propósito en margin/padding: .es-case__body trae
+   reset de prosa para p/ul/ol/li (ver case-study.css) con más
+   especificidad que una sola clase de este archivo — mismo problema que
+   ya se corrigió en .es-flow__marker y .es-flow__track > .es-flow__item.
+   Se repite el prefijo acá por consistencia, no por necesidad puntual de
+   ESTA regla — así ningún elemento nativo del flujo (p/ul/ol) hereda
+   espaciado de prosa por accidente. */
+.es-flow .es-flow__progress {
 	position: sticky;
 	top: 76px;
 	z-index: 2;
@@ -113,7 +133,7 @@
 
 /* ---------- track ---------- */
 
-.es-flow__track {
+.es-flow .es-flow__track {
 	list-style: none;
 	margin: 0;
 	padding: 0;
@@ -130,13 +150,43 @@
 	display: block;
 }
 
+/* El flujo vive dentro de .es-case__body, cuya tipografía de prosa pone
+   margin-top:0.5em en "li + li" (para listas normales de texto). Esa
+   regla también matchea estos <li> — un corrimiento de ~8px, invisible
+   entre el aire generoso del layout vertical, pero suficiente para
+   desalinear el centro compartido de la franja en el grid de desktop.
+   El propio flujo maneja TODO su espaciado vertical (--es-flow-gap /
+   --es-flow-row-gap): el spacing de prosa nunca debe filtrarse acá. */
+.es-flow__track > .es-flow__item {
+	margin-top: 0;
+}
+
+/* ---------- franja compartida de la forma ----------
+   Pastilla, rectángulo y rombo tienen alturas MUY distintas (47 / ~70 /
+   190px). Si cada uno se alinea "arriba" de su celda, sus CENTROS quedan
+   a alturas distintas y el conector no puede tocar el centro de todos a
+   la vez. La franja es una banda de alto compartido (--es-flow-shape-h,
+   la define cada fila en el grid de desktop) donde la forma se centra
+   verticalmente — así el centro de una pastilla, un rectángulo y un
+   rombo en la MISMA fila caen en el mismo eje, sin numeros mágicos por
+   nodo. En mobile/tablet no hay --es-flow-shape-h definida: min-height
+   resuelve a 0 y la franja se comporta como un contenedor normal. */
+.es-flow__shape-band {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	min-height: var(--es-flow-shape-h, 0);
+}
+
 /* ---------- riel + conector SVG ----------
    El svg trae los dos paths (horizontal y vertical) y cada layout muestra
    el suyo: un solo markup sirve para los dos ejes, siempre vectorial. */
 
-/* El riel cuelga de LA FORMA, así que se centra sobre ella por CSS puro,
-   sin conocer su altura: sirve igual para un rectángulo de una línea, un
-   título de dos líneas o un rombo mucho más alto. */
+/* El riel cuelga de la FRANJA (no de la forma): top:50% cae siempre en el
+   centro real de la fila, el mismo eje en el que la franja ya centra la
+   forma — sirve igual para una pastilla, un rectángulo de una o dos
+   líneas, o un rombo mucho más alto, sin conocer la altura de ninguno. */
 .es-flow__rail {
 	position: absolute;
 	left: 50%;
@@ -359,7 +409,7 @@
 	margin-right: 4px;
 }
 
-.es-flow__legend {
+.es-flow .es-flow__legend {
 	display: flex;
 	align-items: center;
 	margin: 22px 0 0;
@@ -370,22 +420,31 @@
 	color: var(--es-ink-4);
 }
 
-/* acentos semánticos — tokens de diagrama ya existentes */
+/* acentos semánticos — tokens de diagrama ya existentes.
+   --es-flow-mark-2 es la variante "más fuerte" del mismo color (ya
+   reservada en tokens.css, sin usar hasta ahora): la usan hover/foco/
+   abierto para reforzar el propio acento del nodo en vez de virar a un
+   color ajeno — así un nodo de decisión sigue leyéndose naranja también
+   al interactuar, nunca azul ni verde genérico. */
 .es-flow__item.is-accent-signal {
 	--es-flow-mark: var(--es-signal);
+	--es-flow-mark-2: var(--es-signal-2);
 }
 
 .es-flow__item.is-accent-decision {
 	--es-flow-mark: var(--es-decision);
+	--es-flow-mark-2: var(--es-decision-2);
 }
 
 .es-flow__item.is-accent-muted {
 	--es-flow-mark: var(--es-ink-4);
+	--es-flow-mark-2: var(--es-ink-3);
 	color: var(--es-ink-3);
 }
 
 .es-flow__item--decision {
 	--es-flow-mark: var(--es-decision);
+	--es-flow-mark-2: var(--es-decision-2);
 }
 
 /* ---------- contenido del nodo ---------- */
@@ -459,41 +518,41 @@
 	transition: transform var(--es-dur-fast) var(--es-ease);
 }
 
-/* ---------- ramas de una decisión (estructura, siempre visibles) ---------- */
+/* ---------- ramas de una decisión — pastillas compactas, siempre visibles ----------
+   Sólo la etiqueta (Sí/No): comunican de un vistazo que el rombo tiene dos
+   salidas sin competir en peso visual con la forma. El texto completo de
+   cada rama vive en el panel de detalle, como filas más del mismo <dl>
+   (ver estilo --branches más abajo) — nunca en una tarjeta aparte. */
 
-.es-flow__branches {
+.es-flow .es-flow__branches {
 	list-style: none;
 	margin: 10px 0 0;
 	padding: 0;
 	display: flex;
-	flex-direction: column;
-	gap: 8px;
+	flex-wrap: wrap;
+	gap: 6px;
 }
 
-.es-flow__branch {
-	display: flex;
-	align-items: baseline;
-	gap: 10px;
-	padding: 9px 12px;
-	border: 1px dashed var(--es-line);
-	border-radius: var(--es-radius-sm);
-	background: var(--es-paper-2);
-	font-size: 13px;
-	line-height: 1.5;
+.es-flow .es-flow__branch {
+	/* .es-case__body pone "li + li { margin-top: 0.5em }" para prosa —
+	   sin este reset, la segunda pastilla (Sí) caería más abajo que la
+	   primera (No) en vez de compartir línea con el gap:6px del padre. */
+	margin: 0;
+	display: inline-flex;
+	align-items: center;
+	padding: 3px 10px;
+	border: 1px solid var(--es-decision-dim);
+	border-radius: 999px;
+	background: var(--es-decision-soft);
 }
 
 .es-flow__branch-label {
-	flex: none;
 	font-family: var(--es-mono);
-	font-size: 10px;
+	font-size: 9.5px;
 	font-weight: 600;
-	letter-spacing: 0.12em;
+	letter-spacing: 0.1em;
 	text-transform: uppercase;
 	color: var(--es-decision);
-}
-
-.es-flow__branch-text {
-	color: var(--es-ink-3);
 }
 
 /* ---------- panel de detalle ----------
@@ -505,6 +564,16 @@
 	border: 1px solid var(--es-line);
 	border-radius: var(--es-radius-sm);
 	background: var(--es-paper-2);
+}
+
+/* Las filas de rama (Sí/No + su explicación), cuando conviven en el mismo
+   panel con las filas de detalle (punto de dolor / decisión / evidencia):
+   un separador liviano marca el quiebre de "por qué" a "qué pasa después",
+   sin una segunda tarjeta ni un color distinto. */
+.es-flow__detail + .es-flow__detail--branches {
+	margin-top: 14px;
+	padding-top: 14px;
+	border-top: 1px dashed var(--es-line);
 }
 
 .es-flow__detail {
@@ -607,18 +676,23 @@
 	color: var(--es-accent);
 }
 
-/* hover / abierto: la FORMA reacciona (no una tarjeta que ya no existe) */
+/* hover / foco / abierto: la FORMA refuerza el borde con SU PROPIO acento
+   (--es-flow-mark-2 — verde por defecto, naranja en un nodo de decisión,
+   nunca un color ajeno) más una superficie apenas más clara. Nada de
+   relleno sólido ni azul: es el mismo criterio de estado que el resto
+   del sitio, aplicado al color que cada nodo ya trae. */
 .es-flow.is-enhanced .es-flow__trigger:hover .es-flow__shape,
 .es-flow.is-enhanced .es-flow__trigger:focus-visible .es-flow__shape,
 .es-flow.is-enhanced .es-flow__item.is-open .es-flow__shape {
 	background: var(--es-surface-2);
+	border-color: var(--es-flow-mark-2);
 }
 
-.es-flow.is-enhanced .es-flow__trigger:hover .es-flow__item--decision .es-flow__shape,
 .es-flow__item--decision .es-flow__trigger:hover .es-flow__shape::before,
 .es-flow__item--decision .es-flow__trigger:focus-visible .es-flow__shape::before,
 .es-flow__item--decision.is-open .es-flow__shape::before {
 	background: var(--es-surface-2);
+	border-color: var(--es-flow-mark-2);
 }
 
 /* inicio/fin son sólidos: no se aclaran, se realzan apenas */
@@ -648,45 +722,54 @@
 	.es-flow__title {
 		font-size: 16px;
 	}
-
-	.es-flow__branches {
-		flex-direction: row;
-		flex-wrap: wrap;
-	}
-
-	.es-flow__branch {
-		flex: 1 1 220px;
-	}
 }
 
 /* =========================================================================
-   DESKTOP (>=1024px) — flujo horizontal con popovers
+   DESKTOP (>=1280px) — flujo horizontal en serpentina, con popovers.
+
+   Por qué 1280 y no 1024: este flujo son 3 filas de 4 (fila 1 y 3 cierran
+   en un rombo de 190px). A 1024–1279px esas 4 columnas quedaban apretadas
+   (una tercera fila intermedia que ni siquiera coincidía con la agrupación
+   semántica de 4). El propio ticket lo permite explícitamente: "si hace
+   falta, en tablet usar antes la narrativa vertical que apretar el
+   diagrama". Así que 680–1279px usa la MISMA narrativa vertical de mobile
+   (ya definida arriba, sólo con más aire) y el grid recién arranca donde
+   4 columnas entran con comodidad real. case-flow.js usa el mismo punto
+   de corte para decidir hover-abre vs. tap-abre (ver isDesktop()).
    ========================================================================= */
 
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
 	.es-flow {
 		--es-flow-gap: 0px;
-		--es-flow-col: 26px; /* ancho del conector entre nodos */
+		--es-flow-col: 26px; /* ancho del conector entre nodos, en la fila */
+		--es-flow-row-gap: 46px; /* alto del salto entre filas */
+		/* Alto compartido de la franja de forma (--es-flow-shape-h): por
+		   default el de un rectángulo de hasta 2 líneas con aire; las filas
+		   1 y 3 lo suben al alto del rombo más abajo, así TODAS las cajas
+		   de esa fila —incluida la pastilla de Inicio/Fin— se centran en
+		   el mismo eje que el rombo, sin números mágicos por nodo. */
+		--es-flow-shape-h: 90px;
 	}
 
-	/* el progreso 01/08 es una affordance de scroll mobile: no aplica acá */
-	.es-flow__progress {
+	/* el progreso 01/08 es una affordance de scroll mobile: no aplica acá.
+	   Prefijo ".es-flow" a propósito: la regla base (arriba) también lo
+	   lleva para ganarle al reset de prosa de .es-case__body, así que
+	   esta tiene que igualar esa especificidad para poder pisarla acá. */
+	.es-flow .es-flow__progress {
 		display: none;
 	}
 
-	/* Grilla, no una fila con scroll: un flujo de 6-9 pasos entra ENTERO en
-	   el ancho editorial repartido en filas de 3/4, y se lee de un vistazo.
-	   Una fila con overflow-x escondería la mitad del proceso detrás de un
-	   gesto de scroll — "desktop presenta el proceso con claridad" pesa más
-	   que la pureza de una sola línea horizontal. Sin overflow en ningún
-	   eje: cero riesgo de overflow horizontal de página. */
-	.es-flow__track {
+	/* Grilla, no una fila con scroll: el flujo entra ENTERO en el ancho
+	   editorial repartido en 3 filas de 4, y se lee de un vistazo. Sin
+	   overflow en ningún eje: cero riesgo de overflow horizontal de
+	   página. align-items:start porque con 'stretch' un nodo de decisión
+	   (más alto) estiraba toda la fila y los pasos quedaban como cajas
+	   casi vacías — la alineación de CENTROS la resuelve la franja
+	   compartida (--es-flow-shape-h), no el grid. */
+	.es-flow .es-flow__track {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 46px var(--es-flow-col);
-		/* cada tarjeta con su altura natural y todas alineadas arriba: con
-		   'stretch' un nodo de decisión (que suma sus ramas debajo) estiraba
-		   toda la fila y los pasos quedaban como cajas casi vacías. */
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: var(--es-flow-row-gap) var(--es-flow-col);
 		align-items: start;
 	}
 
@@ -696,18 +779,51 @@
 		min-width: 0;
 	}
 
-	/* El conector entra en el gap de la grilla, a la izquierda del nodo.
-	   El primero de cada fila no lleva (no viene de su izquierda), así el
-	   salto de fila se lee limpio. */
-	.es-flow__item:nth-child(3n + 1) .es-flow__rail {
-		display: none;
+	/* Filas 1 y 3 (items 1–4 y 9–12) cierran en un rombo: comparten su
+	   altura de 190px para que pastilla/rectángulo/rombo se centren en
+	   el mismo eje. La fila 2 (5–8, sin decisión) usa el default de
+	   arriba. Acoplado a esta serpentina de 12 nodos en concreto — igual
+	   que el resto de esta sección (mismo criterio ya usado más abajo
+	   para la serpentina y los giros). */
+	.es-flow__item:nth-child(-n + 4),
+	.es-flow__item:nth-child(n + 9) {
+		--es-flow-shape-h: 190px;
 	}
 
-	/* Riel horizontal en el gap de la grilla. La ALTURA importa: la línea
-	   se dibuja al 50% del svg, así que height debe ser exactamente el
-	   doble del centro de la forma (8px + 13px/2 ≈ 14.5px) para que línea
-	   y nodo queden sobre el mismo eje. Con height:30px la línea caía 15px
-	   arriba del centro real y el spine se leía como guiones sueltos. */
+	/* ---- SERPENTINA: fila 2 (04→05→06→07) se coloca en espejo ----
+	   El orden semántico del DOM no cambia (sigue siendo 5,6,7,8 —
+	   lectores de pantalla y List View ven la secuencia real); sólo su
+	   UBICACIÓN en el grid se invierte, así 04 queda debajo del rombo 03
+	   (misma columna 4) y 07 queda debajo de donde arranca la fila 3
+	   (misma columna 1). Las filas 1 y 3 no necesitan posición explícita:
+	   el auto-placement del grid las ubica solo, en orden de DOM, en las
+	   celdas que la fila 2 no ocupó. */
+	.es-flow__item:nth-child(5) {
+		grid-row: 2;
+		grid-column: 4;
+	}
+
+	.es-flow__item:nth-child(6) {
+		grid-row: 2;
+		grid-column: 3;
+	}
+
+	.es-flow__item:nth-child(7) {
+		grid-row: 2;
+		grid-column: 2;
+	}
+
+	.es-flow__item:nth-child(8) {
+		grid-row: 2;
+		grid-column: 1;
+	}
+
+	/* Riel horizontal por default: entra en el gap de la grilla, a la
+	   izquierda del nodo, apuntando hacia la derecha (misma dirección de
+	   lectura fila 1 y fila 3). top:50% cae en el centro de la FRANJA
+	   compartida — el mismo eje en el que ya se centra la forma — así que
+	   sirve igual para el rectángulo más chico de la fila que para el
+	   rombo, sin ningún ajuste por nodo. */
 	.es-flow__rail {
 		left: auto;
 		right: 100%;
@@ -728,6 +844,61 @@
 		display: block;
 	}
 
+	/* ---- Los dos giros de fila (03→04 y 07→08): caída vertical simple ----
+	   El nodo de llegada queda en la MISMA columna que el nodo de salida
+	   (col. 4 y col. 1 respectivamente, por la serpentina de arriba), así
+	   que el giro no necesita ningún desvío horizontal — sólo mostrar el
+	   trazo vertical del propio svg, del alto exacto del salto de fila. */
+	.es-flow__item:nth-child(5) .es-flow__rail,
+	.es-flow__item:nth-child(9) .es-flow__rail {
+		left: 50%;
+		right: auto;
+		top: auto;
+		bottom: 100%;
+		transform: translateX(-50%);
+		width: 22px;
+		height: var(--es-flow-row-gap);
+	}
+
+	.es-flow__item:nth-child(5) .es-flow__line--h,
+	.es-flow__item:nth-child(5) .es-flow__head--h,
+	.es-flow__item:nth-child(9) .es-flow__line--h,
+	.es-flow__item:nth-child(9) .es-flow__head--h {
+		display: none;
+	}
+
+	.es-flow__item:nth-child(5) .es-flow__line--v,
+	.es-flow__item:nth-child(5) .es-flow__head--v,
+	.es-flow__item:nth-child(9) .es-flow__line--v,
+	.es-flow__item:nth-child(9) .es-flow__head--v {
+		display: block;
+	}
+
+	/* ---- Fila 2 en espejo: 06 y 07 reciben la flecha desde su DERECHA ----
+	   (04 no necesita rail horizontal — llega por el giro vertical de
+	   arriba). El riel pasa al otro lado del nodo y el propio conector se
+	   espeja: mismo trazo, apuntando a la izquierda, nunca un svg nuevo. */
+	.es-flow__item:nth-child(6) .es-flow__rail,
+	.es-flow__item:nth-child(7) .es-flow__rail,
+	.es-flow__item:nth-child(8) .es-flow__rail {
+		left: 100%;
+		right: auto;
+	}
+
+	.es-flow__item:nth-child(6) .es-flow__connector,
+	.es-flow__item:nth-child(7) .es-flow__connector,
+	.es-flow__item:nth-child(8) .es-flow__connector {
+		transform: scaleX(-1);
+	}
+
+	.es-flow__item:nth-child(6) .es-flow__edge,
+	.es-flow__item:nth-child(7) .es-flow__edge,
+	.es-flow__item:nth-child(8) .es-flow__edge {
+		left: auto;
+		right: 0;
+		text-align: right;
+	}
+
 	.es-flow__node {
 		grid-column: auto;
 		display: flex;
@@ -738,7 +909,8 @@
 	/* La etiqueta va ARRIBA de la caja, no sobre la línea: el gap entre
 	   columnas es de 26px y ahí no entra "Acceso principal al sitio" sin
 	   pisar la caja siguiente. Arriba y alineada a la izquierda se lee
-	   limpio y sigue diciendo qué pasa ANTES de este paso. */
+	   limpio y sigue diciendo qué pasa ANTES de este paso (fila 2 la
+	   espeja a la derecha, arriba). */
 	.es-flow__edge {
 		left: 0;
 		right: auto;
@@ -747,11 +919,24 @@
 		text-align: left;
 	}
 
-	/* El flujo termina arriba a la derecha (último nodo de la última fila),
-	   así que el marcador de fin acompaña ahí: alineado a la izquierda
-	   quedaba debajo del nodo 05 y contradecía la lectura del recorrido. */
-	.es-flow__marker--end {
-		text-align: right;
+	/* Las pastillas de inicio/fin se alinean con la COLUMNA de su nodo
+	   (1 y 4), no con el borde del contenedor: mismo ancho que una
+	   columna del grid (misma fórmula que minmax(0,1fr) con 4 fracciones
+	   iguales) + text-align:center, así el CENTRO del marcador coincide
+	   con el centro real de "Inicio"/"Fin" (que sí ocupa la columna
+	   entera) sin depender de ningún px fijo — no sólo un borde en común.
+	   WIDTH, no max-width: margin-left:auto sólo reparte espacio cuando
+	   'width' es un valor definido — con max-width solo, 'width' sigue
+	   siendo auto y el margen automático se ignora (la caja queda pegada
+	   a la izquierda). */
+	.es-flow .es-flow__marker--start,
+	.es-flow .es-flow__marker--end {
+		width: calc((100% - 3 * var(--es-flow-col)) / 4);
+		text-align: center;
+	}
+
+	.es-flow .es-flow__marker--end {
+		margin-left: auto;
 	}
 
 	.es-flow.is-enhanced .es-flow__trigger:hover,
@@ -774,20 +959,6 @@
 		border: 0;
 		border-radius: 0;
 		background: none;
-	}
-
-	.es-flow__branches {
-		flex-direction: column;
-		gap: 6px;
-		margin-top: 8px;
-	}
-
-	.es-flow__branch {
-		flex: none;
-		flex-direction: column;
-		gap: 3px;
-		padding: 7px 10px;
-		font-size: 12px;
 	}
 
 	/* --- POPOVER --- */
@@ -845,25 +1016,6 @@
 		top: 100%;
 		border-bottom-color: transparent;
 		border-top-color: var(--es-line-strong);
-	}
-}
-
-/* =========================================================================
-   DESKTOP ANCHO (>=1280px) — 4 por fila
-   ========================================================================= */
-
-@media (min-width: 1280px) {
-	.es-flow__track {
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-	}
-
-	/* se recalcula cuál es el primero de cada fila */
-	.es-flow__item:nth-child(3n + 1) .es-flow__rail {
-		display: block;
-	}
-
-	.es-flow__item:nth-child(4n + 1) .es-flow__rail {
-		display: none;
 	}
 }
 

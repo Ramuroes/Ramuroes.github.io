@@ -9,8 +9,10 @@
  * bloqueado, no se pierde ni una línea de contenido.
  *
  * Comportamiento por dispositivo (requisito del ticket):
- *  - desktop (>=1024px): hover y foco abren; salir del nodo cierra.
- *  - touch / mobile: tap abre, segundo tap cierra, tap afuera cierra.
+ *  - desktop (>=1280px, el mismo corte que el grid en serpentina de
+ *    case-flow.css): hover y foco abren; salir del nodo cierra.
+ *  - touch / mobile / tablet (<1280px, narrativa vertical): tap abre,
+ *    segundo tap cierra, tap afuera cierra.
  *  - teclado, en los dos: el trigger es un <button> nativo (Enter/Espacio),
  *    Escape cierra y devuelve el foco al trigger.
  *
@@ -23,7 +25,7 @@
 (function () {
 	'use strict';
 
-	var DESKTOP = '(min-width: 1024px)';
+	var DESKTOP = '(min-width: 1280px)';
 	var EDGE = 12; // margen mínimo contra el borde del viewport
 
 	function isDesktop() {

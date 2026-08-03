@@ -17,8 +17,14 @@
  * script. Por eso el <button> del trigger se emite sin `hidden` y el
  * panel no arranca con display:none inline.
  *
- * Semántica: <ol> — un flujo ES una secuencia ordenada. Las ramas de una
- * decisión van en una <ul> anidada dentro del propio <li> del nodo.
+ * Semántica: <ol> — un flujo ES una secuencia ordenada. El orden del DOM es
+ * SIEMPRE el orden cronológico real, aunque el desktop lo lea en serpentina
+ * (fila 2 visualmente derecha-a-izquierda vía CSS Grid — ver case-flow.css);
+ * lectores de pantalla y la Vista de lista de Gutenberg ven la secuencia
+ * verdadera. Las ramas de una decisión emiten sólo su etiqueta (Sí/No) junto
+ * al rombo — visible siempre, pero compacta — y su texto completo pasa a
+ * ser filas más del mismo panel de detalle del nodo (dt/dd), no una tarjeta
+ * propia: así "Ver detalle" contesta también "¿qué pasa en cada rama?".
  *
  * @package estavillo-portfolio-core
  * @var array    $attributes Atributos del bloque.
@@ -147,7 +153,7 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 			);
 
 			$es_panel_id  = $es_uid . '-panel-' . $es_i;
-			$es_has_panel = ! empty( $es_rows );
+			$es_has_panel = ! empty( $es_rows ) || ! empty( $es_branches );
 			?>
 			<li class="es-flow__item es-flow__item--<?php echo esc_attr( $es_kind ); ?><?php echo esc_attr( $es_accent ); ?>" data-es-flow-item data-es-flow-index="<?php echo esc_attr( (string) ( $es_i + 1 ) ); ?>">
 
@@ -169,16 +175,20 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 						// o rombo (decisión) con el título ADENTRO; la
 						// descripción va afuera, debajo, en tinta apagada.
 						?>
-						<span class="es-flow__shape">
+						<span class="es-flow__shape-band">
 							<?php if ( $es_i > 0 ) : ?>
 								<?php
 								/*
-								 * El conector es hijo de LA FORMA, no del <li>. Así queda
-								 * centrado sobre la forma por CSS puro (top:50% / left:50%)
-								 * sin ningún número mágico, y sigue estando bien tanto en un
-								 * rectángulo de una línea como en un rombo mucho más alto o
-								 * en un título que envuelve a dos líneas. Cuando colgaba del
-								 * <li> había que adivinar la altura y se desalineaba.
+								 * El conector y su etiqueta ahora son HERMANOS de la forma,
+								 * no hijos: los dos cuelgan de .es-flow__shape-band, la franja
+								 * de altura compartida por fila (ver --es-flow-shape-h en
+								 * case-flow.css). Así top:50% del riel apunta siempre al
+								 * centro REAL de la fila — el mismo eje en el que la forma
+								 * (pastilla, rectángulo o rombo) ya está centrada por la
+								 * propia franja — en vez de adivinar el centro de CADA forma
+								 * individual, que es exactamente lo que rompía la alineación
+								 * cuando el rombo (190px) compartía fila con una pastilla o
+								 * un rectángulo mucho más bajos.
 								 */
 								$es_edge = trim( (string) ( $es_node['edgeLabel'] ?? '' ) );
 								?>
@@ -186,33 +196,26 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 									<?php echo es_flow_connector_svg(); // phpcs:ignore WordPress.Security.EscapeOutput -- SVG del propio plugin, sin dato de usuario. ?>
 								</span>
 								<?php if ( '' !== $es_edge ) : ?>
-									<?php
-									/*
-									 * La etiqueta de la flecha es hermana del riel, no hija:
-									 * el riel está centrado verticalmente sobre la forma, así
-									 * que cualquier cosa adentro caía ENCIMA de la caja. Como
-									 * hija de la forma puede colocarse arriba de ella y no
-									 * pisa ni el número ni el título.
-									 */
-									?>
 									<span class="es-flow__edge"><?php echo esc_html( $es_edge ); ?></span>
 								<?php endif; ?>
 							<?php endif; ?>
-							<span class="es-flow__shape-inner">
-								<?php if ( '' !== $es_num ) : ?>
-									<span class="es-flow__num">
-										<?php if ( '' !== $es_step_lb ) : ?>
-											<span class="es-visually-hidden"><?php echo esc_html( $es_step_lb ); ?> </span>
-										<?php endif; ?>
-										<?php echo esc_html( $es_num ); ?>
-									</span>
+							<span class="es-flow__shape">
+								<span class="es-flow__shape-inner">
+									<?php if ( '' !== $es_num ) : ?>
+										<span class="es-flow__num">
+											<?php if ( '' !== $es_step_lb ) : ?>
+												<span class="es-visually-hidden"><?php echo esc_html( $es_step_lb ); ?> </span>
+											<?php endif; ?>
+											<?php echo esc_html( $es_num ); ?>
+										</span>
+									<?php endif; ?>
+									<span class="es-flow__title"><?php echo wp_kses_post( $es_title ); ?></span>
+								</span>
+								<?php if ( ! empty( $es_node['ai'] ) ) : ?>
+									<?php // Marcador (IA) del diagrama de referencia: punto donde interviene el asistente. La leyenda al pie lo explica una sola vez. ?>
+									<span class="es-flow__ai" title="<?php echo esc_attr( $es_ai_legend ); ?>"><span class="es-visually-hidden"><?php echo esc_html( $es_ai_legend ); ?></span><span aria-hidden="true">IA</span></span>
 								<?php endif; ?>
-								<span class="es-flow__title"><?php echo wp_kses_post( $es_title ); ?></span>
 							</span>
-							<?php if ( ! empty( $es_node['ai'] ) ) : ?>
-								<?php // Marcador (IA) del diagrama de referencia: punto donde interviene el asistente. La leyenda al pie lo explica una sola vez. ?>
-								<span class="es-flow__ai" title="<?php echo esc_attr( $es_ai_legend ); ?>"><span class="es-visually-hidden"><?php echo esc_html( $es_ai_legend ); ?></span><span aria-hidden="true">IA</span></span>
-							<?php endif; ?>
 						</span>
 
 						<span class="es-flow__body">
@@ -241,14 +244,21 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 					</<?php echo esc_html( $es_tag ); ?>>
 
 					<?php if ( ! empty( $es_branches ) ) : ?>
-						<?php // Las ramas son ESTRUCTURA (sí/no de una decisión), no detalle: siempre visibles, nunca escondidas tras el popover. ?>
+						<?php
+						/*
+						 * Por defecto son SÓLO la etiqueta (Sí/No) — una pastilla chica
+						 * junto al rombo, no una tarjeta. Comunican de un vistazo que la
+						 * decisión tiene dos salidas sin competir en peso visual con la
+						 * forma. El texto completo de cada rama vive en el panel de
+						 * detalle (abajo), como filas más del mismo <dl> — así "Ver
+						 * detalle" también responde "¿qué pasa si es Sí/No?", y sin JS
+						 * ambas cosas (pastillas + panel) ya están completas en el HTML.
+						 */
+						?>
 						<ul class="es-flow__branches">
 							<?php foreach ( $es_branches as $es_branch ) : ?>
 								<li class="es-flow__branch">
 									<span class="es-flow__branch-label"><?php echo esc_html( trim( (string) $es_branch['label'] ) ); ?></span>
-									<?php if ( '' !== trim( (string) ( $es_branch['text'] ?? '' ) ) ) : ?>
-										<span class="es-flow__branch-text"><?php echo wp_kses_post( trim( (string) $es_branch['text'] ) ); ?></span>
-									<?php endif; ?>
 								</li>
 							<?php endforeach; ?>
 						</ul>
@@ -256,15 +266,28 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 
 					<?php if ( $es_has_panel ) : ?>
 						<div class="es-flow__panel" id="<?php echo esc_attr( $es_panel_id ); ?>" data-es-flow-panel>
-							<dl class="es-flow__detail">
-								<?php foreach ( $es_rows as $es_row ) : ?>
-									<?php $es_row_label = trim( (string) ( $es_row['label'] ?? '' ) ); ?>
-									<?php if ( '' !== $es_row_label ) : ?>
-										<dt><?php echo esc_html( $es_row_label ); ?></dt>
-									<?php endif; ?>
-									<dd><?php echo wp_kses_post( trim( (string) $es_row['text'] ) ); ?></dd>
-								<?php endforeach; ?>
-							</dl>
+							<?php if ( ! empty( $es_rows ) ) : ?>
+								<dl class="es-flow__detail">
+									<?php foreach ( $es_rows as $es_row ) : ?>
+										<?php $es_row_label = trim( (string) ( $es_row['label'] ?? '' ) ); ?>
+										<?php if ( '' !== $es_row_label ) : ?>
+											<dt><?php echo esc_html( $es_row_label ); ?></dt>
+										<?php endif; ?>
+										<dd><?php echo wp_kses_post( trim( (string) $es_row['text'] ) ); ?></dd>
+									<?php endforeach; ?>
+								</dl>
+							<?php endif; ?>
+							<?php if ( ! empty( $es_branches ) ) : ?>
+								<dl class="es-flow__detail es-flow__detail--branches">
+									<?php foreach ( $es_branches as $es_branch ) : ?>
+										<?php $es_branch_text = trim( (string) ( $es_branch['text'] ?? '' ) ); ?>
+										<?php if ( '' !== $es_branch_text ) : ?>
+											<dt><?php echo esc_html( trim( (string) $es_branch['label'] ) ); ?></dt>
+											<dd><?php echo wp_kses_post( $es_branch_text ); ?></dd>
+										<?php endif; ?>
+									<?php endforeach; ?>
+								</dl>
+							<?php endif; ?>
 							<?php if ( '' !== $es_close ) : ?>
 								<button type="button" class="es-flow__close" data-es-flow-close><?php echo esc_html( $es_close ); ?></button>
 							<?php endif; ?>
