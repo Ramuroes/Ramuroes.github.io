@@ -32,7 +32,7 @@
 	   0 en el grid de desktop (el conector ya hace de separador entre
 	   filas), y si el marcador compartiera esa variable quedaría pegado
 	   a "Inicio" — exactamente el bug que corrige este ticket. */
-	--es-flow-marker-gap: 14px;
+	--es-flow-marker-gap: 10px;
 	--es-flow-node-bg: var(--es-surface);
 	--es-flow-mark: var(--es-ink-4);
 	--es-flow-mark-2: var(--es-signal-2);
@@ -54,6 +54,15 @@
 
 .es-flow--compact {
 	--es-flow-gap: 18px;
+}
+
+/* ---------- título de sección (opcional) ----------
+   Mismo lenguaje visual que el resto de eyebrows del portfolio: reutiliza
+   .es-eyebrow (base.css) tal cual — mono, mayúsculas, acento verde — en
+   vez de inventar un estilo nuevo. Sólo se imprime si el campo tiene
+   texto (ver render.php); "ocultarlo" es simplemente vaciar el campo. */
+.es-flow .es-flow__eyebrow {
+	margin: 0 0 14px;
 }
 
 /* ---------- marcadores de inicio / fin ---------- */
@@ -1132,6 +1141,25 @@
 
 	.es-flow .es-flow__marker--end {
 		margin-left: auto;
+	}
+
+	/* Pulido de "conexión visual": Inicio/Fin comparten fila de grid con
+	   un rombo de decisión (03 / 08), y esa fila usa la franja de alto
+	   compartido (--es-flow-shape-h, ver más abajo) para que el rombo y
+	   la pastilla queden centrados en el MISMO eje — el mismo mecanismo
+	   que alinea los conectores. Como Inicio/Fin son mucho más bajos que
+	   esa franja, quedan centrados muy por debajo/encima de su propio
+	   borde de fila, y el marcador (que sigue el flujo normal, pegado al
+	   borde de la fila) termina mucho más lejos de la pastilla real de lo
+	   que --es-flow-marker-gap por sí solo sugiere. transform (no margin)
+	   a propósito: sólo la etiqueta se desliza hacia el nodo — la franja,
+	   la fila y los conectores quedan exactamente donde ya estaban. */
+	.es-flow .es-flow__marker--start {
+		transform: translateY(64px);
+	}
+
+	.es-flow .es-flow__marker--end {
+		transform: translateY(-176px);
 	}
 
 	.es-flow.is-enhanced .es-flow__trigger:hover,

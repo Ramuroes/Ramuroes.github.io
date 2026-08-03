@@ -9,6 +9,7 @@
 	"keywords": [ "estavillo", "flow", "flujo", "process", "journey", "blueprint", "decision", "diagram" ],
 	"textdomain": "estavillo-portfolio-core",
 	"attributes": {
+		"sectionLabel": { "type": "string", "default": "" },
 		"nodes": {
 			"type": "array",
 			"default": [],

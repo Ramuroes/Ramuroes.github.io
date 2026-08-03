@@ -107,6 +107,14 @@
 						PanelBody,
 						{ title: __('Flow labels', 'estavillo-portfolio-core'), initialOpen: true },
 						el(TextControl, {
+							label: __('Section title (eyebrow)', 'estavillo-portfolio-core'),
+							help: __('Optional small caption above the flow, e.g. "IDEAL USER FLOW". Leave blank to hide.', 'estavillo-portfolio-core'),
+							value: a.sectionLabel,
+							onChange: function (v) {
+								set({ sectionLabel: v });
+							},
+						}),
+						el(TextControl, {
 							label: __('Start marker', 'estavillo-portfolio-core'),
 							help: __('Leave blank to hide.', 'estavillo-portfolio-core'),
 							value: a.startLabel,
@@ -171,6 +179,9 @@
 					el(
 						'div',
 						{ className: 'es-flow es-flow--' + (a.density || 'comfortable') },
+						a.sectionLabel
+							? el('p', { className: 'es-eyebrow es-flow__eyebrow' }, a.sectionLabel)
+							: null,
 						a.startLabel
 							? el('p', { className: 'es-flow__marker es-flow__marker--start' }, el('span', null, a.startLabel))
 							: null,

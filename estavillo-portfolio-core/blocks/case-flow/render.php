@@ -102,6 +102,7 @@ if ( empty( $es_nodes ) ) {
 	return;
 }
 
+$es_section_label = trim( (string) ( $attributes['sectionLabel'] ?? '' ) );
 $es_start   = trim( (string) ( $attributes['startLabel'] ?? '' ) );
 $es_end     = trim( (string) ( $attributes['endLabel'] ?? '' ) );
 $es_detail  = trim( (string) ( $attributes['detailLabel'] ?? '' ) );
@@ -119,6 +120,11 @@ $es_total = count( $es_nodes );
 $es_classes = 'es-flow es-flow--' . $es_density;
 ?>
 <div <?php echo get_block_wrapper_attributes( array( 'class' => $es_classes ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- ya escapado por core. ?> data-es-flow>
+
+	<?php // Título de sección opcional ("FLUJO DE USUARIO IDEAL"…) — mismo lenguaje visual que el resto de eyebrows del portfolio (.es-eyebrow: mono, uppercase, acento). Vacío = no se imprime nada, ni siquiera el <p>. ?>
+	<?php if ( '' !== $es_section_label ) : ?>
+		<p class="es-eyebrow es-flow__eyebrow"><?php echo esc_html( $es_section_label ); ?></p>
+	<?php endif; ?>
 
 	<?php if ( '' !== $es_start ) : ?>
 		<p class="es-flow__marker es-flow__marker--start"><span><?php echo esc_html( $es_start ); ?></span></p>
