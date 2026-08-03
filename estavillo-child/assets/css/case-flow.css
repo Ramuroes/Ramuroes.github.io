@@ -292,6 +292,36 @@
 	cursor: default;
 }
 
+/* ---------- .trigger SIEMPRE transparente, en TODO estado ----------
+   Corrección urgente: en producción, .es-flow__trigger — el área táctil
+   completa del nodo, más grande que la forma visible (ver
+   .es-flow__shape-band) — aparecía con un plato rectangular azul detrás
+   del rombo/rectángulo al pasar el mouse, enfocar o abrir un nodo. Ese
+   azul no sale de ningún selector propio de este archivo (no hay un solo
+   valor azul en esta hoja); el patrón ya documentado en el resto del
+   tema es que Kadence/WordPress pinta sus propios componentes (acordeón,
+   FAQ, tabs) sobre selectores genéricos como [aria-expanded="true"] — el
+   mismo atributo ARIA que este trigger usa para su propio estado
+   abierto/cerrado. En vez de perseguir cuál regla exacta es, se blinda
+   el trigger con transparencia forzada en cada estado relevante: ningún
+   estilo externo puede pintarle un fondo, sea cual sea su origen. El
+   color real del nodo lo sigue dando .es-flow__shape (la forma), nunca
+   el trigger. */
+.es-flow__trigger,
+.es-flow__trigger:hover,
+.es-flow__trigger:focus,
+.es-flow__trigger:focus-visible,
+.es-flow__trigger:active,
+.es-flow__trigger[aria-expanded='true'],
+.es-flow__trigger[aria-expanded='false'],
+.es-flow__node,
+.es-flow__item.is-open .es-flow__trigger {
+	background: transparent !important;
+	background-color: transparent !important;
+	background-image: none !important;
+	box-shadow: none !important;
+}
+
 /* ---------- LA FORMA (la caja del diagrama) ---------- */
 
 .es-flow__shape {
@@ -686,15 +716,19 @@
    relleno sólido ni azul: es el mismo criterio de estado que el resto
    del sitio, aplicado al color que cada nodo ya trae.
 
-   :not(.es-flow__item--decision) es deliberado: para una decisión,
-   .es-flow__shape es el CUADRADO invisible que envuelve al rombo (ver
-   arriba, background:none/border:0 en reposo) — si este mismo tinte
-   entrara acá también, se pintaría un plato rectangular detrás del rombo
-   al pasar el mouse o enfocar. El rombo tiene su propia regla, dos bloques
-   más abajo, aplicada a ::before (el elemento realmente rotado). */
-.es-flow.is-enhanced .es-flow__item:not(.es-flow__item--decision) .es-flow__trigger:hover .es-flow__shape,
-.es-flow.is-enhanced .es-flow__item:not(.es-flow__item--decision) .es-flow__trigger:focus-visible .es-flow__shape,
-.es-flow.is-enhanced .es-flow__item:not(.es-flow__item--decision).is-open .es-flow__shape {
+   Selectores POSITIVOS (--step / --milestone), no ":not(decision)": un
+   ":not()" agrega un punto de especificidad como si fuera una clase más
+   — con ":not(.es-flow__item--decision)" esta regla terminaba siendo MÁS
+   específica que la de --start/--end de abajo (aunque esa venga después
+   en el archivo) y le ganaba con su superficie neutra, apagando el verde
+   del botón de Inicio/Fin en hover. Con selectores positivos cada kind
+   de nodo cae en una sola regla, sin pisarse. */
+.es-flow.is-enhanced .es-flow__item--step .es-flow__trigger:hover .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--step .es-flow__trigger:focus-visible .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--step.is-open .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--milestone .es-flow__trigger:hover .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--milestone .es-flow__trigger:focus-visible .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--milestone.is-open .es-flow__shape {
 	background: var(--es-surface-2);
 	border-color: var(--es-flow-mark-2);
 }
@@ -706,11 +740,26 @@
 	border-color: var(--es-flow-mark-2);
 }
 
-/* inicio/fin son sólidos: no se aclaran, se realzan apenas */
+/* inicio/fin son sólidos: no se aclaran, se realzan apenas. color con
+   !important: refuerzo defensivo — mismo criterio que el resto del sitio
+   (nav, botones) contra cualquier estilo de hover/foco ajeno que intente
+   pisar el texto de un elemento interactivo. */
 .es-flow.is-enhanced .es-flow__item--start .es-flow__trigger:hover .es-flow__shape,
-.es-flow.is-enhanced .es-flow__item--end .es-flow__trigger:hover .es-flow__shape {
-	background: var(--es-flow-mark);
+.es-flow.is-enhanced .es-flow__item--start .es-flow__trigger:focus-visible .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--start.is-open .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--end .es-flow__trigger:hover .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--end .es-flow__trigger:focus-visible .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--end.is-open .es-flow__shape {
+	background: var(--es-flow-mark) !important;
+	border-color: var(--es-flow-mark) !important;
 	filter: brightness(1.12);
+}
+
+.es-flow__item--start .es-flow__trigger:hover .es-flow__title,
+.es-flow__item--start .es-flow__trigger:focus-visible .es-flow__title,
+.es-flow__item--end .es-flow__trigger:hover .es-flow__title,
+.es-flow__item--end .es-flow__trigger:focus-visible .es-flow__title {
+	color: var(--es-paper) !important;
 }
 
 /* ---------- foco de teclado — sigue la FORMA visible, no el área de clic ----------
