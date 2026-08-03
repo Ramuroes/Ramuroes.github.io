@@ -268,11 +268,65 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 						?>
 						<ul class="es-flow__branches">
 							<?php foreach ( $es_branches as $es_branch ) : ?>
-								<li class="es-flow__branch">
+								<li class="es-flow__branch<?php echo '' !== trim( (string) ( $es_branch['detourTitle'] ?? '' ) ) ? ' es-flow__branch--detour' : ''; ?>">
 									<span class="es-flow__branch-label"><?php echo esc_html( trim( (string) $es_branch['label'] ) ); ?></span>
 								</li>
 							<?php endforeach; ?>
 						</ul>
+					<?php endif; ?>
+
+					<?php
+					/*
+					 * DECISIÓN REAL, no una bifurcación decorativa: si una rama
+					 * declara detourTitle, esa rama tiene una pantalla propia en
+					 * el recorrido — se pinta SIEMPRE (nunca sólo dentro del panel
+					 * colapsable) como una tarjeta satélite, chica y silenciada,
+					 * colgada de su propio branch pill con un conector corto. El
+					 * camino SIN detour (típicamente "Sí") no necesita nada nuevo:
+					 * ya es el nodo siguiente real de la secuencia, conectado por
+					 * el conector principal de siempre — sólo la rama excepcional
+					 * (la que hoy vivía escondida en el texto del detalle) pasa a
+					 * ser un nodo visible. reconnectLabel es texto libre (no un
+					 * cálculo automático "vuelve al nodo X"): mantiene el
+					 * componente genérico para cualquier flujo futuro, no sólo
+					 * este caso puntual.
+					 */
+					$es_detours = array_values(
+						array_filter(
+							$es_branches,
+							function ( $es_branch ) {
+								return '' !== trim( (string) ( $es_branch['detourTitle'] ?? '' ) );
+							}
+						)
+					);
+					?>
+					<?php if ( ! empty( $es_detours ) ) : ?>
+						<div class="es-flow__satellites">
+							<?php foreach ( $es_detours as $es_branch ) : ?>
+								<?php
+								$es_detour_title = trim( (string) $es_branch['detourTitle'] );
+								$es_detour_text  = trim( (string) ( $es_branch['detourText'] ?? '' ) );
+								$es_detour_next  = trim( (string) ( $es_branch['detourNext'] ?? '' ) );
+								?>
+								<div class="es-flow__satellite">
+									<span class="es-flow__satellite-connector" aria-hidden="true">
+										<svg viewBox="0 0 12 16" focusable="false">
+											<path d="M6 0 V10" vector-effect="non-scaling-stroke" />
+											<polyline points="2,7 6,12 10,7" vector-effect="non-scaling-stroke" />
+										</svg>
+									</span>
+									<div class="es-flow__satellite-card">
+										<span class="es-flow__satellite-title"><?php echo wp_kses_post( $es_detour_title ); ?></span>
+										<?php if ( '' !== $es_detour_text ) : ?>
+											<span class="es-flow__satellite-text"><?php echo wp_kses_post( $es_detour_text ); ?></span>
+										<?php endif; ?>
+										<?php if ( '' !== $es_detour_next ) : ?>
+											<span class="es-flow__satellite-next"><?php echo esc_html( $es_detour_next ); ?></span>
+										<?php endif; ?>
+									</div>
+								</div>
+							<?php endforeach; ?>
+						</div>
 					<?php endif; ?>
 
 					<?php if ( $es_has_panel ) : ?>

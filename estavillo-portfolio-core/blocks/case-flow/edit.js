@@ -68,6 +68,9 @@
 							o.onChange(ui.listUpdate(rows, ri, { text: v }));
 						},
 					}),
+					o.extraFields ? o.extraFields(row, function (patch) {
+						o.onChange(ui.listUpdate(rows, ri, patch));
+					}) : null,
 					ui.itemBar({
 						index: ri,
 						count: rows.length,
@@ -308,6 +311,45 @@
 											addLabel: __('Add branch', 'estavillo-portfolio-core'),
 											onChange: function (rows) {
 												updateNode(i, { branches: rows });
+											},
+											// Rama con pantalla propia: si esta salida NO es
+											// "sigue directo al próximo nodo" sino que pasa por
+											// una pantalla intermedia (p. ej. "No" -> Crear
+											// cuenta), esa pantalla se vuelve visible en el
+											// diagrama (nunca sólo texto adentro del panel).
+											// Vacío = comportamiento de siempre, sin tarjeta.
+											extraFields: function (row, onChangeRow) {
+												return el(
+													'div',
+													{ className: 'es-caseb-sub__row' },
+													el(TextControl, {
+														label: __('Detour screen (optional)', 'estavillo-portfolio-core'),
+														help: __('If this branch leads to its own screen (not straight to the next node), name it here — it becomes a visible node.', 'estavillo-portfolio-core'),
+														value: row.detourTitle || '',
+														onChange: function (v) {
+															onChangeRow({ detourTitle: v });
+														},
+													}),
+													row.detourTitle
+														? el(TextControl, {
+															label: __('Detour description', 'estavillo-portfolio-core'),
+															value: row.detourText || '',
+															onChange: function (v) {
+																onChangeRow({ detourText: v });
+															},
+														})
+														: null,
+													row.detourTitle
+														? el(TextControl, {
+															label: __('Reconnect caption', 'estavillo-portfolio-core'),
+															help: __('e.g. "Continues to Checkout" — where this detour rejoins the flow.', 'estavillo-portfolio-core'),
+															value: row.detourNext || '',
+															onChange: function (v) {
+																onChangeRow({ detourNext: v });
+															},
+														})
+														: null
+												);
 											},
 										})
 									)

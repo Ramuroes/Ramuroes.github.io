@@ -683,6 +683,89 @@
 	color: var(--es-decision);
 }
 
+/* Pastilla cuya salida tiene pantalla propia (ver .es-flow__satellite más
+   abajo): una flechita chica es la única pista extra — el pill en sí no
+   cambia de tamaño ni de peso. */
+.es-flow__branch--detour::after {
+	content: '↓';
+	margin-left: 5px;
+	font-size: 9px;
+}
+
+/* ---------- rama con pantalla propia (satélite) ----------
+   Una decisión real tiene dos salidas; la que NO sigue derecho al
+   siguiente nodo (típicamente "No") pasa antes por una pantalla propia
+   del recorrido — eso tiene que ser un nodo visible, no una frase adentro
+   del panel colapsable. Se cuelga chico y silenciado de su branch pill,
+   con el mismo criterio de peso que .es-flow__branch: nunca compite con
+   la forma principal del diagrama. reconnectLabel (es-flow__satellite-next)
+   es texto libre, no un cálculo "vuelve al nodo X" — mantiene el
+   componente genérico para cualquier flujo futuro (User Journey, Service
+   Blueprint, Decision Tree), no sólo esta decisión puntual. */
+.es-flow__satellites {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-top: 12px;
+}
+
+.es-flow__satellite {
+	display: flex;
+	flex-direction: column;
+	max-width: 260px;
+}
+
+.es-flow__satellite-connector {
+	display: block;
+	width: 14px;
+	height: 16px;
+	margin-left: 10px;
+	color: var(--es-decision-dim);
+}
+
+.es-flow__satellite-connector svg {
+	display: block;
+	width: 100%;
+	height: 100%;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.25;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.es-flow__satellite-card {
+	padding: 10px 12px;
+	border: 1px dashed var(--es-decision-dim);
+	border-radius: var(--es-radius-sm);
+	background: var(--es-paper-2);
+}
+
+.es-flow__satellite-title {
+	display: block;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--es-ink-2);
+}
+
+.es-flow__satellite-text {
+	display: block;
+	margin-top: 4px;
+	font-size: 11.5px;
+	line-height: 1.5;
+	color: var(--es-ink-3);
+}
+
+.es-flow__satellite-next {
+	display: block;
+	margin-top: 7px;
+	font-family: var(--es-mono);
+	font-size: 9px;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+}
+
 /* ---------- panel de detalle ----------
    BASE = visible y estático: esto es lo que ve alguien sin JS. */
 
@@ -1153,13 +1236,21 @@
 	   borde de la fila) termina mucho más lejos de la pastilla real de lo
 	   que --es-flow-marker-gap por sí solo sugiere. transform (no margin)
 	   a propósito: sólo la etiqueta se desliza hacia el nodo — la franja,
-	   la fila y los conectores quedan exactamente donde ya estaban. */
+	   la fila y los conectores quedan exactamente donde ya estaban.
+
+	   El valor de Fin es mayor que el de Inicio porque su fila (08–End)
+	   además tiene una rama con nodo satélite propio (ver
+	   .es-flow__satellite más abajo): el satélite cuelga DEBAJO del
+	   rombo, en la misma fila, y estira su alto real bastante más allá
+	   de --es-flow-shape-h. Valor medido contra el contenido real (los
+	   dos idiomas dan el mismo resultado); si el texto de una rama
+	   detour cambia mucho de longitud, puede necesitar reajuste. */
 	.es-flow .es-flow__marker--start {
 		transform: translateY(64px);
 	}
 
 	.es-flow .es-flow__marker--end {
-		transform: translateY(-176px);
+		transform: translateY(-292px);
 	}
 
 	.es-flow.is-enhanced .es-flow__trigger:hover,
