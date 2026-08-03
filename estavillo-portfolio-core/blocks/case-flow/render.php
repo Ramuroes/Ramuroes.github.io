@@ -71,14 +71,19 @@ if ( ! function_exists( 'es_flow_node_kind' ) ) {
  * aunque el svg se estire con preserveAspectRatio="none".
  * Sin <marker>/<defs>: los IDs de marker colisionarían si hay más de un
  * flujo en la misma página — la punta de flecha es un polyline común.
+ *
+ * Línea y punta de flecha llegan hasta ~96-98 (en vez de 92-93): el hueco
+ * final se reduce sin llegar a 100 para que la punta no se solape con el
+ * borde/sombra de la forma de destino — pulido puramente visual, no toca
+ * geometría de grid/rieles/posición de las formas.
  */
 if ( ! function_exists( 'es_flow_connector_svg' ) ) {
 	function es_flow_connector_svg() {
 		return '<svg class="es-flow__connector" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
-			. '<path class="es-flow__line es-flow__line--h" d="M0 50 H92" vector-effect="non-scaling-stroke" />'
-			. '<polyline class="es-flow__head es-flow__head--h" points="86,44 93,50 86,56" vector-effect="non-scaling-stroke" />'
-			. '<path class="es-flow__line es-flow__line--v" d="M50 0 V92" vector-effect="non-scaling-stroke" />'
-			. '<polyline class="es-flow__head es-flow__head--v" points="44,86 50,93 56,86" vector-effect="non-scaling-stroke" />'
+			. '<path class="es-flow__line es-flow__line--h" d="M0 50 H96" vector-effect="non-scaling-stroke" />'
+			. '<polyline class="es-flow__head es-flow__head--h" points="91,44 98,50 91,56" vector-effect="non-scaling-stroke" />'
+			. '<path class="es-flow__line es-flow__line--v" d="M50 0 V96" vector-effect="non-scaling-stroke" />'
+			. '<polyline class="es-flow__head es-flow__head--v" points="44,91 50,98 56,91" vector-effect="non-scaling-stroke" />'
 			. '</svg>';
 	}
 }

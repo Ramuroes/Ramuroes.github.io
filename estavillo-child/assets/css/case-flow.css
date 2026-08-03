@@ -32,13 +32,23 @@
 	   0 en el grid de desktop (el conector ya hace de separador entre
 	   filas), y si el marcador compartiera esa variable quedaría pegado
 	   a "Inicio" — exactamente el bug que corrige este ticket. */
-	--es-flow-marker-gap: 20px;
+	--es-flow-marker-gap: 14px;
 	--es-flow-node-bg: var(--es-surface);
 	--es-flow-mark: var(--es-ink-4);
 	--es-flow-mark-2: var(--es-signal-2);
+	/* Paso del retraso entre nodos consecutivos en la animación de entrada
+	   (ver .is-revealed más abajo): con ~12 nodos, 80ms de paso suma una
+	   secuencia total de ~1-1.3s, dentro del rango pedido. */
+	--es-flow-stagger: 80ms;
 
 	position: relative;
-	margin: clamp(32px, 4.5vw, 52px) 0;
+	/* Top más corto que bottom a propósito: en Trazur el flujo viene
+	   siempre después de una lista de bullets (.es-case__body ul tiene
+	   margin:0 — ver case-study.css), así que ANTES del diagrama todo el
+	   espacio lo pone este margen. clamp(32,4.5vw,52) arriba Y abajo
+	   dejaba un salto más grande de lo necesario entre "el resumen en
+	   viñetas" y el diagrama; abajo se mantiene igual de generoso. */
+	margin: clamp(20px, 3vw, 36px) 0 clamp(32px, 4.5vw, 52px);
 	color: var(--es-ink-2);
 }
 
@@ -56,6 +66,12 @@
    fuga que "li + li" más arriba). */
 .es-flow .es-flow__marker {
 	margin: 0;
+	/* Pulido de ritmo: centrado también en mobile/tablet, no sólo en el
+	   grid de desktop (ver la regla >=1280px más abajo) — Inicio/Fin ya
+	   ocupan el ancho completo de su columna en cualquier viewport, así
+	   que centrar el texto del marcador alinea su propio centro con el
+	   de la pastilla real, en vez de quedar pegado al borde izquierdo. */
+	text-align: center;
 	font-family: var(--es-mono);
 	font-size: 10.5px;
 	font-weight: 500;
@@ -235,16 +251,17 @@
 	display: none;
 }
 
-/* “las líneas se dibujan una vez al cargar” — una sola pasada, sin loop */
+/* Visibles por defecto (contrato sin-JS: nada esencial depende del JS).
+   La animación de entrada (dibujo + secuencia) sólo se activa más abajo,
+   bajo .es-flow.is-enhanced — ahí es donde se pre-esconden y se disparan
+   con la entrada en viewport. */
 .es-flow__line {
 	stroke-dasharray: 100;
-	stroke-dashoffset: 100;
-	animation: es-flow-draw var(--es-dur-slow) var(--es-ease) forwards;
+	stroke-dashoffset: 0;
 }
 
 .es-flow__head {
-	opacity: 0;
-	animation: es-flow-fade var(--es-dur) var(--es-ease) var(--es-dur-fast) forwards;
+	opacity: 1;
 }
 
 @keyframes es-flow-draw {
@@ -257,6 +274,71 @@
 	to {
 		opacity: 1;
 	}
+}
+
+@keyframes es-flow-item-in {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	/* to: none (no translateY(0)) — con fill-mode forwards el valor final
+	   queda aplicado para siempre, y CUALQUIER transform que no sea
+	   literalmente "none" crea un stacking context nuevo en el nodo. Con
+	   translateY(0) cada .es-flow__item quedaba con su propio stacking
+	   context permanente, y eso rompía el popover: la fila siguiente
+	   (mismo nivel, más tarde en el DOM) pasaba a pintarse ENCIMA del
+	   popover en vez de abajo. transform:none no genera ese contexto. */
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+/* ---------- animación de entrada, una sola vez ----------
+   Requiere .is-enhanced (case-flow.js) para pre-esconder: sin JS el
+   flujo se ve completo desde el primer pintado. .is-revealed lo agrega
+   el mismo script cuando ~25-35% del componente entra en el viewport
+   (IntersectionObserver, se desconecta después del primer disparo — no
+   se repite al seguir scrolleando). El orden Start→conector→01→… lo da
+   --i, que el JS escribe en cada .es-flow__item siguiendo el mismo
+   orden real del DOM (el de la narrativa serpenteada). */
+.es-flow.is-enhanced:not(.is-revealed) .es-flow__item {
+	opacity: 0;
+	transform: translateY(10px);
+}
+
+.es-flow.is-enhanced:not(.is-revealed) .es-flow__line {
+	stroke-dashoffset: 100;
+}
+
+.es-flow.is-enhanced:not(.is-revealed) .es-flow__head {
+	opacity: 0;
+}
+
+/* fill-mode "backwards" (NO "forwards"): sostiene el keyframe 0% durante
+   el animation-delay (si no, cada nodo/línea aparecería de golpe apenas
+   se agrega .is-revealed, y recién después "animaría" desde ahí — el
+   típico flash). Deliberadamente SIN "forwards": un valor de transform
+   distinto de "none" que quede aplicado para siempre (aunque sea la
+   identidad, translateY(0)) crea un stacking context nuevo y permanente
+   en cada nodo — eso rompía el popover (la fila siguiente pasaba a
+   pintarse encima). Sin "forwards", al terminar la animación el elemento
+   vuelve a su valor de cascada normal (sin animar), que ya es
+   exactamente el mismo estado final (opacity:1, transform:none,
+   stroke-dashoffset:0) — cero salto visual, cero stacking context extra. */
+.es-flow.is-revealed .es-flow__item {
+	animation: es-flow-item-in var(--es-dur) var(--es-ease) backwards;
+	animation-delay: calc(var(--es-flow-stagger) * var(--i, 0));
+}
+
+.es-flow.is-revealed .es-flow__line {
+	animation: es-flow-draw var(--es-dur-slow) var(--es-ease) backwards;
+	animation-delay: calc(var(--es-flow-stagger) * var(--i, 0));
+}
+
+.es-flow.is-revealed .es-flow__head {
+	animation: es-flow-fade var(--es-dur) var(--es-ease) backwards;
+	animation-delay: calc(var(--es-flow-stagger) * var(--i, 0) + var(--es-dur-fast));
 }
 
 /* ---------- nodo ---------- */
@@ -446,7 +528,10 @@
 .es-flow .es-flow__legend {
 	display: flex;
 	align-items: center;
-	margin: 22px 0 0;
+	/* Ritmo más compacto (pulido final): la nota del pie (que explica el
+	   marcador IA) quedaba con más aire del necesario respecto al último
+	   nodo/marcador End justo encima. */
+	margin: 16px 0 0;
 	font-family: var(--es-mono);
 	font-size: 10.5px;
 	line-height: 1.5;
@@ -1134,14 +1219,25 @@
    ========================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-	.es-flow__line {
+	.es-flow__line,
+	.es-flow.is-enhanced:not(.is-revealed) .es-flow__line,
+	.es-flow.is-revealed .es-flow__line {
 		stroke-dasharray: none;
 		stroke-dashoffset: 0;
 		animation: none;
 	}
 
-	.es-flow__head {
+	.es-flow__head,
+	.es-flow.is-enhanced:not(.is-revealed) .es-flow__head,
+	.es-flow.is-revealed .es-flow__head {
 		opacity: 1;
+		animation: none;
+	}
+
+	.es-flow.is-enhanced:not(.is-revealed) .es-flow__item,
+	.es-flow.is-revealed .es-flow__item {
+		opacity: 1;
+		transform: none;
 		animation: none;
 	}
 

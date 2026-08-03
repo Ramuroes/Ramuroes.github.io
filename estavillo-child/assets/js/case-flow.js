@@ -41,6 +41,13 @@
 		// A partir de acá el CSS puede esconder paneles con seguridad.
 		flow.classList.add('is-enhanced');
 
+		// --i alimenta el retraso escalonado de la animación de entrada
+		// (case-flow.css, .es-flow.is-revealed) — mismo orden que el DOM,
+		// que ya es el orden de lectura real de la narrativa serpenteada.
+		items.forEach(function (item, idx) {
+			item.style.setProperty('--i', idx);
+		});
+
 		var openItem = null;
 
 		function panelOf(item) {
@@ -223,6 +230,29 @@
 			items.forEach(function (item) {
 				observer.observe(item);
 			});
+		}
+
+		// ---- animación de entrada, una sola vez ----
+		// Se dispara cuando ~30% del componente entra en el viewport y
+		// nunca se repite (se desconecta después del primer disparo).
+		// Con prefers-reduced-motion el CSS ya fuerza todo visible sin
+		// animación, así que ni vale la pena observar: se revela directo.
+		var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		if (reduceMotion || !('IntersectionObserver' in window)) {
+			flow.classList.add('is-revealed');
+		} else {
+			var revealObserver = new IntersectionObserver(
+				function (entries, obs) {
+					entries.forEach(function (entry) {
+						if (entry.isIntersecting) {
+							flow.classList.add('is-revealed');
+							obs.disconnect();
+						}
+					});
+				},
+				{ threshold: 0.3 }
+			);
+			revealObserver.observe(flow);
 		}
 	}
 
