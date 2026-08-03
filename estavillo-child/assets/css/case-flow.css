@@ -277,6 +277,10 @@
 	margin: 0;
 	padding: 0;
 	border: 0;
+	/* algunos motores conservan el estilo NATIVO de <button> (halo de foco
+	   propio de la plataforma) incluso con outline reseteado, si no se
+	   apaga explícitamente el appearance por defecto. */
+	appearance: none;
 	background: none;
 	font: inherit;
 	color: inherit;
@@ -680,10 +684,17 @@
    (--es-flow-mark-2 — verde por defecto, naranja en un nodo de decisión,
    nunca un color ajeno) más una superficie apenas más clara. Nada de
    relleno sólido ni azul: es el mismo criterio de estado que el resto
-   del sitio, aplicado al color que cada nodo ya trae. */
-.es-flow.is-enhanced .es-flow__trigger:hover .es-flow__shape,
-.es-flow.is-enhanced .es-flow__trigger:focus-visible .es-flow__shape,
-.es-flow.is-enhanced .es-flow__item.is-open .es-flow__shape {
+   del sitio, aplicado al color que cada nodo ya trae.
+
+   :not(.es-flow__item--decision) es deliberado: para una decisión,
+   .es-flow__shape es el CUADRADO invisible que envuelve al rombo (ver
+   arriba, background:none/border:0 en reposo) — si este mismo tinte
+   entrara acá también, se pintaría un plato rectangular detrás del rombo
+   al pasar el mouse o enfocar. El rombo tiene su propia regla, dos bloques
+   más abajo, aplicada a ::before (el elemento realmente rotado). */
+.es-flow.is-enhanced .es-flow__item:not(.es-flow__item--decision) .es-flow__trigger:hover .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item:not(.es-flow__item--decision) .es-flow__trigger:focus-visible .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item:not(.es-flow__item--decision).is-open .es-flow__shape {
 	background: var(--es-surface-2);
 	border-color: var(--es-flow-mark-2);
 }
@@ -702,8 +713,58 @@
 	filter: brightness(1.12);
 }
 
-/* foco de teclado: el mismo anillo verde del resto del sitio (base.css) */
-.es-flow__trigger:focus-visible,
+/* ---------- foco de teclado — sigue la FORMA visible, no el área de clic ----------
+   .es-flow__trigger es el área táctil completa (incluye el aire vertical
+   de --es-flow-shape-h en desktop, más alto que la forma en sí — ver
+   .es-flow__shape-band más arriba). Si el outline se pusiera en .trigger
+   directamente, dibujaría un rectángulo más alto que la pastilla/rombo/
+   rectángulo real, sin seguir su contorno. Poniéndolo en .es-flow__shape
+   en cambio, el anillo verde traza exactamente la caja visible — y en
+   navegadores modernos el outline ya respeta el propio border-radius de
+   esa caja (pastilla incluida). El rombo no participa de esta regla — su
+   contorno no es una caja alineada a los ejes, tiene su propia solución
+   (box-shadow sobre el ::before rotado) inmediatamente después.
+
+   .es-flow__trigger:focus-visible { outline: none } es OBLIGATORIO acá,
+   no cosmético: .trigger es un <button> dentro de .es-page, así que la
+   regla genérica ".es-page button:focus-visible" (base.css) también le
+   pone un anillo verde — al área táctil completa, no a la forma. Sin
+   este reset quedarían DOS anillos superpuestos (uno correcto en la
+   forma, uno de más alrededor de toda la franja).
+
+   Prefijo ".es-flow" obligatorio por especificidad: la regla genérica es
+   ".es-page button:focus-visible" (1 clase + 1 elemento + 1 pseudo-clase),
+   más específica que ".es-flow__trigger:focus-visible" sola (1 clase + 1
+   pseudo) aunque esta última venga después en el archivo — el empate en
+   la categoría de clases se rompe por la categoría de elementos, y ahí
+   pierde. Con el prefijo pasa a 2 clases + 1 pseudo, que gana sin
+   depender del orden. */
+/* SIN gate de .is-enhanced a propósito: el foco de teclado tiene que
+   verse igual con o sin JS (mismo contrato de progressive enhancement
+   que el resto del bloque — ver el docblock de render.php). */
+.es-flow .es-flow__trigger:focus-visible {
+	outline: none;
+}
+
+.es-flow__item:not(.es-flow__item--decision) .es-flow__trigger:focus-visible .es-flow__shape {
+	outline: 2px solid var(--es-accent);
+	outline-offset: 3px;
+}
+
+/* El rombo está rotado 45° — un outline en .trigger o .shape siempre
+   sería un rectángulo recto, nunca el propio diamante. box-shadow en el
+   ::before SÍ hereda la rotación del elemento (el shadow se pinta en el
+   sistema de coordenadas YA transformado), así que su contorno traza el
+   rombo real. (El outline:none general de arriba ya cubre la decisión
+   también — esta regla queda para dejar la intención explícita.) */
+.es-flow__item--decision .es-flow__trigger:focus-visible {
+	outline: none;
+}
+
+.es-flow__item--decision .es-flow__trigger:focus-visible .es-flow__shape::before {
+	box-shadow: 0 0 0 2px var(--es-accent);
+}
+
 .es-flow__close:focus-visible {
 	outline: 2px solid var(--es-accent);
 	outline-offset: 3px;

@@ -3,9 +3,20 @@
    Botones, links con flecha, pills, cards, indicador "en vivo".
    ========================================================================= */
 
-/* ---------- botón principal (outline pill con flecha) ---------- */
-
-.es-btn {
+/* ---------- botón principal (outline pill con flecha) ----------
+   Sprint interaction-state fix: extendido a CUALQUIER core/button sin
+   clase dentro de .es-page (p.ej. "Descargar Póster (PDF)" de Trazur).
+   Antes de esto, ningún estilo de este design system tocaba
+   .wp-block-button__link/.wp-element-button dentro de un Case Study —
+   quedaban con el color primario por defecto de Kadence/WP (azul), sin
+   ninguna hoja que lo pisara. Es la MISMA regla, extendida — nunca un
+   tratamiento nuevo — así que un botón sin clase y un .es-btn explícito
+   (Currículum, hero) se ven y comportan idénticos. El estilo nativo
+   "Outline" de Gutenberg (.is-style-outline) resuelve al mismo look: acá
+   no existe una variante "rellena" aparte que inventar. */
+.es-btn,
+.es-page .wp-block-button__link,
+.es-page a.wp-element-button {
 	display: inline-flex;
 	align-items: center;
 	gap: 12px;
@@ -31,7 +42,13 @@
    hoja externa agresiva podía ganar igual con especificidad clase+pseudo. */
 .es-btn:hover,
 .es-btn:focus-visible,
-.es-btn:active {
+.es-btn:active,
+.es-page .wp-block-button__link:hover,
+.es-page .wp-block-button__link:focus-visible,
+.es-page .wp-block-button__link:active,
+.es-page a.wp-element-button:hover,
+.es-page a.wp-element-button:focus-visible,
+.es-page a.wp-element-button:active {
 	color: var(--es-ink) !important;
 	background: var(--es-accent-soft);
 	border: 1px solid var(--es-accent);
@@ -45,12 +62,43 @@
 
 /* el CTA conserva texto claro en todos los estados de link */
 .es-btn:link,
-.es-btn:visited {
+.es-btn:visited,
+.es-page .wp-block-button__link:link,
+.es-page .wp-block-button__link:visited,
+.es-page a.wp-element-button:link,
+.es-page a.wp-element-button:visited {
 	color: var(--es-ink) !important;
 }
 
 .es-btn__arrow {
 	color: var(--es-accent);
+}
+
+/* foco de teclado visible incluso en un botón sin clase: mismo anillo
+   verde del resto del sitio. .es-btn ya lo hereda del selector genérico
+   ".es-page a:focus-visible" (base.css) porque .es-btn siempre vive
+   dentro de .es-page; se declara explícito acá para que no dependa de
+   esa herencia si el bloque llega a usarse fuera de ese wrapper. */
+.es-page .wp-block-button__link:focus-visible,
+.es-page a.wp-element-button:focus-visible {
+	outline: 2px solid var(--es-accent);
+	outline-offset: 3px;
+}
+
+/* Reset defensivo de los DOS niveles de wrapper (.wp-block-buttons y
+   .wp-block-button) — nunca del link. pages.css ya hace esto mismo, pero
+   sólo bajo la clase .es-btn-group (documentado ahí: "el CV mostraba dos
+   contornos visibles"); ese archivo no carga en un Case Study. Generalizado
+   acá a CUALQUIER wp:buttons dentro de .es-page para que un botón sin
+   clase (el póster) quede con la misma protección, no sólo los que ya
+   usan es-btn-group explícito. */
+.es-page .wp-block-buttons,
+.es-page .wp-block-button {
+	border: none !important;
+	background: none !important;
+	border-radius: 0 !important;
+	padding: 0 !important;
+	box-shadow: none !important;
 }
 
 /* ---------- link con flecha ----------

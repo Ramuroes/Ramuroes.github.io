@@ -248,6 +248,32 @@
 	color: var(--es-accent);
 }
 
+/* El link al otro idioma (p.ej. "ES" mientras se ve la home en inglés) es
+   un <a> plano armado por es_print_lang_switcher() — nunca tuvo su propio
+   refuerzo de color, a diferencia de .es-nav__link/.es-nav__brand/
+   .es-mobile-menu__link (mismo motivo documentado en esos tres: el color
+   Link/Visited que Kadence inyecta desde el Customizer puede ganar sin
+   este !important). Resultado real visto en producción: azul en hover,
+   clic y :visited. Mismo criterio que el resto del header — nunca azul. */
+.es-nav__lang a,
+.es-mobile-menu__foot a {
+	color: inherit;
+}
+
+.es-nav__lang a:hover,
+.es-nav__lang a:focus-visible,
+.es-nav__lang a:active,
+.es-mobile-menu__foot a:hover,
+.es-mobile-menu__foot a:focus-visible,
+.es-mobile-menu__foot a:active {
+	color: var(--es-accent) !important;
+}
+
+.es-nav__lang a:visited,
+.es-mobile-menu__foot a:visited {
+	color: var(--es-ink-4) !important;
+}
+
 /* slot reservado para el futuro toggle Light/Dark (sin funcionalidad aún) */
 .es-nav__toggle {
 	display: inline-flex;
