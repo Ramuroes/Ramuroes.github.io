@@ -358,9 +358,22 @@ if ( ! function_exists( 'es_flow_layout' ) ) {
 					// Tramo del camino principal: recto. Horizontal si los dos
 					// están en la misma banda, vertical si es un salto de banda.
 					$same_band = ( $nodes[ $i ]['_band'] === $nodes[ $j ]['_band'] );
+					// El rombo mide 190px fijos pero su columna de grilla es más
+					// ancha (se centra con un margen a cada lado, ver .es-flow
+					// __item--decision .es-flow__shape-band en el CSS): un riel
+					// horizontal del ancho normal del gap se queda corto contra
+					// ESE margen, entre a un rombo o salga de uno. 'decisionEdge'
+					// avisa al CSS que este tramo toca un rombo en cualquiera de
+					// sus dos puntas, para que el riel se estire lo que haga
+					// falta — el mismo cálculo sirve para los dos casos porque el
+					// riel siempre queda anclado contra el destino y crece hacia
+					// atrás, sea cual sea el extremo angosto.
+					$decision_edge = ( 'decision' === es_flow_node_kind( $node['kind'] ?? 'step' ) )
+						|| ( 'decision' === es_flow_node_kind( $nodes[ $j ]['kind'] ?? 'step' ) );
 					$nodes[ $j ]['_links'][] = array(
-						'type'  => $same_band ? 'h' : 'v',
-						'label' => $label,
+						'type'   => $same_band ? 'h' : 'v',
+						'label'  => $label,
+						'wide'   => $same_band && $decision_edge,
 					);
 					// Si el salto de banda atraviesa un carril de ramas, hay que
 					// prolongar la línea a través de esa fila (si no, el conector
@@ -574,7 +587,7 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 									 * rombo compartía fila con una pastilla mucho más baja.
 									 */
 									?>
-									<span class="es-flow__rail es-flow__rail--<?php echo esc_attr( $es_link['type'] ); ?>" aria-hidden="true">
+									<span class="es-flow__rail es-flow__rail--<?php echo esc_attr( $es_link['type'] ); ?><?php echo ! empty( $es_link['wide'] ) ? ' is-decision-edge' : ''; ?>" aria-hidden="true">
 										<?php echo es_flow_connector_svg(); // phpcs:ignore WordPress.Security.EscapeOutput -- SVG del propio plugin, sin dato de usuario. ?>
 									</span>
 									<?php if ( '' !== $es_link['label'] ) : ?>

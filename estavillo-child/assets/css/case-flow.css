@@ -211,10 +211,62 @@
    Para que NO se confunda con un paso más del camino principal se indenta
    y se marca con una guía naranja: se lee "esto pasa sólo si la decisión
    sale por acá". El texto "Sí"/"No" del propio conector (--in) queda a la
-   vista arriba, así que la lógica sigue siendo explícita. */
+   vista arriba, así que la lógica sigue siendo explícita.
+
+   La guía sola (un simple borde punteado) se leía como una indentación,
+   no como un conector: no tenía ni principio ni fin marcados. Un ::before
+   y un ::after cortos — un pequeño codo, no una curva — le dan los dos
+   extremos que le faltaban: arriba, un tramo que se "despega" de la línea
+   principal hacia la guía punteada; abajo, un tramo con punta de flecha
+   que vuelve a apuntar hacia el próximo paso — el que YA es, en el orden
+   de lectura, el nodo al que la rama reingresa. No se agrega texto nuevo
+   (son trazos decorativos, aria-hidden por ser pseudo-elementos): el
+   contenido accesible sigue siendo el mismo, sólo se refuerza visualmente
+   lo que el orden del DOM ya dice. */
 .es-flow__item--branch {
+	position: relative;
 	padding-left: 18px;
 	border-left: 1px dashed var(--es-decision-dim);
+}
+
+.es-flow__item--branch::before {
+	content: '';
+	position: absolute;
+	left: -1px;
+	top: 11px;
+	width: 9px;
+	height: 1px;
+	background: var(--es-decision-dim);
+}
+
+/* Reingreso: un pequeño chevron apoyado en el extremo de la guía. Un
+   cuadrado diminuto rotado con dos bordes visibles (mismo truco ya usado
+   en otras puntas de flecha del componente): no hace falta un svg nuevo
+   ni tocar el markup, es un pseudo-elemento puramente decorativo.
+
+   Apunta hacia ABAJO por default — "esto vuelve al flujo, que sigue justo
+   debajo" — porque una rama que abre pantalla propia y sigue hacia
+   ADELANTE (ver render.php: rejoins=true) reingresa exactamente en el
+   siguiente nodo de la lectura (Registro → Checkout es el paso siguiente
+   de verdad). Un BUCLE es distinto: el próximo bloque en el orden del DOM
+   es la OTRA salida de la misma decisión (la rama "Sí"), no el destino
+   real del bucle, que está más arriba. Ahí el chevron apunta hacia ARRIBA
+   — la misma pieza, sólo espejada — para no sugerir una continuación que
+   no existe. .is-loop lo pone render.php mirando el grafo, nunca a mano. */
+.es-flow__item--branch::after {
+	content: '';
+	position: absolute;
+	left: -5px;
+	bottom: 2px;
+	width: 7px;
+	height: 7px;
+	border-right: 1px solid var(--es-decision-dim);
+	border-bottom: 1px solid var(--es-decision-dim);
+	transform: rotate(45deg);
+}
+
+.es-flow__item--branch.is-loop::after {
+	transform: rotate(225deg);
 }
 
 
@@ -1016,6 +1068,16 @@
 		   de esa fila —incluida la pastilla de Inicio/Fin— se centran en
 		   el mismo eje que el rombo, sin números mágicos por nodo. */
 		--es-flow-shape-h: 90px;
+		/* (columna − 190px) / 2: cuánto margen le queda al rombo (190px
+		   fijos) adentro de una columna de grilla más ancha. Con 4 columnas
+		   y el ancho editorial de 1044px de --es-flow-track, la columna mide
+		   241.5px, así que el margen es (241.5-190)/2. No depende del
+		   contenido — sólo de la grilla (4 columnas, 26px de gap) y del
+		   único tamaño de rombo que existe — así que es una constante del
+		   componente, no un número por nodo. Si el flujo alguna vez usa
+		   --es-flow-cols distinto de 4, este valor hay que recalcularlo con
+		   la misma fórmula (ver el comentario de .is-decision-edge). */
+		--es-flow-decision-slack: 25.75px;
 	}
 
 	/* el progreso 01/08 es una affordance de scroll mobile: no aplica acá.
@@ -1053,6 +1115,21 @@
 	   concreto. */
 	.es-flow__item.is-tall {
 		--es-flow-shape-h: 190px;
+	}
+
+	/* El rombo raíz de un conector: la franja (shape-band) es tan ancha como
+	   la COLUMNA de grilla, pero el rombo mismo tiene max-width:190px y
+	   queda centrado adentro con un margen a cada lado — en columnas más
+	   anchas que 190px (el caso real: ~242px), ese margen medía 25-26px por
+	   costado. Los rieles horizontales cuelgan del BORDE DE LA FRANJA, así
+	   que ese margen se traducía en un conector que se detenía 25-26px antes
+	   del vértice real del rombo, en vez de tocarlo. Igualando el ancho de
+	   la franja al del propio rombo, el borde de la franja Y el vértice
+	   quedan en el mismo punto — sin mover un solo pixel el resto del
+	   layout, porque el rombo ya estaba centrado ahí. */
+	.es-flow__item--decision .es-flow__shape-band {
+		max-width: 190px;
+		margin-inline: auto;
 	}
 
 	/* ---- SERPENTINA, ahora dirigida por el DATO ----
@@ -1114,10 +1191,41 @@
 		display: block;
 	}
 
+	/* El riel normal (var(--es-flow-col), 26px) mide exactamente el gap de
+	   la grilla — correcto entre dos rectángulos, que llenan el 100% de su
+	   columna. Un rombo NO: mide 190px fijos dentro de una columna más
+	   ancha, centrado con un margen a cada lado (ver .es-flow__item
+	   --decision .es-flow__shape-band más abajo). Si cualquiera de los dos
+	   extremos de este tramo es una decisión, ese margen se suma al gap
+	   real que el riel tiene que cubrir — si no, la flecha se detiene
+	   antes de tocar el rombo, o el trazo nace lejos del rectángulo
+	   anterior. render.php ya sabe si el tramo toca un rombo (mira el
+	   grafo, no el CSS) y lo marca con .is-decision-edge; acá sólo se
+	   define CUÁNTO estirar, una vez, para cualquier rombo del sistema —
+	   190px de lado es el único tamaño de rombo que existe.
+	   El riel siempre queda anclado por el lado que ya toca a SU propio
+	   nodo (right:100% o, en RTL, left:100%) y crece hacia atrás: estirar
+	   el ancho nunca desancla la punta que ya estaba bien, sólo alarga el
+	   otro extremo hasta el próximo nodo, sea cual sea cuál de los dos es
+	   el rombo. */
+	.es-flow__rail--h.is-decision-edge {
+		width: calc(var(--es-flow-col) + var(--es-flow-decision-slack));
+	}
+
 	/* Salto de banda: caída vertical recta. El nodo de llegada queda en la
 	   MISMA columna que el de salida (lo garantiza la serpentina), así que
 	   no hace falta ningún desvío horizontal — sólo el trazo vertical del
-	   propio svg, del alto exacto del salto de fila. */
+	   propio svg, del alto exacto del salto de fila. Deliberadamente NO
+	   estirado hasta el borde de la forma anterior: el cuerpo (descripción
+	   + "Ver detalle") vive en esa franja, en el mismo eje central que este
+	   riel — estirar el riel hasta ahí lo haría cruzar ese texto. La franja
+	   de despeje del cuerpo (--es-flow-body-clear, ver más abajo) ahora
+	   mide SIEMPRE lo mismo para cualquier nodo, así que este gap —aunque
+	   no toque la forma— es idéntico y predecible en todo el diagrama: se
+	   lee como una pausa deliberada después de la descripción, no como un
+	   corte arbitrario a mitad de fila (que es lo que pasaba antes, cuando
+	   el alto de cada fila lo definía el vecino con la descripción más
+	   larga). */
 	.es-flow__rail--v {
 		left: 50%;
 		right: auto;
@@ -1181,6 +1289,18 @@
 	.es-flow__item--branch {
 		padding-left: 0;
 		border-left: 0;
+	}
+
+	/* Los ticks y el chevron de "codo" (::before/::after) son un recurso
+	   de la narrativa vertical: ahí no hay grid, así que la guía punteada
+	   necesita marcar dónde empieza y dónde reingresa. En desktop la
+	   bifurcación real ya la dibuja el conector en "L" con su propia
+	   punta de flecha — dejar estos pseudo-elementos activos los mostraría
+	   sueltos, sin la guía punteada que les da sentido (que también se
+	   apaga acá arriba). */
+	.es-flow__item--branch::before,
+	.es-flow__item--branch::after {
+		display: none;
 	}
 
 	.es-flow__item--branch .es-flow__shape {
@@ -1434,6 +1554,45 @@
 		bottom: calc(100% + 7px);
 		max-width: 100%;
 		text-align: left;
+	}
+
+	/* =====================================================================
+	   FRANJA DE DESPEJE DEL CUERPO — por qué un conector vertical podía
+	   "empezar en un punto distinto según el vecino de fila"
+	   ---------------------------------------------------------------------
+	   Cada fila del grid mide, en alto, lo que mida su ítem MÁS ALTO — y
+	   ese alto incluye la descripción de cada nodo, que variaba de uno a
+	   otro. Un conector vertical (el riel entre bandas, la prolongación a
+	   través de un carril de ramas, la "L" que entra o sale de una
+	   pantalla intermedia) arranca en el BORDE DE LA FILA — así que su
+	   punto de partida dependía de qué tan larga fuera la descripción del
+	   vecino más largo de esa fila, no de la del propio nodo: dos filas
+	   con el mismo tipo de salto podían dejar un gap visualmente distinto.
+
+	   La solución no es medir nada en JS: es hacer que TODOS los cuerpos
+	   midan lo MISMO, una franja fija (--es-flow-body-clear) que cabe
+	   holgada hasta 2 líneas de descripción + el afordance "Ver detalle".
+	   Con eso el alto de CUALQUIER fila es siempre (alto de forma + esta
+	   franja), sin excepción — así que el conector, aunque siga arrancando
+	   en el borde de la fila (deliberadamente: estirarlo más cruzaría la
+	   descripción del propio nodo, que vive en el mismo eje), arranca
+	   siempre a la MISMA distancia relativa de cualquier forma, en
+	   cualquier fila. Un gap fijo y uniforme, no una distancia que cambia
+	   según el contenido del vecino. */
+	.es-flow {
+		--es-flow-body-clear: 74px;
+	}
+
+	.es-flow__body {
+		height: var(--es-flow-body-clear);
+		overflow: hidden;
+	}
+
+	.es-flow__text {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		overflow: hidden;
 	}
 
 	/* Marcadores de contexto anclados a SU PROPIA pastilla.
