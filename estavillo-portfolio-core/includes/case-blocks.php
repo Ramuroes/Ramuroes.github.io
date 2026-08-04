@@ -57,6 +57,7 @@ function es_case_blocks_list() {
 		'case-quote',
 		'case-details',
 		'case-flow',
+		'case-flow-v2',
 		'case-findings-list',
 	);
 }
@@ -141,6 +142,9 @@ function es_case_blocks_editor_theme_css() {
 		'es-editor-tokens'     => 'assets/css/tokens.css',
 		'es-editor-case-study' => 'assets/css/case-study.css',
 		'es-editor-case-flow'  => 'assets/css/case-flow.css',
+		// La v2 son sólo los deltas de geometría: DEPENDE de que case-flow.css
+		// ya esté encolado, y este array conserva el orden de inserción.
+		'es-editor-case-flow-v2' => 'assets/css/case-flow-v2.css',
 	);
 
 	foreach ( $theme_css as $handle => $rel ) {

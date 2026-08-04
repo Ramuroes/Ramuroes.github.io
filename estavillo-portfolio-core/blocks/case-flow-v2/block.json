@@ -1,0 +1,34 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/case-flow-v2",
+	"title": "Case Flow v2 (vértices)",
+	"category": "estavillo-case",
+	"icon": "randomize",
+	"description": "Diagrama de flujo con conectores anclados a los VÉRTICES del rombo, como un flowchart clásico. La rama sale del vértice superior hacia una pantalla intermedia que baja al mismo destino que el vértice derecho, y un bucle sale del vértice inferior y vuelve a un paso anterior sin pasar por ninguna tarjeta. Mismo dato de grafo (nodos + aristas) y mismos colores que Case Flow; convive con la v1, no la reemplaza.",
+	"keywords": [ "estavillo", "flow", "flujo", "flowchart", "decision", "rombo", "loop", "diagram" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"sectionLabel": { "type": "string", "default": "" },
+		"nodes": {
+			"type": "array",
+			"default": [],
+			"items": { "type": "object" }
+		},
+		"startLabel": { "type": "string", "default": "" },
+		"endLabel": { "type": "string", "default": "" },
+		"detailLabel": { "type": "string", "default": "Details" },
+		"closeLabel": { "type": "string", "default": "Close" },
+		"stepLabel": { "type": "string", "default": "Step" },
+		"aiLegend": { "type": "string", "default": "" },
+		"density": { "type": "string", "default": "comfortable" },
+		"columns": { "type": "number", "default": 4 }
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-case-block-case-flow-v2",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}

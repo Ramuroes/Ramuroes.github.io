@@ -5,6 +5,32 @@ Same data model renders a Process Flow, a User Journey, a Service
 Blueprint, a Decision Tree, an IA Workflow or a System Diagram — the shape
 comes from the data, never from hand-written markup.
 
+## 0. Two blocks, one data model
+
+There are **two** flow blocks, and they are both supported. They take the
+*same* attributes, so content moves between them by changing one block name.
+
+| | `estavillo/case-flow` | `estavillo/case-flow-v2` |
+|---|---|---|
+| Title in the inserter | Case Flow | Case Flow v2 (vértices) |
+| Connectors leave a decision from | the card's side or top | the **diamond's vertices** |
+| A "No" that needs its own screen | branch card in a lane, entered from the side | leaves the **top vertex**, and that screen drops back into the same node the **right vertex** feeds |
+| A loop | needs an intermediate node that points back | an **edge straight back** — leaves the **bottom vertex**, no card |
+| Decision description | under the diamond | in the popover (the vertical axis is reserved for connectors) |
+| Nodes per row | fixed at 4 | `columns` attribute (3–6) |
+
+Everything else — tokens, colours, shapes, hover, popovers, focus, the
+entrance animation, the mobile narrative, progressive enhancement — is the
+same code. `case-flow-v2.css` holds **only** the geometry deltas and loads
+after `case-flow.css`; there is no duplicated CSS and no second JS file.
+
+**Which to use.** v2 when the diagram has a real fork or a loop and should
+read like a classic flowchart. v1 for a mostly linear flow, or for anything
+already published that you don't want to touch. v1 is not deprecated.
+
+Sections 3–9 below describe the shared model and the v1 geometry; §10
+covers what v2 changes.
+
 ## 1. Why one block and not a Pattern
 
 The ticket asked to prefer a Pattern. A Pattern cannot do this job, for
@@ -39,7 +65,11 @@ theme, not duplicated in the plugin.
 | `estavillo-portfolio-core/blocks/case-flow/render.php` | Server render (the only markup source) |
 | `estavillo-portfolio-core/blocks/case-flow/edit.js` | Editor UI (repeaters, no JSX) |
 | `estavillo-child/assets/css/case-flow.css` | All presentation (tokens only) |
-| `estavillo-child/assets/js/case-flow.js` | Optional interaction layer (~4 KB) |
+| `estavillo-child/assets/js/case-flow.js` | Optional interaction layer (~4 KB), shared by both blocks |
+| `estavillo-portfolio-core/blocks/case-flow-v2/block.json` | v2 attributes (adds `columns`) |
+| `estavillo-portfolio-core/blocks/case-flow-v2/render.php` | v2 server render + vertex layout engine |
+| `estavillo-portfolio-core/blocks/case-flow-v2/edit.js` | v2 editor UI (same controls + nodes-per-row) |
+| `estavillo-child/assets/css/case-flow-v2.css` | v2 geometry deltas **only** — needs `case-flow.css` first |
 
 Loaded on the front end only where the block actually is
 (`has_block( 'estavillo/case-flow' )` in `inc/enqueue.php`), and bridged
@@ -321,3 +351,109 @@ into `case-patterns.php`).
   bands. This is verified to work at length (an 18-node fixture lays out
   as 5 correct serpentine bands with no CSS change), but a flow of that
   size is tall; a dedicated "long flow" treatment is not built.
+
+## 10. Case Flow v2 — connectors anchored to the diamond's vertices
+
+### What problem it solves
+
+In v1 a branch connector deliberately enters a card's **side or top**,
+because underneath every shape lives its description — a stroke running
+down the centre would cross text. That is correct, but it makes a decision
+read as a box with attachments rather than as a flowchart diamond. v2
+inverts the trade: it frees the diamond's vertical axis (a decision's
+description moves into the popover, and the desktop "show detail"
+affordance is dropped since hover already signals it), and then all four
+vertices become real connection points.
+
+    right vertex   → the main line, straight on to the next step
+    top vertex     → the branch rises to a lane, enters an intermediate
+                     screen, and that screen drops back into the SAME node
+                     the right vertex feeds — the two paths rejoin
+    bottom vertex  → the loop drops into a return channel under the band,
+                     runs along it, and comes back UP into an earlier step
+
+### The loop is just an edge
+
+No intermediate node required. An edge pointing at any node that appears
+earlier on the main path is detected as a loop from the graph alone and
+drawn as a return channel. In v1 the same idea needed a "go back to X"
+card; in v2 you point at X.
+
+### Extra rows
+
+A band can now allocate up to three grid rows, and only what it needs:
+
+    lane row     — intermediate screens (only if the band opens one)
+    band row     — the main path
+    return row   — a fixed-height empty channel (only if the band loops)
+
+A flow with no branches and no loops uses exactly the rows v1 used.
+
+### Why the strokes are grid items
+
+`.es-flow__route` elements are positioned by the grid, not nested inside a
+card, because a stroke is born at a vertex in **one** row and dies at the
+edge of a card in **another** — the only reference both ends share is the
+grid. Each one computes the width of a single column from its own span
+(`--colw`), so it can aim at the exact centre of the first or last column
+it covers without knowing how many there are.
+
+Two consequences worth knowing if you touch this CSS:
+
+- The route `<li>` needs `align-self: stretch`. The track is
+  `align-items: start`, and a route has no in-flow content, so without it
+  the box collapses to zero height and every offset resolves against the
+  top edge of the row instead of the row.
+- It also needs `margin: 0`. It is an `<li>` inside case-study prose, so
+  it inherits the list-item margin — which would shift the origin of the
+  whole geometry.
+
+### Why the loop enters from below, not from the side
+
+Entering the target's side at the shape axis would put the return stroke
+exactly on top of the main connector that already occupies that gutter at
+that height, and the two would merge into one line. Underneath there is
+real clearance: the shape band is taller than the rectangle (the band's
+height is set by the diamond), so between the box's base and the end of
+the band there is an empty horizontal lane. The return runs through it and
+rises into the column's centre — which is also what the reference diagram
+does.
+
+### `columns`
+
+v2 exposes nodes-per-row as an attribute (3–6, default 4) because it
+decides **which nodes share a row**, and therefore whether a decision and
+the step its branch rejoins land in the same band. Trazur uses 5 so that
+`¿Está logueado?` and `Checkout` sit side by side and the fork reads as a
+fork. This is in the Inspector as "Nodes per row (desktop)".
+
+### Accessibility
+
+The Yes/No chips sit on absolutely-positioned strokes, outside reading
+order, so they are `aria-hidden` decoration. The fork itself is emitted as
+visually-hidden text inside the decision node — "Sí: Checkout. No:
+Registro / Crear cuenta." — which is what a screen reader actually needs,
+and is also what carries the branch on mobile, where the strokes are not
+drawn at all.
+
+### Verified
+
+- v1 renders **identically** with v2's stylesheet loaded alongside:
+  computed geometry of all 14 nodes compared at 1440 / 1280 / 900 / 390px.
+- v2's engine on five graphs that are not Trazur: a legacy linear flow with
+  no edges, a loop in a left-to-right band, a loop in a right-to-left band,
+  a fork with a rejoining screen, and both together plus a dangling edge.
+- Vertex anchoring asserted on real computed geometry, not markup: the
+  stroke's origin is within a few pixels of the diamond's actual apex, and
+  no painted segment overlaps any card's description.
+
+### Limitations
+
+- Same as §9, plus: **one loop per band renders cleanly.** Two loops in the
+  same band would share one return channel and could overlap; the engine
+  allocates a single channel row per band.
+- The clear lane the loop enters through exists because the band is taller
+  than the rectangle. In a band with **no** decision the clearance is small
+  (~12px), so a loop that targets a node in a band with no diamond will
+  read tighter. In practice a loop always originates at a decision, which
+  makes its band tall.

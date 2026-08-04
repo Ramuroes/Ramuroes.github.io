@@ -230,7 +230,10 @@ function es_child_enqueue_assets() {
 	 * la plantilla. El JS es 100% opcional (progressive enhancement — ver el
 	 * docblock de case-flow.js): si no cargara, el flujo se sigue leyendo.
 	 */
-	if ( is_singular() && has_block( 'estavillo/case-flow' ) ) {
+	$es_has_flow_v1 = is_singular() && has_block( 'estavillo/case-flow' );
+	$es_has_flow_v2 = is_singular() && has_block( 'estavillo/case-flow-v2' );
+
+	if ( $es_has_flow_v1 || $es_has_flow_v2 ) {
 		wp_enqueue_style( 'es-case-flow', ES_CHILD_URI . '/assets/css/case-flow.css', array( 'es-components' ), es_asset_ver( 'assets/css/case-flow.css' ) );
 		wp_enqueue_script(
 			'es-case-flow',
@@ -242,6 +245,17 @@ function es_child_enqueue_assets() {
 				'strategy'  => 'defer',
 			)
 		);
+	}
+
+	/*
+	 * La v2 son SÓLO los deltas de geometría de los conectores: se declara
+	 * dependiente de 'es-case-flow' para que el orden de carga quede
+	 * garantizado por WordPress y no por el orden de estas líneas. El JS es
+	 * el mismo de la v1 (mismos data-attributes), así que no hay un segundo
+	 * script que mantener.
+	 */
+	if ( $es_has_flow_v2 ) {
+		wp_enqueue_style( 'es-case-flow-v2', ES_CHILD_URI . '/assets/css/case-flow-v2.css', array( 'es-case-flow' ), es_asset_ver( 'assets/css/case-flow-v2.css' ) );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'es_child_enqueue_assets' );

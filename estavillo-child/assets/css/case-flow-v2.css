@@ -1,0 +1,367 @@
+/* =========================================================================
+   CASE FLOW v2 — conectores anclados a los VÉRTICES del rombo
+   -------------------------------------------------------------------------
+   Este archivo NO se basta solo: se carga DESPUÉS de case-flow.css y sólo
+   contiene las diferencias de la v2. Todo lo demás —tokens, formas, colores,
+   hover, popovers, foco, animación de entrada, narrativa mobile— es
+   exactamente el mismo CSS que la v1, sin una sola regla duplicada.
+
+   QUÉ CAMBIA, Y POR QUÉ
+
+   La v1 entra a las ramas por el COSTADO o el TECHO de la tarjeta a
+   propósito: debajo de cada forma vive su descripción, así que un trazo que
+   bajara por el centro cruzaría texto. Eso es correcto, pero hace que el
+   rombo se lea como una caja con anexos en vez de como un rombo de flowchart.
+
+   La v2 invierte esa decisión: libera el eje vertical del rombo (su
+   descripción pasa al panel) y entonces los tres vértices quedan disponibles
+   como puntos de conexión reales.
+
+     vértice DERECHO   → salida principal, recta, al paso siguiente.
+     vértice SUPERIOR  → la rama sube a un carril, entra a una pantalla
+                         intermedia, y esa pantalla BAJA al mismo destino
+                         que la salida principal: las dos se reencuentran.
+     vértice INFERIOR  → el bucle baja a un canal de retorno propio, lo
+                         recorre por debajo de la banda y sube al COSTADO
+                         del paso anterior. Sin tarjeta intermedia.
+
+   Los trazos son items de grilla (.es-flow__route), no hijos de una tarjeta:
+   nacen en el vértice de un rombo de UNA fila y mueren en el borde de una
+   tarjeta de OTRA, así que la única referencia común es la grilla. Se dibujan
+   con bordes CSS (un borde recto no se deforma nunca, sea cual sea el ancho
+   de columna) y la punta de flecha va aparte, en su svg de tamaño fijo.
+   ========================================================================= */
+
+.es-flow--v2 {
+	/* Alto del canal de retorno: por acá pasa el bucle, debajo de la banda. */
+	--es-flow-return-h: 34px;
+}
+
+/* Items de pura geometría: fuera de la grilla no existen. En la narrativa
+   vertical de mobile el bucle se cuenta con texto (ver el resumen de
+   bifurcación que emite render.php dentro del nodo de decisión), no con
+   trazos que ahí no significarían nada. */
+.es-flow--v2 .es-flow__route,
+.es-flow--v2 .es-flow__spacer {
+	display: none;
+}
+
+@media (min-width: 1280px) {
+
+	/* ---------------------------------------------------------------------
+	   1. EL ROMBO PASA A SER DIRECCIONABLE
+	   El trazo tiene que nacer exactamente en un vértice, así que el rombo
+	   tiene que medir exactamente lo que mide la franja de forma: así el
+	   vértice superior cae en el borde de arriba de la fila y el inferior en
+	   el de abajo, sin ningún número mágico. Un poco más chico que en la v1
+	   (168 vs 190): el ticket pide densidad antes que aire.
+	   --------------------------------------------------------------------- */
+	.es-flow--v2 .es-flow__item.is-tall,
+	.es-flow--v2 .es-flow__route.is-tall {
+		--es-flow-shape-h: 168px;
+	}
+
+	.es-flow--v2 .es-flow__item--decision .es-flow__shape {
+		width: min(100%, var(--es-flow-shape-h));
+		max-width: none;
+		padding: 30px 34px;
+	}
+
+	/* Debajo de un rombo no puede haber NADA: por ahí sale el bucle. La
+	   descripción ya se movió al panel en render.php; el "Ver detalle" sobra
+	   en desktop, donde el propio hover es la señal de que el nodo se abre
+	   (misma lógica que ya aplica case-flow.css al quitarle el chip). */
+	.es-flow--v2 .es-flow__item--decision .es-flow__more {
+		display: none;
+	}
+
+	/* El rótulo de la arista entrante vive arriba a la izquierda de la forma,
+	   y en una decisión el eje central de esa misma franja ahora lo ocupa el
+	   trazo que sube al carril. Se le acota el ancho para que envuelva antes
+	   de llegar al eje en vez de chocar con el trazo. */
+	.es-flow--v2 .es-flow__item--decision .es-flow__edge {
+		max-width: calc(50% - 14px);
+	}
+
+	/* ---------------------------------------------------------------------
+	   2. CANAL DE RETORNO
+	   Una fila de alto fijo y sin contenido debajo de la banda que tenga
+	   bucles. Sólo se emite para las bandas que realmente los tienen, así
+	   que un flujo sin bucles ocupa exactamente las mismas filas que la v1.
+	   --------------------------------------------------------------------- */
+	.es-flow--v2 .es-flow__spacer {
+		display: block;
+		grid-row: var(--r);
+		grid-column: 1;
+		height: var(--es-flow-return-h);
+		margin: 0;
+	}
+
+	/* ---------------------------------------------------------------------
+	   3. TRAZOS DE GRILLA
+	   --------------------------------------------------------------------- */
+	.es-flow--v2 .es-flow__route {
+		position: relative;
+		display: block;
+		grid-row: var(--r);
+		grid-column: var(--c) / span var(--cspan);
+		min-width: 0;
+		pointer-events: none;
+		/* El track es align-items:start, y este item no tiene contenido en
+		   flujo (todo lo dibuja con bordes absolutos): sin stretch colapsaría
+		   a altura 0 y cada offset se resolvería contra una caja vacía en el
+		   borde de arriba de la fila, no contra la fila. */
+		align-self: stretch;
+		/* Es un <li> dentro de la prosa del case study, así que hereda el
+		   margen entre ítems de lista. Acá ese margen desplazaría el ORIGEN
+		   de toda la geometría: cada trazo se mide contra el borde de su
+		   celda, y la celda tiene que empezar donde empieza la fila. */
+		margin: 0;
+		/* Ancho de UNA columna dentro del tramo que abarca este trazo. Con
+		   esto el trazo puede apuntar al centro exacto de la primera o la
+		   última columna que cubre sin saber cuántas son ni cuánto miden:
+		   es la misma cuenta que hace el grid, resuelta en CSS. */
+		--colw: calc((100% - (var(--cspan) - 1) * var(--es-flow-col)) / var(--cspan));
+	}
+
+	.es-flow--v2 .es-flow__route-path,
+	.es-flow--v2 .es-flow__route-end {
+		position: absolute;
+		display: block;
+	}
+
+	.es-flow--v2 .es-flow__route-path {
+		border: 0 solid var(--es-line-strong);
+	}
+
+	.es-flow--v2 .es-flow__route-end {
+		border: 0 solid var(--es-line-strong);
+	}
+
+	.es-flow--v2 .es-flow__route .es-flow__tip {
+		stroke: var(--es-line-strong);
+	}
+
+	/* Rótulo Sí/No: chip mono diminuto, pegado al vértice del que nace el
+	   trazo — nunca en el medio del recorrido, donde no se sabría de cuál de
+	   las dos salidas está hablando. */
+	.es-flow--v2 .es-flow__route-label {
+		position: absolute;
+		z-index: 1;
+		padding: 1px 5px;
+		border-radius: 3px;
+		background: var(--es-paper);
+		font-family: var(--es-mono);
+		font-size: 9.5px;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		line-height: 1.5;
+		text-transform: uppercase;
+		color: var(--es-decision);
+		white-space: nowrap;
+	}
+
+	/* ---- 3a. RAMA: del vértice SUPERIOR al carril de arriba --------------
+	   Sube por el centro de la columna del rombo hasta la mitad de la
+	   pantalla intermedia, y entra por su costado. El borde vertical arranca
+	   en el borde superior de la banda, que es justo donde está el vértice:
+	   por eso el trazo "nace" del rombo y no de una caja alrededor. */
+	.es-flow--v2 .es-flow__route--fork .es-flow__route-path {
+		top: calc(var(--es-flow-shape-h) / 2);
+		/* baja hasta el techo de la banda de abajo, atravesando el gap */
+		bottom: calc(-1 * var(--es-flow-row-gap));
+	}
+
+	.es-flow--v2 .es-flow__route--fork.is-dir-right .es-flow__route-path {
+		left: calc(var(--colw) / 2);
+		right: var(--colw);
+		border-top-width: 1px;
+		border-left-width: 1px;
+	}
+
+	.es-flow--v2 .es-flow__route--fork.is-dir-left .es-flow__route-path {
+		right: calc(var(--colw) / 2);
+		left: var(--colw);
+		border-top-width: 1px;
+		border-right-width: 1px;
+	}
+
+	.es-flow--v2 .es-flow__route--fork .es-flow__route-end {
+		top: calc(var(--es-flow-shape-h) / 2);
+		width: 11px;
+		height: 11px;
+		margin-top: -5.5px;
+	}
+
+	.es-flow--v2 .es-flow__route--fork.is-dir-right .es-flow__route-end {
+		right: calc(var(--colw) - 2px);
+	}
+
+	.es-flow--v2 .es-flow__route--fork.is-dir-left .es-flow__route-end {
+		left: calc(var(--colw) - 2px);
+	}
+
+	.es-flow--v2 .es-flow__route--fork .es-flow__route-label {
+		bottom: 2px;
+	}
+
+	.es-flow--v2 .es-flow__route--fork.is-dir-right .es-flow__route-label {
+		left: calc(var(--colw) / 2 + 5px);
+	}
+
+	.es-flow--v2 .es-flow__route--fork.is-dir-left .es-flow__route-label {
+		right: calc(var(--colw) / 2 + 5px);
+	}
+
+	/* Rama que sube en la MISMA columna (la pantalla intermedia quedó justo
+	   encima del rombo): no hay tramo horizontal, sólo el trazo vertical. */
+	.es-flow--v2 .es-flow__route--fork.is-same-col .es-flow__route-path {
+		left: 50%;
+		right: auto;
+		width: 1px;
+		border-top-width: 0;
+		border-left-width: 1px;
+	}
+
+	/* ---- 3b. BUCLE: del vértice INFERIOR al paso anterior ----------------
+	   Baja desde el vértice de abajo, recorre el canal de retorno por debajo
+	   de toda la banda y sube por el CALLE entre columnas —nunca por encima
+	   de una tarjeta— hasta entrar por el costado del paso al que vuelve, a
+	   la altura del eje de las formas. */
+	.es-flow--v2 .es-flow__route--back .es-flow__route-path {
+		/* nace exactamente en el vértice inferior del rombo */
+		top: var(--es-flow-shape-h);
+		bottom: calc(-1 * var(--es-flow-row-gap) - var(--es-flow-return-h) / 2);
+		border-bottom-width: 1px;
+	}
+
+	/* La subida va por la CALLE contigua al nodo destino —la que queda entre
+	   él y el rombo—, no rodeándolo por la otra punta: el recorrido más corto
+	   es el que se lee como "vuelve ahí". --colw es el ancho de UNA columna,
+	   así que "una columna más media calle" desde el extremo del tramo cae
+	   siempre en esa calle, sea cual sea la cantidad de columnas que abarque. */
+	.es-flow--v2 .es-flow__route--back.is-dir-left .es-flow__route-path {
+		right: calc(var(--colw) / 2);
+		left: calc(var(--colw) + var(--es-flow-col) / 2);
+		border-right-width: 1px;
+	}
+
+	.es-flow--v2 .es-flow__route--back.is-dir-right .es-flow__route-path {
+		left: calc(var(--colw) / 2);
+		right: calc(var(--colw) + var(--es-flow-col) / 2);
+		border-left-width: 1px;
+	}
+
+	/* La subida + la entrada al nodo destino. Va como elemento aparte porque
+	   arranca a otra altura que la bajada.
+
+	   ENTRA POR ABAJO, no por el costado. En una serpentina el costado a la
+	   altura del eje ya está ocupado por el conector principal que entra o
+	   sale de ese mismo nodo: las dos líneas quedarían encimadas y el retorno
+	   dejaría de leerse como un camino aparte. Por abajo hay lugar libre de
+	   verdad — la franja de forma es más alta que el rectángulo (la fija el
+	   rombo de la banda), así que entre la base de la caja y el final de la
+	   franja queda una calle horizontal vacía. Por ahí pasa el retorno y sube
+	   al centro de la columna, igual que en un flowchart de manual. */
+	.es-flow--v2 .es-flow__route--back .es-flow__route-end {
+		top: calc(var(--es-flow-shape-h) - 22px);
+		bottom: calc(-1 * var(--es-flow-row-gap) - var(--es-flow-return-h) / 2);
+		/* de la calle entre columnas hasta el centro de la columna destino */
+		width: calc(var(--colw) / 2 + var(--es-flow-col) / 2);
+		border-top-width: 1px;
+	}
+
+	.es-flow--v2 .es-flow__route--back.is-dir-left .es-flow__route-end {
+		left: calc(var(--colw) / 2);
+		border-right-width: 1px;
+	}
+
+	.es-flow--v2 .es-flow__route--back.is-dir-right .es-flow__route-end {
+		right: calc(var(--colw) / 2);
+		border-left-width: 1px;
+	}
+
+	/* La punta apunta HACIA ARRIBA, al nodo al que se vuelve. */
+	.es-flow--v2 .es-flow__route--back .es-flow__route-end .es-flow__tip {
+		top: -11px;
+	}
+
+	.es-flow--v2 .es-flow__route--back.is-dir-left .es-flow__route-end .es-flow__tip {
+		left: -5.5px;
+	}
+
+	.es-flow--v2 .es-flow__route--back.is-dir-right .es-flow__route-end .es-flow__tip {
+		right: -5.5px;
+	}
+
+	.es-flow--v2 .es-flow__route--back .es-flow__route-label {
+		top: calc(var(--es-flow-shape-h) + 4px);
+	}
+
+	.es-flow--v2 .es-flow__route--back.is-dir-left .es-flow__route-label {
+		right: calc(var(--colw) / 2 + 5px);
+	}
+
+	.es-flow--v2 .es-flow__route--back.is-dir-right .es-flow__route-label {
+		left: calc(var(--colw) / 2 + 5px);
+	}
+
+	/* ---- 3c. REINGRESO en otra columna (caso residual) -------------------
+	   Una pantalla intermedia que NO quedó encima de su destino. No pasa en
+	   el diagrama de Trazur, pero el motor es genérico y un grafo cualquiera
+	   puede producirlo: se dibuja como una L simple para no dejar nunca un
+	   trazo colgado. */
+	.es-flow--v2 .es-flow__route--rejoin .es-flow__route-path {
+		top: calc(var(--es-flow-shape-h) / 2);
+		bottom: calc(-1 * var(--es-flow-row-gap));
+		border-bottom-width: 1px;
+	}
+
+	.es-flow--v2 .es-flow__route--rejoin.is-dir-left .es-flow__route-path {
+		right: calc(var(--colw) / 2);
+		left: calc(var(--colw) / 2);
+		border-left-width: 1px;
+	}
+
+	.es-flow--v2 .es-flow__route--rejoin.is-dir-right .es-flow__route-path {
+		left: calc(var(--colw) / 2);
+		right: calc(var(--colw) / 2);
+		border-right-width: 1px;
+	}
+
+	.es-flow--v2 .es-flow__route--rejoin .es-flow__route-end {
+		bottom: calc(-1 * var(--es-flow-row-gap) - 5px);
+		width: 11px;
+		height: 11px;
+	}
+
+	.es-flow--v2 .es-flow__route--rejoin.is-dir-left .es-flow__route-end {
+		left: calc(var(--colw) / 2 - 5.5px);
+	}
+
+	.es-flow--v2 .es-flow__route--rejoin.is-dir-right .es-flow__route-end {
+		right: calc(var(--colw) / 2 - 5.5px);
+	}
+
+	/* ---------------------------------------------------------------------
+	   4. La entrada de los trazos acompaña a la de los nodos
+	   Sin esto los conectores aparecerían de golpe mientras las tarjetas
+	   todavía se están revelando, que es justo el efecto de PowerPoint que
+	   el sistema evita. Misma curva y misma duración que .es-flow__item.
+	   --------------------------------------------------------------------- */
+	.es-flow--v2.is-enhanced:not(.is-revealed) .es-flow__route {
+		opacity: 0;
+	}
+
+	.es-flow--v2.is-revealed .es-flow__route {
+		animation: es-flow-item-in var(--es-dur) var(--es-ease) backwards;
+		animation-delay: calc(var(--es-flow-stagger) * 4);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-flow--v2 .es-flow__route {
+		animation: none !important;
+		opacity: 1 !important;
+	}
+}
