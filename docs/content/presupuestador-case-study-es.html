@@ -1,0 +1,340 @@
+<!--
+  ESTAVILLO — Contenido de Case Study: "Presupuestador" (Guzmán Villalba) — ES
+  ============================================================================
+  CÓMO USAR ESTE ARCHIVO
+  ----------------------------------------------------------------------------
+  1. En wp-admin, creá/abrí el post de Case Study en español (Case
+     Studies → Add New, o su traducción vía Polylang si el post en
+     inglés ya existe).
+  2. En el editor de bloques, agregá un bloque "Custom HTML" y pegá TODO
+     lo que está debajo del final de este comentario de instrucciones (no
+     pegues este bloque de comentario — son instrucciones, no contenido).
+  3. Los campos nativos van por separado — ver
+     docs/content/presupuestador-case-study-fields.md para los valores
+     exactos recomendados en español (Title, Excerpt, Tags, Eyebrow,
+     Status, Role, Tools, Period, Hero layout, Case index).
+  4. Todo lo de abajo usa SOLO la librería de clases .es-case-*
+     existente (case-study.css) — sin markup nuevo, sin estilos inline,
+     sin JS.
+  5. Nota editorial importante: los números específicos que existían en
+     un borrador anterior de este caso (p. ej. "3–5 días de espera",
+     "2 personas no podían presupuestar") no estaban respaldados por
+     ninguna fuente verificable en este repositorio, así que ESTE
+     archivo los reemplaza por lenguaje cualitativo honesto o por
+     placeholders explícitos [DATO PENDIENTE DE VALIDACIÓN — ...]. Si
+     tenés el número real, reemplazá el placeholder correspondiente
+     antes de publicar — no lo dejes en blanco y no inventes un valor.
+  6. Mismo criterio para citas: este archivo NO incluye una cita
+     firmada — el cierre está escrito como reflexión en primera persona
+     sin atribución de comillas, para no presentar como "dicho
+     textual" algo que no fue verificado palabra por palabra.
+  ============================================================================
+-->
+
+<div class="es-case-section" id="overview">
+	<div class="es-case-label">Fig. 00 — Resumen</div>
+	<h2 class="es-case-heading">Un presupuesto que dependía de una sola cabeza, convertido en un criterio que se puede escribir, discutir y mejorar.</h2>
+	<p class="es-case-lead">Presupuestador es un sistema de apoyo a la decisión para un taller de fabricación metálica en Montevideo. El objetivo no fue construir una app de presupuestos genérica, sino hacer explícito el criterio de precios que hasta ahora vivía en la cabeza de una sola persona — y ponerlo a disposición del resto del equipo sin perder el juicio experto que lo sostiene.</p>
+
+	<ol class="es-case-ladder">
+		<li class="es-case-ladder__step">Diagnóstico operativo</li>
+		<li class="es-case-ladder__step">Criterios documentados</li>
+		<li class="es-case-ladder__step">MVP en Google Sheets</li>
+		<li class="es-case-ladder__step">Calibración contra el presupuestador</li>
+		<li class="es-case-ladder__step es-case-ladder__step--active">App Alpha</li>
+		<li class="es-case-ladder__step">Adopción en todo el equipo</li>
+	</ol>
+	<p class="es-case-caption">Dónde está hoy el proyecto: App Alpha está construida y responde presupuestos reales; el paso siguiente —que todo el equipo presupueste de forma independiente— es el objetivo, todavía no un resultado medido (más en Resultados y Limitaciones, más abajo).</p>
+</div>
+
+<div class="es-case-section" id="context">
+	<div class="es-case-label">Fig. 01 — Contexto</div>
+	<h2 class="es-case-heading">Un taller que presupuesta bien — pero despacio, y desde la cabeza de una sola persona.</h2>
+	<p class="es-case-lead">Guzmán Villalba es un taller de fabricación metálica en Montevideo. Cada trabajo — desde una baranda a medida hasta una tanda completa de piezas — arranca con un presupuesto. Durante años, ese presupuesto salió del criterio de un solo presupuestador: material, mano de obra, tiempo de máquina y margen, calculados desde la memoria y la experiencia, no desde un sistema escrito.</p>
+	<p>Eso funcionó mientras el volumen fue manejable. Pero los pedidos empezaron a hacer cola detrás de una sola persona. Alguien nuevo en el equipo no podía presupuestar sin acompañar el proceso durante meses. Y como el criterio vivía solo en su cabeza, no se podía cuestionar, versionar ni mejorar — solo repetir.</p>
+</div>
+
+<div class="es-case-section" id="problem">
+	<div class="es-case-label">Fig. 02 — El problema operativo</div>
+	<h2 class="es-case-heading">Un presupuesto lento puede perder el trabajo antes de cortar el primer caño.</h2>
+	<p class="es-case-lead">Un cliente que llama pidiendo un número aproximado necesita una respuesta rápida y defendible. Si la única vía es un presupuesto formal completo — y ese presupuesto depende de que una persona puntual tenga tiempo libre esa semana — la respuesta llega tarde, o no llega.</p>
+	<ul>
+		<li>El criterio de precios no estaba escrito en ningún lado: vivía en la experiencia de una persona.</li>
+		<li>No había una forma rápida de dar un rango orientativo sin armar el presupuesto completo.</li>
+		<li>Sumar gente al equipo de presupuestos significaba, en la práctica, que esa persona los acompañara caso por caso.</li>
+	</ul>
+	<p>[DATO PENDIENTE DE VALIDACIÓN — si existe un tiempo de respuesta promedio real (p. ej. días de espera típicos para un presupuesto formal), reemplazar este párrafo con ese dato concreto. No se incluye acá un número porque no hay una fuente verificable en este repositorio.]</p>
+</div>
+
+<div class="es-case-section" id="discovery">
+	<div class="es-case-label">Fig. 03 — Entender el flujo real</div>
+	<h2 class="es-case-heading">Mirar cómo se arma un presupuesto, no solo preguntar cómo se arma.</h2>
+	<div class="es-case-cols">
+		<div>
+			<p>Las entrevistas solas no alcanzaron para entender cuánto criterio había en juego — el propio presupuestador tenía dificultad para poner en palabras sus propias reglas. Acompañar varios presupuestos reales de punta a punta mostró las variables reales en juego: tipo y espesor del material, complejidad del corte, terminaciones, disponibilidad de máquina esa semana, y un margen que se ajustaba según la relación con el cliente y la urgencia del pedido.</p>
+			<p>El hallazgo más claro: el criterio no era arbitrario, era <em>consistente pero no estaba documentado</em> — lo que significaba que se podía capturar como un modelo explícito, en vez de reemplazarlo por una fórmula genérica que hubiera ignorado las condiciones reales del taller.</p>
+		</div>
+		<figure class="es-case-figure">
+			<div class="es-placeholder" role="img" aria-label="Placeholder para foto o notas de investigación">
+				<span class="es-placeholder__tag">{asset: discovery-notes}</span>
+			</div>
+			<figcaption class="es-case-caption">
+				<span class="es-case-caption__tag">01</span>
+				<span>[CAPTURA PENDIENTE — foto del acompañamiento de presupuestos o de las notas de investigación sintetizadas.]</span>
+			</figcaption>
+		</figure>
+	</div>
+</div>
+
+<div class="es-case-section" id="system">
+	<div class="es-case-label">Fig. 04 — Hipótesis de diseño y arquitectura</div>
+	<h2 class="es-case-heading">Un solo modelo de precios, varias superficies.</h2>
+	<p class="es-case-lead">La hipótesis de partida: si el criterio del presupuestador se podía volver explícito, no hacía falta reemplazar su juicio — hacía falta darle una forma que otra persona pudiera usar, cuestionar y mejorar. En vez de construir una aplicación única desde el principio, el sistema separa la <em>lógica de precios</em> (versionada, inspeccionable, propiedad del taller) de las <em>superficies</em> que la consultan — así el presupuestador podía seguir trabajando desde el primer día, y la interfaz podía evolucionar sin tocar la lógica de fondo.</p>
+
+	<div class="es-case-cols">
+		<div class="es-case-browser">
+			<div class="es-case-browser__bar">
+				<span class="es-case-browser__dot"></span>
+				<span class="es-case-browser__dot"></span>
+				<span class="es-case-browser__dot"></span>
+				<span class="es-case-browser__label">diagrama-de-sistema</span>
+			</div>
+			<div class="es-placeholder" role="img" aria-label="Placeholder para diagrama de arquitectura del sistema">
+				<span class="es-placeholder__tag">{asset: architecture-diagram}</span>
+			</div>
+		</div>
+		<div>
+			<p>Los datos de entrada (material, dimensiones, terminación, urgencia) alimentan un único modelo de precios. Ese modelo devuelve tanto un rango orientativo rápido como, una vez confirmado, un presupuesto detallado. El mismo modelo se consulta desde el MVP en Sheets y, más adelante, desde la app Alpha — cambiar de superficie nunca implica rehacer la lógica.</p>
+			<p>[DIAGRAMA PENDIENTE — reemplazar el placeholder por el flujo real de entradas → modelo de precios → salidas una vez que exista como asset final.]</p>
+		</div>
+	</div>
+
+	<div class="es-case-taxonomy">
+		<div class="es-case-taxonomy__root">Modelo de precios — las entradas que lee</div>
+		<div class="es-case-taxonomy__grid">
+			<div class="es-case-taxonomy__item">
+				<div class="es-case-taxonomy__item-title">Material y espesor</div>
+				<div class="es-case-taxonomy__item-meta">mueve el costo</div>
+			</div>
+			<div class="es-case-taxonomy__item">
+				<div class="es-case-taxonomy__item-title">Complejidad del corte</div>
+				<div class="es-case-taxonomy__item-meta">mueve la mano de obra</div>
+			</div>
+			<div class="es-case-taxonomy__item">
+				<div class="es-case-taxonomy__item-title">Terminaciones</div>
+				<div class="es-case-taxonomy__item-meta">mueve la mano de obra</div>
+			</div>
+			<div class="es-case-taxonomy__item">
+				<div class="es-case-taxonomy__item-title">Disponibilidad de máquina esa semana</div>
+				<div class="es-case-taxonomy__item-meta">capacidad, no precio</div>
+			</div>
+		</div>
+		<div class="es-case-taxonomy__mods">
+			<div class="es-case-taxonomy__mods-label">Se ajusta<br>según…</div>
+			<div class="es-case-taxonomy__mods-tags">
+				<span class="es-case-taxonomy__tag">Relación con el cliente</span>
+				<span class="es-case-taxonomy__tag">Urgencia</span>
+			</div>
+		</div>
+	</div>
+	<p class="es-case-caption">Las mismas variables que aparecieron en el descubrimiento — material y espesor, complejidad de corte, terminaciones y tiempo de máquina definen costo y mano de obra; la relación con el cliente y la urgencia ajustan desde ahí.</p>
+
+	<div class="es-case-stats">
+		<div class="es-case-stat">
+			<div class="es-case-stat__num">1</div>
+			<div class="es-case-stat__label">modelo de precios único, versionado</div>
+		</div>
+		<div class="es-case-stat">
+			<div class="es-case-stat__num">2</div>
+			<div class="es-case-stat__label">superficies que lo consultan (Sheets y App Alpha)</div>
+		</div>
+		<div class="es-case-stat">
+			<div class="es-case-stat__num">2</div>
+			<div class="es-case-stat__label">tipos de salida por consulta: rango rápido y presupuesto detallado</div>
+		</div>
+	</div>
+	<p class="es-case-caption">Estos tres números describen decisiones de diseño del sistema (cuántos modelos, cuántas superficies, cuántos tipos de salida) — no métricas de negocio del taller.</p>
+</div>
+
+<div class="es-case-section" id="mvp">
+	<div class="es-case-label">Fig. 05 — MVP en Google Sheets + Apps Script</div>
+	<h2 class="es-case-heading">Publicar la lógica antes que la interfaz.</h2>
+	<p class="es-case-lead">La primera versión del modelo de precios vivió enteramente en Google Sheets con Apps Script — a propósito, para que el presupuestador pudiera corregir y extender el criterio él mismo, sin depender de un ciclo de desarrollo, y para poder validar el sistema contra presupuestos reales antes de construir cualquier interfaz.</p>
+
+	<div class="es-case-browser">
+		<div class="es-case-browser__bar">
+			<span class="es-case-browser__dot"></span>
+			<span class="es-case-browser__dot"></span>
+			<span class="es-case-browser__dot"></span>
+			<span class="es-case-browser__label">presupuestador.xlsx — modelo de precios v1</span>
+		</div>
+		<div class="es-placeholder" role="img" aria-label="Placeholder para captura de la planilla del MVP">
+			<span class="es-placeholder__tag">{asset: mvp-sheets-screenshot}</span>
+		</div>
+	</div>
+
+	<p>Cada presupuesto que pasaba por la planilla quedaba registrado. Esa base de presupuestos —no un número de negocio, sino el propio material de trabajo del sistema— es lo que después permitió comparar el modelo contra el criterio del presupuestador y ajustar la ponderación antes de pasar a una interfaz dedicada.</p>
+</div>
+
+<div class="es-case-section" id="testing">
+	<div class="es-case-label">Fig. 06 — Testing e iteración</div>
+	<h2 class="es-case-heading">El presupuestador como referencia, no como usuario de prueba.</h2>
+	<p class="es-case-lead">La validación no fue una tanda de usability testing con usuarios externos — fue comparar, presupuesto por presupuesto, lo que proponía el modelo contra lo que decía el propio presupuestador. Cuando coincidían, eso confirmaba una regla. Cuando no coincidían, esa diferencia era la señal para revisar el modelo, no para descartar el desacuerdo.</p>
+
+	<ol class="es-case-timeline">
+		<li class="es-case-timeline__item">
+			<div class="es-case-timeline__title">Correr un presupuesto real por el modelo</div>
+			<div class="es-case-timeline__text">Mismo caso, dos criterios: el del modelo y el del presupuestador, uno al lado del otro.</div>
+		</li>
+		<li class="es-case-timeline__item">
+			<div class="es-case-timeline__title">Marcar coincidencias y desvíos</div>
+			<div class="es-case-timeline__text">Los desvíos no se promediaban ni se ignoraban — cada uno se revisaba para entender qué variable faltaba o estaba mal ponderada.</div>
+		</li>
+		<li class="es-case-timeline__item">
+			<div class="es-case-timeline__title">Ajustar el modelo, no el criterio</div>
+			<div class="es-case-timeline__text">El objetivo era que el modelo aprendiera a explicar el criterio del presupuestador — no al revés.</div>
+		</li>
+	</ol>
+
+	<p>[DATO PENDIENTE DE VALIDACIÓN — si existe una cifra real de cobertura o precisión del modelo frente al criterio del presupuestador (por ejemplo, en cuántos casos coincidieron dentro de un rango aceptable), incorporarla acá con su fuente. Mientras tanto, este proceso se describe de forma cualitativa porque no hay una cifra confirmada.]</p>
+</div>
+
+<div class="es-case-section" id="app-alpha">
+	<div class="es-case-label">Fig. 07 — App Alpha</div>
+	<h2 class="es-case-heading">De una planilla que solo una persona sabía manejar, a una herramienta que puede usar el equipo.</h2>
+
+	<div class="es-case-browser">
+		<div class="es-case-browser__bar">
+			<span class="es-case-browser__dot"></span>
+			<span class="es-case-browser__dot"></span>
+			<span class="es-case-browser__dot"></span>
+			<span class="es-case-browser__label">app.presupuestador — alpha</span>
+		</div>
+		<div class="es-placeholder" role="img" aria-label="Placeholder para captura de App Alpha">
+			<span class="es-placeholder__tag">{asset: app-alpha-screenshot}</span>
+		</div>
+	</div>
+
+	<ol class="es-case-timeline">
+		<li class="es-case-timeline__item">
+			<div class="es-case-timeline__title">Mismo modelo, puerta de entrada nueva</div>
+			<div class="es-case-timeline__text">La app Alpha consulta el mismo modelo de precios validado en Sheets — no se reescribió la lógica, solo se le dio una interfaz nueva.</div>
+		</li>
+		<li class="es-case-timeline__item">
+			<div class="es-case-timeline__title">Entrada guiada en vez de una planilla en blanco</div>
+			<div class="es-case-timeline__text">Un formulario corto y estructurado reemplaza las celdas libres, para que cualquiera del equipo —no solo el presupuestador original— pueda armar un presupuesto consistente.</div>
+		</li>
+		<li class="es-case-timeline__item">
+			<div class="es-case-timeline__title">Rango rápido primero, presupuesto preciso después</div>
+			<div class="es-case-timeline__text">La app responde un "más o menos cuánto" orientado al cliente en segundos, y después acompaña armar el presupuesto detallado.</div>
+		</li>
+	</ol>
+</div>
+
+<div class="es-case-section" id="ai">
+	<div class="es-case-label">Fig. 08 — El rol de la IA y del criterio humano</div>
+	<h2 class="es-case-heading">La IA asiste el presupuesto. Nunca fija el precio en silencio.</h2>
+	<p class="es-case-lead">La inteligencia artificial se usa en tres puntos acotados e inspeccionables del flujo — cada uno asistivo, y cada uno revisable por la persona que está armando el presupuesto.</p>
+
+	<div class="es-case-decisions">
+		<div class="es-case-decision">
+			<div class="es-case-decision__num">01</div>
+			<h3 class="es-case-decision__title">Leer la entrada cruda</h3>
+			<dl class="es-case-decision__row">
+				<dt>Tarea</dt>
+				<dd>Extraer medidas o notas de material desde una foto o una descripción en texto libre del cliente.</dd>
+				<dt>Resguardo</dt>
+				<dd>Siempre se muestra de vuelta al presupuestador como campos editables antes de correr el modelo.</dd>
+			</dl>
+		</div>
+		<div class="es-case-decision">
+			<div class="es-case-decision__num">02</div>
+			<h3 class="es-case-decision__title">Sugerir un rango</h3>
+			<dl class="es-case-decision__row">
+				<dt>Tarea</dt>
+				<dd>Proponer un rango orientativo a partir de presupuestos anteriores con entradas similares.</dd>
+				<dt>Resguardo</dt>
+				<dd>Se etiqueta explícitamente como sugerencia — el número final lo define la lógica del modelo de precios, no la IA.</dd>
+			</dl>
+		</div>
+		<div class="es-case-decision">
+			<div class="es-case-decision__num">03</div>
+			<h3 class="es-case-decision__title">Marcar anomalías</h3>
+			<dl class="es-case-decision__row">
+				<dt>Tarea</dt>
+				<dd>Señalar un presupuesto que se aleja mucho del patrón histórico, para que alguien lo revise antes de enviarlo.</dd>
+				<dt>Resguardo</dt>
+				<dd>Es solo una alerta — nunca bloquea el envío de un presupuesto, solo pide una segunda mirada.</dd>
+			</dl>
+		</div>
+	</div>
+
+	<p>El sistema no reemplaza al presupuestador del taller: estructura y pone en operación su criterio. Los rangos sirven para responder rápido y hacer una primera evaluación de viabilidad — un caso fuera de lo común, con condiciones que el modelo todavía no cubre bien, sigue necesitando el juicio de una persona antes de confirmarse.</p>
+</div>
+
+<div class="es-case-section" id="results">
+	<div class="es-case-label">Fig. 09 — Estado actual</div>
+	<h2 class="es-case-heading">Dónde está el sistema hoy.</h2>
+	<p class="es-case-lead">Presupuestador es un sistema en uso real, no un producto terminado. Esto es lo que se puede afirmar hoy con confianza, y lo que todavía necesita más evidencia antes de poder afirmarse como resultado.</p>
+
+	<div class="es-case-status">
+		<div class="es-case-status__col es-case-status__col--done">
+			<div class="es-case-status__head">Vigente hoy</div>
+			<ul class="es-case-status__list">
+				<li>El criterio de precios está escrito, versionado y ya no vive solo en la cabeza de una persona.</li>
+				<li>Existe un modelo único que responde tanto desde Sheets como desde la app Alpha.</li>
+				<li>Cada presupuesto que pasa por el sistema queda registrado, no se pierde en una conversación o un papel.</li>
+			</ul>
+		</div>
+		<div class="es-case-status__col es-case-status__col--attention">
+			<div class="es-case-status__head">Necesita más evidencia</div>
+			<ul class="es-case-status__list">
+				<li>[DATO PENDIENTE DE VALIDACIÓN — impacto real en el tiempo de respuesta al cliente, una vez que haya datos de uso suficientes para medirlo con confianza.]</li>
+				<li>[DATO PENDIENTE DE VALIDACIÓN — cuántas personas del equipo, además del presupuestador original, ya presupuestan de forma independiente usando el sistema.]</li>
+				<li>Los casos atípicos todavía dependen del criterio directo del presupuestador — el sistema no tiene suficiente historial para cubrirlos con confianza.</li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<div class="es-case-section" id="limitations">
+	<div class="es-case-label">Fig. 10 — Limitaciones</div>
+	<h2 class="es-case-heading">Lo que el sistema todavía no hace.</h2>
+	<ul>
+		<li>Los trabajos atípicos o a medida siguen resolviéndose con criterio manual — el modelo cubre bien el patrón común, no el caso excepcional.</li>
+		<li>Todavía no existe un flujo pensado primero para uso desde el celular en el piso del taller.</li>
+		<li>El rango sugerido por IA necesita más historial de presupuestos para mantenerse preciso a medida que cambian los costos de material.</li>
+		<li>El sistema depende de que el presupuestador siga revisando y corrigiendo el modelo — no es un criterio que se mantenga solo.</li>
+	</ul>
+</div>
+
+<div class="es-case-section" id="learnings">
+	<div class="es-case-label">Fig. 11 — Qué aprendí</div>
+	<h2 class="es-case-heading">Lo difícil nunca fue la pantalla.</h2>
+	<p>El trabajo de diseño real fue volver explícito un criterio que una persona nunca había tenido que poner en palabras — hacerlo lo bastante claro como para escribirlo, discutirlo y corregirlo. La aplicación fue, en comparación, el paso más simple una vez que eso estaba resuelto.</p>
+	<p>También aprendí a desconfiar de la tentación de reemplazar el criterio experto por una fórmula prolija: un modelo que ignora las condiciones reales del taller —la relación con el cliente, la urgencia, la disponibilidad de máquina esa semana— hubiera sido más simple de construir, y peor. El sistema tenía que aprender del presupuestador, no corregirlo desde afuera.</p>
+</div>
+
+<div class="es-case-section" id="next">
+	<div class="es-case-label">Fig. 12 — Próximos pasos</div>
+	<h2 class="es-case-heading">Hacia dónde va esto.</h2>
+
+	<details class="es-case-details">
+		<summary>Extender el modelo a trabajos atípicos o a medida</summary>
+		<div class="es-case-details__body">
+			<p>[DATO PENDIENTE DE VALIDACIÓN — describir el plan concreto para cubrir los trabajos no estándar que hoy siguen dependiendo del criterio manual.]</p>
+		</div>
+	</details>
+	<details class="es-case-details">
+		<summary>Construir un flujo pensado para el piso del taller</summary>
+		<div class="es-case-details__body">
+			<p>[DATO PENDIENTE DE VALIDACIÓN — describir el plan concreto para un flujo de presupuestado liviano, usable directamente desde el celular en el taller.]</p>
+		</div>
+	</details>
+	<details class="es-case-details">
+		<summary>Formalizar el rango asistido por IA con más historial</summary>
+		<div class="es-case-details__body">
+			<p>[DATO PENDIENTE DE VALIDACIÓN — describir cómo va a seguir creciendo la base histórica de presupuestos para mejorar la precisión del rango sugerido con el tiempo.]</p>
+		</div>
+	</details>
+</div>

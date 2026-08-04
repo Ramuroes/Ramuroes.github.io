@@ -1,0 +1,131 @@
+/* =========================================================================
+   ESTAVILLO — Design tokens (prefijo es-)
+   -------------------------------------------------------------------------
+   Fuente: Design Language ESTAVILLO (Hero Lab v2 / Home v2).
+   Dark-first. El modo claro se activa con [data-theme="light"] en <html>
+   (compatible con WP Dark Mode si se mapea su atributo, o manualmente).
+   El acento se conmuta desde el Customizer: body.es-accent--green (default)
+   o body.es-accent--orange. Ningún componente usa colores directos:
+   siempre var(--es-*).
+   ========================================================================= */
+
+:root {
+	/* --- superficies (papel oscuro cálido) --- */
+	--es-paper: #131211;
+	--es-paper-2: #181614;
+	--es-surface: #1d1b18;
+	--es-surface-2: #23201d;
+	--es-line: #2b2825;
+	--es-line-strong: #403c37;
+
+	/* --- tinta --- */
+	--es-ink: #ebe7df;
+	--es-ink-2: #c8c2b8;
+	--es-ink-3: #9a948b;
+	--es-ink-4: #6f6961;
+
+	/* --- bloques de contraste (secciones destacadas) --- */
+	--es-block: #0d0c0b;
+	--es-block-2: #141210;
+	--es-block-line: #28241f;
+
+	/* --- acento: definido por pares dark/light por cada color --- */
+	--es-accent-green: #58b183;
+	--es-accent-green-dim: rgba(88, 177, 131, 0.42);
+	--es-accent-green-soft: rgba(88, 177, 131, 0.12);
+	--es-accent-orange: #d98e4a;
+	--es-accent-orange-dim: rgba(217, 142, 74, 0.42);
+	--es-accent-orange-soft: rgba(217, 142, 74, 0.12);
+
+	/* acento activo (default: green; el Customizer agrega la clase al body).
+	   Gobierna SOLO el "chrome" de marca: eyebrow, palabra destacada del
+	   titular, botones, links, subrayado de nav. NO gobierna la semántica
+	   de los diagramas. */
+	--es-accent: var(--es-accent-green);
+	--es-accent-dim: var(--es-accent-green-dim);
+	--es-accent-soft: var(--es-accent-green-soft);
+
+	/* --- semántica de diagrama (fija, independiente del toggle de acento) ---
+	   Regla de marca §05: verde = el sistema (camino activo/resuelto, señal
+	   viva); naranja = la decisión (el único punto de foco/juicio humano,
+	   como máximo una vez por vista). Ambos coexisten en la misma pantalla:
+	   NO son dos modos de marca. Ver reference/design-system/NOTES.md §05.
+	   Verde primario; naranja usado con moderación para puntos de decisión. */
+	--es-signal: #58b183; /* green — active / resolved / system path */
+	--es-signal-2: #2fa968;
+	--es-signal-dim: rgba(88, 177, 131, 0.42);
+	--es-signal-soft: rgba(88, 177, 131, 0.12);
+	--es-decision: #d98e4a; /* orange — the one decision / focus point */
+	--es-decision-2: #c25e2b;
+	--es-decision-dim: rgba(217, 142, 74, 0.42);
+	--es-decision-soft: rgba(217, 142, 74, 0.15);
+
+	/* --- tipografía: tres voces --- */
+	--es-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+	--es-sans: 'Instrument Sans', system-ui, -apple-system, sans-serif;
+	--es-mono: 'Spline Sans Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+	/* --- ritmo --- */
+	--es-max-w: 1140px;
+	--es-pad-x: clamp(20px, 4.5vw, 48px);
+	--es-section-y: clamp(64px, 8vw, 112px);
+	--es-radius: 13px;
+	--es-radius-sm: 7px;
+
+	/* --- motion --- */
+	--es-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+	--es-dur-fast: 0.15s;
+	--es-dur: 0.4s;
+	--es-dur-slow: 0.55s;
+}
+
+/* ---------- modo claro ---------- */
+[data-theme='light'] {
+	--es-paper: #faf9f6;
+	--es-paper-2: #f3f1ec;
+	--es-surface: #ffffff;
+	--es-surface-2: #f0ede7;
+	--es-line: #e7e4de;
+	--es-line-strong: #d0ccc4;
+	--es-ink: #161513;
+	--es-ink-2: #4a463f;
+	--es-ink-3: #7a746b;
+	--es-ink-4: #9c968c;
+	--es-block: #14211b;
+	--es-block-2: #1a2a22;
+	--es-block-line: #28382f;
+	--es-accent-green: #2d6a4f;
+	--es-accent-green-dim: rgba(45, 106, 79, 0.45);
+	--es-accent-green-soft: rgba(45, 106, 79, 0.1);
+	--es-accent-orange: #a85c1e;
+	--es-accent-orange-dim: rgba(168, 92, 30, 0.45);
+	--es-accent-orange-soft: rgba(168, 92, 30, 0.1);
+	/* semántica de diagrama en claro (contraste sobre papel claro) */
+	--es-signal: #2d6a4f;
+	--es-signal-2: #245a42;
+	--es-signal-dim: rgba(45, 106, 79, 0.45);
+	--es-signal-soft: rgba(45, 106, 79, 0.1);
+	--es-decision: #a85c1e;
+	--es-decision-2: #8c4a15;
+	--es-decision-dim: rgba(168, 92, 30, 0.45);
+	--es-decision-soft: rgba(168, 92, 30, 0.12);
+}
+
+/* ---------- acento naranja (Customizer → Estavillo → Accent color) ---------- */
+body.es-accent--orange {
+	--es-accent: var(--es-accent-orange);
+	--es-accent-dim: var(--es-accent-orange-dim);
+	--es-accent-soft: var(--es-accent-orange-soft);
+}
+
+/* ---------- preset tipográfico (Customizer → Estavillo → Font preset) ----------
+   Default 'design_system' = tokens :root de arriba (Newsreader / Instrument
+   Sans / Spline Sans Mono) — NO se toca la tipografía por defecto.
+   'classic_mockup' = stack de sistema (sin web fonts). Si tu sitio previo
+   usaba otras fuentes exactas, reemplazá estos tres valores por las tuyas
+   (mismos tres roles: serif editorial / sans interfaz / mono técnico). */
+body.es-font--classic_mockup {
+	--es-serif: Georgia, 'Times New Roman', 'Times', serif;
+	--es-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+	--es-mono: ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Consolas, monospace;
+}

@@ -1,0 +1,27 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/how-i-work-teaser",
+	"title": "How I Work — Teaser row",
+	"category": "estavillo-pages",
+	"icon": "screenoptions",
+	"description": "El contenedor de las tres ideas (Understand / Explore / Improve) del teaser de How I Work en Home. UN solo bloque envoltorio (no tres): mantiene las tres ideas como InnerBlocks editables (ilustración + título + texto) y expone dos controles de presentación en el Inspector — Desktop layout (ilustración arriba / al costado del texto) y tamaño de ilustración (small/medium/large) — que se aplican por igual a las tres. Mobile siempre apila (ilustración arriba). Render dinámico: solo envuelve las InnerBlocks en un div con las clases modificadoras, sin duplicar copy ni markup.",
+	"keywords": [ "estavillo", "how i work", "teaser", "process", "home" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"desktopLayout": {
+			"type": "string",
+			"default": "stacked"
+		},
+		"illustrationSize": {
+			"type": "string",
+			"default": "small"
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-pages-block-how-i-work-teaser",
+	"render": "file:./render.php"
+}

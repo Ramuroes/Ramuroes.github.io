@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/case-timeline",
+	"title": "Case Timeline",
+	"category": "estavillo-case",
+	"icon": "clock",
+	"description": "Timeline vertical de pasos (.es-case-timeline): título + texto por ítem, con el riel y los puntos del design system.",
+	"keywords": [ "estavillo", "case", "timeline", "pasos", "proceso" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"items": {
+			"type": "array",
+			"default": [],
+			"items": { "type": "object" }
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-case-block-case-timeline",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}

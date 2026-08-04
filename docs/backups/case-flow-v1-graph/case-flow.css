@@ -1,0 +1,1578 @@
+/* =========================================================================
+   ESTAVILLO — Case Flow (.es-flow)
+   -------------------------------------------------------------------------
+   Componente de flujo de proceso del design system. Lo emite el bloque
+   estavillo/case-flow (plugin) — este archivo es la ÚNICA fuente de su
+   presentación, igual que case-study.css es la de .es-case-*.
+
+   MOBILE-FIRST DE VERDAD, no un desktop encogido: el layout base (sin
+   media query) es la narrativa editorial vertical — una tarjeta por paso,
+   columna de marcador a la izquierda con el riel vertical, indicador de
+   progreso sticky, detalle desplegable a lo alto. El flujo horizontal con
+   popovers recién aparece en >=1024px, donde hay ancho real para leerlo.
+   Es el mismo criterio de dos columnas marcador/cuerpo que ya usa
+   .es-process-detail (pages.css) en How I Work — no un lenguaje nuevo.
+
+   TOKENS: 100% var(--es-*) de tokens.css. Ni un color, radio, tipografía
+   o duración literal. 'signal' (verde) y 'decision' (naranja) son los
+   tokens semánticos de diagrama que la marca ya define — verde = camino
+   del sistema, naranja = el punto de juicio humano.
+
+   PROGRESSIVE ENHANCEMENT: por defecto (sin JS) los paneles de detalle
+   son bloques estáticos visibles — el flujo entero se lee. El JS agrega
+   .is-enhanced al contenedor y recién ahí se vuelven colapsables/popover.
+   Todo lo que esconde contenido está bajo .is-enhanced, nunca en la base.
+   ========================================================================= */
+
+.es-flow {
+	--es-flow-gutter: 34px;
+	--es-flow-gap: 28px;
+	/* Espacio entre las pastillas de inicio/fin y el resto del flujo.
+	   Deliberadamente SEPARADA de --es-flow-gap: esa variable pasa a valer
+	   0 en el grid de desktop (el conector ya hace de separador entre
+	   filas), y si el marcador compartiera esa variable quedaría pegado
+	   a "Inicio" — exactamente el bug que corrige este ticket. */
+	--es-flow-marker-gap: 10px;
+	/* Alto real de la pastilla Inicio/Fin (padding + línea de texto). Es un
+	   valor del propio componente, no del contenido: lo usa el anclaje de
+	   los marcadores de contexto para apoyarse en el borde de la pastilla
+	   sin medir nada en JS. */
+	--es-flow-pill-h: 47px;
+	--es-flow-node-bg: var(--es-surface);
+	--es-flow-mark: var(--es-ink-4);
+	--es-flow-mark-2: var(--es-signal-2);
+	/* Paso del retraso entre nodos consecutivos en la animación de entrada
+	   (ver .is-revealed más abajo): con ~12 nodos, 80ms de paso suma una
+	   secuencia total de ~1-1.3s, dentro del rango pedido. */
+	--es-flow-stagger: 80ms;
+
+	position: relative;
+	/* Top más corto que bottom a propósito: en Trazur el flujo viene
+	   siempre después de una lista de bullets (.es-case__body ul tiene
+	   margin:0 — ver case-study.css), así que ANTES del diagrama todo el
+	   espacio lo pone este margen. clamp(32,4.5vw,52) arriba Y abajo
+	   dejaba un salto más grande de lo necesario entre "el resumen en
+	   viñetas" y el diagrama; abajo se mantiene igual de generoso. */
+	margin: clamp(20px, 3vw, 36px) 0 clamp(32px, 4.5vw, 52px);
+	color: var(--es-ink-2);
+}
+
+.es-flow--compact {
+	--es-flow-gap: 18px;
+}
+
+/* ---------- título de sección (opcional) ----------
+   Mismo lenguaje visual que el resto de eyebrows del portfolio: reutiliza
+   .es-eyebrow (base.css) tal cual — mono, mayúsculas, acento verde — en
+   vez de inventar un estilo nuevo. Sólo se imprime si el campo tiene
+   texto (ver render.php); "ocultarlo" es simplemente vaciar el campo. */
+.es-flow .es-flow__eyebrow {
+	margin: 0 0 14px;
+}
+
+/* ---------- marcadores de inicio / fin ---------- */
+
+/* .es-flow vive dentro de .es-case__body, cuya tipografía de prosa fuerza
+   "p { margin: 0 }" con especificidad (0,1,1) — más alta que una sola
+   clase (0,1,0). Sin el prefijo ".es-flow" de acá en más, ESA regla global
+   le ganaba a --marker-gap/margin-left:auto de abajo y los marcadores
+   quedaban con margen 0 pese al valor que se les asignara (mismo tipo de
+   fuga que "li + li" más arriba). */
+.es-flow .es-flow__marker {
+	margin: 0;
+	/* Pulido de ritmo: centrado también en mobile/tablet, no sólo en el
+	   grid de desktop (ver la regla >=1280px más abajo) — Inicio/Fin ya
+	   ocupan el ancho completo de su columna en cualquier viewport, así
+	   que centrar el texto del marcador alinea su propio centro con el
+	   de la pastilla real, en vez de quedar pegado al borde izquierdo. */
+	text-align: center;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	font-weight: 500;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+}
+
+.es-flow__marker span {
+	display: inline-flex;
+	align-items: center;
+	gap: 9px;
+	padding: 7px 13px;
+	border: 1px solid var(--es-line);
+	border-radius: 999px;
+	background: var(--es-paper-2);
+}
+
+.es-flow__marker span::before {
+	content: '';
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--es-signal);
+}
+
+.es-flow__marker--end span::before {
+	background: var(--es-ink-4);
+}
+
+/* Los marcadores viven DENTRO del nodo que describen (ver render.php), así
+   que en la narrativa vertical basta con el espacio normal antes/después:
+   su posición sale sola de la pastilla, no de un cálculo sobre el diagrama
+   entero. */
+.es-flow .es-flow__marker--start {
+	margin-bottom: var(--es-flow-marker-gap);
+}
+
+.es-flow .es-flow__marker--end {
+	margin-top: var(--es-flow-marker-gap);
+}
+
+/* ---------- indicador de progreso (sólo mobile) ----------
+   sticky respecto al viewport: .es-flow no declara overflow, así que
+   ningún ancestro del componente rompe el sticky (misma lección que el
+   bug de .es-page → ver base.css). */
+
+/* .es-flow-prefijado a propósito en margin/padding: .es-case__body trae
+   reset de prosa para p/ul/ol/li (ver case-study.css) con más
+   especificidad que una sola clase de este archivo — mismo problema que
+   ya se corrigió en .es-flow__marker y .es-flow__track > .es-flow__item.
+   Se repite el prefijo acá por consistencia, no por necesidad puntual de
+   ESTA regla — así ningún elemento nativo del flujo (p/ul/ol) hereda
+   espaciado de prosa por accidente. */
+.es-flow .es-flow__progress {
+	position: sticky;
+	top: 76px;
+	z-index: 2;
+	width: max-content;
+	margin: 0 0 14px;
+	padding: 5px 11px;
+	border: 1px solid var(--es-line);
+	border-radius: 999px;
+	background: var(--es-paper-2);
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	color: var(--es-ink-3);
+}
+
+.es-flow__progress-current {
+	color: var(--es-ink);
+}
+
+.es-flow__progress-sep {
+	margin: 0 2px;
+	color: var(--es-ink-4);
+}
+
+/* ---------- track ---------- */
+
+.es-flow .es-flow__track {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--es-flow-gap);
+}
+
+/* Una caja por paso, a lo ancho. El conector corre ENTRE las cajas, no en
+   una columna lateral: ahora la forma ES la caja (como en el diagrama de
+   referencia), así que ya no hay un punto en un gutter que conectar. */
+.es-flow__item {
+	position: relative;
+	display: block;
+}
+
+/* El flujo vive dentro de .es-case__body, cuya tipografía de prosa pone
+   margin-top:0.5em en "li + li" (para listas normales de texto). Esa
+   regla también matchea estos <li> — un corrimiento de ~8px, invisible
+   entre el aire generoso del layout vertical, pero suficiente para
+   desalinear el centro compartido de la franja en el grid de desktop.
+   El propio flujo maneja TODO su espaciado vertical (--es-flow-gap /
+   --es-flow-row-gap): el spacing de prosa nunca debe filtrarse acá. */
+.es-flow__track > .es-flow__item {
+	margin-top: 0;
+}
+
+/* Prolongación del trazo principal a través de un carril de ramas. Es un
+   item de grilla vacío, puro trazo: sólo existe en el grid de desktop
+   (ver la regla con su geometría más abajo), donde una fila de ramas se
+   interpone entre dos filas del camino principal y el conector tiene que
+   atravesarla sin cortarse. En mobile no hay carriles, así que no se
+   imprime nada. */
+.es-flow .es-flow__pass {
+	display: none;
+	margin-top: 0;
+}
+
+/* ---------- pantalla intermedia (rama) en la narrativa vertical ----------
+   Sin grid (mobile/tablet) la rama es el bloque siguiente de la lectura.
+   Para que NO se confunda con un paso más del camino principal se indenta
+   y se marca con una guía naranja: se lee "esto pasa sólo si la decisión
+   sale por acá". El texto "Sí"/"No" del propio conector (--in) queda a la
+   vista arriba, así que la lógica sigue siendo explícita. */
+.es-flow__item--branch {
+	padding-left: 18px;
+	border-left: 1px dashed var(--es-decision-dim);
+}
+
+
+/* ---------- franja compartida de la forma ----------
+   Pastilla, rectángulo y rombo tienen alturas MUY distintas (47 / ~70 /
+   190px). Si cada uno se alinea "arriba" de su celda, sus CENTROS quedan
+   a alturas distintas y el conector no puede tocar el centro de todos a
+   la vez. La franja es una banda de alto compartido (--es-flow-shape-h,
+   la define cada fila en el grid de desktop) donde la forma se centra
+   verticalmente — así el centro de una pastilla, un rectángulo y un
+   rombo en la MISMA fila caen en el mismo eje, sin numeros mágicos por
+   nodo. En mobile/tablet no hay --es-flow-shape-h definida: min-height
+   resuelve a 0 y la franja se comporta como un contenedor normal. */
+.es-flow__shape-band {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	min-height: var(--es-flow-shape-h, 0);
+}
+
+/* ---------- riel + conector SVG ----------
+   El svg trae los dos paths (horizontal y vertical) y cada layout muestra
+   el suyo: un solo markup sirve para los dos ejes, siempre vectorial. */
+
+/* El riel cuelga de la FRANJA (no de la forma): top:50% cae siempre en el
+   centro real de la fila, el mismo eje en el que la franja ya centra la
+   forma — sirve igual para una pastilla, un rectángulo de una o dos
+   líneas, o un rombo mucho más alto, sin conocer la altura de ninguno. */
+.es-flow__rail {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	bottom: 100%;
+	width: 22px;
+	height: var(--es-flow-gap);
+	pointer-events: none;
+}
+
+.es-flow__connector {
+	display: block;
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+}
+
+/* etiqueta sobre la flecha ("Acceso principal al sitio", "Elige forma de
+   pago…") — igual que el diagrama de referencia. En mobile va al costado
+   del riel vertical; en desktop, encima de la línea horizontal. */
+.es-flow__edge {
+	position: absolute;
+	left: calc(50% + 16px);
+	bottom: calc(100% + 6px);
+	width: max-content;
+	max-width: 24ch;
+	font-family: var(--es-mono);
+	font-size: 9.5px;
+	line-height: 1.4;
+	letter-spacing: 0.06em;
+	color: var(--es-ink-4);
+}
+
+.es-flow__line,
+.es-flow__head {
+	fill: none;
+	stroke: var(--es-line-strong);
+	stroke-width: 1.25;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+/* base (mobile) = eje vertical */
+.es-flow__line--h,
+.es-flow__head--h {
+	display: none;
+}
+
+/* Visibles por defecto (contrato sin-JS: nada esencial depende del JS).
+   La animación de entrada (dibujo + secuencia) sólo se activa más abajo,
+   bajo .es-flow.is-enhanced — ahí es donde se pre-esconden y se disparan
+   con la entrada en viewport. */
+.es-flow__line {
+	stroke-dasharray: 100;
+	stroke-dashoffset: 0;
+}
+
+.es-flow__head {
+	opacity: 1;
+}
+
+@keyframes es-flow-draw {
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+@keyframes es-flow-fade {
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes es-flow-item-in {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	/* to: none (no translateY(0)) — con fill-mode forwards el valor final
+	   queda aplicado para siempre, y CUALQUIER transform que no sea
+	   literalmente "none" crea un stacking context nuevo en el nodo. Con
+	   translateY(0) cada .es-flow__item quedaba con su propio stacking
+	   context permanente, y eso rompía el popover: la fila siguiente
+	   (mismo nivel, más tarde en el DOM) pasaba a pintarse ENCIMA del
+	   popover en vez de abajo. transform:none no genera ese contexto. */
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+/* ---------- animación de entrada, una sola vez ----------
+   Requiere .is-enhanced (case-flow.js) para pre-esconder: sin JS el
+   flujo se ve completo desde el primer pintado. .is-revealed lo agrega
+   el mismo script cuando ~25-35% del componente entra en el viewport
+   (IntersectionObserver, se desconecta después del primer disparo — no
+   se repite al seguir scrolleando). El orden Start→conector→01→… lo da
+   --i, que el JS escribe en cada .es-flow__item siguiendo el mismo
+   orden real del DOM (el de la narrativa serpenteada). */
+.es-flow.is-enhanced:not(.is-revealed) .es-flow__item {
+	opacity: 0;
+	transform: translateY(10px);
+}
+
+.es-flow.is-enhanced:not(.is-revealed) .es-flow__line {
+	stroke-dashoffset: 100;
+}
+
+.es-flow.is-enhanced:not(.is-revealed) .es-flow__head {
+	opacity: 0;
+}
+
+/* fill-mode "backwards" (NO "forwards"): sostiene el keyframe 0% durante
+   el animation-delay (si no, cada nodo/línea aparecería de golpe apenas
+   se agrega .is-revealed, y recién después "animaría" desde ahí — el
+   típico flash). Deliberadamente SIN "forwards": un valor de transform
+   distinto de "none" que quede aplicado para siempre (aunque sea la
+   identidad, translateY(0)) crea un stacking context nuevo y permanente
+   en cada nodo — eso rompía el popover (la fila siguiente pasaba a
+   pintarse encima). Sin "forwards", al terminar la animación el elemento
+   vuelve a su valor de cascada normal (sin animar), que ya es
+   exactamente el mismo estado final (opacity:1, transform:none,
+   stroke-dashoffset:0) — cero salto visual, cero stacking context extra. */
+.es-flow.is-revealed .es-flow__item {
+	animation: es-flow-item-in var(--es-dur) var(--es-ease) backwards;
+	animation-delay: calc(var(--es-flow-stagger) * var(--i, 0));
+}
+
+.es-flow.is-revealed .es-flow__line {
+	animation: es-flow-draw var(--es-dur-slow) var(--es-ease) backwards;
+	animation-delay: calc(var(--es-flow-stagger) * var(--i, 0));
+}
+
+.es-flow.is-revealed .es-flow__head {
+	animation: es-flow-fade var(--es-dur) var(--es-ease) backwards;
+	animation-delay: calc(var(--es-flow-stagger) * var(--i, 0) + var(--es-dur-fast));
+}
+
+/* ---------- nodo ---------- */
+
+.es-flow__node {
+	position: relative;
+}
+
+/* El trigger ya NO es la caja visible: es sólo el área interactiva. La
+   caja es .es-flow__shape (pastilla / rectángulo / rombo), igual que en el
+   diagrama de referencia, y la descripción va afuera y debajo. */
+.es-flow__trigger {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	/* algunos motores conservan el estilo NATIVO de <button> (halo de foco
+	   propio de la plataforma) incluso con outline reseteado, si no se
+	   apaga explícitamente el appearance por defecto. */
+	appearance: none;
+	background: none;
+	font: inherit;
+	color: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.es-flow__trigger--static {
+	cursor: default;
+}
+
+/* ---------- .trigger SIEMPRE transparente, en TODO estado ----------
+   Corrección urgente: en producción, .es-flow__trigger — el área táctil
+   completa del nodo, más grande que la forma visible (ver
+   .es-flow__shape-band) — aparecía con un plato rectangular azul detrás
+   del rombo/rectángulo al pasar el mouse, enfocar o abrir un nodo. Ese
+   azul no sale de ningún selector propio de este archivo (no hay un solo
+   valor azul en esta hoja); el patrón ya documentado en el resto del
+   tema es que Kadence/WordPress pinta sus propios componentes (acordeón,
+   FAQ, tabs) sobre selectores genéricos como [aria-expanded="true"] — el
+   mismo atributo ARIA que este trigger usa para su propio estado
+   abierto/cerrado. En vez de perseguir cuál regla exacta es, se blinda
+   el trigger con transparencia forzada en cada estado relevante: ningún
+   estilo externo puede pintarle un fondo, sea cual sea su origen. El
+   color real del nodo lo sigue dando .es-flow__shape (la forma), nunca
+   el trigger. */
+.es-flow__trigger,
+.es-flow__trigger:hover,
+.es-flow__trigger:focus,
+.es-flow__trigger:focus-visible,
+.es-flow__trigger:active,
+.es-flow__trigger[aria-expanded='true'],
+.es-flow__trigger[aria-expanded='false'],
+.es-flow__node,
+.es-flow__item.is-open .es-flow__trigger {
+	background: transparent !important;
+	background-color: transparent !important;
+	background-image: none !important;
+	box-shadow: none !important;
+}
+
+/* ---------- LA FORMA (la caja del diagrama) ---------- */
+
+.es-flow__shape {
+	position: relative;
+	display: block;
+	padding: 13px 16px;
+	/* el riel sale fuera de la caja: nunca recortarlo */
+	overflow: visible;
+	border: 1px solid var(--es-flow-mark);
+	border-radius: var(--es-radius-sm);
+	background: var(--es-flow-node-bg);
+	transition: border-color var(--es-dur-fast) var(--es-ease),
+		background-color var(--es-dur-fast) var(--es-ease),
+		transform var(--es-dur-fast) var(--es-ease);
+}
+
+.es-flow__shape-inner {
+	display: block;
+}
+
+/* pastilla — inicio y fin */
+.es-flow__item--start .es-flow__shape,
+.es-flow__item--end .es-flow__shape {
+	border-radius: 999px;
+	text-align: center;
+	background: var(--es-flow-mark);
+	border-color: var(--es-flow-mark);
+}
+
+.es-flow__item--start .es-flow__title,
+.es-flow__item--end .es-flow__title {
+	color: var(--es-paper);
+}
+
+/* hito — rectángulo con esquina marcada */
+.es-flow__item--milestone .es-flow__shape {
+	border-left-width: 3px;
+}
+
+/* rombo — decisión.
+   Un cuadrado rotado 45° dentro de una caja cuadrada: para que sus vértices
+   toquen justo los bordes, el lado debe ser C/√2, o sea un inset de
+   (1 - 0.7071)/2 ≈ 14.6%. El texto NO se rota (va encima, sin transform),
+   así que se lee normal; el padding grande lo mantiene dentro del área
+   inscripta del rombo.
+
+   El padding es en PX, no en %, a propósito: un padding porcentual se
+   resuelve contra el ancho del CONTENEDOR (el <li>), no contra el propio
+   ancho de la caja — con max-width:190px la caja queda fija en 190px pero
+   el <li> puede ser mucho más ancho (por ej. ~770px en tablet, layout
+   vertical de una sola columna todavía). Ahí el padding porcentual salía
+   enorme (146px+) y el propio min-content de esa altura forzaba a la caja
+   a crecer muy por encima de max-width para no recortar el texto — el
+   rombo aparecía gigante en tablet. Fijo en px no depende del contenedor:
+   la caja siempre resuelve exactamente a 190×190 (o menos, en una pantalla
+   angosta al extremo). */
+.es-flow__item--decision .es-flow__shape {
+	display: grid;
+	place-items: center;
+	/* TIENE que ser 1/1: el inset de 14.6% de abajo sólo da un rombo de
+	   lados iguales si la caja que lo contiene es cuadrada. Un 1.2/1 acá
+	   rompe la geometría por eje y el rombo sale un rectángulo girado. */
+	aspect-ratio: 1 / 1;
+	width: 100%;
+	max-width: 190px;
+	margin-inline: auto;
+	padding: 36px 40px;
+	border: 0;
+	border-radius: 0;
+	background: none;
+	text-align: center;
+}
+
+.es-flow__item--decision .es-flow__shape::before {
+	content: '';
+	position: absolute;
+	inset: 14.6%;
+	border: 1px solid var(--es-flow-mark);
+	border-radius: 3px;
+	background: var(--es-flow-node-bg);
+	transform: rotate(45deg);
+	transition: border-color var(--es-dur-fast) var(--es-ease),
+		background-color var(--es-dur-fast) var(--es-ease);
+}
+
+.es-flow__item--decision .es-flow__shape-inner {
+	position: relative; /* encima del rombo */
+}
+
+/* marcador (IA) */
+.es-flow__ai {
+	position: absolute;
+	top: -9px;
+	right: -9px;
+	z-index: 2;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 22px;
+	height: 22px;
+	padding: 0 5px;
+	border: 1px solid var(--es-signal);
+	border-radius: 999px;
+	background: var(--es-paper);
+	font-family: var(--es-mono);
+	font-size: 9.5px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	color: var(--es-signal);
+}
+
+.es-flow__item--decision .es-flow__ai {
+	top: 8%;
+	right: 8%;
+}
+
+.es-flow__ai--legend {
+	position: static;
+	margin-right: 4px;
+}
+
+.es-flow .es-flow__legend {
+	display: flex;
+	align-items: center;
+	/* Ritmo más compacto (pulido final): la nota del pie (que explica el
+	   marcador IA) quedaba con más aire del necesario respecto al último
+	   nodo/marcador End justo encima. */
+	margin: 16px 0 0;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	line-height: 1.5;
+	letter-spacing: 0.04em;
+	color: var(--es-ink-4);
+}
+
+/* acentos semánticos — tokens de diagrama ya existentes.
+   --es-flow-mark-2 es la variante "más fuerte" del mismo color (ya
+   reservada en tokens.css, sin usar hasta ahora): la usan hover/foco/
+   abierto para reforzar el propio acento del nodo en vez de virar a un
+   color ajeno — así un nodo de decisión sigue leyéndose naranja también
+   al interactuar, nunca azul ni verde genérico. */
+.es-flow__item.is-accent-signal {
+	--es-flow-mark: var(--es-signal);
+	--es-flow-mark-2: var(--es-signal-2);
+}
+
+.es-flow__item.is-accent-decision {
+	--es-flow-mark: var(--es-decision);
+	--es-flow-mark-2: var(--es-decision-2);
+}
+
+.es-flow__item.is-accent-muted {
+	--es-flow-mark: var(--es-ink-4);
+	--es-flow-mark-2: var(--es-ink-3);
+	color: var(--es-ink-3);
+}
+
+.es-flow__item--decision {
+	--es-flow-mark: var(--es-decision);
+	--es-flow-mark-2: var(--es-decision-2);
+}
+
+/* ---------- contenido del nodo ---------- */
+
+/* el cuerpo va AFUERA de la forma, como las descripciones del diagrama */
+.es-flow__body {
+	display: block;
+	padding: 8px 2px 0;
+}
+
+.es-flow__num {
+	display: block;
+	margin-bottom: 4px;
+	font-family: var(--es-mono);
+	font-size: 9.5px;
+	font-weight: 500;
+	letter-spacing: 0.18em;
+	color: var(--es-flow-mark);
+}
+
+.es-flow__item--start .es-flow__num,
+.es-flow__item--end .es-flow__num {
+	display: none; /* inicio y fin no se numeran, igual que en el diagrama */
+}
+
+.es-flow__title {
+	display: block;
+	font-family: var(--es-sans);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.3;
+	color: var(--es-ink);
+}
+
+.es-flow__item--decision .es-flow__title {
+	font-size: 12.5px;
+	line-height: 1.25;
+}
+
+.es-flow__text {
+	display: block;
+	font-size: 12.5px;
+	line-height: 1.55;
+	/* ink-4 daba 3.87:1 sobre el papel — abajo del piso de 4.5:1 para
+	   texto normal. ink-3 es el token muted que sí pasa (5.7:1). */
+	color: var(--es-ink-3);
+}
+
+.es-flow__more {
+	display: none; /* sólo aparece cuando el JS convierte el panel en popover/acordeón */
+	align-items: center;
+	gap: 6px;
+	margin-top: 10px;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+	transition: color var(--es-dur-fast) var(--es-ease), border-color var(--es-dur-fast) var(--es-ease), background-color var(--es-dur-fast) var(--es-ease);
+}
+
+.es-flow__more-icon {
+	flex: none;
+	width: 10px;
+	height: 10px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.6;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	transition: transform var(--es-dur-fast) var(--es-ease);
+}
+
+/* ---------- ramas de una decisión ----------
+   Una decisión de verdad tiene DOS salidas reales, cada una con su propio
+   conector rotulado (Sí / No). Las dos salen del mismo rombo: la primera
+   sigue derecho por la línea principal, la segunda pasa por una pantalla
+   propia — un nodo más del diagrama, no una nota — y vuelve a entrar al
+   flujo (o vuelve hacia atrás, si es un bucle).
+
+   Nada de esto es específico de un diagrama: quién es rama, dónde cae y
+   qué conector le toca lo calcula render.php leyendo el grafo. */
+
+/* Etiqueta Sí/No apoyada sobre su conector. Misma tipografía mono de las
+   etiquetas de arista que ya existían — es la MISMA familia de rótulo, no
+   un elemento nuevo: sólo cambia de color, porque un rótulo de decisión
+   usa el naranja semántico del rombo del que sale. */
+.es-flow__edge-label {
+	display: inline-block;
+	z-index: 2;
+	width: max-content;
+	margin-bottom: 7px;
+	padding: 1px 6px;
+	border-radius: 999px;
+	background: var(--es-paper);
+	font-family: var(--es-mono);
+	font-size: 9px;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	line-height: 1.6;
+	text-transform: uppercase;
+	color: var(--es-decision);
+}
+
+/* Punta de flecha suelta de las ramas: tamaño fijo, nunca se deforma con
+   el ancho de la columna (por eso va aparte y no dentro de un svg
+   estirado). Rota según hacia dónde entra. */
+.es-flow__tip {
+	position: absolute;
+	width: 11px;
+	height: 11px;
+	fill: none;
+	stroke: var(--es-line-strong);
+	stroke-width: 1.25;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.es-flow__tip--up {
+	transform: rotate(180deg);
+}
+
+.es-flow__tip--left {
+	transform: rotate(90deg);
+}
+
+.es-flow__tip--right {
+	transform: rotate(-90deg);
+}
+
+/* En mobile/tablet la rama es simplemente el siguiente bloque de la
+   narrativa vertical: el conector en "L" no aplica (alcanza con el riel
+   vertical que ya usan todos los pasos), pero su RÓTULO sí — "No" es
+   justamente lo que explica por qué aparece esta pantalla. Así que el
+   elemento se queda en el flujo, sin trazo, mostrando sólo la etiqueta.
+   La "L" y sus puntas aparecen recién en el grid de desktop (más abajo). */
+.es-flow__branch-link {
+	display: block;
+	position: relative;
+}
+
+.es-flow__branch-link .es-flow__tip {
+	display: none;
+}
+
+/* La vuelta al flujo no aporta nada en lectura vertical: en mobile el
+   siguiente bloque YA es el nodo al que se vuelve. */
+.es-flow__branch-link--out {
+	display: none;
+}
+
+/* ---------- panel de detalle ----------
+   BASE = visible y estático: esto es lo que ve alguien sin JS. */
+
+.es-flow__panel {
+	margin-top: 12px;
+	padding: 14px 16px;
+	border: 1px solid var(--es-line);
+	border-radius: var(--es-radius-sm);
+	background: var(--es-paper-2);
+}
+
+.es-flow__detail {
+	margin: 0;
+	display: grid;
+	gap: 10px;
+}
+
+.es-flow__detail dt {
+	font-family: var(--es-mono);
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--es-flow-mark);
+}
+
+.es-flow__detail dd {
+	margin: 3px 0 0;
+	font-size: 13.5px;
+	line-height: 1.6;
+	color: var(--es-ink-2);
+}
+
+.es-flow__close {
+	display: none; /* sólo con JS */
+	margin-top: 12px;
+	padding: 7px 12px;
+	border: 1px solid var(--es-line-strong);
+	border-radius: 999px;
+	background: transparent;
+	font-family: var(--es-mono);
+	font-size: 10px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--es-ink-3);
+	cursor: pointer;
+	transition: color var(--es-dur-fast) var(--es-ease), border-color var(--es-dur-fast) var(--es-ease);
+}
+
+.es-flow__close:hover,
+.es-flow__close:focus-visible {
+	color: var(--es-accent);
+	border-color: var(--es-accent);
+}
+
+/* =========================================================================
+   ENHANCED — a partir de acá manda el JS (.is-enhanced)
+   ========================================================================= */
+
+/* Mobile/tablet: sin hover, esto ES el desplegable — se ve como un control
+   (chip con borde), no como una línea de texto más, y gira el ícono al
+   abrirse. En desktop (media query de abajo) vuelve a texto simple porque
+   ahí el hover ya hace ese trabajo. */
+.es-flow.is-enhanced .es-flow__more {
+	display: inline-flex;
+	padding: 7px 12px;
+	border: 1px solid var(--es-line-strong);
+	border-radius: 999px;
+	background: var(--es-paper-2);
+	color: var(--es-ink-3);
+}
+
+.es-flow.is-enhanced .es-flow__item.is-open .es-flow__more {
+	border-color: var(--es-accent);
+	color: var(--es-accent);
+}
+
+.es-flow.is-enhanced .es-flow__item.is-open .es-flow__more-icon {
+	transform: rotate(180deg);
+}
+
+.es-flow.is-enhanced .es-flow__close {
+	display: inline-block;
+}
+
+/* mobile: el panel se colapsa como acordeón (no popover) */
+.es-flow.is-enhanced .es-flow__panel {
+	display: none;
+}
+
+.es-flow.is-enhanced .es-flow__item.is-open .es-flow__panel {
+	display: block;
+	animation: es-flow-in var(--es-dur) var(--es-ease) both;
+}
+
+@keyframes es-flow-in {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+.es-flow.is-enhanced .es-flow__trigger:hover .es-flow__more,
+.es-flow.is-enhanced .es-flow__trigger:focus-visible .es-flow__more {
+	color: var(--es-accent);
+}
+
+/* hover / foco / abierto: la FORMA refuerza el borde con SU PROPIO acento
+   (--es-flow-mark-2 — verde por defecto, naranja en un nodo de decisión,
+   nunca un color ajeno) más una superficie apenas más clara. Nada de
+   relleno sólido ni azul: es el mismo criterio de estado que el resto
+   del sitio, aplicado al color que cada nodo ya trae.
+
+   Selectores POSITIVOS (--step / --milestone), no ":not(decision)": un
+   ":not()" agrega un punto de especificidad como si fuera una clase más
+   — con ":not(.es-flow__item--decision)" esta regla terminaba siendo MÁS
+   específica que la de --start/--end de abajo (aunque esa venga después
+   en el archivo) y le ganaba con su superficie neutra, apagando el verde
+   del botón de Inicio/Fin en hover. Con selectores positivos cada kind
+   de nodo cae en una sola regla, sin pisarse. */
+.es-flow.is-enhanced .es-flow__item--step .es-flow__trigger:hover .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--step .es-flow__trigger:focus-visible .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--step.is-open .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--milestone .es-flow__trigger:hover .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--milestone .es-flow__trigger:focus-visible .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--milestone.is-open .es-flow__shape {
+	background: var(--es-surface-2);
+	border-color: var(--es-flow-mark-2);
+}
+
+.es-flow__item--decision .es-flow__trigger:hover .es-flow__shape::before,
+.es-flow__item--decision .es-flow__trigger:focus-visible .es-flow__shape::before,
+.es-flow__item--decision.is-open .es-flow__shape::before {
+	background: var(--es-surface-2);
+	border-color: var(--es-flow-mark-2);
+}
+
+/* inicio/fin son sólidos: no se aclaran, se realzan apenas. color con
+   !important: refuerzo defensivo — mismo criterio que el resto del sitio
+   (nav, botones) contra cualquier estilo de hover/foco ajeno que intente
+   pisar el texto de un elemento interactivo. */
+.es-flow.is-enhanced .es-flow__item--start .es-flow__trigger:hover .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--start .es-flow__trigger:focus-visible .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--start.is-open .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--end .es-flow__trigger:hover .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--end .es-flow__trigger:focus-visible .es-flow__shape,
+.es-flow.is-enhanced .es-flow__item--end.is-open .es-flow__shape {
+	background: var(--es-flow-mark) !important;
+	border-color: var(--es-flow-mark) !important;
+	filter: brightness(1.12);
+}
+
+.es-flow__item--start .es-flow__trigger:hover .es-flow__title,
+.es-flow__item--start .es-flow__trigger:focus-visible .es-flow__title,
+.es-flow__item--end .es-flow__trigger:hover .es-flow__title,
+.es-flow__item--end .es-flow__trigger:focus-visible .es-flow__title {
+	color: var(--es-paper) !important;
+}
+
+/* ---------- foco de teclado — sigue la FORMA visible, no el área de clic ----------
+   .es-flow__trigger es el área táctil completa (incluye el aire vertical
+   de --es-flow-shape-h en desktop, más alto que la forma en sí — ver
+   .es-flow__shape-band más arriba). Si el outline se pusiera en .trigger
+   directamente, dibujaría un rectángulo más alto que la pastilla/rombo/
+   rectángulo real, sin seguir su contorno. Poniéndolo en .es-flow__shape
+   en cambio, el anillo verde traza exactamente la caja visible — y en
+   navegadores modernos el outline ya respeta el propio border-radius de
+   esa caja (pastilla incluida). El rombo no participa de esta regla — su
+   contorno no es una caja alineada a los ejes, tiene su propia solución
+   (box-shadow sobre el ::before rotado) inmediatamente después.
+
+   .es-flow__trigger:focus-visible { outline: none } es OBLIGATORIO acá,
+   no cosmético: .trigger es un <button> dentro de .es-page, así que la
+   regla genérica ".es-page button:focus-visible" (base.css) también le
+   pone un anillo verde — al área táctil completa, no a la forma. Sin
+   este reset quedarían DOS anillos superpuestos (uno correcto en la
+   forma, uno de más alrededor de toda la franja).
+
+   Prefijo ".es-flow" obligatorio por especificidad: la regla genérica es
+   ".es-page button:focus-visible" (1 clase + 1 elemento + 1 pseudo-clase),
+   más específica que ".es-flow__trigger:focus-visible" sola (1 clase + 1
+   pseudo) aunque esta última venga después en el archivo — el empate en
+   la categoría de clases se rompe por la categoría de elementos, y ahí
+   pierde. Con el prefijo pasa a 2 clases + 1 pseudo, que gana sin
+   depender del orden. */
+/* SIN gate de .is-enhanced a propósito: el foco de teclado tiene que
+   verse igual con o sin JS (mismo contrato de progressive enhancement
+   que el resto del bloque — ver el docblock de render.php). */
+.es-flow .es-flow__trigger:focus-visible {
+	outline: none;
+}
+
+.es-flow__item:not(.es-flow__item--decision) .es-flow__trigger:focus-visible .es-flow__shape {
+	outline: 2px solid var(--es-accent);
+	outline-offset: 3px;
+}
+
+/* El rombo está rotado 45° — un outline en .trigger o .shape siempre
+   sería un rectángulo recto, nunca el propio diamante. box-shadow en el
+   ::before SÍ hereda la rotación del elemento (el shadow se pinta en el
+   sistema de coordenadas YA transformado), así que su contorno traza el
+   rombo real. (El outline:none general de arriba ya cubre la decisión
+   también — esta regla queda para dejar la intención explícita.) */
+.es-flow__item--decision .es-flow__trigger:focus-visible {
+	outline: none;
+}
+
+.es-flow__item--decision .es-flow__trigger:focus-visible .es-flow__shape::before {
+	box-shadow: 0 0 0 2px var(--es-accent);
+}
+
+.es-flow__close:focus-visible {
+	outline: 2px solid var(--es-accent);
+	outline-offset: 3px;
+}
+
+/* =========================================================================
+   TABLET (>=680px) — misma narrativa vertical, más aire y medida de lectura
+   ========================================================================= */
+
+@media (min-width: 680px) {
+	.es-flow {
+		--es-flow-gutter: 44px;
+		--es-flow-gap: 30px;
+	}
+
+	.es-flow__title {
+		font-size: 16px;
+	}
+}
+
+/* =========================================================================
+   DESKTOP (>=1280px) — flujo horizontal en serpentina, con popovers.
+
+   Por qué 1280 y no 1024: este flujo son 3 filas de 4 (fila 1 y 3 cierran
+   en un rombo de 190px). A 1024–1279px esas 4 columnas quedaban apretadas
+   (una tercera fila intermedia que ni siquiera coincidía con la agrupación
+   semántica de 4). El propio ticket lo permite explícitamente: "si hace
+   falta, en tablet usar antes la narrativa vertical que apretar el
+   diagrama". Así que 680–1279px usa la MISMA narrativa vertical de mobile
+   (ya definida arriba, sólo con más aire) y el grid recién arranca donde
+   4 columnas entran con comodidad real. case-flow.js usa el mismo punto
+   de corte para decidir hover-abre vs. tap-abre (ver isDesktop()).
+   ========================================================================= */
+
+@media (min-width: 1280px) {
+	.es-flow {
+		--es-flow-gap: 0px;
+		--es-flow-col: 26px; /* ancho del conector entre nodos, en la fila */
+		--es-flow-row-gap: 46px; /* alto del salto entre filas */
+		/* Alto compartido de la franja de forma (--es-flow-shape-h): por
+		   default el de un rectángulo de hasta 2 líneas con aire; las filas
+		   1 y 3 lo suben al alto del rombo más abajo, así TODAS las cajas
+		   de esa fila —incluida la pastilla de Inicio/Fin— se centran en
+		   el mismo eje que el rombo, sin números mágicos por nodo. */
+		--es-flow-shape-h: 90px;
+	}
+
+	/* el progreso 01/08 es una affordance de scroll mobile: no aplica acá.
+	   Prefijo ".es-flow" a propósito: la regla base (arriba) también lo
+	   lleva para ganarle al reset de prosa de .es-case__body, así que
+	   esta tiene que igualar esa especificidad para poder pisarla acá. */
+	.es-flow .es-flow__progress {
+		display: none;
+	}
+
+	/* Grilla, no una fila con scroll: el flujo entra ENTERO en el ancho
+	   editorial repartido en 3 filas de 4, y se lee de un vistazo. Sin
+	   overflow en ningún eje: cero riesgo de overflow horizontal de
+	   página. align-items:start porque con 'stretch' un nodo de decisión
+	   (más alto) estiraba toda la fila y los pasos quedaban como cajas
+	   casi vacías — la alineación de CENTROS la resuelve la franja
+	   compartida (--es-flow-shape-h), no el grid. */
+	.es-flow .es-flow__track {
+		display: grid;
+		grid-template-columns: repeat(var(--es-flow-cols, 4), minmax(0, 1fr));
+		gap: var(--es-flow-row-gap) var(--es-flow-col);
+		align-items: start;
+	}
+
+	.es-flow__item {
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+	}
+
+	/* Una banda que contenga un rombo comparte su altura (190px) para que
+	   pastilla, rectángulo y rombo caigan en el mismo eje y el conector
+	   pueda tocar el centro de todos. Qué banda la necesita lo decide el
+	   PHP mirando el grafo (.is-tall), no un nth-child atado a un diagrama
+	   concreto. */
+	.es-flow__item.is-tall {
+		--es-flow-shape-h: 190px;
+	}
+
+	/* ---- SERPENTINA, ahora dirigida por el DATO ----
+	   La posición de cada nodo la calcula render.php a partir del grafo y
+	   la escribe en --r / --c. Antes esto era una lista de nth-child atada
+	   a una serpentina de 12 nodos exactos: cualquier flujo con otro largo,
+	   o con una rama, quedaba mal colocado. Ahora el CSS no sabe cuántos
+	   nodos hay ni dónde están las decisiones — sólo obedece la grilla que
+	   le pasan, así que el mismo archivo sirve para cualquier diagrama.
+
+	   El orden del DOM sigue siendo el narrativo real (lectores de pantalla
+	   y Vista de lista ven la secuencia verdadera); sólo la UBICACIÓN
+	   visual la decide el grid. */
+	.es-flow__item {
+		grid-row: var(--r);
+		grid-column: var(--c);
+	}
+
+	/* Banda que se lee al revés (derecha → izquierda): el conector entra por
+	   el otro lado y el trazo se espeja. .is-rtl lo pone el PHP según la
+	   paridad de la banda — nunca un nth-child. */
+	.es-flow__item.is-rtl .es-flow__rail--h {
+		left: 100%;
+		right: auto;
+	}
+
+	.es-flow__item.is-rtl .es-flow__rail--h .es-flow__connector {
+		transform: scaleX(-1);
+	}
+
+	.es-flow__item.is-rtl .es-flow__edge {
+		left: auto;
+		right: 0;
+		text-align: right;
+	}
+
+	/* Riel horizontal: entra en el gap de la grilla, a la izquierda del
+	   nodo. top:50% cae en el centro de la FRANJA compartida — el mismo eje
+	   en el que ya se centra la forma — así que sirve igual para el
+	   rectángulo más chico de la fila que para el rombo, sin ningún ajuste
+	   por nodo. */
+	.es-flow__rail--h {
+		left: auto;
+		right: 100%;
+		top: 50%;
+		bottom: auto;
+		transform: translateY(-50%);
+		width: var(--es-flow-col);
+		height: 22px;
+	}
+
+	.es-flow__rail--h .es-flow__line--v,
+	.es-flow__rail--h .es-flow__head--v {
+		display: none;
+	}
+
+	.es-flow__rail--h .es-flow__line--h,
+	.es-flow__rail--h .es-flow__head--h {
+		display: block;
+	}
+
+	/* Salto de banda: caída vertical recta. El nodo de llegada queda en la
+	   MISMA columna que el de salida (lo garantiza la serpentina), así que
+	   no hace falta ningún desvío horizontal — sólo el trazo vertical del
+	   propio svg, del alto exacto del salto de fila. */
+	.es-flow__rail--v {
+		left: 50%;
+		right: auto;
+		top: auto;
+		bottom: 100%;
+		transform: translateX(-50%);
+		width: 22px;
+		height: var(--es-flow-row-gap);
+	}
+
+	.es-flow__rail--v .es-flow__line--h,
+	.es-flow__rail--v .es-flow__head--h {
+		display: none;
+	}
+
+	.es-flow__rail--v .es-flow__line--v,
+	.es-flow__rail--v .es-flow__head--v {
+		display: block;
+	}
+
+	/* =====================================================================
+	   RAMAS REALES — la decisión se bifurca de verdad
+	   ---------------------------------------------------------------------
+	   Cuando una decisión tiene una salida que pasa por su propia pantalla,
+	   esa pantalla cae en un CARRIL propio (una fila de grilla extra que
+	   render.php inserta encima de la banda) y en la columna vecina. Así:
+
+	     · la salida principal sigue bajando recta por el centro de su
+	       columna, sin desviarse ni un pixel;
+	     · la otra salida se abre en "L" hacia el carril, entra a la
+	       pantalla intermedia y vuelve a la línea principal con otra "L";
+	     · las dos salidas nacen del MISMO punto del rombo, que es lo que
+	       hace que se lea como una bifurcación y no como dos cosas sueltas.
+
+	   Las "L" son dos bordes CSS, no un svg estirado: un borde recto no se
+	   deforma nunca, sea cual sea el ancho de columna, mientras que un svg
+	   con preserveAspectRatio="none" deformaría la punta de flecha. La
+	   punta va aparte, en su propio svg de tamaño fijo, apoyada en el
+	   extremo de la L.
+	   ===================================================================== */
+
+	/* Prolongación de la línea principal a través del carril: sin esto el
+	   conector llegaría sólo hasta el borde del carril y quedaría cortado
+	   justo donde la rama se abre — que es exactamente donde más importa
+	   que se vea continuo. */
+	.es-flow .es-flow__pass {
+		display: block;
+		grid-row: var(--r);
+		grid-column: var(--c);
+		align-self: stretch;
+		justify-self: center;
+		width: 1px;
+		/* se mete en los dos gaps de fila para empalmar con los rieles */
+		margin: calc(-1 * var(--es-flow-row-gap)) 0;
+		background: var(--es-line-strong);
+	}
+
+	/* La pantalla intermedia es secundaria: ocupa algo menos que una celda
+	   entera y se alinea del lado de su columna principal, para que el
+	   carril no compita en peso con la línea del flujo. */
+	.es-flow__item--branch {
+		padding-left: 0;
+		border-left: 0;
+	}
+
+	.es-flow__item--branch .es-flow__shape {
+		padding: 10px 13px;
+	}
+
+	.es-flow__item--branch .es-flow__title {
+		font-size: 13px;
+	}
+
+	.es-flow__item--branch .es-flow__text {
+		font-size: 11.5px;
+	}
+
+	/* --- la "L" que abre la rama y la que la devuelve al flujo ---
+	   Cada una entra y sale por un LADO DISTINTO de la tarjeta. Dos razones:
+	   (a) debajo de la forma vive la descripción del propio nodo ("Ver
+	   detalle" incluido), así que un conector que pasara por ahí cruzaría
+	   texto; (b) si entrada y salida se engancharan en el mismo borde
+	   quedarían como un doble trazo paralelo y la rama se leería como una
+	   conexión suelta, no como un recorrido de ida y vuelta.
+
+	   Rama hacia adelante:  entra por ARRIBA,     sale por la DERECHA.
+	   Bucle (vuelve atrás): entra por la IZQUIERDA, sale por ARRIBA.
+
+	   Son dos bordes CSS, no un svg estirado: un borde recto no se deforma
+	   nunca, sea cual sea el ancho de columna, mientras que un svg con
+	   preserveAspectRatio="none" deformaría la punta de flecha. La punta va
+	   aparte, en su propio svg de tamaño fijo, apoyada en el extremo. */
+	.es-flow__branch-link {
+		display: block;
+		position: absolute;
+		border-color: var(--es-line-strong);
+		border-style: solid;
+		border-width: 0;
+	}
+
+	.es-flow__branch-link .es-flow__tip {
+		display: block;
+	}
+
+	/* La geometría depende SÓLO de dónde está el otro extremo respecto de la
+	   tarjeta — no de si la rama "va hacia adelante" o "vuelve atrás". Con eso
+	   quedan cubiertos los tres casos que produce el algoritmo: el carril
+	   entre dos bandas (decisión arriba, reingreso abajo), el bucle (decisión
+	   abajo, destino arriba) y la rama que nace y muere en la misma banda
+	   (los dos extremos abajo). is-side-* sólo dice hacia qué lado queda la
+	   columna principal, para saber por dónde estirar el tramo horizontal. */
+
+	/* viene de ARRIBA → entra por el techo de la tarjeta */
+	.es-flow__branch-link--in.is-from-above {
+		bottom: 100%;
+		height: var(--es-flow-row-gap);
+		width: calc(100% + var(--es-flow-col));
+		border-top-width: 1px;
+	}
+
+	.is-side-right .es-flow__branch-link--in.is-from-above {
+		left: 50%;
+		border-left-width: 1px;
+		border-top-left-radius: 5px;
+	}
+
+	.is-side-left .es-flow__branch-link--in.is-from-above {
+		right: 50%;
+		border-right-width: 1px;
+		border-top-right-radius: 5px;
+	}
+
+	/* viene de ABAJO → entra por el costado (nunca por la base: ahí está la
+	   descripción del propio nodo) */
+	.es-flow__branch-link--in.is-from-below {
+		top: 50%;
+		height: calc(50% + var(--es-flow-row-gap));
+		border-top-width: 1px;
+	}
+
+	.is-side-left .es-flow__branch-link--in.is-from-below {
+		right: 100%;
+		width: calc(26% + var(--es-flow-col));
+		border-left-width: 1px;
+		border-top-left-radius: 5px;
+	}
+
+	/* columna principal a la derecha: la entrada igual baja por la izquierda,
+	   así no choca con la salida, que usa el lado derecho. */
+	.is-side-right .es-flow__branch-link--in.is-from-below {
+		right: 100%;
+		width: 26px;
+		border-left-width: 1px;
+		border-top-left-radius: 5px;
+	}
+
+	/* va hacia ABAJO → sale por el costado y cae sobre el eje de la columna
+	   principal: "me salí de la línea, pasé por acá, vuelvo a la misma línea" */
+	.es-flow__branch-link--out.is-to-below {
+		top: 50%;
+		height: calc(50% + var(--es-flow-row-gap));
+		border-top-width: 1px;
+	}
+
+	.is-side-right .es-flow__branch-link--out.is-to-below {
+		left: 100%;
+		width: calc(var(--es-flow-col) + 50%);
+		border-right-width: 1px;
+		border-top-right-radius: 5px;
+	}
+
+	.is-side-left .es-flow__branch-link--out.is-to-below {
+		right: 100%;
+		width: calc(var(--es-flow-col) + 50%);
+		border-left-width: 1px;
+		border-top-left-radius: 5px;
+	}
+
+	/* va hacia ARRIBA (retorno) → sale por el techo. Los verticales del
+	   retorno NO se apoyan sobre el eje de la columna: corren en paralelo a la
+	   línea principal y en sentido contrario, así que si compartieran eje se
+	   leerían como una sola línea. */
+	.es-flow__branch-link--out.is-to-above {
+		bottom: 100%;
+		height: var(--es-flow-row-gap);
+		border-top-width: 1px;
+	}
+
+	.is-side-left .es-flow__branch-link--out.is-to-above {
+		right: 50%;
+		width: calc(76% + var(--es-flow-col));
+		border-right-width: 1px;
+		border-top-right-radius: 5px;
+	}
+
+	.is-side-right .es-flow__branch-link--out.is-to-above {
+		left: 50%;
+		width: calc(76% + var(--es-flow-col));
+		border-left-width: 1px;
+		border-top-left-radius: 5px;
+	}
+
+	/* Punta de flecha en el extremo de cada "L", apoyada sobre el borde de la
+	   forma a la que llega. */
+	.es-flow__branch-link--in.is-from-above .es-flow__tip {
+		bottom: -6px;
+	}
+
+	.is-side-right .es-flow__branch-link--in.is-from-above .es-flow__tip {
+		left: -5.5px;
+	}
+
+	.is-side-left .es-flow__branch-link--in.is-from-above .es-flow__tip {
+		right: -5.5px;
+	}
+
+	.es-flow__branch-link--in.is-from-below .es-flow__tip {
+		right: -6px;
+		top: -5.5px;
+	}
+
+	.es-flow__branch-link--out.is-to-below .es-flow__tip {
+		bottom: -6px;
+	}
+
+	.is-side-right .es-flow__branch-link--out.is-to-below .es-flow__tip {
+		right: -5.5px;
+	}
+
+	.is-side-left .es-flow__branch-link--out.is-to-below .es-flow__tip {
+		left: -5.5px;
+	}
+
+	.es-flow__branch-link--out.is-to-above .es-flow__tip {
+		top: -6px;
+	}
+
+	.is-side-left .es-flow__branch-link--out.is-to-above .es-flow__tip {
+		left: -5.5px;
+	}
+
+	.is-side-right .es-flow__branch-link--out.is-to-above .es-flow__tip {
+		right: -5.5px;
+	}
+
+	/* En el grid, TODO rótulo de arista se despega del flujo:
+	   .es-flow__shape-band es un flex en columna, así que un rótulo en flujo
+	   normal empujaría la forma hacia abajo y rompería el eje compartido de
+	   la fila. */
+	.es-flow__edge-label {
+		position: absolute;
+		margin: 0;
+	}
+
+	/* El rótulo Sí/No va del lado del rombo del que sale, sobre su propio
+	   conector: es el conector el que explica la lógica. La vuelta al flujo
+	   no lleva rótulo — ya se leyó al abrirse. */
+	.es-flow__branch-link--in.is-from-above .es-flow__edge-label {
+		top: -7px;
+	}
+
+	.es-flow__branch-link--in.is-from-below .es-flow__edge-label {
+		bottom: -7px;
+	}
+
+	.is-side-right .es-flow__branch-link--in.is-from-above .es-flow__edge-label {
+		right: 5px;
+	}
+
+	.is-side-left .es-flow__branch-link--in.is-from-above .es-flow__edge-label {
+		left: 5px;
+	}
+
+	.es-flow__branch-link--in.is-from-below .es-flow__edge-label {
+		left: 3px;
+	}
+
+	.es-flow__edge-label--out {
+		display: none;
+	}
+
+	/* Rótulo de un tramo recto (una decisión cuya salida principal sigue
+	   derecho): va pegado al riel, del lado por el que entra. */
+	.es-flow__rail--v + .es-flow__edge-label {
+		left: calc(50% + 7px);
+		bottom: calc(100% + 6px);
+	}
+
+	.es-flow__rail--h + .es-flow__edge-label {
+		right: calc(100% + 4px);
+		top: calc(50% - 22px);
+	}
+
+	.is-rtl .es-flow__rail--h + .es-flow__edge-label {
+		right: auto;
+		left: calc(100% + 4px);
+	}
+
+	.es-flow__node {
+		grid-column: auto;
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+	}
+
+	/* La etiqueta va ARRIBA de la caja, no sobre la línea: el gap entre
+	   columnas es de 26px y ahí no entra "Acceso principal al sitio" sin
+	   pisar la caja siguiente. Arriba y alineada a la izquierda se lee
+	   limpio y sigue diciendo qué pasa ANTES de este paso (fila 2 la
+	   espeja a la derecha, arriba). */
+	.es-flow__edge {
+		left: 0;
+		right: auto;
+		bottom: calc(100% + 7px);
+		max-width: 100%;
+		text-align: left;
+	}
+
+	/* Marcadores de contexto anclados a SU PROPIA pastilla.
+	   Antes vivían sueltos arriba y abajo del diagrama y se los acercaba con
+	   un translateY a ojo — un número que dependía del alto real de la última
+	   fila y que había que reajustar cada vez que cambiaba el contenido.
+	   Ahora el marcador es hijo del nodo, y su posición se deriva de la
+	   geometría que ya gobierna la forma: la pastilla está centrada en la
+	   franja (50%), así que su borde está a media pastilla del centro y el
+	   marcador se apoya justo después del gap. Cero acoplamiento al contenido:
+	   sirve igual para un flujo de 6 nodos o de 30. */
+	.es-flow__item .es-flow__marker {
+		position: absolute;
+		left: 0;
+		right: 0;
+		margin: 0;
+	}
+
+	.es-flow__item .es-flow__marker--start {
+		bottom: calc(50% + var(--es-flow-pill-h) / 2 + var(--es-flow-marker-gap));
+	}
+
+	.es-flow__item .es-flow__marker--end {
+		top: calc(50% + var(--es-flow-pill-h) / 2 + var(--es-flow-marker-gap));
+	}
+
+	.es-flow.is-enhanced .es-flow__trigger:hover,
+	.es-flow.is-enhanced .es-flow__trigger:focus-visible {
+		transform: translateY(-2px);
+	}
+
+	.es-flow__title {
+		font-size: 14.5px;
+	}
+
+	.es-flow__text {
+		font-size: 12.5px;
+	}
+
+	/* El hover ya es la señal de "esto se abre" en desktop: el chip con
+	   borde vuelve a ser texto simple con su flechita, sin fondo/borde. */
+	.es-flow.is-enhanced .es-flow__more {
+		padding: 0;
+		border: 0;
+		border-radius: 0;
+		background: none;
+	}
+
+	/* --- POPOVER --- */
+	.es-flow.is-enhanced .es-flow__panel {
+		position: absolute;
+		top: calc(100% + 10px);
+		left: 50%;
+		z-index: 5;
+		width: max-content;
+		max-width: min(320px, 78vw);
+		/* --es-flow-shift lo escribe el JS para que el popover nunca se
+		   salga del viewport (clamp real, no una apuesta de CSS). */
+		transform: translateX(calc(-50% + var(--es-flow-shift, 0px)));
+		border-color: var(--es-line-strong);
+		background: var(--es-surface);
+		box-shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.75);
+	}
+
+	/* Reveal corto a propósito: un popover de hover con los 0.4s de --es-dur
+	   se siente lento y se lo ve "lavado" mientras entra. --es-dur-fast es
+	   el token pensado justo para microinteracciones como esta. */
+	.es-flow.is-enhanced .es-flow__item.is-open .es-flow__panel {
+		animation: es-flow-pop var(--es-dur-fast) var(--es-ease) both;
+	}
+
+	/* pico del popover */
+	.es-flow.is-enhanced .es-flow__panel::before {
+		content: '';
+		position: absolute;
+		bottom: 100%;
+		left: calc(50% - 5px - var(--es-flow-shift, 0px));
+		border: 5px solid transparent;
+		border-bottom-color: var(--es-line-strong);
+	}
+
+	@keyframes es-flow-pop {
+		from {
+			opacity: 0;
+			transform: translateX(calc(-50% + var(--es-flow-shift, 0px))) translateY(-5px);
+		}
+		to {
+			opacity: 1;
+			transform: translateX(calc(-50% + var(--es-flow-shift, 0px))) translateY(0);
+		}
+	}
+
+	/* el último nodo abre el popover hacia arriba si no hay aire abajo */
+	.es-flow.is-enhanced .es-flow__item.is-flip .es-flow__panel {
+		top: auto;
+		bottom: calc(100% + 10px);
+	}
+
+	.es-flow.is-enhanced .es-flow__item.is-flip .es-flow__panel::before {
+		bottom: auto;
+		top: 100%;
+		border-bottom-color: transparent;
+		border-top-color: var(--es-line-strong);
+	}
+}
+
+/* =========================================================================
+   REDUCED MOTION — se apaga todo lo animado, nada de contenido se pierde
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+	.es-flow__line,
+	.es-flow.is-enhanced:not(.is-revealed) .es-flow__line,
+	.es-flow.is-revealed .es-flow__line {
+		stroke-dasharray: none;
+		stroke-dashoffset: 0;
+		animation: none;
+	}
+
+	.es-flow__head,
+	.es-flow.is-enhanced:not(.is-revealed) .es-flow__head,
+	.es-flow.is-revealed .es-flow__head {
+		opacity: 1;
+		animation: none;
+	}
+
+	.es-flow.is-enhanced:not(.is-revealed) .es-flow__item,
+	.es-flow.is-revealed .es-flow__item {
+		opacity: 1;
+		transform: none;
+		animation: none;
+	}
+
+	.es-flow.is-enhanced .es-flow__item.is-open .es-flow__panel {
+		animation: none;
+	}
+
+	.es-flow.is-enhanced .es-flow__trigger:hover,
+	.es-flow.is-enhanced .es-flow__trigger:focus-visible {
+		transform: none;
+	}
+}

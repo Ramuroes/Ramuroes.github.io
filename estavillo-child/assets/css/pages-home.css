@@ -1,0 +1,540 @@
+/* =========================================================================
+   ESTAVILLO — Home (secciones específicas del template)
+   ========================================================================= */
+
+/* ---------- featured case (Main case) ---------- */
+
+.es-featured__grid {
+	display: grid;
+	grid-template-columns: 0.95fr 1.05fr;
+	gap: clamp(32px, 5vw, 72px);
+	align-items: center;
+}
+
+.es-featured__kicker {
+	margin-bottom: 18px;
+}
+
+.es-featured__title {
+	font-family: var(--es-serif);
+	font-size: clamp(34px, 4vw, 52px);
+	font-weight: 500;
+	letter-spacing: -0.015em;
+	line-height: 1.06;
+	color: var(--es-ink);
+	margin: 0 0 20px;
+	text-wrap: balance;
+}
+
+.es-featured__title em {
+	font-style: italic;
+}
+
+.es-featured__body {
+	max-width: 56ch;
+	font-size: 15.5px;
+	line-height: 1.7;
+	color: var(--es-ink-2);
+	margin: 0 0 18px;
+}
+
+.es-featured__source {
+	max-width: 56ch;
+	font-size: 13px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+	margin: 0 0 20px;
+}
+
+.es-featured__status {
+	margin-bottom: 28px;
+}
+
+.es-featured__media {
+	position: relative;
+}
+
+.es-featured__placeholder {
+	aspect-ratio: 16 / 10;
+	background: var(--es-block-2);
+}
+
+@media (max-width: 900px) {
+	.es-featured__grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ---------- How I Work illustrations — shared base (Home + page) ----------
+   Used by both this teaser (three small, secondary icons) and the How I
+   Work page's estavillo/how-i-work-illustration block (one large
+   illustration per move, sized in pages.css) — one set of rules so the
+   token mapping and accent toggle only exist once. Loads on Home AND the
+   4 static pages (see inc/enqueue.php es_is_home_template() ||
+   es_is_estavillo_static_page()), unlike pages.css which is static-pages-only.
+
+   --es-signal/--es-signal-soft is the token family already used by the
+   hero system map for exactly this meaning ("the system: active/resolved
+   path, live signal" — see tokens.css §diagram semantics), fixed
+   regardless of the orange/green brand-accent Customizer toggle — the
+   right mapping for --how-work-accent, not --es-accent. The soft-circle
+   opacity is split into its own variable (not baked into a fixed rgba a
+   la --es-signal-soft) specifically so it can be tuned later without
+   touching the RGB triple or the six SVG files. */
+.how-work-illustration {
+	--how-work-line: var(--es-ink);
+	--how-work-accent: var(--es-signal);
+	--how-work-accent-soft-opacity: 0.12;
+	--how-work-accent-soft: rgba(88, 177, 131, var(--how-work-accent-soft-opacity));
+	display: block;
+}
+
+[data-theme='light'] .how-work-illustration {
+	--how-work-accent-soft: rgba(45, 106, 79, var(--how-work-accent-soft-opacity));
+}
+
+.how-work-illustration svg {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+/* showAccents = false (Inspector toggle / show_accents param): hide only
+   the four accent classes, never the base line drawing underneath. */
+.how-work-illustration--no-accents .how-work-svg__accent-path,
+.how-work-illustration--no-accents .how-work-svg__accent-node,
+.how-work-illustration--no-accents .how-work-svg__accent-fill,
+.how-work-illustration--no-accents .how-work-svg__accent-soft {
+	display: none;
+}
+
+/* MVP motion only: a restrained hover on the illustration itself, gated to
+   pointer devices that can actually hover and to prefers-reduced-motion:
+   no-preference. No autoplay/loop/scroll-linked motion this pass — see
+   docs/HOW-I-WORK-STRATEGY.md §motion (richer motion is a later phase). */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+	.how-work-illustration {
+		transition: transform var(--es-dur-fast) ease;
+	}
+
+	.how-work-illustration:hover {
+		transform: translateY(-2px);
+	}
+}
+
+/* ---------- how I work (proceso) — teaser compacto ----------
+   Reescrito para docs/HOW-I-WORK-CONTENT-SPEC.md §1A: ya no reproduce la
+   grilla de 6 pasos (ver template-parts/how-i-work-detail.php /
+   la versión Gutenberg de la página dedicada para eso) — es un preview
+   de 3 ideas, deliberadamente más liviano. "No debe dominar la Home ni
+   competir con Featured/Selected Work": sin bordes pesados, sin números
+   por idea, tipografía notablemente más chica que el título de Featured
+   Case o el hero. Cada idea SÍ lleva una ilustración chica y secundaria
+   (una de las seis piezas de How I Work, ver es_how_work_illustration_svg())
+   — restrained on purpose: nunca compite con el copy ni con Featured/
+   Selected Work. */
+
+.es-process-teaser__group-illustration {
+	width: 44px;
+	margin: 0 0 12px;
+}
+
+/* Refinement ticket §7: the illustration size is a preset (Small/Medium/
+   Large) driven by a single CSS var on the teaser row, so the estavillo/
+   how-i-work-teaser block's illustrationSize attribute maps to a class and
+   the three illustrations scale together. Small = the approved 44px.
+   Medium ≈ 1.35×, Large ≈ 1.7×. Tunable here without touching PHP/JS. */
+.es-process-teaser__row {
+	--es-illus-size: 44px;
+}
+
+.es-process-teaser__row--illus-medium {
+	--es-illus-size: 60px;
+}
+
+.es-process-teaser__row--illus-large {
+	--es-illus-size: 75px;
+}
+
+/* Correction ticket §6: en el layout SIDE la ilustración vive en su propia
+   columna, así que Medium/Large pueden respirar un poco más que en stacked
+   sin dominar el copy. La columna del icono (track `auto`, ver abajo) se
+   expande sola con el nuevo width; Small mantiene el tamaño aprobado. */
+.es-process-teaser__row--side.es-process-teaser__row--illus-medium {
+	--es-illus-size: 72px;
+}
+
+.es-process-teaser__row--side.es-process-teaser__row--illus-large {
+	--es-illus-size: 92px;
+}
+
+/* The block's own wrapper markup (.how-work-illustration) is what actually
+   sizes — the legacy PHP fallback keeps its own fixed 44px above. */
+.es-process-teaser__group .how-work-illustration {
+	width: var(--es-illus-size, 44px);
+	margin: 0 0 12px;
+}
+
+/* Refinement ticket §6: desktop layout variant. The teaser row is the
+   estavillo/how-i-work-teaser block's OWN div (not a core/group), so
+   .es-process-teaser__row (grid, defined below) applies cleanly. "Side"
+   arranges each concept as illustration | (title + text) via grid, desktop
+   only — mobile always stacks (the row collapses to 1 column under 560px
+   and this rule is gated above that breakpoint, so tiny icons never sit
+   beside long text on phones). */
+@media (min-width: 561px) {
+	/* Correction ticket §5: layout de dos columnas REAL — [ilustración][texto].
+	   Forma recomendada `auto minmax(0, 1fr)`:
+	     · col 1 (`auto`) = el ancho fijo del icono (var(--es-illus-size)), así
+	       que es idéntico en las tres ideas y no deja track sobrante;
+	     · col 2 (`minmax(0, 1fr)`) = título + descripción, alineados a la
+	       izquierda, sin desbordar (el minmax(0,…) evita el blowout del 1fr).
+	   El icono se ancla ARRIBA (align-self:start), a la altura de la región del
+	   título — NO se centra contra la card de altura variable — y el texto
+	   arranca en la misma posición vertical en las tres. Sin posicionamiento
+	   absoluto, sin márgenes flotantes. */
+	.es-process-teaser__row--side .es-process-teaser__group {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		/* min-content: las filas las dimensionan SOLO el título y la descripción
+		   (su alto natural al ancho de la columna 2) — nunca la ilustración, que
+		   abarca ambas filas pero no las estira (ver min-height:0 abajo). Así el
+		   texto arranca en la misma Y en las tres ideas, sin importar el largo. */
+		grid-template-rows: min-content min-content;
+		column-gap: clamp(14px, 1.4vw, 20px);
+		row-gap: 5px;
+		align-items: start;
+	}
+
+	.es-process-teaser__row--side .es-process-teaser__group > * {
+		margin: 0;
+	}
+
+	/* icono: columna 1, ocupa ambas filas pero anclado arriba (no estirado ni
+	   centrado) → su tope queda a la altura del título. `min-height: 0` anula
+	   el mínimo automático (min-content) del item, para que su altura NO empuje
+	   las filas del grid: así las filas las dimensiona SOLO el texto (título +
+	   descripción) y el texto arranca en la MISMA posición vertical en las tres
+	   ideas, sin importar el largo de cada descripción. El icono se dibuja a su
+	   alto natural desde arriba (overflow visible), siempre en su columna. */
+	.es-process-teaser__row--side .es-process-teaser__group > .wp-block-estavillo-how-i-work-illustration {
+		grid-column: 1;
+		grid-row: 1 / span 2;
+		align-self: start;
+		min-height: 0;
+	}
+
+	/* the illustration keeps its own bottom margin off in side mode */
+	.es-process-teaser__row--side .es-process-teaser__group .how-work-illustration {
+		margin-bottom: 0;
+	}
+
+	.es-process-teaser__row--side .es-process-teaser__group-title {
+		grid-column: 2;
+		grid-row: 1;
+	}
+
+	.es-process-teaser__row--side .es-process-teaser__group-text {
+		grid-column: 2;
+		grid-row: 2;
+	}
+}
+
+/* Same story for the About teaser: .es-about__grid was a CSS grid on a
+   wp:group in the Gutenberg path — converted to real core/columns
+   (300px portrait column + growing body column, mirroring the fallback's
+   grid-template-columns: 300px 1fr). Gap/alignment scoped here; the
+   fallback's .es-about__grid rules stay untouched. The 900px stack
+   matches the fallback's own breakpoint (core's native stack only kicks
+   in at 781px, which would leave a 782–900px band with two columns where
+   the approved design already stacks). */
+.es-about .wp-block-columns {
+	gap: clamp(32px, 5vw, 72px);
+	align-items: flex-start;
+}
+
+@media (max-width: 900px) {
+	/* !important obligatorio: el CSS de core/columns fuerza
+	   flex-wrap: nowrap !important arriba de 782px, así que entre 782 y
+	   900 una regla normal pierde — mismo recurso que ya usa el fix
+	   equivalente de Connect (flex-basis con !important). */
+	.es-about .wp-block-columns {
+		flex-wrap: wrap !important;
+	}
+
+	.es-about .wp-block-columns .wp-block-column {
+		flex-basis: 100% !important;
+		flex-grow: 1;
+	}
+}
+
+.es-process-teaser__headline {
+	max-width: 46ch;
+	margin: 28px 0 10px;
+	font-family: var(--es-serif);
+	font-size: clamp(19px, 2.1vw, 25px);
+	font-weight: 500;
+	line-height: 1.35;
+	letter-spacing: -0.005em;
+	color: var(--es-ink);
+}
+
+.es-process-teaser__lead {
+	max-width: 52ch;
+	margin: 0 0 clamp(24px, 3vw, 36px);
+	font-size: 14.5px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+}
+
+.es-process-teaser__row {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 20px clamp(24px, 3vw, 40px);
+}
+
+.es-process-teaser__group {
+	padding-top: 14px;
+	border-top: 1px solid var(--es-line);
+}
+
+.es-process-teaser__group-title {
+	margin: 0 0 6px;
+	font-family: var(--es-mono);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--es-accent);
+}
+
+.es-process-teaser__group-text {
+	margin: 0;
+	font-size: 13.5px;
+	line-height: 1.55;
+	color: var(--es-ink-3);
+}
+
+/* Tablet: sigue horizontal — recién colapsa en mobile, y ahí con
+   espaciado chico a propósito (nunca la sensación de "sección larga"
+   que tenía la grilla de 6). */
+@media (max-width: 560px) {
+	.es-process-teaser__row {
+		grid-template-columns: 1fr;
+		gap: 16px;
+	}
+}
+
+/* ---------- selected work ---------- */
+
+.es-work__stack {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(16px, 2vw, 24px);
+}
+
+.es-work__head-label {
+	display: flex;
+	align-items: baseline;
+	gap: 14px;
+}
+
+/* ---------- about ---------- */
+
+.es-about__grid {
+	display: grid;
+	grid-template-columns: 300px 1fr;
+	gap: clamp(32px, 5vw, 72px);
+	align-items: start;
+}
+
+.es-about__portrait {
+	position: relative;
+}
+
+/* Refinement ticket §5: the Home About teaser now uses a real, directly
+   editable core/image (figure.es-about__portrait) instead of the dynamic
+   portrait block. Empty = a clean reserved frame (never a broken <img> or
+   a dev marker); once a real image is picked, :has(img) drops the frame
+   chrome and the photo fills a 3:4 crop. The :has() fallback (older
+   browsers) just keeps the 3:4 frame around the image — graceful. The
+   legacy PHP fallback still uses the .es-about__portrait DIV rule above. */
+figure.es-about__portrait {
+	margin: 0;
+	aspect-ratio: 3 / 4;
+	border: 1px dashed var(--es-line-strong);
+	border-radius: var(--es-radius);
+	background: var(--es-paper-2);
+	overflow: hidden;
+}
+
+figure.es-about__portrait img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+figure.es-about__portrait:has(img) {
+	aspect-ratio: auto;
+	border: none;
+	background: none;
+}
+
+.es-about__placeholder {
+	aspect-ratio: 3 / 4;
+}
+
+.es-about__text {
+	max-width: 50ch;
+	font-family: var(--es-serif);
+	font-size: clamp(20px, 2.3vw, 27px);
+	font-weight: 400;
+	line-height: 1.5;
+	letter-spacing: -0.005em;
+	color: var(--es-ink-2);
+	margin: 0 0 30px;
+}
+
+.es-about__body .es-section-head {
+	margin-bottom: 28px;
+}
+
+@media (max-width: 900px) {
+	.es-about__grid {
+		grid-template-columns: 1fr;
+	}
+	.es-about__portrait {
+		max-width: 320px;
+	}
+}
+
+/* ---------- footer CTA ---------- */
+
+.es-footer-cta {
+	border-bottom: none;
+}
+
+.es-footer-cta__title {
+	font-family: var(--es-serif);
+	font-size: clamp(48px, 7vw, 88px);
+	font-weight: 500;
+	letter-spacing: -0.015em;
+	line-height: 1;
+	color: var(--es-ink);
+	margin-bottom: 26px;
+}
+
+.es-footer-cta__title em {
+	font-style: italic;
+}
+
+.es-footer-cta__lead {
+	max-width: 56ch;
+	font-size: clamp(15.5px, 1.35vw, 17px);
+	line-height: 1.65;
+	color: var(--es-ink-3);
+	margin-bottom: 40px;
+}
+
+.es-footer-cta__email {
+	font-family: var(--es-mono);
+	font-size: clamp(17px, 2.4vw, 24px);
+	color: var(--es-ink);
+	text-decoration: none;
+	border-bottom: 1px solid var(--es-accent);
+	padding-bottom: 3px;
+	transition: color var(--es-dur-fast) ease;
+}
+
+.es-footer-cta__email:hover {
+	color: var(--es-accent);
+}
+
+/* Correction ticket §9: el número de teléfono (link WhatsApp) tiene
+   jerarquía comparable al email — mismo tratamiento mono/tamaño — y ambos
+   viven en la misma fila (.es-footer-cta__contacts). El alias .__whatsapp
+   se mantiene mapeado a lo mismo por si quedó contenido guardado con la
+   clase vieja. */
+.es-footer-cta__phone,
+.es-footer-cta__whatsapp {
+	font-family: var(--es-mono);
+	font-size: clamp(17px, 2.4vw, 24px);
+	color: var(--es-ink);
+	text-decoration: none;
+	border-bottom: 1px solid var(--es-accent);
+	padding-bottom: 3px;
+	transition: color var(--es-dur-fast) ease;
+}
+
+.es-footer-cta__phone:hover,
+.es-footer-cta__whatsapp:hover {
+	color: var(--es-accent);
+}
+
+/* Email + teléfono al mismo nivel visual, en una fila; envuelven juntos y
+   se apilan naturalmente en mobile con gap compacto. */
+.es-footer-cta__contacts {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 14px clamp(28px, 5vw, 64px);
+}
+
+.es-footer-cta__actions {
+	display: flex;
+	align-items: center;
+	gap: 20px 28px;
+	flex-wrap: wrap;
+}
+
+/* mobile: email y teléfono se apilan (columna), gap compacto, alineados a
+   la izquierda — nunca forzados a una sola línea. */
+@media (max-width: 560px) {
+	.es-footer-cta__contacts {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 14px;
+	}
+}
+
+/* ---------- banda "intersection of" (legacy, sin uso en Home v1) ---------- */
+
+.es-intersection {
+	border-bottom: none;
+	padding-top: clamp(28px, 3.5vw, 44px);
+	padding-bottom: clamp(28px, 3.5vw, 44px);
+	border-top: 1px solid var(--es-line);
+}
+
+.es-intersection__row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: clamp(20px, 3vw, 40px);
+	flex-wrap: wrap;
+}
+
+.es-intersection__item {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--es-ink-3);
+}
+
+.es-intersection__item svg {
+	color: var(--es-accent);
+}
+
+@media (max-width: 680px) {
+	.es-intersection__row {
+		justify-content: flex-start;
+	}
+}

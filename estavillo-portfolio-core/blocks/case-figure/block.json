@@ -1,0 +1,28 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/case-figure",
+	"title": "Case Figure",
+	"category": "estavillo-case",
+	"icon": "format-image",
+	"description": "Figura de Case Study: imagen de la Biblioteca de medios (o placeholder {asset: …} mientras no exista), con caption numerada y tres variantes — standard (a medida de lectura), browser (marco tipo navegador) y wide (ancho completo).",
+	"keywords": [ "estavillo", "case", "figure", "imagen", "screenshot" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"mediaId": { "type": "number", "default": 0 },
+		"url": { "type": "string", "default": "" },
+		"alt": { "type": "string", "default": "" },
+		"caption": { "type": "string", "default": "" },
+		"tag": { "type": "string", "default": "" },
+		"variant": { "type": "string", "default": "standard", "enum": [ "standard", "browser", "wide" ] },
+		"placeholderLabel": { "type": "string", "default": "" },
+		"browserLabel": { "type": "string", "default": "" }
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-case-block-case-figure",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}

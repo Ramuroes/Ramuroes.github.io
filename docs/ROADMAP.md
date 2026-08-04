@@ -1,0 +1,768 @@
+# Roadmap — Estavillo Portfolio (Kadence child theme)
+
+Status: the child theme foundation and Home v1 are built and visually strong.
+We are moving from **"build the system"** to **"iterate the product."**
+
+The priority from here forward is to avoid large, token-heavy rewrites and
+instead work in small, scoped tickets — one section or one concern at a
+time. See `DECISIONS.md` for the standing rules behind this shift and
+`BACKLOG.md` for the itemized, prioritized task list that feeds each sprint.
+
+This roadmap is organized into short sprints. Sprints are not calendar-bound;
+they're just an ordering of scope. Do not start a sprint's work until the
+previous one is considered done (or explicitly deprioritized).
+
+---
+
+## Sprint 0 — Documentation / control layer
+
+**Goal:** establish the ticket-based workflow itself. No code changes.
+
+- Create `docs/ROADMAP.md`, `docs/BACKLOG.md`, `docs/DECISIONS.md`,
+  `docs/QA-CHECKLIST.md`, `docs/EDITABILITY-PLAN.md`.
+- No CSS/JS/PHP changes.
+- No visual redesign.
+- No ZIP rebuild required (docs-only).
+
+**Status:** in progress (this document is part of it).
+
+---
+
+## Sprint 1 — Critical UI fixes
+
+**Goal:** close out the remaining known bugs before anything else ships.
+
+- Remove remaining blue interaction states (mobile menu active/pressed,
+  especially the "Work" link).
+- Fix mobile menu active state so it never shows blue anywhere.
+- Fix mobile CTA wrapping ("See how I work" wrapping below the main CTA on
+  some real phones) — define the responsive behavior intentionally instead
+  of leaving it to accident.
+- Normalize case CTA hover states (Selected Work / case links should be
+  white/neutral by default, green only on hover — not permanently green).
+
+See `BACKLOG.md` P0 items for the exact list this sprint should clear.
+
+---
+
+## Sprint 2 — Home polish
+
+**Goal:** refine what already exists. Not a redesign.
+
+- Improve the hero-to-How-I-Work transition (still feels slightly awkward
+  even after the gradient softening fix).
+- Refine footer rhythm (currently feels unresolved).
+- Improve How I Work's visual treatment lightly (within the existing
+  reserved icon/motion slots — no layout change).
+- Do not redesign color, type, spacing, or layout beyond these specific
+  refinements.
+
+---
+
+## Sprint 3 — Editability foundation
+
+**Goal:** prove the editability path on one section before touching the rest.
+
+- Make **Selected Work** editable first (see `EDITABILITY-PLAN.md` priority
+  order).
+- Decide the mechanism: filters, theme options, block patterns, or CPT —
+  see `EDITABILITY-PLAN.md` for the comparison and phased recommendation.
+- Build one editable section end-to-end (including the WordPress-admin
+  editing experience, not just the PHP data structure) before migrating any
+  other section.
+
+**Status:** Done, except Hero (deliberately deferred — see below).
+
+- Selected Work — **done**: "Case Study" custom post type (native fields +
+  one small meta box, no ACF), with the current placeholder cases kept as
+  an automatic fallback when no Case Studies exist yet.
+- Featured Case — **done**: reuses the same Case Study CPT (a "feature
+  this case" flag) rather than a separate mechanism.
+- About — **done**: a plugin-owned "Home Content" options page hooks the
+  `es_home_about_*` filters that already existed in the theme since Home
+  v1 — no theme template changes needed.
+- How I Work — **done**: same options page, per-step merge (editing one
+  step doesn't require filling in all 6).
+- Connect — **done**: title, lead, contact email, CTA URL. Contact email
+  is shared with Footer (same underlying filter both sections use).
+- Header — **done**: 4 nav links, edited individually. Same array feeds
+  desktop nav, mobile menu, and footer nav (already shared before this
+  ticket) — one edit updates all three.
+- Footer — **done**: LinkedIn URL, Behance URL, location. Nav links and
+  contact email were already covered by Header/Connect above (same shared
+  data), so this ticket only needed its two genuinely footer-only fields.
+- Hero — deliberately deferred until the Hero block/layout ticket flagged
+  in `BACKLOG.md` lands first — editability shouldn't be built on top of a
+  layout that's about to change.
+
+Every section above (except Selected Work/Featured Case, which needed a
+CPT because they're repeatable) turned out to already have
+`apply_filters()` extension points from Home v1 — Sprint 3's real work for
+them was giving those filters a wp-admin UI (one shared "Home Content"
+options page in the plugin), not building new plumbing. No theme template
+was changed for About, How I Work, Connect, Header, or Footer.
+
+See `EDITABILITY-PLAN.md` for usage and the architecture rationale.
+
+**Flagged during this sprint, deliberately not built now** (logged to
+`BACKLOG.md` instead of expanding this sprint's scope):
+- A dedicated Hero block/layout ticket — broader mobile-specific
+  constellation composition and Hero editability, still open. (The
+  specific mobile secondary-CTA alignment bug mentioned here was fixed as
+  a scoped, approved exception in Sprint 4 — see below — without opening
+  the full Hero ticket.)
+- Accessibility/UX items: sticky header refinement, an optional "back to
+  top" interaction, and a breadcrumbs/accessibility strategy for internal
+  case-study pages (the single Case Study template now exists as of
+  Sprint 4B, so breadcrumbs are unblocked whenever picked up).
+
+---
+
+## Sprint 4 — Polylang, Case Study template, real content
+
+**Goal:** a fast, publishable V1 — real EN/ES portfolio switching and a
+real single Case Study page, then real content on top of both.
+
+**Sprint 4A — Polylang readiness — done.** The Case Study CPT registers
+itself as translatable via Polylang's `pll_get_post_types` filter (plugin,
+self-configuring — no manual Polylang settings step required).
+`es_case_tag` deliberately stays language-neutral for V1 (approved human
+decision — see `EDITABILITY-PLAN.md`). The header and mobile-menu language
+indicators are now a real switcher via `pll_the_languages()`, guarded by
+`function_exists()` — falls back to the original static "EN / ES" markup,
+byte-for-byte, if Polylang isn't installed. Home Content options stay
+single/global for V1 (approved human decision, not per-language).
+
+**Sprint 4B — Single Case Study template — done.** New
+`estavillo-child/single-es_case_study.php`, resolved automatically by
+WordPress's own template hierarchy (no plugin registration needed),
+reusing the ESTAVILLO header/footer chrome. Renders title, eyebrow,
+excerpt, tags, featured image (or placeholder), a Status/Role/Tools/Period
+meta row, and the post body via the standard `the_content()` — no case
+builder, no custom body fields. Role/Tools/Period are new optional
+plain-text fields on the existing Case Study meta box. New
+`assets/css/case-study.css`, enqueued only on this template; `site.css`
+(chrome) and `motion.js`/`nav.js` are now shared between Home and this
+template instead of being Home-only.
+
+**Also in this sprint (approved, out-of-cycle P0):** the mobile hero CTA
+alignment bug — see `BACKLOG.md` "Bugs / fixes" for the root cause and
+fix. Scoped narrowly to that one bug; the broader Hero block/layout ticket
+flagged in Sprint 3 is still open and unstarted.
+
+**Sprint 4C — Case Study format system + global blue-state fix — done.**
+Built the reusable Case Study formatting layer on top of the Sprint 4B
+template: an optional sticky in-page index (manual `Label|#anchor` textarea
+field, new `_es_case_index` post meta — empty by default, renders nothing
+when unset) and a 14-class `.es-case-*` library
+(section/label/heading/lead/two-column/figure+caption/browser-chrome
+frame/stats grid/timeline/decision cards/pullquote/status grid/native
+`<details>` accordion) usable directly inside the standard editor via
+`the_content()` — no case builder, no ACF, no new repeaters. Visually
+informed by a reference case-study mockup (studied for layout/composition
+only — reimplemented from scratch with existing `--es-*` tokens, zero new
+colors/type, and its JS runtime was never shipped). Also closed out the
+long-flagged **global blue interaction-state bug**: every interactive
+element under the ESTAVILLO scope (desktop nav brand/links, mobile menu
+button, footer nav/meta links, buttons, arrow links, cards, and the two new
+case-study elements) now has explicit rest/hover/focus-visible/active/
+visited rules reinforced with `!important`, verified via an adversarial
+fake-Kadence-CSS-injection test to survive a worst-case external override —
+supersedes the narrower mobile-menu-only fix from Sprint 1's backlog item.
+See `estavillo-child/README.md` ("Sistema de formato de Case Study") for
+the full class reference and a copy-paste editor example.
+
+**Sprint 4D — Case Study hero polish — done.** The hero area of
+`single-es_case_study.php` felt too centered/narrow for a "premium
+editorial" feel. Reworked into a 2-column grid on desktop
+(`.es-case__hero-content` left: eyebrow/title/excerpt/tags/status-role-
+tools-period; `.es-case__hero-media` right: featured image or placeholder,
+4:5 frame), single stacked column on mobile (<1000px, text then image,
+unchanged from before). Text is explicitly left-aligned, never centered.
+No new fields, no change to the `.es-case-*` content-class library, no
+Home/typography/color changes. The sticky index is unaffected (separate
+element above the hero). Logged a future improvement in `BACKLOG.md`
+(desktop-only side index) rather than building it now.
+
+**Sprint 4E — EN/ES Home strategy — next.** Create the Home (ES) page as
+a Polylang translation of the existing Home page (same template, no new
+code) once real Spanish copy exists. Verify hero copy / UI strings
+resolve correctly per language through the existing `es__()` /
+`pll_register_string()` wiring.
+
+**Sprint 4F — Real content loading — next.** Enter real Presupuestador and
+Trazur case studies as Case Study posts (now that the single template
+exists to display them properly, including the new `.es-case-*` formatting
+library and the editorial hero layout), in both languages via their
+Polylang translations. Add real images. Refine EN/ES copy for all Home
+sections (within the single-language-global constraint of Home Content
+options — see Sprint 3 notes above).
+
+**Sprint 4G — V1 publishable structure (mega sprint) — done.** Backup
+branch/tag `backup-before-mega-sprint-case-pages` created first, from a
+confirmed-clean working tree. Built the rest of what a publishable V1
+needs beyond the single Case Study page:
+
+- **Presupuestador case content** — a complete, paste-ready `.es-case-*`
+  HTML deliverable (`docs/content/presupuestador-case-study.html`)
+  covering context/problem/discovery/architecture/MVP/App Alpha/AI
+  role/limitations/reflection/next steps, ready to paste into a Custom
+  HTML block. Entering it as an actual published Case Study post is a
+  manual wp-admin step (see that file's own instructions) — not done by
+  this ticket, since it requires wp-admin access this environment doesn't
+  have.
+- **Case Study hero layout options** — 3 new opt-in variants
+  (`split-left`, `compact`, `stacked`) alongside the Sprint 4D default,
+  selectable per case from a "Hero layout" field on the meta box. Mobile
+  is identical across all 4 (text-first, stacked) — enforced structurally
+  via `@media (min-width: 1000px)` after a real bug was caught in testing
+  (a naive `@media (max-width: 999px)` override lost a CSS specificity
+  fight against the `split-left` variant, breaking mobile stacking for
+  that one variant — see `estavillo-child/assets/css/case-study.css`).
+  Also fixed the hero's vertical alignment (`start` → `center`) so a long
+  excerpt no longer strands the image with a lopsided empty gap.
+- **Breadcrumbs** — Home / Work / case title, on the Case Study page only,
+  reusing `es_nav_links()` for the "Work" link (repoint it once a real
+  Work page exists and every breadcrumb follows).
+- **4 new fixed pages** — Work, About, How I Work, Contact
+  (`templates/page-*.php`), all standalone and sharing the ESTAVILLO
+  chrome (sticky header + footer) with Home and Case Study. Work splits
+  Case Studies into "Selected" and "Archive" by reusing the existing
+  "Show on Home" flag (no new field). About gained 4 new Phase-1 fields
+  (CV URL, timeline, education, hobbies) on the Home Content options
+  page. How I Work and Contact add zero new fields — they just give
+  existing Home data (process steps, Connect/Footer fields) their own
+  dedicated pages.
+- **How I Work icons** — a curated, whitelisted library of 8 inline SVG
+  icons (`es_process_icon_choices()` / `es_process_icon_svg()` in
+  `functions.php`), selectable per step from Home Content. Never
+  arbitrary HTML — the admin only ever stores a whitelisted key.
+- **Polylang page strategy** — documented, not built: `home_url()` and
+  WordPress permalinks already resolve per-language natively once
+  Polylang is active, so breadcrumbs and nav links need no extra code.
+  Exact wp-admin steps for translating all 5 fixed pages are in
+  `estavillo-child/README.md` → "Polylang".
+- **V1/V2 framing** — added to `README.md`, `EDITABILITY-PLAN.md`: V1 is
+  this fast, options-page-and-filters system; V2 (unplanned in detail) is
+  a future migration of the same sections to Gutenberg blocks/patterns,
+  reading the same underlying data/filters.
+
+No Home sections, global typography, or global colors were touched.
+`dist/estavillo-child.zip` and `dist/estavillo-portfolio-core.zip` both
+rebuilt (the plugin changed this sprint — new hero-layout field, Work
+query, About fields, icon choices in `home-content-options.php`).
+
+**Sprint 4H — Infra/polish: sticky header + breadcrumbs fixes, richer How
+I Work / Contact pages, hobbies system — done.** Backup branch confirmed
+intact, working tree clean before starting.
+
+- **Sticky header, root cause found and fixed.** `.es-page` had
+  `overflow-x: hidden` (base.css) — an ancestor of `.es-site-header` and
+  `.es-case-index` on every single template. Per the CSS Overflow spec,
+  setting only `overflow-x` (not `overflow-y`) makes the browser compute
+  `overflow-y: auto` too, turning `.es-page` into its own scroll-clipping
+  container — which breaks `position: sticky` for any descendant (it
+  sticks relative to `.es-page`, not the viewport). Verified with a real
+  scroll test (not just checking the computed `position` value, which is
+  what let this ship undetected — the header's `getBoundingClientRect().top`
+  went to -387px after scrolling with the old CSS, confirmed pinned at 0
+  with the fix). The one real horizontal-bleed source (the mobile hero
+  SVG, `right:-10%`/`width:120%`) was already self-contained by
+  `.es-hero { overflow: hidden }`, so removing the redundant rule was
+  safe. No new admin control — sticky is automatic, always was meant to
+  be.
+- **Breadcrumbs, root cause found and fixed.** Two separate bugs: (1)
+  `template-parts/breadcrumbs.php` was only ever called from
+  `single-es_case_study.php` — never wired into Work/About/How I
+  Work/Contact. (2) Its CSS lived in `case-study.css`, which only loads on
+  the Case Study template — so even wiring it in elsewhere would have
+  rendered unstyled text. Fixed both: moved the CSS to `site.css` (shared
+  chrome, loads everywhere the header does) and added a reusable
+  `es_breadcrumb_trail()` helper (`functions.php`), now called from all 5
+  interior pages. Home deliberately has none.
+- **How I Work dedicated page rebuilt.** New
+  `template-parts/how-i-work-detail.php` — an editorial vertical sequence
+  (numbered marker column + connecting line, not a SaaS icon-circle
+  timeline), showing 3 new optional per-step fields ("Why it matters",
+  "Example", "Tools" — rendered as pills) that the compact Home teaser
+  never shows. Extracted the shared step-defaults and icon-rendering logic
+  into `functions.php` (`es_home_process_steps()`,
+  `es_process_step_icon_markup()`) so the teaser and detail page can't
+  drift out of sync. Icon library grew from 8 to 10 (added `map` and
+  `tool`, the two the ticket named explicitly that weren't covered yet).
+- **Contact page hierarchy fixed.** Root cause: `page-head.php` printed
+  "Contact." at H1 scale, then `contact-content.php` immediately printed
+  "Let's talk." at `.es-footer-cta__title` scale — bigger than the H1
+  above it. Now "Let's talk." renders at a deliberately smaller,
+  supporting scale (`.es-contact-page__statement`, between H2 and lead).
+  Added 2 new optional fields: a secondary note and an availability/status
+  line (rendered as the same status-pill component Featured Case already
+  uses).
+- **About hobbies/interests, rebuilt as a real structured system.**
+  Replaced the single comma-separated text field with up to 8 rows (label,
+  icon, optional short text, Show/hide checkbox) — ships with the 7
+  suggested interests pre-filled as real default content (not empty
+  scaffolding). New curated icon library (taekwondo, music, coffee, horse,
+  drawing, travel, cinema), each with a single CSS hover/focus
+  micro-interaction (transform/opacity only, triggered by
+  `:hover`/`:focus-visible`, never a loop) — covered automatically by the
+  sitewide `prefers-reduced-motion` rule. Keyboard-focusable
+  (`tabindex="0"`) for interaction parity; the label is always visible so
+  touch users never depend on hover to understand an item.
+- **"Home Content" renamed to "Portfolio Content"** (visible label only —
+  menu slug, option key, and every function/filter name unchanged, so no
+  saved data or bookmarked URL breaks).
+- New README section, "Where to edit each part of the portfolio" — maps
+  every field above to its exact wp-admin location, plus what's not
+  editable yet and what V2 will change.
+
+**Sprint 4I — Presupuestador × REstimator design-reference adaptation —
+done.** A Claude Design handoff bundle (a separate design-exploration
+repo, "REstimator (Dark)" case-study mockup) was reviewed as visual,
+interaction, and narrative *reference only* — not copied, not used as a
+content source, and its runtime (`support.js`) was never touched. Three
+small tickets:
+
+- **CSS (additive only).** Two new opt-in `.es-case-*` components in
+  `case-study.css`: `.es-case-ladder` (horizontal stage/phase chip
+  sequence, `--active` marks the current stage using the existing
+  `--es-accent` green — never `--es-decision` orange, which stays reserved
+  for a single decision/focus moment) and `.es-case-taxonomy` (root label +
+  variable/category grid + an optional "adjusted by…" modifier row). Same
+  rules as every existing class here: only `--es-*` tokens, no new
+  colors/fonts, no JS, invisible to every case that doesn't use them.
+- **Content (Presupuestador masters only).** Enriched
+  `presupuestador-case-study-{es,en}.html` in place: a `.es-case-ladder` in
+  `#overview` showing the real evolution (diagnosis → documented criteria →
+  Sheets MVP → calibration → App Alpha *(marked active — true today per
+  `#results`)* → team-wide adoption *(explicitly the unproven goal, not a
+  claim)*), and a `.es-case-taxonomy` in `#system` visualizing the pricing
+  variables already named in `#discovery`'s prose (material/thickness, cut
+  complexity, finishing, machine availability, adjusted by client
+  relationship and urgency). All 13 anchors, their order, and the Case
+  Index untouched. No numbers were introduced — the reference mockup's
+  illustrative stats (file counts, record counts, override ratios) were
+  deliberately **not** reintroduced; that content-integrity call was
+  already made once (see the editorial note at the top of both HTML
+  files) and stands.
+- **Docs.** `estavillo-child/README.md`'s class table and copy-paste
+  example gained the two new classes; the example's `es-case-stat` values
+  (previously `~650` / `1,600+` — traceable to the same reference mockup)
+  were replaced with an obviously generic `N` placeholder plus an explicit
+  "don't invent this number" note, so the illustrative figures no longer
+  live anywhere in this repo as something that reads like real data.
+
+No template, CPT, or JS changes; no new fields; no dark/light theme
+toggle added (theme stays dark-first per `DECISIONS.md`). Publishing
+Presupuestador to wp-admin is still the open step described in Sprint 4G's
+entry above and `BACKLOG.md`.
+
+---
+
+## Sprint 4J — Gutenberg migration for Case Studies (visibility fix + width system + block library) — done
+
+**Goal:** make Case Studies editable from Gutenberg without raw HTML, and
+fix the two production problems found when publishing Presupuestador (body
+invisible; body too narrow vs. the hero).
+
+- **Visibility root cause (confirmed empirically in Chromium).** The single
+  template put `data-es-reveal` on the entire `.es-case__body` (one element
+  thousands of px tall) and `motion.js` observed it with an
+  IntersectionObserver `threshold: 0.12`. An element taller than ~8× the
+  viewport can never reach a 12% intersection ratio, so `.es-in` never
+  arrived and the body stayed at `opacity: 0` forever. Fix in three layers:
+  the body no longer participates in the reveal system; `motion.js` now
+  observes with `threshold: 0` and adds an `es-motion` gate class on
+  `<html>` right before observing; the hidden state in `components.css`
+  only applies under `html.es-motion`, so with JS blocked/broken/delayed
+  nothing is ever hidden, and `prefers-reduced-motion` shows everything
+  without animating. The temporary Customizer "Additional CSS" override is
+  obsolete — delete it after updating the theme.
+- **Editorial width system.** `.es-case__body` lost its old
+  `max-width: 720px` and now spans the full `.es-container` (same edges as
+  the hero). Reading content (paragraphs, lists, headings, captions,
+  quotes, details) caps at `--es-case-measure` (820px); wide components
+  (figure, browser, stats, ladder, taxonomy, decisions, status, timeline)
+  may use the full container. Grid fixes folded in: `.es-case-status` is
+  now a true 2-column pair (the old fixed `repeat(4,1fr)` left half the
+  frame as a dead panel), stats/decisions use `auto-fit` so any item count
+  fills the row. Opt-ins: `es-case-section--reading`,
+  `es-case-figure--standard`, `es-case-ladder__step--done`.
+- **Block library (plugin, v1.1.0).** 10 dynamic blocks under the new
+  "Estavillo Case Study" inserter category, one folder per block with
+  `block.json` + server `render.php` + no-build plain-JS editor:
+  case-section, case-figure (MediaUpload + placeholder + browser frame),
+  case-stats, case-ladder, case-taxonomy, case-timeline, case-decisions,
+  case-status, case-quote, case-details. Frontend markup reuses the theme's
+  `.es-case-*` classes 1:1 (no duplicated CSS, no frontend JS, no ACF, no
+  remote libraries); the plugin bridges the theme's tokens + case CSS into
+  the editor iframe so previews look like the real page.
+- **Patterns.** "Estavillo — Presupuestador Case Structure (ES)" and
+  "(EN)": the full 13-section case built from the new blocks, same anchors,
+  honest copy and [DATA PENDING VALIDATION] / `{asset: …}` placeholders as
+  the masters. Two patterns (one per language) instead of auto-detection —
+  Polylang defines the post's language, not the pattern inserter's. The
+  masters' two-column `.es-case-cols` groups became sequential text →
+  figure flow (more editable, identical on mobile).
+- **Backward compatible.** The existing Custom-HTML workflow and the
+  `.es-case-*` library are untouched; existing posts keep rendering; no
+  CPT/meta/Polylang changes.
+
+---
+
+## Sprint 4K — Approved hobby-icons artwork (About) — done
+
+**Goal:** replace the placeholder 20×20 inline hobby icons with the
+final APPROVED hand-drawn artwork (estavillo-hobby-icons.zip) and give
+the About "Hobbies & interests" section a premium compact layout —
+without redrawing the artwork, redesigning the page, or touching the
+editability model.
+
+- **Assets.** 8 approved SVGs installed as `estavillo-child/assets/icons/`
+  (`taekwondo`, `guitar`, `coffee`, `horse-head`, `horse-run`, `drawing`,
+  `travel`, `cinema`). Metadata-only normalization (square centered
+  viewBox, `fill="black"` → `currentColor`, `aria-hidden`) — path data
+  byte-identical to the upload, asserted by the integration script.
+- **Registry.** `es_hobby_icon_library()` now reads the files (static
+  per-request cache) instead of holding inline strings; the wp-admin
+  select offers the 8 approved choices; legacy saved keys keep working
+  via `es_hobby_icon_resolve_key()` (`music` → `guitar`, `horse` →
+  `horse-head`) on both the frontend and the admin select.
+- **Layout.** Pill chips → compact editorial grid with `--es-line`
+  hairlines; 28px icons (34px box for the landscape horse-run), neutral
+  ink at rest, accent green + 2px lift on hover/:focus-visible (V1 only —
+  per-icon animations reserved for a V2 via `.es-hobby-icon--{key}`
+  wrappers). Motion respects `prefers-reduced-motion`; reveal reuses the
+  existing fail-safe system.
+- **Validated** with the mock-WP PHP harness (real functions.php + real
+  about-content.php render, kses whitelist proof, alias proof) and
+  Chromium (desktop/mobile/hover/focus/light/reduced-motion/JS-off, no
+  overflow, no blue states).
+
+---
+
+## Sprint 4L — Case Study editorial composition system (spec "Grid System v1") — done
+
+**Goal:** implement the approved editorial grid inside the existing
+Gutenberg Case Study blocks — native to Gutenberg, safe for
+non-technical editing, reusable by Presupuestador, Trazur, French
+Bakery and Samic. No redesign of anything else; no page builder.
+
+- **Container.** Case body only: `.es-container--case` at 1320px.
+  Header/footer/nav and the case hero stay at 1140 untouched.
+- **Grid.** 12 col / 32px gutter desktop (≥1024), 6 col / 24px tablet
+  (768–1023, splits stack), 1 col mobile (<768). The same
+  `.es-case-section__grid` wrapper exists in frontend (render.php) and
+  editor (useInnerBlocksProps) — identical composition both sides.
+- **Case Section presets (locked).** `layout`:
+  reading (cols 3–10 + 72ch hard cap) / split-left 5-7 / split-right 7-5
+  (media first visually via order, DOM unchanged) / split-balanced 6-6 /
+  wide (cols 1–12, flat legacy markup — zero regression). `mobileOrder`:
+  desktop order default / content-first / media-first (stacked only).
+  `spacing`: compact 96 / standard 120 / spacious 144 (total chapter
+  gap, hairline in the middle). No px, no column numbers, no arbitrary
+  margins in the UI.
+- **Split regions.** Two new internal blocks (case-split-content /
+  case-split-media), parent-locked + inserter-hidden, template locked;
+  switching layouts restructures children automatically and undoably;
+  text-only Wide shows an editor notice; editor-only variant chip.
+- **Patterns.** "Case Study — Editorial System Demo" (canonical order:
+  Reading → Split 5/7 → Wide figure → Wide Stats+Ladder → Split 7/5 →
+  Balanced → Reading close with Quote/Details; 100% fictional copy) and
+  "Case Study — Canonical Starter" (Reading → Split → Wide → Reading
+  close, scaffolding copy). Presupuestador content untouched — migration
+  is a later ticket by design.
+- **Validated**: render harness through the real render.php files
+  (incl. Presupuestador ES/EN regression), mock-wp editor harness
+  (conversions, guardrails, template locks), Chromium at
+  320/375/390/768/1024/1440 (container 1320, 12/32 + 6/24 grids, exact
+  5/7-7/5-6/6 ratios, 72ch reading, 96/120/144 spacing, 4 mobile-order
+  combinations, dark/light, JS-off, reduced-motion, zero overflow).
+
+---
+
+## Sprint 4M — Case Study editorial system: architecture correction — done
+
+**Goal:** correct the Case Section composition model based on real
+WordPress testing of Sprint 4L. Not a redesign — a narrowly scoped fix
+to a rigid architecture that produced a bad editing experience.
+
+**Problem confirmed in real WordPress:** Sprint 4L's locked Split
+architecture (fixed Content/Media regions on a custom 12-column CSS
+grid) forced content into narrow predefined areas and could leave a
+large, unintended empty area on the right. Root cause: a CSS rule
+inherited from the original width system (Sprint B) applied
+`max-width: 820px` to any paragraph that was a direct child of a Case
+Section, regardless of the section's chosen width — so a "Content"
+chapter's full-width paragraph was silently capped, leaving unused
+space beside it.
+
+**Fix:**
+- Case Section is now a genuinely flexible chapter container: label/
+  heading/lead (unchanged) + **unrestricted InnerBlocks** — no
+  allowedBlocks, no template, no templateLock. Editors insert and
+  reorder anything (Heading, Paragraph, List, Image, Gallery, Group,
+  Row, Stack, native Columns/Column, existing Estavillo blocks) with
+  normal Gutenberg controls.
+- Three chapter-level attributes only: `layout` — **Content** (default,
+  full 1320px container, no measure cap), **Reading** (whole chapter
+  ~72ch, the only width that constrains prose), **Wide** (same width as
+  Content; distinction is documentation-only); `spacing` (compact 96 /
+  standard 120 / spacious 144, unchanged); new `divider` boolean
+  (chapter hairline on/off).
+- Removed entirely: split-left/split-right/split-balanced, mobileOrder,
+  the locked Content/Media region blocks' use in new content, the
+  custom 12-column CSS grid, and all automatic block-wrapping/
+  unwrapping on layout change.
+- The actual bug fix: `.es-case-section--content`/`--wide` now
+  explicitly cancel the inherited measure cap on direct-child
+  paragraphs/lists/headings; only `--reading` constrains width, and it
+  does so on the whole section (not per-child).
+- Column-left/image-right compositions are built with **native
+  Gutenberg Columns/Column** (33/66, 40/60, 50/50, 60/40, 66/33) inside
+  a Content chapter — Case Section adds a consistent gap token and
+  otherwise does not touch this composition or its responsive stacking
+  (core's own, not reimplemented).
+- Both patterns rewritten: "Case Study — Editorial System Demo" (7
+  chapters: Content w/ full-width paragraph, Columns 40/60, Columns
+  60/40, Wide figure+Stats+Ladder, Reading, Columns 50/50, Reading close
+  w/ Quote+Details) and "Case Study — Canonical Starter" (Content →
+  Content w/ Columns 40/60 → Wide → Reading close).
+- Backward compatible: `case-split-content`/`case-split-media` block
+  types stay registered (parent-locked, inserter-hidden) purely so any
+  already-saved post using the old architecture keeps rendering (now as
+  a flat, unstyled sequence rather than a styled split — recommended to
+  recreate from the corrected pattern rather than edit in place).
+  Presupuestador patterns, Custom-HTML bodies, Polylang, hero, header,
+  footer, breadcrumbs: untouched.
+- Validated: render harness (both new patterns + Presupuestador ES/EN
+  regression + a synthetic old-architecture post proving no fatal error
+  and no content loss), mock-wp editor harness (free InnerBlocks, no
+  auto-restructuring, simplified Inspector), Chromium at
+  320/375/390/768/1024/1440 (exact 40/60/60/40/50/50 ratios via native
+  Columns, 72ch Reading, full-width Content paragraph confirmed
+  uncapped, native core stacking on tablet/mobile, dark/light, JS-off,
+  reduced-motion, zero overflow).
+
+---
+
+## Sprint 4N — Case Section nested-in-Columns compatibility fix — done
+
+**Goal:** narrow compatibility fix found in real WordPress testing of
+Sprint 4M. Case Section worked correctly at the page level but did not
+respect the width of a native Gutenberg Column when nested inside one
+(`Columns → Column → Case Section` next to `Column → Case Decisions/
+Figure`) — it behaved like a page-level container regardless of its
+parent, sometimes forcing the sibling column to wrap/stack or letting
+the section escape its assigned width.
+
+**Root CSS cause:** `.es-case-section` had no explicit sizing rules of
+its own — it relied entirely on default block flow. That's normally
+fine, but a Reading section's `max-width: 72ch` was an unconditional
+value with no upper bound tied to the parent, and — combined with no
+`min-width: 0` — a section with intrinsically wide content could refuse
+to shrink below its content's minimum size once nested in a flex column,
+which is what forced the sibling column to wrap on desktop.
+
+**Fix (case-study.css):**
+- New base rule: `.es-case-section { width: 100%; max-width: 100%;
+  min-width: 0; }` — always fills the immediate parent (page body or a
+  nested Column/Group/Row/Stack), never escapes it, never blocks flex
+  shrinking.
+- `.es-case-section--reading` changed to `max-width: min(72ch, 100%)` —
+  caps at 72ch directly in the page (plenty of room) but never exceeds a
+  narrow column's actual width.
+- Confirmed (and left untouched): case-study.css does not set `display`
+  or `flex-wrap` on `.wp-block-columns`/`.wp-block-column` anywhere —
+  core's own flex/stacking behavior (nowrap ≥782px, wrap + 100%
+  flex-basis below) was never being overridden.
+
+**Content/Wide consolidated:** Content and Wide always produced the same
+visual width, so Wide is removed from the Inspector's Width select for
+new selections — only Content and Reading are offered. `render.php`
+normalizes any saved `layout: "wide"` (and any other unrecognized value)
+to `content` before computing the output class, so `es-case-section--wide`
+is never emitted again; already-saved blocks with `"layout":"wide"` are
+not migrated or invalidated — they keep loading and now render (and are
+labeled, via the same fallback mechanism) identically to Content.
+
+**Validated:** render harness (wide→content normalization, 4 nested
+scenarios A–D built from real core/columns markup through the real
+render.php files), Chromium at 1440/1024/768/390/320 for each scenario
+(Case Section width == its column's width to the pixel, Reading capped
+at min(72ch,100%) in narrow columns, no forced desktop stacking, native
+mobile stacking below core's 782px breakpoint, zero overflow), plus a
+full re-run of every Sprint 4L/4M harness with zero regressions.
+
+---
+
+## Sprint 4O — Patterns Phase 0 (second-pass architecture review) — done
+
+**Goal:** before writing Trazur/Samic/French Bakery content, decide the
+right abstraction level for every recurring case artifact (persona,
+comparison table, journey map, flow diagram, methodology, KPI section,
+callout, etc.) with an explicit bias toward the smallest possible system
+— avoid repeating the Sprint 4M mistake (a custom grid where Gutenberg
+already had an answer) and build new custom blocks only once multiple
+real cases validate the same shape. One real case (Trazur, audited from
+the project owner's own case-study PDF export) isn't that evidence yet.
+
+**Result — three Patterns + one block style, zero new blocks:**
+- **"Case Study — Persona"** (`patterns/case-persona.php`) — Columns
+  35/65 (no wrapping Group — see the bug-fix sprint below) > photo
+  (`estavillo/case-figure`) + name/role/
+  demographics, and Biography + Goals/Frustrations (nested Columns
+  50/50) + a pull-quote (`estavillo/case-quote`).
+- **"Case Study — Comparison Table"** (`patterns/case-comparison-table.php`)
+  — `estavillo/case-section` (eyebrow/heading/lead) + a native Table (4
+  generic columns, 3 placeholder rows) + a caption.
+- **"Case Study — Callout Panel"** (`patterns/case-callout-panel.php`) —
+  a native Group with an opt-in class (`.es-case-callout`, existing
+  `--es-*` tokens only, not the block's own Color panel — this theme has
+  no `theme.json` palette exposing those tokens as pickable colors) +
+  eyebrow/heading/paragraph/optional list.
+- **Checkmark List** — a `register_block_style()` variation on
+  `core/list` (`estavillo-child/inc/block-styles.php` +
+  `.es-case__body ul.is-style-checkmark` in `case-study.css`, driven by
+  `var(--es-accent)` — never a hardcoded color). Opt-in per list; the
+  default bullet list is untouched.
+
+**Deliberately not done:** Journey Maps and Flow Diagrams stay images —
+a flowchart's arrows/decision nodes are a diagramming problem, not a
+content-editing one. Image+text layouts stay plain native Columns — no
+dedicated pattern, since the right ratio depends on the narrative.
+
+**Validated:** all three patterns parsed and round-tripped through the
+real `@wordpress/blocks` + `@wordpress/block-library` packages (not
+memory/guesswork) — zero invalid blocks; rendered through the real
+`case-figure`/`case-quote`/`case-section` `render.php` files with no
+fatals and no case-specific content leakage; Chromium screenshots of
+Persona (desktop + mobile), Comparison Table (desktop + mobile, honest
+`scrollWidth`/`clientWidth` measurement proving the table scrolls
+horizontally instead of crushing text below 560px), Callout Panel (dark
++ light via `[data-theme]`), and Checkmark List vs. the untouched
+standard list (incl. a nested sub-list, to confirm nested markers aren't
+silently lost) — zero console errors across every fixture. Confirmed via
+diff that every existing Estavillo Case Study block, and every other CSS
+rule in `case-study.css`, is unchanged (purely additive commit).
+
+Theme `0.2.1` → `0.2.2`, plugin `1.4.0` → `1.5.0`.
+
+---
+
+## Sprint 4P — Patterns Phase 0 bug fixes (live-editor testing) — done
+
+**Goal:** four real usability bugs surfaced testing the Sprint 4O patterns
+in the actual WordPress editor. Focused fix-only ticket — no Trazur
+migration, no new blocks, no redesign. Ownership split per the ticket's
+explicit rule: plugin owns pattern structure, theme owns visual styling.
+
+**Bug 1 — Persona content not reliably editable (plugin).** Audited the
+full pattern for `templateLock`, block-level `lock`, `contentOnly` mode,
+`parent`/`allowedBlocks` restrictions, and pointer-event-intercepting
+CSS/overlays — found none anywhere in the plugin or theme editor code
+(confirmed by grep across the whole plugin plus a manual read of every
+relevant `edit.js` and `case-blocks-editor.css`). Root cause instead:
+excess structural nesting. Persona's outer `wp:group` wrapper added a
+whole extra block-selection layer with no functional purpose, on top of
+an already 4-level-deep composition (name/role/demographics/biography
+sat 3 canvas-clicks deep; Goals/Frustrations sat 5-6). Removed the
+wrapper — Columns is now the pattern's own root (patterns support
+multiple root-level blocks natively, same as `editorial-demo.php`).
+Measured via a real `@wordpress/blocks.parse()` depth count (not a
+guess): every leaf field moved one level shallower (e.g. name/role now
+depth 2 vs 3; Goals/Frustrations now depth 4-5 vs 5-6).
+
+**Bug 2 — Goals/Frustrations low contrast (theme).** `case-study.css`
+only ever styled `h2`/`h3` — the Persona pattern's `h4` sub-headings fell
+through unstyled to the parent Kadence theme's own default heading
+color (tuned for a light background), reading as low-contrast on this
+system's dark surface. Added a dedicated `.es-case__body h4` rule:
+sans-serif, 14px, `var(--es-ink)` — a neutral light color, not
+`--es-accent`, so Goals and Frustrations stay visually equal (no
+red/green good/bad implication). Measured contrast: `#ebe7df` on
+`#131211` ≈ 14.9:1, well past WCAG AAA (7:1).
+
+**Bug 3 — Comparison Table row/column controls (theme).** Read the real
+`@wordpress/block-library` `table/edit.js` source: row/column insert and
+delete live in the block's own floating toolbar, under an "Edit table"
+dropdown (`BlockControls` → `ToolbarDropdownMenu`) — a portaled Slot/Fill
+element, not something rendered inside the table's own clipped box, so
+nothing in this pattern could disable it outright. Still found and fixed
+a real, verifiable side effect: `.wp-block-table { overflow-x: auto }`
+computes `overflow-y` to `auto` too (confirmed against real Chromium —
+CSS can't have one axis "visible" while the other isn't), meaning the
+frontend's mobile-scroll rule was also clipping the table vertically
+inside the editor for no reason. Added an editor-only reset
+(`.editor-styles-wrapper .es-case__body .wp-block-table { overflow:
+visible }`) — frontend mobile-scroll behavior unchanged, editor no
+longer has any unnecessary clipping. **Where the controls live, for
+QA:** select the Table block → the floating toolbar shows a table icon
+labeled "Edit table" → its dropdown has Insert row before/after, Delete
+row, Insert column before/after, Delete column.
+
+**Bug 4 — Callout Panel width (theme).** `.es-case-callout` had
+`max-width: var(--es-case-measure)` (820px), matching
+`.es-case-quote`/`.es-case-details`'s reading-width treatment — wrong
+call for a full block-level panel. Changed to `max-width: 100%`.
+Verified in two real contexts (a Case Section and a 40%-width Column):
+callout width now equals its immediate parent's width exactly in both.
+
+**Bug 5 — Callout visual flexibility.** Already satisfied by the
+existing background/border/padding/dark-light-token treatment; no
+additional change beyond Bug 4. Confirmed the Group block's native
+Color panel is not disabled by `.es-case-callout` — an editor-picked
+custom background renders as an inline `style=`, which beats a class
+selector by ordinary CSS cascade, so it already overrides the default
+with no extra code.
+
+**Existing inserted patterns:** confirmed — PHP-registered
+(`register_block_pattern()`) patterns are unsynced. Inserting one copies
+its blocks into the post's own content once; there is no ongoing link
+back to the pattern definition (that's what Synced Patterns/`wp_block`
+are for, not this). Practical effect: the Bug 1 fix (pattern structure)
+only applies to Persona copies inserted *after* the plugin update — any
+already-inserted test copy keeps its old Group-wrapped structure until
+deleted and reinserted. Bugs 2/3/4 are pure CSS/theme fixes and apply
+immediately, automatically, to any already-inserted content once the
+theme is updated — no reinsertion needed for those three.
+
+**Validated:** real `@wordpress/blocks` + `@wordpress/block-library`
+round-trip (zero invalid blocks) on the edited Persona pattern; render
+harness (`case-figure`/`case-quote`/`case-section` `render.php`, no
+fatals); Chromium: h4 computed color, table computed overflow in a
+simulated `.editor-styles-wrapper` context vs. frontend, callout width
+inside a Case Section and inside a Column, checkmark list vs. standard
+list (both unchanged) — zero console errors throughout. Confirmed via
+diff that no `blocks/*/` file was touched anywhere (zero new block
+types, no existing Estavillo Case Study block modified).
+
+Theme `0.2.2` → `0.2.3` (CSS only), plugin `1.5.0` → `1.5.1` (pattern
+content only) — only the ZIP for the package that actually changed
+needs re-uploading per package.
+
+---
+
+## Sprint 5 — Hero variants
+
+**Goal:** expand hero variety only once the above is stable — not before.
+This is the **Home animated hero** (the `network_constellation` /
+`blueprint_flow` motion engines in `hero-system-map.js`) — a different
+system from the Case Study hero *layout* variants added in Sprint 4G
+above (those are static content arrangement, no motion/canvas involved).
+
+- Add only 2–3 curated additional hero variants.
+- `network_constellation` remains the default; this does not change.
+- Avoid building a large hero gallery until content and editability are
+  stable — variety is not the current bottleneck.
+
+---
+
+## Working principles across all sprints
+
+- One ticket = one section or one concern. Keep diffs small and reviewable.
+- Each sprint should be broken into individual tickets in `BACKLOG.md`
+  before work starts, not decided ad hoc mid-sprint.
+- No sprint should silently expand into a redesign. If a fix reveals a
+  larger structural problem, log it as a new backlog item and finish the
+  original scope first.

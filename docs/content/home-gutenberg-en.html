@@ -1,0 +1,232 @@
+<!-- ================================================================ -->
+<!-- BEFORE PUBLISHING — 3 notes -->
+<!-- -->
+<!-- 1. FEATURED CASE / SELECTED WORK — these blocks read the Case Study -->
+<!--    CPT live: "Feature this case on Home" and "Show this case in -->
+<!--    Home -> Selected Work" checkboxes plus the native "Order" field -->
+<!--    (Case Studies -> edit a case -> Case details). With no case -->
+<!--    flagged yet they render the same placeholder cases the legacy -->
+<!--    Home always showed - never an empty section. -->
+<!-- -->
+<!-- 2. ABOUT PORTRAIT — the About teaser now uses a plain, directly -->
+<!--    editable Image block (empty = a clean reserved frame, no dev -->
+<!--    marker). Click it and Upload/select the portrait. The teaser text -->
+<!--    and CTA are ordinary editable blocks too - nothing syncs from the -->
+<!--    About page anymore; edit it all here. -->
+<!-- -->
+<!-- 3. HERO — the copy below (eyebrow, headline, paragraph, both CTAs) -->
+<!--    is normal editable Gutenberg content inside the Home Hero block. -->
+<!--    The animated background style (Inspector -> "Animated background") -->
+<!--    and the scroll transition (Inspector -> "Scroll behavior": -->
+<!--    Standard or Parallax) are block controls; the background animation -->
+<!--    itself renders on the real site. -->
+<!-- -->
+<!-- HOW I WORK teaser: the three concepts sit in one "How I Work — -->
+<!--    Teaser row" block whose Inspector ("Teaser layout") sets the -->
+<!--    desktop layout (illustration above / beside text) and the -->
+<!--    illustration size (Small/Medium/Large). -->
+<!-- ================================================================ -->
+
+<!-- wp:estavillo/home-hero {"scrollMode":"standard"} -->
+<!-- wp:paragraph {"className":"es-eyebrow es-hero__eyebrow"} -->
+<p class="es-eyebrow es-hero__eyebrow">Product Designer · Systems &amp; Operations</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":1,"className":"es-h1 es-hero__title"} -->
+<h1 class="wp-block-heading es-h1 es-hero__title">I design systems that turn <em>complexity</em> into <em class="es-accent-word">clarity</em>.</h1>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"className":"es-lead es-hero__lead"} -->
+<p class="es-lead es-hero__lead">AI-assisted tools and workflows for real operations. From estimating to execution.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:group {"className":"es-hero__actions","layout":{"type":"flex","flexWrap":"wrap","verticalAlignment":"center","justifyContent":"left"}} -->
+<div class="wp-block-group es-hero__actions"><!-- wp:paragraph -->
+<p><a class="es-btn" href="#work">View featured case</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a class="es-link-arrow es-link-arrow--quiet" href="#process">See how I work</a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+<!-- /wp:estavillo/home-hero -->
+
+<!-- wp:group {"tagName":"section","anchor":"process","className":"es-section es-process-teaser","metadata":{"name":"How I Work teaser"}} -->
+<section class="wp-block-group es-section es-process-teaser" id="process"><!-- wp:group {"className":"es-container"} -->
+<div class="wp-block-group es-container"><!-- wp:group {"className":"es-section-head"} -->
+<div class="wp-block-group es-section-head"><!-- wp:group {"className":"es-section-head__title"} -->
+<div class="wp-block-group es-section-head__title"><!-- wp:paragraph {"className":"es-section-head__num"} -->
+<p class="es-section-head__num">01</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":2,"className":"es-label"} -->
+<h2 class="wp-block-heading es-label">How I work</h2>
+<!-- /wp:heading --></div>
+<!-- /wp:group -->
+
+<!-- wp:paragraph -->
+<p><a class="es-link-arrow es-link-arrow--quiet" href="#process">See the full process</a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:heading {"level":3,"className":"es-process-teaser__headline"} -->
+<h3 class="wp-block-heading es-process-teaser__headline">I don&#8217;t start with interfaces. I start by understanding the system.</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"className":"es-process-teaser__lead"} -->
+<p class="es-process-teaser__lead">The result should make sense for the people using it, and for the system that has to carry it.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:estavillo/how-i-work-teaser {"desktopLayout":"stacked","illustrationSize":"medium","metadata":{"name":"Concepts"}} -->
+<!-- wp:group {"className":"es-process-teaser__group","metadata":{"name":"Understand"}} -->
+<div class="wp-block-group es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":1,"context":"home"} /-->
+
+<!-- wp:heading {"level":4,"className":"es-process-teaser__group-title"} -->
+<h4 class="wp-block-heading es-process-teaser__group-title">Understand</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"className":"es-process-teaser__group-text"} -->
+<p class="es-process-teaser__group-text">See how people, information and goals actually connect.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:group {"className":"es-process-teaser__group","metadata":{"name":"Explore"}} -->
+<div class="wp-block-group es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":4,"context":"home"} /-->
+
+<!-- wp:heading {"level":4,"className":"es-process-teaser__group-title"} -->
+<h4 class="wp-block-heading es-process-teaser__group-title">Explore</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"className":"es-process-teaser__group-text"} -->
+<p class="es-process-teaser__group-text">Test ideas and challenge assumptions before committing to one.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:group {"className":"es-process-teaser__group","metadata":{"name":"Improve"}} -->
+<div class="wp-block-group es-process-teaser__group"><!-- wp:estavillo/how-i-work-illustration {"step":6,"context":"home"} /-->
+
+<!-- wp:heading {"level":4,"className":"es-process-teaser__group-title"} -->
+<h4 class="wp-block-heading es-process-teaser__group-title">Improve</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"className":"es-process-teaser__group-text"} -->
+<p class="es-process-teaser__group-text">Build something that works &#8212; and keeps working.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+<!-- /wp:estavillo/how-i-work-teaser --></div>
+<!-- /wp:group --></section>
+<!-- /wp:group -->
+
+<!-- wp:group {"tagName":"section","anchor":"featured","className":"es-section es-section--block es-featured","metadata":{"name":"Featured Case Studies"}} -->
+<section class="wp-block-group es-section es-section--block es-featured" id="featured"><!-- wp:group {"className":"es-container"} -->
+<div class="wp-block-group es-container"><!-- wp:group {"className":"es-section-head"} -->
+<div class="wp-block-group es-section-head"><!-- wp:group {"className":"es-section-head__title"} -->
+<div class="wp-block-group es-section-head__title"><!-- wp:paragraph {"className":"es-section-head__num"} -->
+<p class="es-section-head__num">02</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":2,"className":"es-label"} -->
+<h2 class="wp-block-heading es-label">Featured case</h2>
+<!-- /wp:heading --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->
+
+<!-- wp:estavillo/featured-case /--></div>
+<!-- /wp:group --></section>
+<!-- /wp:group -->
+
+<!-- wp:group {"tagName":"section","anchor":"work","className":"es-section es-work","metadata":{"name":"Selected Work"}} -->
+<section class="wp-block-group es-section es-work" id="work"><!-- wp:group {"className":"es-container"} -->
+<div class="wp-block-group es-container"><!-- wp:group {"className":"es-section-head"} -->
+<div class="wp-block-group es-section-head"><!-- wp:group {"className":"es-section-head__title"} -->
+<div class="wp-block-group es-section-head__title"><!-- wp:paragraph {"className":"es-section-head__num"} -->
+<p class="es-section-head__num">03</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":2,"className":"es-label"} -->
+<h2 class="wp-block-heading es-label">Selected work</h2>
+<!-- /wp:heading --></div>
+<!-- /wp:group -->
+
+<!-- wp:paragraph -->
+<p><a class="es-link-arrow es-link-arrow--quiet" href="#">All work</a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:estavillo/selected-work /--></div>
+<!-- /wp:group --></section>
+<!-- /wp:group -->
+
+<!-- wp:group {"tagName":"section","anchor":"about","className":"es-section es-about","metadata":{"name":"About teaser"}} -->
+<section class="wp-block-group es-section es-about" id="about"><!-- wp:group {"className":"es-container"} -->
+<div class="wp-block-group es-container"><!-- wp:columns {"metadata":{"name":"Portrait + intro"}} -->
+<div class="wp-block-columns"><!-- wp:column {"width":"300px","metadata":{"name":"Portrait"}} -->
+<div class="wp-block-column" style="flex-basis:300px;flex-grow:0"><!-- wp:image {"className":"es-about__portrait"} -->
+<figure class="wp-block-image es-about__portrait"></figure>
+<!-- /wp:image --></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"className":"es-about__body","metadata":{"name":"Intro"}} -->
+<div class="wp-block-column es-about__body"><!-- wp:group {"className":"es-section-head"} -->
+<div class="wp-block-group es-section-head"><!-- wp:group {"className":"es-section-head__title"} -->
+<div class="wp-block-group es-section-head__title"><!-- wp:paragraph {"className":"es-section-head__num"} -->
+<p class="es-section-head__num">04</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":2,"className":"es-label"} -->
+<h2 class="wp-block-heading es-label">About</h2>
+<!-- /wp:heading --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->
+
+<!-- wp:paragraph {"className":"es-about__text"} -->
+<p class="es-about__text">Hi, I&#8217;m Ramiro Estavillo, a Product Designer and Industrial Designer based in Montevideo. I turn complex, often invisible processes into clearer, more usable systems &#8212; combining research, systems thinking and practical implementation.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a class="es-link-arrow es-link-arrow--quiet" href="#about">More about me</a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns --></div>
+<!-- /wp:group --></section>
+<!-- /wp:group -->
+
+<!-- wp:group {"tagName":"section","anchor":"connect","className":"es-section es-footer-cta","metadata":{"name":"Connect teaser"}} -->
+<section class="wp-block-group es-section es-footer-cta" id="connect"><!-- wp:group {"className":"es-container"} -->
+<div class="wp-block-group es-container"><!-- wp:group {"className":"es-section-head"} -->
+<div class="wp-block-group es-section-head"><!-- wp:group {"className":"es-section-head__title"} -->
+<div class="wp-block-group es-section-head__title"><!-- wp:paragraph {"className":"es-section-head__num"} -->
+<p class="es-section-head__num">05</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":2,"className":"es-label"} -->
+<h2 class="wp-block-heading es-label">Connect</h2>
+<!-- /wp:heading --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->
+
+<!-- wp:paragraph {"className":"es-footer-cta__title"} -->
+<p class="es-footer-cta__title">Let&#8217;s <em>talk.</em></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"className":"es-footer-cta__lead"} -->
+<p class="es-footer-cta__lead">I&#8217;m open to Product Design, Design Systems and UX Research roles &#8212; anywhere the goal is making a real system work better, not just look better. If that&#8217;s what you&#8217;re building, I&#8217;d like to hear about it.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:group {"className":"es-footer-cta__actions"} -->
+<div class="wp-block-group es-footer-cta__actions"><!-- wp:group {"className":"es-footer-cta__contacts","layout":{"type":"flex","flexWrap":"wrap","verticalAlignment":"bottom"}} -->
+<div class="wp-block-group es-footer-cta__contacts"><!-- wp:paragraph -->
+<p><a class="es-footer-cta__email" href="mailto:hello@ramiroestavillo.com">hello@ramiroestavillo.com</a></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><a class="es-footer-cta__phone" href="https://wa.me/59899892722" target="_blank" rel="noopener">+598 99 892 722</a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:paragraph -->
+<p><a class="es-link-arrow es-link-arrow--quiet" href="#connect">All ways to connect</a></p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group --></section>
+<!-- /wp:group -->

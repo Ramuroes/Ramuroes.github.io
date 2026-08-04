@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/case-stats",
+	"title": "Case Stats",
+	"category": "estavillo-case",
+	"icon": "chart-bar",
+	"description": "Grilla de números con etiqueta (.es-case-stats). Regla editorial: nunca inventar números — solo valores con fuente verificable o decisiones de diseño contables (1 modelo, 2 superficies…).",
+	"keywords": [ "estavillo", "case", "stats", "números" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"items": {
+			"type": "array",
+			"default": [],
+			"items": { "type": "object" }
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-case-block-case-stats",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}

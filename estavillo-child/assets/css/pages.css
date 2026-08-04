@@ -1,0 +1,1778 @@
+/* =========================================================================
+   ESTAVILLO — Páginas fijas (Work / About / How I Work / Contact)
+   -------------------------------------------------------------------------
+   Solo se carga en las 4 páginas fijas nuevas (ver inc/enqueue.php →
+   es_is_estavillo_static_page()). Reusa tokens + componentes existentes
+   (.es-card, .es-pill, .es-btn, .es-label, .es-h1, .es-lead, .es-link-arrow,
+   .es-footer-cta__*, .es-work__*, .es-about__*, .es-process__* — todos ya
+   cargados vía pages-home.css/components.css/base.css en estas páginas).
+   Acá solo lo genuinamente nuevo: page-head, intro grande de About,
+   timeline de experiencia, grilla de educación, lista de hobbies, y el
+   layout específico de Contact. Ningún color ni tipografía nuevos — solo
+   nuevos selectores sobre las mismas variables --es-*.
+   ========================================================================= */
+
+/* ---------- How I Work: página dedicada (editorial, no el teaser de Home) ----------
+   Secuencia vertical numerada: columna de marcador fija (número + ícono en
+   círculo + línea conectora entre pasos) y cuerpo a la derecha — un índice
+   técnico, no el cliché de íconos-en-círculos-grandes-y-flechas de un
+   timeline de SaaS. "Why it matters"/"Example"/"Tools" son opcionales. */
+
+.es-process-detail__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	max-width: 800px;
+}
+
+.es-process-detail__step {
+	display: grid;
+	grid-template-columns: 72px 1fr;
+	gap: clamp(20px, 3vw, 36px);
+	padding: clamp(32px, 4vw, 48px) 0;
+	border-top: 1px solid var(--es-line);
+}
+
+.es-process-detail__step:first-child {
+	border-top: 0;
+	padding-top: 0;
+}
+
+.es-process-detail__marker {
+	position: relative;
+	display: flex;
+	justify-content: center;
+}
+
+/* línea conectora entre pasos, detrás del círculo del ícono */
+.es-process-detail__marker::after {
+	content: '';
+	position: absolute;
+	top: 46px;
+	bottom: calc(-1 * clamp(32px, 4vw, 48px));
+	left: 50%;
+	width: 1px;
+	background: var(--es-line);
+	transform: translateX(-50%);
+}
+
+.es-process-detail__step:last-child .es-process-detail__marker::after {
+	display: none;
+}
+
+.es-process-detail__num {
+	position: absolute;
+	top: -22px;
+	left: 50%;
+	transform: translateX(-50%);
+	font-family: var(--es-mono);
+	font-size: 11px;
+	color: var(--es-accent);
+	white-space: nowrap;
+}
+
+.es-process-detail__step:first-child .es-process-detail__num {
+	top: -2px;
+}
+
+.es-process-detail__icon {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	border: 1px solid var(--es-line-strong);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--es-accent);
+	background: var(--es-paper);
+	position: relative;
+	z-index: 1;
+	flex: none;
+	transition: transform var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease;
+}
+
+.es-process-detail__icon svg {
+	width: 18px;
+	height: 18px;
+}
+
+.es-process-detail__icon--empty {
+	opacity: 0.35;
+	border-style: dashed;
+}
+
+.es-process-detail__step:hover .es-process-detail__icon,
+.es-process-detail__step:focus-within .es-process-detail__icon {
+	border-color: var(--es-accent);
+	transform: scale(1.08);
+}
+
+.es-process-detail__title {
+	font-family: var(--es-serif);
+	font-size: clamp(21px, 2.2vw, 26px);
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	color: var(--es-ink);
+	margin: 0 0 10px;
+}
+
+.es-process-detail__text {
+	font-size: 15px;
+	line-height: 1.65;
+	color: var(--es-ink-2);
+	max-width: 56ch;
+	margin: 0;
+}
+
+.es-process-detail__note {
+	margin: 16px 0 0;
+	font-size: 13.5px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+	max-width: 56ch;
+	padding-left: 14px;
+	border-left: 2px solid var(--es-line-strong);
+}
+
+.es-process-detail__note--why {
+	border-left-color: var(--es-accent);
+}
+
+.es-process-detail__note-label {
+	display: block;
+	font-family: var(--es-mono);
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+	margin-bottom: 4px;
+}
+
+.es-process-detail__tools {
+	margin-top: 16px;
+}
+
+.es-process-detail__tools .es-process-detail__note-label {
+	margin-bottom: 8px;
+}
+
+.es-process-detail__tools-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+@media (max-width: 640px) {
+	.es-process-detail__step {
+		grid-template-columns: 44px 1fr;
+		gap: 16px;
+	}
+	.es-process-detail__icon {
+		width: 32px;
+		height: 32px;
+	}
+	.es-process-detail__icon svg {
+		width: 15px;
+		height: 15px;
+	}
+	.es-process-detail__marker::after {
+		top: 38px;
+	}
+	.es-process-detail__num {
+		position: static;
+		transform: none;
+		display: block;
+		text-align: center;
+		margin-bottom: 6px;
+	}
+	.es-process-detail__step:first-child .es-process-detail__num {
+		top: auto;
+	}
+}
+
+/* ---------- page head (cabecera compartida por las 4 páginas) ---------- */
+
+.es-page-head {
+	padding-bottom: clamp(40px, 5vw, 64px);
+}
+
+.es-page-head__eyebrow {
+	margin-bottom: 18px;
+}
+
+.es-page-head__title {
+	margin-bottom: 18px;
+}
+
+.es-page-head__lead {
+	margin: 0;
+}
+
+/* ---------- About: intro (texto grande, mismo tratamiento que el teaser
+   de Home pero sin la restricción de espacio de la grilla del teaser) ---------- */
+
+.es-about-page__text {
+	max-width: 56ch;
+	font-family: var(--es-serif);
+	font-size: clamp(20px, 2.3vw, 27px);
+	font-weight: 400;
+	line-height: 1.5;
+	letter-spacing: -0.005em;
+	color: var(--es-ink-2);
+	margin: 0 0 30px;
+}
+
+/* ---------- About: timeline de experiencia ---------- */
+
+.es-timeline {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	max-width: 720px;
+}
+
+.es-timeline__item {
+	position: relative;
+	padding: 0 0 clamp(28px, 3vw, 36px) 28px;
+	border-left: 1px solid var(--es-line-strong);
+	margin-left: 4px;
+}
+
+.es-timeline__item:last-child {
+	padding-bottom: 0;
+}
+
+.es-timeline__item::before {
+	content: '';
+	position: absolute;
+	left: -5px;
+	top: 4px;
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	background: var(--es-accent);
+}
+
+.es-timeline__year {
+	display: block;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	color: var(--es-ink-4);
+	margin-bottom: 6px;
+}
+
+.es-timeline__title {
+	margin: 0 0 4px;
+	font-family: var(--es-serif);
+	font-size: 19px;
+	font-weight: 500;
+	color: var(--es-ink);
+}
+
+.es-timeline__text {
+	margin: 0;
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+	max-width: 56ch;
+}
+
+/* ---------- About: Experience / Earlier Experience ----------
+   Reemplaza el "Career timeline" plano (.es-timeline arriba, hoy sin uso
+   — se deja en el archivo por si se reusa, no se borra sin necesidad).
+   Experience: entradas siempre visibles (org/role/location/period/
+   summary) — el detalle largo ("Key contributions") vive en un <details>
+   propio por entrada, componente compartido con Earlier Experience/Other
+   Certifications: ver .es-about-details más abajo.
+
+   Rail + punto: tratamiento editorial mínimo para conservar "sensación de
+   cronología" (pedido explícito de la ticket de corrección) sin construir
+   un componente de timeline elaborado ni JS — una regla vertical continua
+   + un punto por entrada, sobre el hairline divider que ya separaba cada
+   entrada. Funciona igual en mobile (el padding-left es chico, no rompe
+   el ancho legible). */
+
+.es-exp-list {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: clamp(28px, 3.5vw, 40px);
+	max-width: 720px;
+	padding-left: 18px;
+}
+
+.es-exp-list::before {
+	content: '';
+	position: absolute;
+	top: 6px;
+	bottom: 6px;
+	left: 0;
+	width: 1px;
+	background: var(--es-line);
+}
+
+.es-exp-item {
+	position: relative;
+	padding-top: clamp(20px, 2.5vw, 28px);
+	border-top: 1px solid var(--es-line);
+}
+
+.es-exp-list > .es-exp-item:first-child {
+	border-top: none;
+	padding-top: 0;
+}
+
+.es-exp-item::before {
+	content: '';
+	position: absolute;
+	top: clamp(20px, 2.5vw, 28px);
+	left: -21px;
+	width: 7px;
+	height: 7px;
+	margin-top: 5px;
+	border-radius: 50%;
+	background: var(--es-accent);
+}
+
+.es-exp-list > .es-exp-item:first-child::before {
+	top: 0;
+}
+
+.es-exp-item__head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 4px 10px;
+	margin-bottom: 4px;
+}
+
+.es-exp-item__role {
+	font-family: var(--es-serif);
+	font-size: 19px;
+	font-weight: 500;
+	color: var(--es-ink);
+	margin: 0;
+}
+
+.es-exp-item__org {
+	font-family: var(--es-sans);
+	font-size: 15px;
+	color: var(--es-ink-3);
+}
+
+.es-exp-item__meta {
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.06em;
+	color: var(--es-ink-4);
+	margin-bottom: 10px;
+}
+
+.es-exp-item__summary {
+	margin: 0 0 14px;
+	font-size: 14.5px;
+	line-height: 1.65;
+	color: var(--es-ink-3);
+	max-width: 62ch;
+}
+
+.es-exp-item__link {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-family: var(--es-mono);
+	font-size: 12px;
+	letter-spacing: 0.03em;
+	color: var(--es-accent);
+	text-decoration: none;
+	margin-top: 12px;
+}
+
+.es-exp-item__link:hover,
+.es-exp-item__link:focus-visible {
+	text-decoration: underline;
+}
+
+/* Earlier Experience / Other Certifications reusan el mismo item pero
+   más compacto — viven dentro del <details> exterior de su sección, no
+   compiten visualmente con Experience. */
+.es-exp-item--compact {
+	padding-top: 18px;
+}
+
+.es-exp-item--compact .es-exp-item__role {
+	font-size: 16px;
+}
+
+.es-exp-item--compact .es-exp-item__summary {
+	font-size: 13.5px;
+}
+
+/* ---------- About: <details> nativo compartido ----------
+   Tratamiento editorial liviano (corrección sobre la versión anterior,
+   reportada como "visualmente demasiado boxeada/pesada" — panel con
+   borde completo + fondo sólido). Ya no hay caja: solo un hairline bajo
+   el summary (siempre visible, abierto o cerrado) y un indicador +/−
+   simple a la derecha. Dos tamaños: '--nested' (una entrada, "Key
+   contributions") y '--group' (una sección entera, "Earlier Experience"
+   / "Other Certifications"). Mismos tokens de color/tipografía que el
+   resto de la página — compatible con dark/light sin reglas propias. */
+
+.es-about-details summary {
+	list-style: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	font-family: var(--es-mono);
+	color: var(--es-ink-2);
+	letter-spacing: 0.03em;
+	border-bottom: 1px solid var(--es-line);
+	transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.es-about-details summary::-webkit-details-marker {
+	display: none;
+}
+
+.es-about-details summary:hover {
+	color: var(--es-ink);
+	border-color: var(--es-line-strong);
+}
+
+.es-about-details summary:focus-visible {
+	outline: 2px solid var(--es-accent);
+	outline-offset: 2px;
+}
+
+.es-about-details summary::after {
+	content: '+';
+	color: var(--es-accent);
+	font-size: 15px;
+	line-height: 1;
+	flex: none;
+}
+
+.es-about-details[open] summary::after {
+	content: '−';
+}
+
+.es-about-details--nested {
+	margin-top: 8px;
+	max-width: 62ch;
+}
+
+.es-about-details--nested summary {
+	padding: 10px 0;
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.es-about-details--nested .es-about-details__body {
+	padding: 16px 0 4px;
+}
+
+.es-about-details--group {
+	max-width: 720px;
+	/* Polish ticket §1–2: the legacy-fallback group disclosures now sit inside
+	   their parent section (Experience / Education), so they get the same quiet
+	   top gap as the Gutenberg .es-about-group — reads as a continuation of the
+	   section, not a new chapter. */
+	margin-top: clamp(28px, 3.5vw, 40px);
+}
+
+.es-about-details--group summary {
+	padding: 14px 0;
+	font-size: 13px;
+	font-weight: 500;
+}
+
+.es-about-details--group .es-about-details__body {
+	padding-top: 20px;
+}
+
+.es-about-details--group .es-exp-list {
+	gap: clamp(20px, 2.5vw, 28px);
+	max-width: none;
+}
+
+.es-about-contributions {
+	margin: 0;
+	padding-left: 18px;
+	list-style: disc;
+}
+
+.es-about-contributions li {
+	font-size: 13.5px;
+	line-height: 1.65;
+	color: var(--es-ink-3);
+}
+
+.es-about-contributions li + li {
+	margin-top: 8px;
+}
+
+/* ---------- About: educación / certificados ---------- */
+
+.es-cred {
+	padding: 20px 0;
+	border-top: 1px solid var(--es-line);
+}
+
+.es-cred:first-child {
+	padding-top: 0;
+	border-top: none;
+}
+
+/* Fix: en el grid de 2 columnas de escritorio, :first-child solo resetea
+   la primera celda (el título de la Licenciatura empieza en 0) mientras
+   la segunda (Google, misma fila) conserva su padding-top/border-top —
+   su título arranca más abajo que el de al lado. En vez de eso, resetea
+   las primeras 2 celdas (la fila entera de escritorio), y en mobile
+   (donde .es-grid--2 colapsa a 1 columna, ver layout.css) se revierte a
+   solo la primera celda para que las entradas apiladas conserven su
+   divisor entre sí. */
+.es-about-page__education .es-grid--2 .es-cred:nth-child(-n+2) {
+	padding-top: 0;
+	border-top: none;
+}
+
+@media (max-width: 680px) {
+	.es-about-page__education .es-grid--2 .es-cred:nth-child(-n+2) {
+		padding-top: 20px;
+		border-top: 1px solid var(--es-line);
+	}
+
+	.es-about-page__education .es-grid--2 .es-cred:first-child {
+		padding-top: 0;
+		border-top: none;
+	}
+}
+
+.es-cred__title {
+	font-family: var(--es-serif);
+	font-size: 17px;
+	font-weight: 500;
+	color: var(--es-ink);
+	margin-bottom: 6px;
+}
+
+.es-cred__meta {
+	font-family: var(--es-mono);
+	font-size: 11.5px;
+	letter-spacing: 0.04em;
+	color: var(--es-ink-4);
+}
+
+.es-cred__description,
+.es-cred__final-project {
+	margin: 10px 0 0;
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+	max-width: 62ch;
+}
+
+/* Bachelor's/Google supporting-themes bullet list (About Gutenberg
+   migration, round-3 correction — new approved content, core/list). Same
+   treatment as the existing "Key contributions" list, scoped under
+   .es-cred so it only ever applies inside an Education entry. */
+.es-cred__list {
+	margin: 10px 0 0;
+	padding-left: 18px;
+	list-style: disc;
+	max-width: 62ch;
+}
+
+.es-cred__list li {
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+}
+
+.es-cred__list li + li {
+	margin-top: 6px;
+}
+
+.es-cred__link {
+	display: inline-block;
+	margin-top: 10px;
+	font-family: var(--es-mono);
+	font-size: 12px;
+	color: var(--es-accent);
+}
+
+/* ---------- About: Other Certifications (lista dentro de un
+   .es-about-details--group) ---------- */
+
+.es-cert-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.es-cert-item {
+	padding: 14px 0;
+	border-top: 1px solid var(--es-line);
+}
+
+.es-cert-item:first-child {
+	padding-top: 0;
+	border-top: none;
+}
+
+.es-cert-item__name {
+	font-family: var(--es-serif);
+	font-size: 15px;
+	font-weight: 500;
+	color: var(--es-ink);
+	margin-bottom: 4px;
+}
+
+.es-cert-item__meta {
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.03em;
+	color: var(--es-ink-4);
+}
+
+/* ---------- About: Languages ---------- */
+
+/* Polish ticket §3: compact multi-column layout. The three languages sit
+   side by side on desktop (one per column), each showing the language over
+   its level — far less vertical space than the previous wrapping row, and
+   the levels line up in a clean column. Mobile stacks to one column,
+   naturally, without reducing readability. */
+.es-lang-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 16px clamp(24px, 4vw, 56px);
+	max-width: 620px;
+}
+
+.es-lang-item {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	font-size: 14.5px;
+	color: var(--es-ink-2);
+}
+
+.es-lang-item__level {
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.03em;
+	color: var(--es-ink-4);
+	margin-left: 0;
+}
+
+@media (max-width: 680px) {
+	.es-lang-list {
+		grid-template-columns: 1fr;
+		gap: 14px;
+	}
+}
+
+/* ---------- About: hobbies / intereses ----------
+   Artwork final aprobado (assets/icons/*.svg, dibujo a mano en paths
+   rellenos) sobre un layout editorial compacto: grilla con hairlines de
+   token (--es-line), sin pills ni cards — el ícono es secundario (28px),
+   el label siempre visible. Interacción V1, deliberadamente contenida:
+   translateY(-2px) + acento en el ícono y tinta plena en el label, solo
+   en :hover/:focus-visible del item (tabindex="0" cubre teclado; touch
+   no depende del hover para entender nada). Nada de loops/autoplay; el
+   movimiento va dentro de prefers-reduced-motion: no-preference (los
+   usuarios con reduced motion ven solo el cambio de color). Los wrappers
+   .es-hobby-icon--{clave} existen para colgar animaciones por-ícono en
+   una V2 sin tocar la estructura del contenido en WordPress. */
+
+.es-hobbies__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	column-gap: clamp(24px, 4vw, 56px);
+	border-top: 1px solid var(--es-line);
+}
+
+.es-hobby-item {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 15px 4px;
+	border-bottom: 1px solid var(--es-line);
+}
+
+.es-hobby-item:focus-visible {
+	outline: 2px solid var(--es-accent);
+	outline-offset: 2px;
+	border-radius: var(--es-radius-sm);
+}
+
+/* Caja del ícono: neutral en reposo (tinta secundaria, nunca acento ni
+   azul), acento verde recién en hover/focus. El SVG hereda por
+   currentColor — ningún color hardcodeado en los archivos. */
+.es-hobby-icon {
+	width: 28px;
+	height: 28px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--es-ink-2);
+	flex: none;
+	transition: color var(--es-dur) var(--es-ease), transform var(--es-dur) var(--es-ease);
+}
+
+.es-hobby-icon svg {
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+
+/* El caballo al galope es artwork apaisado dentro de su caja cuadrada:
+   una caja apenas mayor lo empareja ópticamente con el resto del set
+   (ajuste de presentación — el vector no se toca). */
+.es-hobby-icon--horse-run {
+	width: 34px;
+	height: 34px;
+	margin: -3px;
+}
+
+.es-hobby-item__icon--empty {
+	opacity: 0.35;
+}
+
+.es-hobby-item:hover .es-hobby-icon,
+.es-hobby-item:focus-visible .es-hobby-icon {
+	color: var(--es-accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.es-hobby-item:hover .es-hobby-icon,
+	.es-hobby-item:focus-visible .es-hobby-icon {
+		transform: translateY(-2px);
+	}
+}
+
+.es-hobby-item__label {
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--es-ink-2);
+	transition: color var(--es-dur) var(--es-ease);
+}
+
+.es-hobby-item:hover .es-hobby-item__label,
+.es-hobby-item:focus-visible .es-hobby-item__label {
+	color: var(--es-ink);
+}
+
+.es-hobby-item__text {
+	font-size: 12px;
+	color: var(--es-ink-4);
+	margin-left: auto;
+	padding-left: 12px;
+	text-align: right;
+}
+
+/* =========================================================================
+   Connect — revision ticket (visual/structural correction)
+   -------------------------------------------------------------------------
+   Supersedes both the original 3-column redesign AND the first Gutenberg
+   migration's button-row CSS (deleted below the fold in this same file's
+   history — see git log for template-parts/contact-content.php and
+   docs/content/connect-gutenberg-en.html for what changed and why).
+
+   Root causes of the real-WP failure this replaces:
+   1. The two-column composition was a plain core/group with a custom CSS
+      Grid on top of it. This is the EXACT failure mode already diagnosed
+      and fixed once before in this file for About's Education section
+      ("core/columns — Education 60/40" below): a CSS-Grid override on a
+      generic wrapper doesn't reliably survive the real Kadence-loaded
+      cascade, and this repo's synthetic test harness (only the vendored
+      @wordpress/block-library core CSS, no Kadence theme CSS) can't catch
+      that. Fixed the same way here: a REAL core/columns block with native
+      width attributes (42/58), styled purely by ancestor position — no
+      className added to core/columns itself, matching the Education fix.
+   2. The "floating near center" look is consistent with core/buttons'
+      cross-axis alignment defaulting to center in the real cascade (not
+      reproducible in the synthetic harness either) once each row shrink-
+      wrapped to its own content width. Fixed structurally, not by
+      patching alignment: contact rows are no longer core/button at all —
+      each is a plain core/group (block-level by default, no flex/shrink-
+      wrap ambiguity possible) containing two core/paragraph blocks (label,
+      value with a real inline link). Typography carries the hierarchy;
+      buttons never enter into it.
+
+   PHP fallback (template-parts/contact-content.php) and the Gutenberg
+   content (docs/content/connect-gutenberg-en.html) now emit IDENTICAL
+   markup/classes for the contact section — a deliberate change from the
+   first migration, which used <ul>/<li>/<a> for the fallback and
+   core/buttons for Gutenberg under the same class names and caused a real
+   duplicate-icon regression (see git history). One shared, simple markup
+   shape removes that whole risk category. */
+
+.es-contact-page .wp-block-columns {
+	column-gap: clamp(40px, 6vw, 88px);
+	row-gap: clamp(40px, 5vw, 56px);
+	align-items: flex-start;
+}
+
+@media (max-width: 780px) {
+	.es-contact-page .wp-block-columns {
+		flex-wrap: wrap;
+	}
+
+	.es-contact-page .wp-block-columns > .wp-block-column {
+		flex-basis: 100% !important;
+	}
+}
+
+/* ---------- left column: editorial intro + contact list ---------- */
+
+.es-contact-intro {
+	margin-bottom: clamp(28px, 3.5vw, 40px);
+}
+
+.es-contact-intro__heading {
+	margin: 0 0 14px;
+}
+
+.es-contact-intro .es-accent-word {
+	color: var(--es-accent);
+}
+
+.es-contact-intro__lead {
+	max-width: 42ch;
+	margin: 0;
+	font-size: 16px;
+	line-height: 1.6;
+	color: var(--es-ink-2);
+}
+
+.es-contact-intro__availability {
+	max-width: 42ch;
+	margin: 10px 0 0;
+	font-size: 13.5px;
+	line-height: 1.6;
+	color: var(--es-ink-4);
+}
+
+.es-contact-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.es-contact-item {
+	padding: 18px 0;
+}
+
+.es-contact-item + .es-contact-item {
+	border-top: 1px solid var(--es-line);
+}
+
+.es-contact-item__label {
+	margin: 0 0 5px;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+}
+
+.es-contact-item__value {
+	margin: 0;
+	font-size: 15.5px;
+	line-height: 1.4;
+	color: var(--es-ink);
+	overflow-wrap: break-word;
+}
+
+.es-contact-item__value a {
+	color: inherit;
+	text-decoration: none;
+	border-bottom: 1px solid var(--es-line-strong);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.es-contact-item__value a:hover {
+		color: var(--es-accent);
+		border-bottom-color: var(--es-accent);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.es-contact-item__value a {
+		transition: color var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease;
+	}
+}
+
+.es-contact-item__value a:focus-visible {
+	outline: 2px solid var(--es-accent);
+	outline-offset: 3px;
+	border-radius: 2px;
+}
+
+/* Email is the strongest value on the page per the approved direction —
+   larger and set in the mono/editorial voice already used for labels
+   elsewhere, so it reads as deliberate emphasis rather than a bigger
+   version of the same body text. */
+.es-contact-item--email .es-contact-item__value {
+	font-family: var(--es-mono);
+	font-size: clamp(17px, 1.8vw, 20px);
+	font-weight: 500;
+}
+
+/* Location is the one non-clickable item (plain text, no link, no hover/
+   focus states) — a real <p>, never a fake button. */
+.es-contact-item--location .es-contact-item__value a {
+	pointer-events: none;
+}
+
+/* ---------- optional per-item icon (block style toggle, off by default) ----------
+   "Contact — with icon" (is-style-contact-icon, registered in
+   inc/block-styles.php) adds a small inline mark before the label — never
+   reserved space, so an icon-free item never leaves a gap. Mask-image
+   keeps it tintable with currentColor like an inline SVG would be,
+   without embedding SVG markup inside a RichText field (no proven-safe
+   round-trip precedent for that in this codebase — see the button-era
+   comment this section replaces). */
+
+.is-style-contact-icon .es-contact-item__label {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+}
+
+.is-style-contact-icon .es-contact-item__label::before {
+	content: "";
+	display: inline-block;
+	flex: none;
+	width: 13px;
+	height: 13px;
+	background-color: var(--es-ink-4);
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	mask-position: center;
+	-webkit-mask-size: contain;
+	mask-size: contain;
+}
+
+.is-style-contact-icon.es-contact-item--email .es-contact-item__label::before {
+	-webkit-mask-image: url(../icons/email.svg);
+	mask-image: url(../icons/email.svg);
+}
+
+.is-style-contact-icon.es-contact-item--whatsapp .es-contact-item__label::before {
+	-webkit-mask-image: url(../icons/whatsapp.svg);
+	mask-image: url(../icons/whatsapp.svg);
+}
+
+.is-style-contact-icon.es-contact-item--linkedin .es-contact-item__label::before {
+	-webkit-mask-image: url(../icons/linkedin.svg);
+	mask-image: url(../icons/linkedin.svg);
+}
+
+.is-style-contact-icon.es-contact-item--instagram .es-contact-item__label::before {
+	-webkit-mask-image: url(../icons/instagram.svg);
+	mask-image: url(../icons/instagram.svg);
+}
+
+.is-style-contact-icon.es-contact-item--location .es-contact-item__label::before {
+	-webkit-mask-image: url(../icons/location.svg);
+	mask-image: url(../icons/location.svg);
+}
+
+/* ---------- right column: "Send a message." + form ---------- */
+
+.es-contact-form__heading {
+	margin: 0 0 10px;
+}
+
+.es-contact-form .es-accent-word {
+	color: var(--es-accent);
+}
+
+.es-contact-form__lead {
+	max-width: 44ch;
+	margin: 0 0 clamp(24px, 3vw, 32px);
+	font-size: 15px;
+	line-height: 1.6;
+	color: var(--es-ink-2);
+}
+
+/* Placeholder — same restrained "reserved, not yet real" visual language
+   used for empty states elsewhere on this site (dashed border, reduced
+   opacity). Replace with a real Fluent Forms block/shortcode — see the
+   HTML comment in docs/content/connect-gutenberg-en.html and
+   docs/FLUENT-FORMS.md. */
+
+.es-contact-form-placeholder {
+	border: 1px dashed var(--es-line-strong);
+	border-radius: var(--es-radius);
+	padding: clamp(28px, 3.5vw, 40px);
+	opacity: 0.7;
+}
+
+.es-contact-form-placeholder__note {
+	margin: 10px 0 0;
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+}
+
+/* ---------- Fluent Forms — scoped support, Connect wrapper only ----------
+   Deliberately generic element selectors (input/textarea/label/button)
+   FIRST, so any form markup dropped into .es-contact-form looks correct
+   immediately, layered with Fluent Forms' own documented class names
+   (.fluentform, .ff-el-*, .ff-btn-submit) for extra polish once the real
+   plugin/block is present. Everything is scoped under .es-contact-form —
+   this file must never style Fluent Forms globally (a form used anywhere
+   else on the site, if that ever happens, is untouched by this block). */
+
+.es-contact-form form,
+.es-contact-form .fluentform form {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+.es-contact-form label,
+.es-contact-form .ff-el-input--label label {
+	display: block;
+	margin: 0 0 8px;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+}
+
+.es-contact-form input[type='text'],
+.es-contact-form input[type='email'],
+.es-contact-form textarea,
+.es-contact-form .ff-el-form-control {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 13px 14px;
+	background: var(--es-block, transparent);
+	border: 1px solid var(--es-line-strong);
+	border-radius: var(--es-radius-sm);
+	font-family: var(--es-sans);
+	font-size: 15px;
+	color: var(--es-ink);
+}
+
+.es-contact-form textarea,
+.es-contact-form .ff-el-form-control[rows] {
+	min-height: 140px;
+	resize: vertical;
+	line-height: 1.6;
+}
+
+.es-contact-form input::placeholder,
+.es-contact-form textarea::placeholder {
+	color: var(--es-ink-4);
+}
+
+.es-contact-form input:focus-visible,
+.es-contact-form textarea:focus-visible,
+.es-contact-form .ff-el-form-control:focus-visible {
+	outline: none;
+	border-color: var(--es-accent);
+	box-shadow: 0 0 0 3px var(--es-accent-soft);
+}
+
+.es-contact-form button[type='submit'],
+.es-contact-form .ff-btn-submit {
+	align-self: flex-start;
+	margin-top: 4px;
+	padding: 14px 28px;
+	border: 1px solid var(--es-accent-dim);
+	border-radius: 40px;
+	background: transparent;
+	font-family: var(--es-sans);
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--es-ink);
+	cursor: pointer;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.es-contact-form button[type='submit']:hover,
+	.es-contact-form .ff-btn-submit:hover {
+		background: var(--es-accent-soft);
+		border-color: var(--es-accent);
+	}
+}
+
+.es-contact-form button[type='submit']:focus-visible,
+.es-contact-form .ff-btn-submit:focus-visible {
+	outline: 2px solid var(--es-accent);
+	outline-offset: 2px;
+}
+
+/* ---------- Work: separación visual clara entre selected work y archive
+   (mismo tratamiento de "bloque de contraste" que Featured Case en Home —
+   .es-section--block, reusado acá vía selector propio para no acoplar
+   la página Work a una clase pensada para Home) ---------- */
+
+.es-work-archive {
+	background: var(--es-block);
+	border-bottom-color: var(--es-block-line);
+}
+
+/* =========================================================================
+   About page — Gutenberg migration (architecture ticket)
+   -------------------------------------------------------------------------
+   New CSS needed ONLY because Gutenberg's native block markup differs from
+   the PHP-generated markup it replaces — no visual redesign, no change to
+   colors/typography/spacing tokens anywhere else on the site.
+
+   1. estavillo/case-details "Light" style: the same already-approved
+      lightweight hairline disclosure from the About-page correction
+      ticket, ported onto the block's OWN class names (.es-case-details,
+      not .es-about-details, which stays exactly as it was for the legacy
+      PHP fallback). Fully self-contained — not a delta over
+      case-study.css — so About never needs to load that stylesheet, and
+      Case Studies keep their current bordered/filled .es-case-details
+      appearance completely untouched (opt-in via the block's own Styles
+      panel; the default/unstyled look is unaffected).
+   2. core/button parity with the existing .es-btn pill CTA — core's own
+      button markup differs structurally (wrapper div + its own link
+      classes) from the hand-written <a class="es-btn">, so this
+      reproduces the same look via a compound selector, scoped to the
+      "es-btn" Additional CSS Class added on the block in the editor.
+   3. core/columns parity with the existing Education 2-column grid + its
+      title-alignment fix, scoped to the About page's Education section.
+   4. core/image parity for the portrait — once a real photo replaces the
+      empty placeholder block, this keeps the same 3:4 frame the old
+      dashed placeholder box used, so the layout doesn't jump/reflow.
+   ========================================================================= */
+
+/* ---------- 1. estavillo/case-details — Light style (About only) ---------- */
+
+.es-case-details.is-style-light {
+	border: none;
+	background: none;
+}
+
+.es-case-details.is-style-light summary {
+	position: relative;
+	list-style: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 14px 26px 14px 0;
+	font-family: var(--es-mono);
+	font-size: 13px;
+	font-weight: 500;
+	letter-spacing: 0.03em;
+	color: var(--es-ink-2);
+	border-bottom: 1px solid var(--es-line);
+	transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.es-case-details.is-style-light summary::-webkit-details-marker {
+	display: none;
+}
+
+.es-case-details.is-style-light summary:hover {
+	color: var(--es-ink);
+	border-color: var(--es-line-strong);
+}
+
+.es-case-details.is-style-light summary:focus-visible {
+	outline: 2px solid var(--es-accent);
+	outline-offset: 2px;
+}
+
+/* Regression fix: the +/− indicator used to be a single text glyph swapped
+   via `content: '+'` / `content: '−'` — a discrete change, so the
+   micro-animation the earlier .es-about-details version had (a smooth
+   rotate) was lost in the Gutenberg port. Restored here as two fixed-size
+   bars forming a "+": ::before is the constant horizontal bar (this is
+   also the resting "−" shape), ::after is the vertical bar, which rotates
+   flat onto ::before when open. Absolutely positioned (not flex items),
+   so neither the rotation nor the open/closed swap ever shifts the
+   summary text or the row's height/width — only `transform` animates,
+   nothing that triggers layout. Same var(--accent) token as before, so
+   dark/light both just work. */
+.es-case-details.is-style-light summary::before,
+.es-case-details.is-style-light summary::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	right: 2px;
+	width: 10px;
+	height: 1.5px;
+	background: var(--es-accent);
+	transition: transform 0.2s ease;
+}
+
+.es-case-details.is-style-light summary::before {
+	transform: translateY(-50%);
+}
+
+.es-case-details.is-style-light summary::after {
+	transform: translateY(-50%) rotate(90deg);
+}
+
+/* Direct-child combinator is deliberate (round-3 fix): without it this
+   also matched any NESTED "Key contributions" summary sitting inside an
+   OPEN outer details (e.g. Earlier Experience's "Show N earlier roles")
+   even while that nested one was still closed — every nested summary
+   showed the open state as soon as its ancestor opened, regardless of
+   its own [open] state. <summary> is always the details element's own
+   first child per the HTML spec, so ">" correctly scopes this to the
+   [open] element's OWN summary only. */
+.es-case-details.is-style-light[open] > summary::after {
+	transform: translateY(-50%) rotate(0deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-case-details.is-style-light summary::before,
+	.es-case-details.is-style-light summary::after {
+		transition: none;
+	}
+}
+
+.es-case-details.is-style-light > .es-case-details__body {
+	padding-top: 16px;
+}
+
+/* Size: "nested" (one Experience/Earlier Experience entry's Key
+   contributions) reads smaller than "group" (the whole Earlier
+   Experience / Other Certifications section) — same distinction the
+   previous ticket's .es-about-details--nested/--group made, driven here
+   by ambient context instead of a second class an editor has to
+   remember to add correctly. */
+.es-exp-item .es-case-details.is-style-light {
+	margin-top: 8px;
+	max-width: 62ch;
+}
+
+.es-exp-item .es-case-details.is-style-light summary {
+	font-size: 12px;
+}
+
+/* Group-level disclosures ("Earlier experience" inside Experience, "Other
+   certifications" inside Education). Polish ticket §1–2: they now live INSIDE
+   their parent section (no longer standalone numbered sections), so they're
+   scoped by their own .es-about-group class instead of the old section IDs —
+   the class travels with the block, so an editor can move them without losing
+   the treatment. The top margin sets them apart from the content above so the
+   disclosure reads as a quiet continuation of the section (a timeline
+   continuation in Experience), not a new chapter. */
+.es-case-details.is-style-light.es-about-group {
+	max-width: 720px;
+	margin-top: clamp(28px, 3.5vw, 40px);
+}
+
+/* ---------- 2. core/button — Resume/CV CTA parity with .es-btn ----------
+   .es-btn__arrow already has its color rule in components.css (bare class
+   selector, no scoping) — the arrow inside the button's text needs no new
+   CSS here, only the pill/link chrome around it. */
+
+.wp-block-button.es-btn > .wp-block-button__link {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	padding: 15px 26px;
+	border: 1px solid var(--es-accent-dim);
+	border-radius: 40px;
+	background: transparent;
+	font-family: var(--es-sans);
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--es-ink) !important;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease,
+		gap 0.2s var(--es-ease);
+}
+
+.wp-block-button.es-btn > .wp-block-button__link:hover,
+.wp-block-button.es-btn > .wp-block-button__link:focus-visible,
+.wp-block-button.es-btn > .wp-block-button__link:active {
+	color: var(--es-ink) !important;
+	background: var(--es-accent-soft);
+	border: 1px solid var(--es-accent);
+	box-shadow: none;
+}
+
+.wp-block-button.es-btn > .wp-block-button__link:hover {
+	gap: 18px;
+}
+
+/* ---------- 3. core/columns — Education 60/40 ----------
+   Correction ticket round 3: the previous CSS-Grid override on top of
+   core/columns' own flex layout didn't reliably apply in real WordPress
+   (Columns stayed effectively single-column). Fixed at the markup level
+   instead — real core/column width via the native flex-basis mechanism
+   (same "width" attribute + inline style the block editor itself writes
+   when a user drags a column handle, proven already in
+   patterns/case-persona.php) — so this file only needs to style the
+   ALREADY-two-column native layout: a generous gutter, a subtle vertical
+   divider between the columns (desktop only — "optional subtle divider",
+   not a heavy rule), and a horizontal divider between the two entries
+   once they stack on mobile. No className on the core/column blocks
+   themselves (deliberate: combining a custom className with a width
+   attribute on the same core/column has no proven-safe precedent in this
+   codebase yet, so this styles the columns purely via their position
+   inside .es-about-page__education, with zero risk of an unexpected
+   class-list mismatch on paste). .es-cred__title/__meta/__description/
+   __final-project (on the paragraphs INSIDE each column) are unchanged. */
+
+.es-about-page__education .wp-block-columns {
+	column-gap: clamp(32px, 4vw, 56px);
+	row-gap: clamp(24px, 3vw, 32px);
+	align-items: flex-start;
+}
+
+.es-about-page__education .wp-block-columns > .wp-block-column:last-child {
+	border-left: 1px solid var(--es-line);
+	padding-left: clamp(32px, 4vw, 56px);
+}
+
+@media (max-width: 680px) {
+	.es-about-page__education .wp-block-columns > .wp-block-column:last-child {
+		border-left: none;
+		padding-left: 0;
+		padding-top: 24px;
+		border-top: 1px solid var(--es-line);
+	}
+}
+
+/* ---------- 4. core/image — portrait frame parity ----------
+   Reproduces the 3:4 frame the old dashed placeholder box used, once a
+   real photo is inserted. Zero effect while the block is still empty —
+   an unpicked core/image renders nothing on the frontend (no url, no
+   invented placeholder graphic), matching the "do not leave a visual
+   placeholder" correction exactly. Scoped by position (first column of
+   the About intro's Columns block) rather than a className on the
+   core/column itself — see the Education comment above for why. */
+
+.es-about-page__intro .wp-block-columns > .wp-block-column:first-child .wp-block-image {
+	margin: 0;
+}
+
+.es-about-page__intro .wp-block-columns > .wp-block-column:first-child .wp-block-image img {
+	display: block;
+	width: 100%;
+	aspect-ratio: 3 / 4;
+	object-fit: cover;
+	border-radius: var(--es-radius);
+}
+
+/* ---------- 5. core/columns — About intro (Portrait + text), round-3 fix ----------
+   Same root cause and same fix as Education above: real core/columns with
+   a native flex-basis width (42/58, ~5/12–7/12) instead of the old
+   CSS-Grid override on a plain core/group (.es-about__grid, SHARED with
+   the Home "About" teaser — deliberately left untouched in
+   pages-home.css: this page never uses that class anymore). Gutter here
+   matches the previous grid's gap value for visual continuity; the text
+   column is narrower than the old single-column intro, so its measure is
+   reduced slightly (56ch/clamp(20,2.3vw,27) → 48ch/clamp(18,1.8vw,24)),
+   per the correction ticket's explicit allowance ("intro type may reduce
+   slightly"). */
+
+.es-about-page__intro .wp-block-columns {
+	column-gap: clamp(32px, 5vw, 72px);
+	align-items: flex-start;
+}
+
+.es-about-page__intro .es-about-page__text {
+	max-width: 48ch;
+	font-size: clamp(18px, 1.8vw, 24px);
+}
+
+/* ---------- 6. core/buttons — Resume/CV wrapper reset (round-3 fix) ----------
+   Round-3 report: the CV button showed two visible outlines. The .es-btn
+   pill chrome was already scoped correctly to .wp-block-button__link (the
+   real <a>); this adds an explicit reset on BOTH wrapper levels
+   (.wp-block-buttons and .wp-block-button itself) so neither can ever
+   render a second border/background/pill-shape of its own — whatever the
+   source of the second outline (parent theme's own default button
+   styling is the most likely one), only .wp-block-button__link is left
+   with visible chrome. !important is deliberate here: this is a reset of
+   generic upstream defaults, not a specificity fight the theme should
+   need to keep re-winning as those defaults evolve. */
+
+.es-btn-group,
+.es-btn-group > .wp-block-button.es-btn {
+	border: none !important;
+	background: none !important;
+	border-radius: 0 !important;
+	padding: 0 !important;
+	box-shadow: none !important;
+}
+
+/* ---------- 7. Experience — remove the nested "Key contributions"
+   disclosure's own divider (round-3 fix) ----------
+   Round-3 report: each Experience/Earlier-Experience entry showed TWO
+   dividers with an empty gap between them — the nested case-details'
+   own summary border-bottom (section 1 above, ".es-case-details.is-style-
+   light summary") PLUS the next .es-exp-item's border-top (this file,
+   "About: Experience / Earlier Experience"). Fixed by dropping the
+   border-bottom only in the nested (per-entry) context — the group-level
+   ones ("Show N earlier roles" / "Show N certifications") are untouched,
+   they don't have a competing sibling border-top right after them. The
+   next .es-exp-item's border-top remains the ONE separator per item, as
+   required. When open, the opened content gets a subtle left rule
+   instead (same visual language as .es-process-detail__note elsewhere on
+   this page) so the summary and its opened content read as one element
+   belonging to the entry, not as two things split by a rule. */
+
+.es-exp-item .es-case-details.is-style-light summary {
+	border-bottom: none;
+}
+
+.es-exp-item .es-case-details.is-style-light[open] > .es-case-details__body {
+	border-left: 2px solid var(--es-line);
+	padding-left: 14px;
+	margin-top: 2px;
+}
+
+/* ---------- 8. Hobbies — deterministic desktop grid (round-3 fix) ----------
+   Round-3 report: on desktop the Hobbies grid rendered as a single narrow
+   column, reading like a mobile layout. auto-fill/minmax sizes columns
+   from the CONTAINER's available width, which is fragile inside nested
+   Gutenberg wrapper divs in real WordPress (a wrapper not reporting the
+   full content width makes every track collapse to one column). Fixed
+   with an explicit, deterministic column count instead — 3 columns on
+   desktop, 2 on tablet, 1 on narrow mobile — so the layout can't collapse
+   based on ambiguous container sizing. */
+
+.es-hobbies__list {
+	grid-template-columns: repeat(3, 1fr) !important;
+}
+
+@media (max-width: 900px) {
+	.es-hobbies__list {
+		grid-template-columns: repeat(2, 1fr) !important;
+	}
+}
+
+@media (max-width: 560px) {
+	.es-hobbies__list {
+		grid-template-columns: 1fr !important;
+	}
+}
+
+/* =========================================================================
+   How I Work page — Gutenberg migration
+   -------------------------------------------------------------------------
+   docs/HOW-I-WORK-STRATEGY.md + docs/HOW-I-WORK-CONTENT-SPEC.md. Same
+   "new CSS only because the markup differs" rule as the About migration
+   above — no new colors/type/spacing tokens, only new selectors over the
+   same --es-* variables. Home's own teaser CSS lives in pages-home.css
+   (it's PHP-templated, not Gutenberg — see template-parts/how-i-work.php).
+   ========================================================================= */
+
+/* ---------- page intro (before the first move) ---------- */
+
+.es-how-page__intro-wrap {
+	padding-top: clamp(8px, 1.5vw, 16px);
+	padding-bottom: clamp(24px, 3vw, 40px);
+}
+
+.es-how-page__intro {
+	max-width: 68ch;
+	margin: 0 0 20px;
+	font-size: clamp(16px, 1.7vw, 18px);
+	line-height: 1.7;
+	color: var(--es-ink-2);
+}
+
+.es-how-page__balance {
+	max-width: 62ch;
+	margin: 0;
+	font-size: 14.5px;
+	line-height: 1.65;
+	color: var(--es-ink-3);
+	padding-left: 14px;
+	border-left: 2px solid var(--es-line-strong);
+}
+
+/* ---------- one process move — editorial section ----------
+   No border between moves at all (removed a hairline border-top that
+   read as redundant on desktop — the generous padding already separates
+   sections — and as visually fragmenting on mobile, where the shorter
+   viewport puts consecutive rules closer together). Generous whitespace,
+   section numbering, and the illustration alone carry the separation
+   between six in a row; case-study separators and the disclosure's own
+   dividers are untouched (different classes entirely, see case-study.css
+   and .es-case-details below). */
+
+.es-process-move {
+	padding: clamp(56px, 7vw, 96px) 0;
+}
+
+.es-process-move__head {
+	display: flex;
+	align-items: baseline;
+	gap: 16px;
+	margin-bottom: clamp(28px, 3.5vw, 44px);
+}
+
+.es-process-move__num {
+	font-family: var(--es-mono);
+	font-size: 13px;
+	letter-spacing: 0.04em;
+	color: var(--es-accent);
+	flex: none;
+}
+
+.es-process-move__title {
+	margin: 0;
+	font-family: var(--es-serif);
+	font-size: clamp(22px, 2.6vw, 30px);
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	color: var(--es-ink);
+}
+
+.es-process-move__row {
+	column-gap: clamp(32px, 5vw, 72px);
+	row-gap: clamp(28px, 4vw, 40px);
+	align-items: flex-start;
+}
+
+.es-process-move__text {
+	margin: 0 0 4px;
+	max-width: 62ch;
+	font-size: clamp(15.5px, 1.5vw, 17px);
+	line-height: 1.65;
+	color: var(--es-ink-2);
+}
+
+/* Illustration column: always the FIRST core/column in the markup
+   regardless of which side it renders on (see the alternation rule
+   below) — this is also what makes "mobile: illustration first" work
+   automatically with zero extra CSS, since DOM order already matches the
+   required mobile reading order. */
+
+.es-process-move__row > .wp-block-column:first-child {
+	position: relative;
+}
+
+/* The illustration itself (.how-work-illustration, shared base rules in
+   pages-home.css) sizes via width:100%/height:auto off its own SVG
+   viewBox — no aspect-ratio hardcoded here, since the real artwork's
+   proportions (440:300) already come from the file, not a guess. */
+.es-process-move__row > .wp-block-column:first-child .how-work-illustration {
+	max-width: 460px;
+}
+
+/* ---------- green accent micro-interaction (full page only) ----------
+   MVP correction: the four accent classes' geometry doesn't sit perfectly
+   on the flattened base artwork (see docs/HOW-I-WORK-ILLUSTRATIONS.md) —
+   crisp, high-opacity green elements made that misalignment obvious. The
+   interaction now works as a soft atmospheric glow behind the
+   illustration instead of a precise overlay: .how-work-svg__accent-soft
+   is the only element that ever becomes visible, blurred and restrained.
+   .how-work-svg__accent-path/-node/-fill stay fully hidden at all
+   times — the option that makes the alignment issue least noticeable,
+   since a hidden shape can't look misplaced.
+
+   Home's teaser icons only ever load pages-home.css (see
+   es_is_home_template() in inc/enqueue.php) — this file never reaches
+   Home at all, so nothing here can touch it; the existing whole-
+   illustration lift in pages-home.css is untouched and still the only
+   motion Home gets.
+
+   --how-work-accent-soft-opacity (pages-home.css, shared, unchanged) is
+   overridden here to 1 — full alpha baked into the fill itself — so the
+   NEW `opacity` property below is the only thing controlling how visible
+   the glow is. Stacking this ticket's opacity on top of the existing
+   0.12 baked-in alpha would multiply down to ~0.02, well under the
+   requested ~0.2 target and effectively invisible. */
+
+.how-work-illustration--page {
+	--how-work-accent-soft-opacity: 1;
+	--how-work-glow-opacity: 0.2;
+	--how-work-glow-scale-rest: 0.88;
+	--how-work-glow-scale-active: 1.05;
+	--how-work-glow-blur: 10px;
+	--how-work-glow-duration: 0.36s;
+	--how-work-illustration-lift: -2px;
+}
+
+/* Default state, every device, unconditionally: no visible green at all —
+   the base line drawing alone is already complete and legible (see the
+   accents-off screenshots from the asset-integration pass). */
+.how-work-illustration--page .how-work-svg__accent-path,
+.how-work-illustration--page .how-work-svg__accent-node,
+.how-work-illustration--page .how-work-svg__accent-fill,
+.how-work-illustration--page .how-work-svg__accent-soft {
+	opacity: 0;
+}
+
+/* Reduced motion: the glow's final, restrained state shown immediately
+   and permanently, no transition/scale — wins outright over the
+   hover-capable block below since that one requires
+   prefers-reduced-motion: no-preference to ever activate. */
+@media (prefers-reduced-motion: reduce) {
+	.how-work-illustration--page .how-work-svg__accent-soft {
+		opacity: var(--how-work-glow-opacity);
+		filter: blur(var(--how-work-glow-blur));
+	}
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+	.how-work-illustration--page .how-work-svg__accent-soft {
+		transform-box: fill-box;
+		transform-origin: center;
+		filter: blur(var(--how-work-glow-blur));
+		transform: scale(var(--how-work-glow-scale-rest));
+		transition: opacity var(--how-work-glow-duration) ease-out, transform var(--how-work-glow-duration) ease-out;
+	}
+
+	.how-work-illustration--page:hover .how-work-svg__accent-soft,
+	.es-process-move:focus-within .how-work-illustration--page .how-work-svg__accent-soft {
+		opacity: var(--how-work-glow-opacity);
+		transform: scale(var(--how-work-glow-scale-active));
+	}
+
+	/* Keyboard parity with the existing mouse-only :hover lift in
+	   pages-home.css (untouched) — same -2px value, formalized as a
+	   variable here rather than duplicating the literal into that shared
+	   file. Specificity is higher than the shared :hover rule, so if both
+	   ever apply at once the result is identical (-2px either way). */
+	.es-process-move:focus-within .how-work-illustration--page {
+		transform: translateY(var(--how-work-illustration-lift));
+	}
+}
+
+/* Graceful degradation: estavillo/how-i-work-illustration prints nothing
+   at all if the theme's renderer isn't available or a step fails to
+   resolve (see inc/how-i-work-illustrations.php) — the column is then
+   genuinely empty. Same dashed/reduced-opacity placeholder language
+   already used for empty icon states elsewhere on this site
+   (.es-process__icon--empty and similar), so a missing illustration still
+   reserves a balanced proportion instead of collapsing the layout. */
+.es-process-move__row > .wp-block-column:first-child:empty {
+	aspect-ratio: 22 / 15;
+	border: 1px dashed var(--es-line-strong);
+	border-radius: var(--es-radius);
+	opacity: 0.4;
+}
+
+/* ---------- desktop alternation ----------
+   Odd moves (1st, 3rd, 5th DOM position): illustration left, default row
+   direction. Even moves: flex-direction: row-reverse flips which SIDE
+   the illustration renders on, without touching DOM order — the image
+   column has no interactive/focusable content (decorative, no link, no
+   button), so this never desyncs keyboard focus order from visual order.
+   Scoped to the How I Work page's own body class. */
+.es-how-page .es-process-move:nth-of-type(even) .es-process-move__row {
+	flex-direction: row-reverse;
+}
+
+@media (max-width: 781px) {
+	/* Undo the desktop-only reverse once Columns stacks (same 781px
+	   breakpoint core/columns itself stacks at) — mobile must always show
+	   the illustration first, in DOM order, on every move regardless of
+	   which side it rendered on at desktop width. */
+	.es-how-page .es-process-move:nth-of-type(even) .es-process-move__row {
+		flex-direction: row;
+	}
+}
+
+/* ---------- expandable detail — per-field labels ----------
+   estavillo/case-details' own summary ("More on this move") already
+   carries the +/- disclosure; each of the four sections inside it
+   (Why it matters / How I approach it / AI and human judgment / In
+   practice) gets its own small mono label instead of relying on default
+   <h4> styling, matching the note-label language already used elsewhere
+   on this site (.es-cred__meta, the legacy .es-process-detail__note-label). */
+
+.es-process-field-label {
+	margin: 20px 0 6px;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+}
+
+.es-case-details.is-style-light .es-process-field-label:first-child {
+	margin-top: 0;
+}
+
+/* ---------- transversal AI band ----------
+   Full-width interlude after the six moves, not a numbered 7th move: no
+   .es-process-move__num, no illustration slot the same size/shape as the
+   six moves' own — reuses the existing "contrast block" background
+   already established for Featured Case (--es-block/--es-block-line),
+   so it reads as a distinct layer under the sequence rather than one
+   more item inside it.
+
+   Polish pass: the statement and paragraph previously used mismatched
+   ch-based measures (46ch at ~30px serif vs. 62ch at 15px sans) that
+   happened to render the SAME nominal "generous" width in characters but
+   very different actual widths in px — the paragraph ended up visibly
+   narrower than the heading above it, reading as an unfinished second
+   column with nothing in it. Both now share one literal px measure so
+   the two lines up front look like one intentional, aligned block
+   instead of two differently-sized columns; an eyebrow gives the band
+   its own small heading-level identity before the statement, same
+   pattern as .es-hero__eyebrow/.es-page-head__eyebrow elsewhere. */
+
+.es-process-ai-band {
+	background: var(--es-block);
+	border-top: 1px solid var(--es-block-line);
+	border-bottom: 1px solid var(--es-block-line);
+	padding: clamp(48px, 6vw, 80px) 0;
+}
+
+.es-process-ai-band__eyebrow {
+	margin: 0 0 16px;
+}
+
+.es-process-ai-band__statement {
+	max-width: 640px;
+	margin: 0 0 20px;
+	font-family: var(--es-serif);
+	font-size: clamp(23px, 2.8vw, 34px);
+	font-weight: 500;
+	line-height: 1.3;
+	letter-spacing: -0.01em;
+	color: var(--es-ink);
+}
+
+.es-process-ai-band__text {
+	max-width: 640px;
+	margin: 0;
+	font-size: 15px;
+	line-height: 1.65;
+	color: var(--es-ink-2);
+}
+
+/* ---------- closing CTA ---------- */
+
+.es-process-closing {
+	padding: clamp(48px, 6vw, 80px) 0;
+}
+
+.es-process-closing__text {
+	margin: 0 0 22px;
+	font-family: var(--es-serif);
+	font-size: clamp(18px, 2vw, 22px);
+	font-weight: 500;
+	color: var(--es-ink);
+}
+

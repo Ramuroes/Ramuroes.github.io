@@ -1,0 +1,723 @@
+/* =========================================================================
+   ESTAVILLO — Site chrome (header + breadcrumbs + footer)
+   Compartido por Home, el single de Case Study y las 4 páginas fijas
+   (Work/About/How I Work/Contact) — todas reusan este chrome.
+   Dark premium, mobile-first. Estados interactivos: solo verde --es-accent,
+   tintas --es-ink* y opacidad. Nunca azul.
+
+   Todos los links/botones interactivos de este archivo declaran rest/hover/
+   focus-visible/active/visited explícitamente con !important (logo, nav
+   desktop, botón Menu, mobile menu link, nav del footer, meta del footer).
+   No es paranoia por cada uno: un test adversarial con una hoja de estilos
+   externa agresiva (simulando el peor caso de Kadence/Customizer) mostró que
+   cualquier regla SIN !important podía perder — !important nunca depende de
+   ganar por especificidad contra un origen externo que no controlamos desde
+   este repo.
+   ========================================================================= */
+
+/* ---------- header sticky ---------- */
+
+.es-site-header {
+	position: sticky;
+	top: 0;
+	z-index: 80; /* por encima del overlay del menú (70) para el morph del botón */
+	background: color-mix(in srgb, var(--es-paper) 88%, transparent);
+	-webkit-backdrop-filter: blur(12px);
+	backdrop-filter: blur(12px);
+	border-bottom: 1px solid var(--es-line);
+}
+
+/* si hay admin bar de WP, bajar el sticky para no quedar tapado */
+.admin-bar .es-site-header {
+	top: 32px;
+}
+
+@media (max-width: 782px) {
+	.admin-bar .es-site-header {
+		top: 46px;
+	}
+}
+
+/* Sticky option (Phase 5 §6): default is sticky (rules above). When the
+   global "Sticky header" toggle is off, the header sits in normal flow — no
+   pin, no jump, everything else unchanged. */
+.es-site-header--static {
+	position: static;
+}
+
+/* Anchor jumps clear the sticky header (no overlap with headings, §6). Gated
+   to the sticky body class so a static header adds no offset. scroll-margin on
+   the target sections works regardless of the scroll container; the admin bar
+   only affects logged-in editors, handled with a small extra offset. */
+.es-header-sticky :where( .es-hero, .es-section ) {
+	scroll-margin-top: 84px;
+}
+
+.admin-bar.es-header-sticky :where( .es-hero, .es-section ) {
+	scroll-margin-top: 116px;
+}
+
+/* Active navigation state (§5): green label + a small green dot, absolutely
+   positioned so it never shifts layout. Server-side (aria-current) — no scroll
+   tracking. Home stays neutral. */
+.es-nav__link {
+	position: relative;
+}
+
+.es-nav__link.is-active {
+	color: var(--es-ink) !important;
+}
+
+.es-nav__dot {
+	position: absolute;
+	left: 50%;
+	bottom: -3px;
+	width: 4px;
+	height: 4px;
+	transform: translateX(-50%);
+	border-radius: 50%;
+	background: var(--es-accent);
+	pointer-events: none;
+}
+
+/* optional wordmark logo image (text wordmark stays the default) */
+.es-nav__brand--logo {
+	display: inline-flex;
+	align-items: center;
+}
+
+.es-nav__logo {
+	display: block;
+	height: 22px;
+	width: auto;
+	max-width: 180px;
+}
+
+/* mobile menu active item: green label + inline dot (roomy rows, no shift
+   concern here). */
+.es-mobile-menu__link.is-active {
+	color: var(--es-accent) !important;
+}
+
+.es-mobile-menu__link.is-active .es-nav__dot {
+	position: static;
+	transform: none;
+	display: inline-block;
+	margin-left: 10px;
+	vertical-align: middle;
+}
+
+/* ---------- breadcrumbs (Home / [sección] / página o caso actual) ----------
+   Usados en Case Study, Work, About, How I Work y Contact — nunca en Home
+   (template-parts/breadcrumbs.php simplemente no se llama ahí). Movidos
+   acá desde case-study.css (sprint de infra/polish): eran invisibles en
+   4 de las 5 páginas que los necesitan porque case-study.css solo se
+   encola en el single de Case Study — ahora viven en el chrome
+   compartido, así que cargan en cualquier página que los use. */
+
+.es-breadcrumbs {
+	padding: 14px 0;
+	border-bottom: 1px solid var(--es-line);
+}
+
+.es-breadcrumbs__list {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.04em;
+}
+
+.es-breadcrumbs__item {
+	display: flex;
+	align-items: center;
+}
+
+.es-breadcrumbs__item:not(:first-child)::before {
+	content: '/';
+	margin: 0 9px;
+	color: var(--es-ink-4);
+}
+
+.es-breadcrumbs__link {
+	color: var(--es-ink-3) !important;
+	text-decoration: none;
+	transition: color var(--es-dur-fast) ease;
+}
+
+.es-breadcrumbs__link:hover,
+.es-breadcrumbs__link:focus-visible,
+.es-breadcrumbs__link:active {
+	color: var(--es-accent) !important;
+}
+
+.es-breadcrumbs__link:visited {
+	color: var(--es-ink-3) !important;
+}
+
+.es-breadcrumbs__current {
+	color: var(--es-ink-4);
+	max-width: 40ch;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.es-nav {
+	height: 66px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+}
+
+.es-nav__brand {
+	font-size: 14px;
+	font-weight: 700;
+	letter-spacing: 0.22em;
+	color: var(--es-ink) !important;
+	text-decoration: none;
+	transition: color 0.15s ease;
+}
+
+/* logo: verde de identidad en hover/foco, tinta neutra en todo el resto —
+   incl. :active/:visited con !important. Mismo motivo que .es-mobile-menu__link
+   (ver más abajo): un color de link/visited externo con su propio !important
+   podía ganar sin esto. Nunca azul, en ningún estado. */
+.es-nav__brand:hover,
+.es-nav__brand:focus-visible,
+.es-nav__brand:active {
+	color: var(--es-accent) !important;
+}
+
+.es-nav__brand:visited {
+	color: var(--es-ink) !important;
+}
+
+/* cluster derecho: links + language + toggle slot + botón menu */
+.es-nav__right {
+	display: flex;
+	align-items: center;
+	gap: clamp(16px, 2.4vw, 30px);
+}
+
+.es-nav__links {
+	display: flex;
+	align-items: center;
+	gap: clamp(20px, 2.6vw, 36px);
+}
+
+.es-nav__link {
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--es-ink-2) !important;
+	text-decoration: none;
+	padding: 6px 0;
+	background: linear-gradient(var(--es-accent), var(--es-accent)) left bottom / 0 1px no-repeat;
+	transition: background-size 0.2s ease, color 0.15s ease;
+}
+
+/* desktop nav links: nunca azul en ningún estado, incl. :active/:visited
+   (mismo refuerzo !important que el resto del chrome — ver nota en
+   .es-mobile-menu__link más abajo). */
+.es-nav__link:hover,
+.es-nav__link:focus-visible,
+.es-nav__link:active {
+	color: var(--es-ink) !important;
+	background-size: 100% 1px;
+}
+
+.es-nav__link:visited {
+	color: var(--es-ink-2) !important;
+}
+
+.es-nav__lang {
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.12em;
+	color: var(--es-ink-4);
+	white-space: nowrap;
+}
+
+.es-nav__lang-on {
+	color: var(--es-accent);
+}
+
+/* El link al otro idioma (p.ej. "ES" mientras se ve la home en inglés) es
+   un <a> plano armado por es_print_lang_switcher() — nunca tuvo su propio
+   refuerzo de color, a diferencia de .es-nav__link/.es-nav__brand/
+   .es-mobile-menu__link (mismo motivo documentado en esos tres: el color
+   Link/Visited que Kadence inyecta desde el Customizer puede ganar sin
+   este !important). Resultado real visto en producción: azul en hover,
+   clic y :visited. Mismo criterio que el resto del header — nunca azul. */
+.es-nav__lang a,
+.es-mobile-menu__foot a {
+	color: inherit;
+}
+
+.es-nav__lang a:hover,
+.es-nav__lang a:focus-visible,
+.es-nav__lang a:active,
+.es-mobile-menu__foot a:hover,
+.es-mobile-menu__foot a:focus-visible,
+.es-mobile-menu__foot a:active {
+	color: var(--es-accent) !important;
+}
+
+.es-nav__lang a:visited,
+.es-mobile-menu__foot a:visited {
+	color: var(--es-ink-4) !important;
+}
+
+/* slot reservado para el futuro toggle Light/Dark (sin funcionalidad aún) */
+.es-nav__toggle {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	border: 1px solid var(--es-line-strong);
+	border-radius: 50%;
+	color: var(--es-ink-4);
+	opacity: 0.6;
+	cursor: default;
+	flex: none;
+}
+
+/* ---------- botón "Menu" + hamburguesa (mobile) ---------- */
+
+.es-nav__menu-btn {
+	display: none; /* solo mobile (ver breakpoint) */
+	align-items: center;
+	gap: 10px;
+	min-height: 44px;
+	padding: 6px 4px 6px 12px;
+	margin-right: -4px;
+	background: none;
+	border: 0;
+	cursor: pointer;
+	color: var(--es-ink) !important;
+	transition: color 0.15s ease;
+}
+
+/* estados del botón Menu: cue verde, fondo/borde transparentes en TODOS los
+   estados para que un `button:hover`/`button:focus` de Kadence no lo pinte
+   (nunca azul). El anillo verde de foco lo da :focus-visible (base.css).
+   !important en todos los estados — mismo refuerzo que el resto del chrome. */
+.es-nav__menu-btn:hover,
+.es-nav__menu-btn:focus,
+.es-nav__menu-btn:focus-visible,
+.es-nav__menu-btn:active {
+	color: var(--es-accent) !important;
+	background: none;
+	border: 0;
+	box-shadow: none;
+}
+
+.es-nav__menu-label {
+	font-family: var(--es-mono);
+	font-size: 12px;
+	font-weight: 500;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+}
+
+/* hamburguesa de 2 líneas que morfa a X cuando aria-expanded="true" */
+.es-burger {
+	position: relative;
+	display: inline-block;
+	width: 22px;
+	height: 14px;
+	flex: none;
+}
+
+.es-burger span {
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 1.6px;
+	background: currentColor;
+	border-radius: 2px;
+	transition: transform 0.28s var(--es-ease), top 0.28s var(--es-ease);
+}
+
+.es-burger span:nth-child(1) {
+	top: 3px;
+}
+
+.es-burger span:nth-child(2) {
+	top: 9.4px;
+}
+
+[aria-expanded='true'] .es-burger span:nth-child(1) {
+	top: 6.2px;
+	transform: rotate(45deg);
+}
+
+[aria-expanded='true'] .es-burger span:nth-child(2) {
+	top: 6.2px;
+	transform: rotate(-45deg);
+}
+
+/* breakpoint del nav: colapsa a "Menu" */
+@media (max-width: 919px) {
+	.es-nav__links,
+	.es-nav__lang,
+	.es-nav__toggle {
+		display: none;
+	}
+	.es-nav__menu-btn {
+		display: inline-flex;
+	}
+}
+
+/* ---------- mobile menu (overlay) ---------- */
+
+.es-mobile-menu {
+	position: fixed;
+	inset: 0;
+	z-index: 70; /* debajo del header (80): el botón queda visible y morfa a X */
+	background: var(--es-paper);
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+	opacity: 0;
+	transition: opacity 0.28s var(--es-ease);
+}
+
+.es-mobile-menu[hidden] {
+	display: none;
+}
+
+.es-menu-open .es-mobile-menu {
+	opacity: 1;
+}
+
+.es-mobile-menu__panel {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	padding-top: 66px; /* deja ver la barra del header (logo + X) */
+	transform: translateY(10px);
+	transition: transform 0.3s var(--es-ease);
+}
+
+.admin-bar .es-mobile-menu__panel {
+	padding-top: 98px;
+}
+
+.es-menu-open .es-mobile-menu__panel {
+	transform: none;
+}
+
+.es-mobile-menu__links {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 8px;
+	padding-top: 24px;
+	padding-bottom: 24px;
+}
+
+.es-mobile-menu__link {
+	display: flex;
+	align-items: baseline;
+	gap: 16px;
+	padding: 14px 0;
+	font-family: var(--es-serif);
+	font-size: clamp(32px, 9vw, 40px);
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	/* !important: este color viene regresando en azul por reglas de Kadence
+	   fuera de nuestro control (link/visited color del Customizer). Este fue
+	   el primer link donde se detectó (ver nota abajo) — Sprint 4C extendió
+	   el mismo refuerzo !important a todo el chrome desktop/footer, no solo acá. */
+	color: var(--es-ink) !important;
+	text-decoration: none;
+	border-bottom: 1px solid var(--es-line);
+	transition: color 0.18s ease;
+	/* micro-animación de entrada (stagger) */
+	opacity: 0;
+	transform: translateY(10px);
+}
+
+.es-menu-open .es-mobile-menu__link {
+	opacity: 1;
+	transform: none;
+	transition: color 0.18s ease, opacity 0.32s var(--es-ease), transform 0.32s var(--es-ease);
+}
+
+.es-menu-open .es-mobile-menu__link:nth-child(1) { transition-delay: 0s, 0.06s, 0.06s; }
+.es-menu-open .es-mobile-menu__link:nth-child(2) { transition-delay: 0s, 0.11s, 0.11s; }
+.es-menu-open .es-mobile-menu__link:nth-child(3) { transition-delay: 0s, 0.16s, 0.16s; }
+.es-menu-open .es-mobile-menu__link:nth-child(4) { transition-delay: 0s, 0.21s, 0.21s; }
+.es-menu-open .es-mobile-menu__link:nth-child(5) { transition-delay: 0s, 0.26s, 0.26s; }
+
+/* estados declarados explícitamente (incl. :active/:visited) con especificidad
+   clase+pseudo-clase Y !important.
+   Descartado por inspección de código: current-menu-item / current_page_item /
+   aria-current NO pueden ser la causa — este menú es un <a> plano armado desde
+   es_nav_links() (array PHP filtrable), nunca pasa por wp_nav_menu()/Walker,
+   así que WP no genera esas clases/atributos aquí.
+   Causa real: el :visited nativo del navegador (el link ya fue clickeado) más
+   el color "Link/Visited" que Kadence inyecta vía wp_head() — su regla es de
+   especificidad/origen desconocidos desde este repo (no tenemos el CSS de
+   Kadence en el sandbox), así que iguala con !important para no depender de
+   ganar por especificidad. Nunca azul. */
+.es-mobile-menu__link:hover,
+.es-mobile-menu__link:focus-visible,
+.es-mobile-menu__link:active {
+	color: var(--es-accent) !important;
+}
+
+.es-mobile-menu__link:visited {
+	color: var(--es-ink) !important;
+}
+
+.es-mobile-menu__link:last-child {
+	border-bottom: none;
+}
+
+.es-mobile-menu__num {
+	font-family: var(--es-mono);
+	font-size: 12px;
+	color: var(--es-accent);
+	flex: none;
+}
+
+.es-mobile-menu__foot {
+	padding: 24px 0 32px;
+	border-top: 1px solid var(--es-line);
+	font-family: var(--es-mono);
+	font-size: 12px;
+	letter-spacing: 0.12em;
+	color: var(--es-ink-4);
+}
+
+/* reduced motion: sin desplazamientos ni stagger (aparece/desaparece limpio) */
+@media (prefers-reduced-motion: reduce) {
+	.es-mobile-menu,
+	.es-mobile-menu__panel,
+	.es-mobile-menu__link {
+		transition: none !important;
+		transform: none !important;
+		opacity: 1;
+	}
+	.es-mobile-menu {
+		opacity: 1;
+	}
+}
+
+/* ---------- footer (Phase 5) ----------
+   Global footer, editorially restrained (dark, thin borders, mono meta — same
+   language as the header). Layout is a global option: three columns (default),
+   two, or compact, plus a standard/wide width and per-section visibility.
+   Reuses the site container + tokens; no cards, gradients or heavy icons. */
+
+.es-site-footer {
+	border-top: 1px solid var(--es-line);
+}
+
+.es-site-footer__inner {
+	padding-top: clamp(44px, 5vw, 64px);
+	padding-bottom: clamp(28px, 3.5vw, 40px);
+}
+
+/* wide width option (default stays the standard site container) */
+.es-site-footer--wide .es-site-footer__inner {
+	max-width: min(1320px, 92vw);
+}
+
+.es-site-footer__grid {
+	display: grid;
+	grid-template-columns: 1.4fr 1fr 1.2fr;
+	gap: clamp(28px, 5vw, 72px);
+	align-items: start;
+}
+
+/* two columns: identity spans the top, nav + contact sit below as two columns */
+.es-site-footer--two .es-site-footer__grid {
+	grid-template-columns: 1fr 1fr;
+}
+
+.es-site-footer--two .es-site-footer__col--identity {
+	grid-column: 1 / -1;
+}
+
+/* compact: a single tidy column */
+.es-site-footer--compact .es-site-footer__grid {
+	grid-template-columns: 1fr;
+	gap: clamp(18px, 3vw, 26px);
+}
+
+.es-site-footer__col {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	min-width: 0;
+}
+
+.es-site-footer__brand {
+	color: var(--es-ink-2);
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0.22em;
+}
+
+.es-site-footer__note {
+	margin: 0;
+	max-width: 34ch;
+	font-size: 13px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+}
+
+/* navigation column — vertical list, reuses the same links as the header */
+.es-site-footer__nav {
+	gap: 10px;
+}
+
+.es-site-footer__nav a {
+	width: fit-content;
+	font-size: 13.5px;
+	font-weight: 500;
+	color: var(--es-ink-3) !important;
+	text-decoration: none;
+	transition: color 0.15s ease;
+}
+
+.es-site-footer__nav a:hover,
+.es-site-footer__nav a:focus-visible,
+.es-site-footer__nav a:active {
+	color: var(--es-ink) !important;
+}
+
+.es-site-footer__nav a[aria-current='page'] {
+	color: var(--es-accent) !important;
+}
+
+.es-site-footer__nav a:visited {
+	color: var(--es-ink-3) !important;
+}
+
+/* contact + elsewhere column */
+.es-footer-contact,
+.es-footer-elsewhere {
+	display: flex;
+	flex-direction: column;
+	gap: 9px;
+}
+
+.es-footer-elsewhere {
+	margin-top: 14px;
+}
+
+.es-footer-contact__item {
+	display: inline-flex;
+	align-items: center;
+	gap: 9px;
+	width: fit-content;
+	font-size: 13.5px;
+	color: var(--es-ink-3) !important;
+	text-decoration: none;
+	transition: color 0.15s ease;
+}
+
+.es-footer-contact__item:hover,
+.es-footer-contact__item:focus-visible,
+.es-footer-contact__item:active {
+	color: var(--es-accent) !important;
+}
+
+.es-footer-contact__item:visited {
+	color: var(--es-ink-3) !important;
+}
+
+/* the two line icons stay secondary to the text; ≤2px nudge on hover (§13) */
+.es-footer-contact__icon {
+	flex: none;
+	color: var(--es-ink-4);
+	transition: transform 0.18s var(--es-ease), color 0.15s ease;
+}
+
+.es-footer-contact__item:hover .es-footer-contact__icon,
+.es-footer-contact__item:focus-visible .es-footer-contact__icon {
+	color: var(--es-accent);
+	transform: translateX(2px);
+}
+
+.es-footer-elsewhere a {
+	width: fit-content;
+	font-size: 13.5px;
+	color: var(--es-ink-3) !important;
+	text-decoration: none;
+	transition: color 0.15s ease;
+}
+
+.es-footer-elsewhere a:hover,
+.es-footer-elsewhere a:focus-visible,
+.es-footer-elsewhere a:active {
+	color: var(--es-accent) !important;
+}
+
+.es-footer-elsewhere a:visited {
+	color: var(--es-ink-3) !important;
+}
+
+/* base row — location + auto-year copyright, mono meta */
+.es-site-footer__base {
+	margin-top: clamp(28px, 4vw, 44px);
+	padding-top: clamp(16px, 2vw, 20px);
+	border-top: 1px solid var(--es-line);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px 24px;
+	flex-wrap: wrap;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	color: var(--es-ink-4);
+}
+
+/* tablet: identity spans full width, nav + contact become two columns */
+@media (max-width: 900px) {
+	.es-site-footer--three .es-site-footer__grid {
+		grid-template-columns: 1fr 1fr;
+	}
+	.es-site-footer--three .es-site-footer__col--identity {
+		grid-column: 1 / -1;
+	}
+}
+
+/* mobile: single column, clean stack, logical reading order */
+@media (max-width: 600px) {
+	.es-site-footer__grid {
+		grid-template-columns: 1fr !important;
+		gap: clamp(22px, 6vw, 32px);
+	}
+	.es-site-footer__col--identity {
+		grid-column: auto !important;
+	}
+	.es-site-footer__base {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-footer-contact__icon {
+		transition: color 0.15s ease;
+	}
+	.es-footer-contact__item:hover .es-footer-contact__icon,
+	.es-footer-contact__item:focus-visible .es-footer-contact__icon {
+		transform: none;
+	}
+}

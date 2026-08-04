@@ -1,0 +1,17 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/about-teaser-portrait",
+	"title": "About teaser portrait",
+	"category": "estavillo-pages",
+	"icon": "id-alt",
+	"description": "El retrato del About teaser, leído en vivo del mismo campo que alimenta la página About (Portfolio Content → About → Portrait image URL, filtro es_home_about_portrait) — nunca dos copias de la misma imagen. Mientras el campo esté vacío renderiza el marco reservado del design system, limpio (sin marcadores de desarrollo); al cargar la URL, la imagen real aparece acá Y en la página About a la vez.",
+	"keywords": [ "estavillo", "about", "portrait", "home", "teaser" ],
+	"textdomain": "estavillo-portfolio-core",
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-pages-block-about-teaser-portrait",
+	"render": "file:./render.php"
+}

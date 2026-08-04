@@ -1,0 +1,1782 @@
+/* =========================================================================
+   ESTAVILLO — Single Case Study
+   -------------------------------------------------------------------------
+   Sprint 4B + 4C + 4D + mega sprint (hero options + breadcrumbs). Solo se
+   carga en single-es_case_study.php. Reusa el chrome de site.css y los
+   tokens de tokens.css — ningún color ni tipografía nuevos acá, solo
+   nuevos selectores aplicando las mismas variables --es-*.
+
+   Estructura del archivo:
+   1. Índice sticky (.es-case-index)           — fuera de the_content()
+   2. Hero del caso (.es-case__*)               — fuera de the_content()
+      Sprint 4D: grilla editorial de 2 columnas en desktop
+      (.es-case__hero-content izquierda / .es-case__hero-media derecha),
+      1 columna apilada en mobile (<1000px). Texto siempre alineado a la
+      izquierda, nunca centrado. Mega sprint: 3 variantes opt-in vía clase
+      modificadora (.es-case__hero--split-left / --compact / --stacked),
+      seleccionables por caso ("Hero layout" en el meta box) — el default
+      'split-right' es exactamente el markup/CSS de Sprint 4D sin cambios.
+   3. Prose por defecto (.es-case__body h2...) — dentro de the_content()
+   4. Librería de clases .es-case-* (sección, stats, timeline, decisiones,
+      quote, status, details, browser chrome, etc.) — para USAR dentro del
+      editor nativo de WordPress. Ver README para instrucciones y ejemplos.
+      Suma en esta sprint: aspect-ratio para placeholders de figura sin
+      imagen todavía (.es-case-figure .es-placeholder) — resto sin cambios.
+
+   Inspirado visualmente en el case study de referencia REstimator (Dark) —
+   reimplementado desde cero acá como CSS propio del design system
+   ESTAVILLO, no copiado. El runtime de la referencia (support.js) nunca se
+   usa ni se enqueuea en el sitio.
+
+   Presupuestador × REstimator adaptation: suma 2 componentes nuevos al
+   final del archivo — .es-case-ladder (secuencia de etapas) y
+   .es-case-taxonomy (raíz + grilla de variables + modificadores) — mismo
+   criterio de siempre: solo tokens --es-* existentes, opt-in, sin JS.
+   ========================================================================= */
+
+/* Breadcrumbs (.es-breadcrumbs) — movidos a site.css en el sprint de
+   infra/polish: se usan en 5 templates (Case Study + Work/About/How I
+   Work/Contact), no solo acá, así que viven en el CSS de chrome
+   compartido en vez de en este archivo Case-Study-only. Ver site.css. */
+
+/* ---------- índice sticky en-página (opcional, manual) ---------- */
+
+.es-case-index {
+	position: sticky;
+	top: 66px;
+	z-index: 40; /* por debajo del header (80) y del overlay del menú (70) */
+	background: color-mix(in srgb, var(--es-paper) 90%, transparent);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+	border-bottom: 1px solid var(--es-line);
+}
+
+.admin-bar .es-case-index {
+	top: 98px;
+}
+
+@media (max-width: 782px) {
+	.admin-bar .es-case-index {
+		top: 112px;
+	}
+}
+
+.es-case-index__inner {
+	max-width: var(--es-max-w);
+	margin: 0 auto;
+	padding: 0 var(--es-pad-x);
+	display: flex;
+	gap: 2px;
+	overflow-x: auto;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+/* mobile: tira horizontal scrolleable, liviana — sin scrollbar visible */
+.es-case-index__inner::-webkit-scrollbar {
+	display: none;
+	height: 0;
+}
+
+.es-case-index__link {
+	flex: none;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	letter-spacing: 0.04em;
+	white-space: nowrap;
+	color: var(--es-ink-3) !important;
+	text-decoration: none;
+	padding: 12px 11px;
+	border-bottom: 2px solid transparent;
+	transition: color var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease;
+}
+
+/* nunca azul — mismo refuerzo !important que el resto del chrome (site.css) */
+.es-case-index__link:hover,
+.es-case-index__link:focus-visible,
+.es-case-index__link:active {
+	color: var(--es-ink) !important;
+	border-bottom-color: var(--es-accent);
+}
+
+.es-case-index__link:visited {
+	color: var(--es-ink-3) !important;
+}
+
+/* ---------- hero del caso: grilla editorial 2 columnas en desktop ----------
+   Izquierda: eyebrow/título/extracto/tags, texto siempre alineado a la
+   izquierda (nunca centrado). Derecha: imagen destacada o placeholder.
+   Mobile (<1000px): una sola columna apilada, imagen debajo del texto.
+
+   La metadata del proyecto (Status/Role/Period/Tools) YA NO vive acá
+   adentro — es un bloque hermano después de que esta grilla cierra (ver
+   .es-case__meta-wrap más abajo, y el comentario en el template). Antes
+   vivía dentro de .es-case__hero-content: en mobile eso significaba que
+   el orden real del DOM era texto→METADATA→imagen, así que la imagen
+   quedaba después de todo el bloque técnico. Sacarla de acá es lo que
+   arregla ese orden, estructuralmente — no un truco de CSS. */
+
+.es-case__hero {
+	display: grid;
+	grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+	/* center (no 'start'): con un extracto largo, el texto queda más alto
+	   que el marco de imagen (aspect-ratio fijo) — centrar reparte el
+	   espacio sobrante arriba/abajo de la imagen en vez de amontonarlo
+	   todo debajo, que es lo que se leía "raro". Aplica a las 4 variantes. */
+	align-items: center;
+	gap: clamp(40px, 6vw, 88px);
+	text-align: left;
+}
+
+.es-case__hero-content {
+	max-width: 560px;
+}
+
+@media (max-width: 999px) {
+	.es-case__hero {
+		grid-template-columns: 1fr;
+		gap: clamp(28px, 6vw, 40px);
+	}
+
+	.es-case__hero-content {
+		max-width: none;
+	}
+
+	/* Las 3 opciones de Hero text width (Editorial/Wide/Full) son una
+	   decisión de DESKTOP — en mobile "diferentes medidas angostas" no
+	   tienen sentido (el ticket lo pide explícito): siempre el ancho
+	   normal de contenido mobile, sin importar cuál esté elegida. Sin
+	   este reset, .es-lead (base.css) le seguiría poniendo max-width:46ch
+	   al extracto acá, más angosto que la columna real en un mobile/
+	   tablet grande (~600-680px) — la misma "columna angosta huérfana"
+	   del bug original, sólo que en mobile en vez de en full-width. */
+	.es-case__excerpt {
+		max-width: none;
+	}
+}
+
+.es-case__kicker {
+	margin-bottom: 18px;
+}
+
+.es-case__title {
+	margin-bottom: 22px;
+}
+
+.es-case__excerpt {
+	margin-bottom: 20px;
+}
+
+.es-case__tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 28px;
+}
+
+/* ---------- metadata del proyecto: bloque propio después de la imagen ----------
+   Ya no es hija del hero — ver el comentario arriba de .es-case__hero y el
+   del template. Mismo container que el hero (--es-max-w, vía .es-container
+   en el propio .es-case__meta-wrap), para que el borde izquierdo siga
+   alineado con el título/imagen de arriba en vez de saltar al ancho del
+   cuerpo del caso.
+
+   Desktop: 3 columnas en el orden real del DOM (Status/Role/Period), con
+   Tools ocupando su propia fila completa abajo — no una grilla 4-up ni
+   2×2 teóricamente simétrica, a propósito: Tools es sistemáticamente el
+   campo más largo (una lista de herramientas), y en una columna de 1/4 o
+   1/2 de ancho se ve desproporcionado frente a Status/Role/Period, que
+   son cortos. Con una fila propia a ancho completo, envuelve prolijo sin
+   importar cuántas herramientas tenga la lista. Si falta algún campo
+   (Status/Role/Period son todos opcionales) el resto simplemente se
+   corre a la izquierda — grid-column en vez de grid-template-areas, así
+   no depende de que las 4 claves existan siempre. */
+
+.es-case__meta-wrap {
+	margin: clamp(28px, 4vw, 44px) auto clamp(40px, 5.5vw, 64px);
+}
+
+.es-case__meta {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 22px 32px;
+	margin: 0;
+	border-top: 1px solid var(--es-line);
+	padding-top: 24px;
+}
+
+.es-case__meta-item--tools {
+	grid-column: 1 / -1;
+}
+
+.es-case__meta-item dt {
+	font-family: var(--es-mono);
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+	margin-bottom: 4px;
+}
+
+.es-case__meta-item dd {
+	margin: 0;
+	font-size: 14px;
+	color: var(--es-ink-2);
+}
+
+/* mobile: una columna, cada entrada separada por un divisor sutil (no un
+   hueco enorme) — la primera no lleva borde/padding arriba, ya tiene el
+   de .es-case__meta justo encima. */
+@media (max-width: 999px) {
+	.es-case__meta {
+		grid-template-columns: 1fr;
+		gap: 16px;
+	}
+
+	.es-case__meta-item--tools {
+		grid-column: auto;
+	}
+
+	.es-case__meta-item {
+		padding-top: 14px;
+		border-top: 1px solid var(--es-line);
+	}
+
+	.es-case__meta-item:first-child {
+		padding-top: 0;
+		border-top: 0;
+	}
+}
+
+/* ---------- media (imagen destacada o placeholder): columna derecha del hero ---------- */
+
+.es-case__media {
+	margin: 0;
+	border-radius: var(--es-radius);
+	overflow: hidden;
+	border: 1px solid var(--es-line);
+}
+
+.es-case__hero-media .es-case__media {
+	aspect-ratio: 4 / 5;
+}
+
+.es-case__media img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.es-case__placeholder {
+	aspect-ratio: 16 / 9;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--es-paper-2);
+}
+
+@media (max-width: 999px) {
+	.es-case__hero-media .es-case__media {
+		aspect-ratio: 4 / 3;
+	}
+}
+
+/* ---------- variantes de hero (opt-in, "Hero layout" en el meta box) ----------
+   'split-right' (default) no tiene clase — es el bloque de arriba, sin
+   cambios. TODO lo de acá abajo vive adentro de min-width:1000px a
+   propósito (no solo el reorder): un modificador de una sola clase tiene
+   la MISMA especificidad que la regla mobile de .es-case__hero de arriba,
+   así que si viviera sin media query terminaría ganando por orden de
+   aparición en el archivo y rompiendo el apilado mobile. Adentro del
+   min-width la colisión no puede pasar — mobile SIEMPRE queda
+   texto-primero-imagen-después sin importar la variante, estructuralmente,
+   no por especificidad. */
+
+@media (min-width: 1000px) {
+	/* imagen a la izquierda, texto a la derecha */
+	.es-case__hero--split-left {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+	}
+
+	.es-case__hero--split-left .es-case__hero-content {
+		order: 2;
+	}
+
+	.es-case__hero--split-left .es-case__hero-media {
+		order: 1;
+	}
+
+	/* imagen horizontal compacta (más corta, no intenta igualar la altura
+	   de un extracto largo) — sirve tanto de variante propia como de
+	   opción para casos con mucho texto en el hero */
+	.es-case__hero--compact .es-case__hero-media .es-case__media {
+		aspect-ratio: 16 / 10;
+	}
+
+	/* apilado a ancho completo en desktop también: texto primero, imagen
+	   ancha debajo — mismo criterio visual que mobile pero elegido a
+	   propósito, no por falta de espacio */
+	.es-case__hero--stacked {
+		grid-template-columns: 1fr;
+	}
+
+	.es-case__hero--stacked .es-case__hero-content {
+		order: 1;
+		max-width: none;
+	}
+
+	.es-case__hero--stacked .es-case__hero-media {
+		order: 2;
+	}
+
+	.es-case__hero--stacked .es-case__hero-media .es-case__media {
+		aspect-ratio: 21 / 9;
+	}
+}
+
+/* ---------- ancho de texto del hero (opt-in, "Hero text width" en el meta box) ----------
+   Independiente del layout de imagen de arriba — se combina con
+   cualquiera de las 4 variantes. 'editorial' no necesita reglas propias
+   (es exactamente el default de .es-case__hero-content, 560px, y el
+   max-width:46ch heredado de .es-lead para el extracto): sigue
+   emitiéndose como clase por prolijidad/uniformidad, pero no hay nada
+   que sobreescribir.
+
+   IMPORTANTE — orden en el archivo: este bloque va DESPUÉS de las
+   variantes de layout de arriba a propósito. .es-case__hero--stacked ya
+   le saca el max-width a .es-case__hero-content con la MISMA
+   especificidad (dos clases) que las reglas de acá abajo — si
+   'stacked' + 'editorial' se combinan, la de acá (más tardía en el
+   archivo) tiene que ganar para que 'editorial' realmente angoste el
+   texto de vuelta. Si este bloque viviera arriba de las variantes,
+   'stacked' ganaría siempre por orden de aparición y 'editorial' nunca
+   podría angostar un hero apilado. */
+
+@media (min-width: 1000px) {
+	/* Sí hace falta esta regla, aunque el VALOR sea igual al default sin
+	   clase: .es-case__hero--stacked .es-case__hero-content ya le pone
+	   max-width:none con la misma especificidad (dos clases) — sin este
+	   override explícito, 'stacked' + 'editorial' combinados ganaban
+	   siempre por 'stacked' (aparece antes en el archivo), y "Editorial"
+	   dejaba de angostar nada en un hero apilado. Confirmado con el
+	   harness: sin esta regla, content quedaba en 1044px en vez de 560. */
+	.es-case__hero--text-editorial .es-case__hero-content {
+		max-width: 560px;
+	}
+
+	.es-case__hero--text-wide .es-case__hero-content {
+		max-width: none;
+	}
+
+	/* ~65-75% de un container de 1140px son ~740-855px; 65ch a este
+	   tamaño de fuente ronda los 520-580px — más angosto que ese cálculo
+	   puramente numérico, pero es la medida que de verdad se sigue
+	   leyendo como un párrafo editorial en vez de una franja de texto
+	   corrida de punta a punta. En un hero split (donde .es-case__hero-
+	   content ya es sólo la mitad del container) el grid track manda de
+	   todos modos vía minmax(0, …) — este tope nunca fuerza overflow. */
+	.es-case__hero--text-wide .es-case__excerpt {
+		max-width: 65ch;
+	}
+
+	.es-case__hero--text-full .es-case__hero-content {
+		max-width: none;
+	}
+
+	/* Full container: el título/tags SÍ van de punta a punta (ya lo hacen
+	   solos en cuanto se libera hero-content, .es-h1 no tiene max-width
+	   propio). El resumen puede — el ticket lo permite explícito — seguir
+	   usando una medida de lectura, más generosa que 'wide', mientras
+	   arranque en el mismo borde izquierdo que el título: nunca un
+	   remanente angosto de la grilla split, sólo una decisión editorial
+	   consciente. */
+	.es-case__hero--text-full .es-case__excerpt {
+		max-width: 75ch;
+	}
+}
+
+/* ---------- prose: contenido del editor estándar (the_content()) ----------
+
+   Sistema editorial de anchos (corrección de alineación — ver más abajo):
+   - El body del caso comparte el MISMO container que el resto de la
+     página: --es-max-w (1140px), igual que header, hero, Case Index y
+     breadcrumbs. Nada usa un ancho de container distinto.
+   - El texto de lectura suelto (párrafos, listas, blockquotes, headings,
+     captions, quotes, details) se limita a una medida legible:
+     --es-case-measure (820px ≈ 75–80 caracteres a 15.5px) — compat con
+     los bodies Custom HTML existentes.
+   - Los componentes anchos (figura, browser frame, stats, ladder,
+     taxonomy, decisions, status, timeline) pueden usar el ancho completo
+     del container.
+   - El bloque case-section suma tres controles de capítulo (Width:
+     Content/Reading/Wide, Chapter spacing, Chapter divider) — ver el
+     bloque de reglas "Sistema editorial del bloque Case Section" más
+     abajo. Content y Wide son el mismo ancho completo (sin tope de
+     medida); solo Reading limita el CAPÍTULO ENTERO a ~72ch. La
+     composición interna (texto+figura lado a lado, comparaciones, etc.)
+     es responsabilidad de los bloques Columns/Column NATIVOS de
+     Gutenberg — este archivo no define ninguna grilla propia para eso,
+     a propósito (corrección de arquitectura: una grilla de 12 columnas
+     con regiones fijas resultó demasiado rígida en uso real). */
+
+/* Corrección de alineación: .es-container--case existió brevemente con
+   max-width: 1320px (spec "Grid System v1"), MÁS ANCHO que el resto del
+   sitio. En uso real eso desalineaba el body del caso contra el header,
+   el hero, el Case Index y las breadcrumbs — los cuatro siguen usando
+   var(--es-max-w) — corriendo el borde izquierdo del body ~90px a la
+   izquierda del borde del hero de arriba. La clase queda acá (el
+   template todavía la aplica) pero ahora es un alias explícito del
+   mismo ancho que el chrome del sitio — un solo container, un solo
+   borde, en toda la página. Si en el futuro un artefacto necesita
+   genuinamente más ancho, esa debe ser una decisión explícita y acotada
+   a ese componente, no un cambio de container a nivel página. */
+.es-container--case {
+	max-width: var(--es-max-w);
+}
+
+.es-case__body {
+	--es-case-measure: 820px;
+	--es-case-gutter: 32px;
+	margin-top: clamp(48px, 6vw, 88px);
+	font-size: 15.5px;
+	line-height: 1.75;
+	color: var(--es-ink-2);
+}
+
+@media (max-width: 781px) {
+	.es-case__body {
+		--es-case-gutter: 24px;
+	}
+}
+
+/* texto de lectura a medida legible: hijos directos del body (posts de
+   Gutenberg "planos", compat hacia atrás) y de cada sección */
+.es-case__body > p,
+.es-case__body > ul,
+.es-case__body > ol,
+.es-case__body > blockquote,
+.es-case__body .es-case-section > p,
+.es-case__body .es-case-section > ul,
+.es-case__body .es-case-section > ol,
+.es-case__body .es-case-section > blockquote {
+	max-width: var(--es-case-measure);
+}
+
+.es-case__body > * + * {
+	margin-top: 1.4em;
+}
+
+.es-case__body h2,
+.es-case__body h3 {
+	font-family: var(--es-serif);
+	font-weight: 500;
+	letter-spacing: -0.012em;
+	color: var(--es-ink);
+	margin-top: 2em;
+	/* headings genéricos también a medida de lectura; .es-case-heading
+	   tiene su propio 20ch (regla más específica, gana sobre esta) */
+	max-width: var(--es-case-measure);
+}
+
+.es-case__body h2 {
+	font-size: clamp(24px, 2.6vw, 30px);
+}
+
+.es-case__body h3 {
+	font-size: clamp(19px, 2vw, 22px);
+}
+
+/* h4: small structural sub-label (e.g. "Goals"/"Frustrations" inside the
+   Persona pattern) — not covered by the h2/h3 rule above, so it was
+   falling through to whatever un-tokenized heading color the parent
+   Kadence theme sets globally (tuned for a light background), reading as
+   low-contrast on this system's dark --es-paper surface. Sans, not
+   serif, and deliberately smaller than h2/h3: this is a short label
+   above 2-3 list items, not an editorial chapter heading. --es-ink (not
+   --es-accent) on purpose — a neutral, equally-weighted label for BOTH
+   Goals and Frustrations, no green/red good/bad pairing implied. */
+.es-case__body h4 {
+	font-family: var(--es-sans);
+	font-weight: 600;
+	font-size: 14px;
+	letter-spacing: 0.01em;
+	color: var(--es-ink);
+	margin-top: 1.5em;
+	margin-bottom: 0;
+}
+
+.es-case__body p {
+	margin: 0;
+}
+
+.es-case__body ul,
+.es-case__body ol {
+	padding-left: 1.3em;
+	margin: 0;
+}
+
+.es-case__body li + li {
+	margin-top: 0.5em;
+}
+
+/* verde de identidad, subrayado — nunca azul en ningún estado, incl.
+   :active/:visited (!important, mismo refuerzo que el resto del chrome —
+   ver site.css). Cubre cualquier link que el editor cree dentro del body,
+   incluidos los que vengan de .es-case-quote, tablas, etc. */
+.es-case__body a {
+	color: var(--es-accent) !important;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.es-case__body a:hover,
+.es-case__body a:focus-visible,
+.es-case__body a:active {
+	color: var(--es-accent) !important;
+}
+
+.es-case__body a:visited {
+	color: var(--es-accent) !important;
+}
+
+.es-case__body blockquote {
+	margin: 0;
+	padding-left: 20px;
+	border-left: 2px solid var(--es-line-strong);
+	color: var(--es-ink-3);
+	font-style: italic;
+}
+
+.es-case__body img {
+	display: block;
+	width: 100%;
+	height: auto;
+	border-radius: var(--es-radius-sm);
+}
+
+.es-case__body figcaption {
+	margin-top: 8px;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	color: var(--es-ink-4);
+}
+
+/* =========================================================================
+   Librería de clases para estructurar contenido DENTRO del editor nativo
+   -------------------------------------------------------------------------
+   Todo lo de acá abajo se usa agregando la clase CSS al bloque/elemento
+   correspondiente en el editor (bloque Group/Paragraph/Image → panel
+   Avanzado → "Clases CSS adicionales", o directo en HTML si usás el editor
+   clásico / un bloque HTML personalizado). Ver README para el detalle
+   completo y un ejemplo de caso armado con estas clases.
+   ========================================================================= */
+
+/* ---------- sección / capítulo ---------- */
+
+.es-case__body .es-case-section {
+	border-top: 1px solid var(--es-line);
+	padding-top: clamp(48px, 6vw, 88px);
+	margin-top: clamp(48px, 6vw, 88px);
+}
+
+.es-case__body .es-case-section:first-child {
+	border-top: 0;
+	padding-top: 0;
+	margin-top: 0;
+}
+
+/* =========================================================================
+   Sistema editorial del bloque Case Section (corrección de arquitectura)
+   -------------------------------------------------------------------------
+   Historia: una versión anterior envolvía reading/split en una grilla CSS
+   propia de 12 columnas con regiones fijas Contenido/Media. En uso real
+   sobre WordPress resultó demasiado rígida (forzaba el contenido a áreas
+   angostas predefinidas) y — el bug real — un selector heredado de la
+   librería de prosa de más abajo (`.es-case-section > p`, sin restricción
+   de modificador) le ponía max-width:820px a CUALQUIER párrafo hijo
+   directo de la sección sin importar el layout elegido: un capítulo
+   "Content" con un párrafo suelto a ancho completo quedaba angosto contra
+   el borde izquierdo con un hueco vacío a la derecha.
+
+   Esta versión no tiene grilla propia. case-section solo controla tres
+   cosas a nivel CAPÍTULO — la composición interna (texto+figura lado a
+   lado, comparaciones, etc.) es 100% bloques Columns/Column NATIVOS de
+   Gutenberg. Su comportamiento responsive imita el de WordPress core
+   (mismo breakpoint, 782px) pero SÍ está reimplementado acá — ver el
+   bloque "Columns/Column nativos de Gutenberg" más abajo para el porqué
+   (el template standalone no encola wp-block-library):
+
+   - es-case-section--content (default): ancho completo del padre, SIN
+     tope de medida — el override de abajo cancela el cap heredado para
+     hijos directos. "Wide" (valor legacy, ver más abajo) renderiza
+     idéntico: render.php lo normaliza a --content, así que esta es la
+     ÚNICA clase de ancho completo que este archivo necesita conocer.
+   - es-case-section--reading: el CAPÍTULO ENTERO (label/heading/lead +
+     contenido) se limita a ~72ch — la única variante que angosta prosa.
+   - es-case-section--sp-{compact,standard,spacious}: espacio total entre
+     capítulos (96/120/144px), sin cambios respecto de la versión anterior.
+   - es-case-section--no-divider: oculta la línea divisoria de arriba (el
+     spacing no cambia, solo la línea).
+
+   Anidamiento (corrección de compatibilidad): un Case Section puede vivir
+   directo en el body del caso O adentro de un Column/Group/Row/Stack
+   nativo de Gutenberg (p. ej. Columns 40/60 con Case Section en una
+   columna y Case Figure/Decisions en la otra). "ancho completo" siempre
+   significa el ancho completo del PADRE INMEDIATO, nunca del viewport ni
+   del container de la página (--es-max-w) — por eso NINGUNA regla de acá
+   usa vw, % absoluto a la página, ni auto-margins de re-posicionamiento.
+   La regla base de abajo (width/max-width/min-width) es lo que hace que "ancho
+   completo del padre" sea cierto tanto en el body como adentro de una
+   columna angosta: sin min-width:0 un hijo con contenido intrínsecamente
+   ancho (p. ej. la grilla de Case Decisions) puede forzar a la columna
+   flex a crecer más de lo asignado — eso es lo que se veía en WordPress
+   real como "las columnas se apilan" o "Case Section se escapa de su
+   columna". */
+
+.es-case__body .es-case-section {
+	width: 100%;
+	max-width: 100%;
+	min-width: 0;
+}
+
+.es-case__body .es-case-section--reading {
+	/* min(): 72ch directo en el body (ancho de sobra), pero nunca más
+	   ancho que el padre cuando ese padre es una columna angosta — sin
+	   esto, un Case Section Reading en una columna de 33% pediría 72ch
+	   igual, empujando el layout de columnas. */
+	max-width: min(72ch, 100%);
+}
+
+/* el fix original (sprint de corrección de ancho): cancela el cap de
+   820px de la librería de prosa (más arriba en este archivo) para hijos
+   directos de un capítulo Content — ese cap sigue aplicando tal cual a
+   HTML manual/Custom HTML (sin esta clase) y a los capítulos Reading (ya
+   limitados por el max-width del punto anterior, más angosto). Mismo
+   nivel de especificidad que la regla original (2 clases + 1 elemento):
+   gana por orden de aparición, más tarde en el archivo — se repite acá
+   con :is() por prolijidad/robustez ante reordenamientos. */
+.es-case__body .es-case-section--content > :is(p, ul, ol, blockquote, h2, h3) {
+	max-width: none;
+}
+
+/* ---------- spacing presets: espacio TOTAL entre capítulos ---------- */
+
+.es-case__body .es-case-section--sp-compact {
+	--es-case-chapter: 96px;
+}
+
+.es-case__body .es-case-section--sp-standard {
+	--es-case-chapter: 120px;
+}
+
+.es-case__body .es-case-section--sp-spacious {
+	--es-case-chapter: 144px;
+}
+
+.es-case__body .es-case-section--sp-compact,
+.es-case__body .es-case-section--sp-standard,
+.es-case__body .es-case-section--sp-spacious {
+	margin-top: calc(var(--es-case-chapter) / 2);
+	padding-top: calc(var(--es-case-chapter) / 2);
+}
+
+.es-case__body .es-case-section--no-divider {
+	border-top: 0;
+}
+
+/* ---------- Columns/Column nativos de Gutenberg dentro de un capítulo ----------
+   Fallback de compatibilidad (sprint de auditoría de CSS de columnas):
+   el template standalone de Case Study encola solo tokens/base/layout/
+   components/site/case-study — NUNCA wp-block-library — así que estas
+   reglas NO pueden asumir que el CSS de Columns de WordPress core esté
+   presente en el front. Confirmado con computed styles reales (sin
+   ningún CSS inyectado a mano): sin este bloque, .wp-block-columns
+   calcula display:block y las columnas quedan apiladas siempre, con o
+   sin ratio, incluso en desktop — el `gap` que ya existía acá era inerte
+   porque nunca hubo display:flex/grid para activarlo.
+
+   Este bloque reimplementa SOLO lo esencial de Columns/Column, scopeado
+   a .es-case__body para no tocar Kadence ni ningún otro Columns del
+   sitio: flex en dos ejes, min-width:0 para que las columnas puedan
+   achicarse sin forzar overflow/wrap, y el breakpoint de apilado de
+   core (782px) reproducido con el mismo número. flex-grow queda en 1
+   (no en 0) a propósito: así una columna SIN ratio explícito (ningún
+   atributo "width" en el bloque Column) sigue repartiéndose el espacio
+   50/50 con su vecina — exactamente el comportamiento nativo de
+   Gutenberg — mientras que una columna CON flex-basis inline (40%, 60%,
+   etc., emitido por el editor) conserva ese ratio intacto: flex-grow no
+   pisa un flex-basis ya explícito en el mismo elemento, solo decide
+   cómo repartir el espacio SOBRANTE cuando el total de bases no llena
+   el contenedor. */
+
+.es-case__body .wp-block-columns {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: normal;
+	gap: var(--es-case-gutter);
+}
+
+.es-case__body .wp-block-column {
+	flex-grow: 1;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+@media (max-width: 781px) {
+	.es-case__body .wp-block-columns {
+		flex-wrap: wrap;
+	}
+
+	.es-case__body .wp-block-column {
+		flex-basis: 100% !important;
+	}
+}
+
+.es-case__body .wp-block-column :is(p, ul, ol, blockquote, h2, h3) {
+	max-width: none;
+}
+
+/* figuras Wide: sangran al borde del viewport en mobile (independiente del
+   ancho del capítulo que las contiene) */
+@media (max-width: 767px) {
+	.es-case__body .es-case-figure--wide {
+		margin-left: calc(-1 * var(--es-pad-x));
+		margin-right: calc(-1 * var(--es-pad-x));
+	}
+
+	.es-case__body .es-case-figure--wide .es-placeholder,
+	.es-case__body .es-case-figure--wide img {
+		border-radius: 0;
+	}
+
+	.es-case__body .es-case-figure--wide figcaption {
+		padding-left: var(--es-pad-x);
+		padding-right: var(--es-pad-x);
+	}
+}
+
+.es-case__body .es-case-label {
+	display: block;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--es-accent);
+	margin: 0 0 16px;
+}
+
+.es-case__body .es-case-heading {
+	font-family: var(--es-serif);
+	font-weight: 500;
+	font-size: clamp(26px, 3.6vw, 42px);
+	line-height: 1.08;
+	letter-spacing: -0.015em;
+	color: var(--es-ink);
+	margin: 0 0 20px;
+	max-width: 20ch;
+}
+
+.es-case__body .es-case-lead {
+	font-family: var(--es-serif);
+	font-weight: 400;
+	font-size: clamp(18px, 2vw, 23px);
+	line-height: 1.5;
+	color: var(--es-ink-2);
+	max-width: 58ch;
+	margin: 0 0 clamp(28px, 3.5vw, 40px);
+}
+
+/* ---------- bloque de dos columnas (texto/imagen) ---------- */
+
+.es-case__body .es-case-cols {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: clamp(28px, 4vw, 56px);
+	align-items: start;
+	margin: clamp(28px, 3.5vw, 40px) 0;
+}
+
+@media (max-width: 767px) {
+	.es-case__body .es-case-cols {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ---------- figura + caption ---------- */
+
+.es-case__body .es-case-figure {
+	margin: clamp(28px, 3.5vw, 40px) 0;
+}
+
+/* variante "standard" del bloque case-figure: figura que acompaña al texto,
+   limitada a la medida de lectura. Sin la clase (o con --wide), la figura
+   usa el ancho completo del container — igual que siempre. */
+.es-case__body .es-case-figure--standard {
+	max-width: var(--es-case-measure);
+}
+
+.es-case__body .es-case-figure img {
+	border: 1px solid var(--es-line);
+	border-radius: var(--es-radius);
+}
+
+/* placeholder de imagen todavía no subida, usado dentro de una figura del
+   editor: sin este aspect-ratio el marco quedaría colapsado a la altura
+   del tag "{asset: ...}" en vez de leerse como un espacio reservado. */
+.es-case__body .es-case-figure .es-placeholder {
+	aspect-ratio: 16 / 9;
+}
+
+.es-case__body .es-case-caption {
+	display: flex;
+	gap: 12px;
+	align-items: baseline;
+	margin-top: 12px;
+	font-family: var(--es-mono);
+	font-size: 11.5px;
+	line-height: 1.55;
+	color: var(--es-ink-3);
+	max-width: var(--es-case-measure);
+}
+
+.es-case__body .es-case-caption__tag {
+	flex: none;
+	color: var(--es-accent);
+}
+
+/* ---------- marco tipo browser chrome (screenshot con barra de título) ---------- */
+
+.es-case__body .es-case-browser {
+	border: 1px solid var(--es-line);
+	border-radius: var(--es-radius);
+	overflow: hidden;
+	background: var(--es-surface);
+}
+
+.es-case__body .es-case-browser__bar {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	height: 36px;
+	padding: 0 14px;
+	background: var(--es-surface-2);
+	border-bottom: 1px solid var(--es-line-strong);
+}
+
+.es-case__body .es-case-browser__dot {
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	background: var(--es-line-strong);
+	display: block;
+}
+
+.es-case__body .es-case-browser__label {
+	margin-left: 10px;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	color: var(--es-ink-3);
+}
+
+.es-case__body .es-case-browser img {
+	border: 0;
+	border-radius: 0;
+}
+
+/* placeholder dentro de un marco browser chrome, cuando la captura todavía
+   no está subida — mismo motivo que .es-case-figure .es-placeholder de
+   arriba: sin esto el marco colapsa a la altura del tag de texto. */
+.es-case__body .es-case-browser .es-placeholder {
+	aspect-ratio: 16 / 10;
+	border: 0;
+}
+
+/* ---------- grilla de stats ---------- */
+
+.es-case__body .es-case-stats {
+	display: grid;
+	/* auto-fit: cualquier cantidad de stats llena la fila completa — con el
+	   viejo repeat(4, 1fr) fijo, 3 stats dejaban un panel vacío a la derecha */
+	grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+	gap: 1px;
+	background: var(--es-line);
+	border: 1px solid var(--es-line);
+	margin: clamp(28px, 3.5vw, 40px) 0;
+}
+
+.es-case__body .es-case-stat {
+	background: var(--es-paper-2);
+	padding: 22px 20px;
+}
+
+.es-case__body .es-case-stat__num {
+	font-family: var(--es-mono);
+	font-size: clamp(24px, 3vw, 32px);
+	font-weight: 500;
+	letter-spacing: -0.02em;
+	color: var(--es-ink);
+	line-height: 1;
+}
+
+.es-case__body .es-case-stat__label {
+	font-size: 12.5px;
+	line-height: 1.45;
+	color: var(--es-ink-3);
+	margin-top: 10px;
+}
+
+@media (max-width: 767px) {
+	.es-case__body .es-case-stats {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+/* ---------- timeline vertical ---------- */
+
+.es-case__body .es-case-timeline {
+	list-style: none;
+	margin: clamp(28px, 3.5vw, 40px) 0;
+	padding: 0;
+}
+
+.es-case__body .es-case-timeline__item {
+	position: relative;
+	padding: 0 0 22px 28px;
+	border-left: 1px solid var(--es-line-strong);
+	margin-left: 4px;
+}
+
+.es-case__body .es-case-timeline__item:last-child {
+	padding-bottom: 0;
+}
+
+.es-case__body .es-case-timeline__item::before {
+	content: '';
+	position: absolute;
+	left: -5px;
+	top: 4px;
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	background: var(--es-accent);
+}
+
+.es-case__body .es-case-timeline__title {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--es-ink);
+	max-width: 66ch;
+}
+
+.es-case__body .es-case-timeline__text {
+	font-size: 13.5px;
+	color: var(--es-ink-3);
+	margin-top: 3px;
+	/* el riel de la timeline puede ocupar el container completo, pero las
+	   líneas de texto se cortan a medida legible */
+	max-width: 66ch;
+}
+
+/* ---------- decision cards (hallazgo → decisión de diseño) ----------
+   Cada card es un razonamiento en dos pasos, no una fila de tabla: antes
+   el hallazgo y la decisión compartían un único <dl> de dos columnas
+   (auto 1fr — label angosta a la izquierda, texto a la derecha), así que
+   "Hallazgo" y "Decisión de diseño" quedaban con el mismo peso visual y
+   el párrafo se leía angosto. Ahora son dos <dl> independientes,
+   apilados verticalmente, con un conector entre ambos — el hallazgo se
+   ve como evidencia (label apagada), la decisión se ve como la acción
+   resultante (label en acento, borde izquierdo sutil). El mismo cambio
+   de layout aplica a cualquier instancia del bloque (incluida la de
+   Presupuestador con sus propias etiquetas Task/Reviewed by) — es una
+   corrección de jerarquía, no contenido específico de un caso. */
+
+.es-case__body .es-case-decisions {
+	display: grid;
+	/* 2×2 para las 4 cards típicas de este bloque — compacto y fácil de
+	   escanear, en vez de auto-fit estirando 3-4 cards angostas en una
+	   sola fila. Con un número impar de items (3, Presupuestador) el
+	   último queda solo en su fila, que sigue siendo legible. */
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1px;
+	background: var(--es-line);
+	border: 1px solid var(--es-line);
+	margin: clamp(28px, 3.5vw, 40px) 0;
+}
+
+.es-case__body .es-case-decision {
+	background: var(--es-paper-2);
+	padding: clamp(24px, 2.6vw, 32px);
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	transition: box-shadow var(--es-dur-fast) var(--es-ease);
+}
+
+/* Con un número impar de items (Presupuestador, 3) la última card queda
+   sola en la segunda fila: sin esta regla, la celda vacía de al lado
+   mostraba el fondo --es-line del grid como si fuera una card en blanco
+   rota. :last-child:nth-child(odd) matchea sólo cuando el último item
+   es también el impar final de una fila de a 2 — se estira a todo el
+   ancho en vez de dejar un hueco. Con un total par (4, Trazur) nunca
+   aplica, la grilla 2×2 queda intacta. */
+.es-case__body .es-case-decision:last-child:nth-child(odd) {
+	grid-column: 1 / -1;
+}
+
+.es-case__body .es-case-decision__head {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.es-case__body .es-case-decision__num {
+	font-family: var(--es-mono);
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--es-accent);
+}
+
+.es-case__body .es-case-decision__title {
+	font-family: var(--es-serif);
+	font-weight: 500;
+	font-size: 18px;
+	line-height: 1.25;
+	color: var(--es-ink);
+	margin: 0;
+}
+
+.es-case__body .es-case-decision__pair {
+	margin: 0;
+	font-size: 13.5px;
+	line-height: 1.6;
+	max-width: 46ch;
+}
+
+.es-case__body .es-case-decision__pair dt {
+	font-family: var(--es-mono);
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	margin: 0 0 6px;
+}
+
+.es-case__body .es-case-decision__pair dd {
+	margin: 0;
+}
+
+/* hallazgo — evidencia: label apagada, texto secundario */
+.es-case__body .es-case-decision__pair--finding dt {
+	color: var(--es-ink-4);
+}
+
+.es-case__body .es-case-decision__pair--finding dd {
+	color: var(--es-ink-3);
+}
+
+/* decisión — la acción resultante: label en acento, texto más fuerte que
+   el hallazgo, borde izquierdo sutil (nunca una superficie rellena — eso
+   se vería como un botón/CTA, no como texto). */
+.es-case__body .es-case-decision__pair--decision {
+	padding-left: 12px;
+	border-left: 2px solid var(--es-accent);
+}
+
+.es-case__body .es-case-decision__pair--decision dt {
+	color: var(--es-accent);
+}
+
+.es-case__body .es-case-decision__pair--decision dd {
+	color: var(--es-ink-2);
+}
+
+/* conector — línea corta con una punta hacia abajo, deliberadamente
+   chico: la jerarquía ya la dan las etiquetas/colores, esto es sólo el
+   gesto "de acá sale esto". Puramente decorativo (aria-hidden en el
+   render), así que no interrumpe la lectura hallazgo → decisión de un
+   lector de pantalla, que ya la tiene por el orden real del DOM. */
+.es-case__body .es-case-decision__connector {
+	position: relative;
+	width: 1px;
+	height: 18px;
+	margin-left: 2px;
+	background: var(--es-line-strong);
+	transition: background-color var(--es-dur-fast) var(--es-ease);
+}
+
+.es-case__body .es-case-decision__connector::after {
+	content: '';
+	position: absolute;
+	left: 50%;
+	bottom: -1px;
+	transform: translateX(-50%);
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	border-top: 5px solid var(--es-line-strong);
+	transition: border-top-color var(--es-dur-fast) var(--es-ease);
+}
+
+/* hover + foco de teclado (card es tabindex="0", mismo patrón que
+   .es-hobby-item / .es-findings__row): refuerza el borde de la card y
+   resalta el conector — nada se mueve, nada se oculta, todo el
+   contenido ya estaba visible. El anillo de foco es el token global
+   (base.css, [tabindex]:focus-visible); acá sólo se agrega el realce. */
+.es-case__body .es-case-decision:hover,
+.es-case__body .es-case-decision:focus-visible {
+	box-shadow: inset 0 0 0 1px var(--es-line-strong);
+}
+
+.es-case__body .es-case-decision:hover .es-case-decision__connector,
+.es-case__body .es-case-decision:focus-visible .es-case-decision__connector {
+	background: var(--es-accent);
+}
+
+.es-case__body .es-case-decision:hover .es-case-decision__connector::after,
+.es-case__body .es-case-decision:focus-visible .es-case-decision__connector::after {
+	border-top-color: var(--es-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-case__body .es-case-decision,
+	.es-case__body .es-case-decision__connector,
+	.es-case__body .es-case-decision__connector::after {
+		transition: none;
+	}
+}
+
+@media (max-width: 767px) {
+	.es-case__body .es-case-decisions {
+		grid-template-columns: 1fr;
+	}
+
+	.es-case__body .es-case-decision__pair {
+		max-width: none;
+	}
+}
+
+/* ---------- findings list (ícono / herramienta / hallazgo) ----------
+   Reemplaza la tabla de dos columnas que se usaba para evidencia de
+   investigación: una tabla no tiene una historia responsive real —
+   columnas ínfimas, "Synthetic Users" partido en dos líneas, mobile con
+   scroll horizontal o texto microscópico. Esto es una lista (<ul>/<li>),
+   grilla de tres columnas en desktop (ícono / herramienta / hallazgo,
+   grid-template-areas para no depender de orden de columnas en el
+   markup) y apilada en mobile — la MISMA fila, sólo reacomodada. */
+
+.es-case__body .es-findings {
+	margin: clamp(28px, 3.5vw, 40px) 0;
+}
+
+.es-case__body .es-findings__title {
+	font-family: var(--es-serif);
+	font-weight: 500;
+	font-size: clamp(19px, 2.2vw, 23px);
+	line-height: 1.3;
+	color: var(--es-ink);
+	margin: 0 0 8px;
+}
+
+.es-case__body .es-findings__subtitle {
+	font-size: 14.5px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+	max-width: 62ch;
+	margin: 0 0 clamp(18px, 2vw, 26px);
+}
+
+.es-case__body .es-findings__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.es-case__body .es-findings__row {
+	display: grid;
+	grid-template-columns: 64px minmax(200px, 28%) 1fr;
+	grid-template-areas: "icon tool finding";
+	align-items: center;
+	column-gap: 28px;
+	padding: 22px 4px;
+	border-bottom: 1px solid var(--es-line);
+	border-radius: var(--es-radius-sm);
+	transition: background-color var(--es-dur-fast) var(--es-ease), border-color var(--es-dur-fast) var(--es-ease);
+}
+
+.es-case__body .es-findings__row:first-child {
+	border-top: 1px solid var(--es-line);
+}
+
+/* fila sin ícono: la columna del ícono directamente no existe, para que
+   el nombre de la herramienta no quede esperando detrás de un gutter
+   vacío (en vez de esconder el elemento y dejar el hueco en la grilla). */
+.es-case__body .es-findings__row--no-icon {
+	grid-template-columns: minmax(200px, 28%) 1fr;
+	grid-template-areas: "tool finding";
+}
+
+.es-case__body .es-findings__icon {
+	grid-area: icon;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	color: var(--es-ink-3);
+	transition: color var(--es-dur-fast) var(--es-ease);
+}
+
+.es-case__body .es-findings__icon svg {
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+
+.es-case__body .es-findings__tool {
+	grid-area: tool;
+	font-family: var(--es-sans);
+	font-weight: 600;
+	font-size: 15px;
+	line-height: 1.4;
+	color: var(--es-ink);
+}
+
+.es-case__body .es-findings__finding {
+	grid-area: finding;
+	margin: 0;
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+	max-width: 62ch;
+}
+
+/* hover + foco de teclado (fila entera es tabindex="0", mismo patrón que
+   .es-hobby-item): fondo apenas más claro y acento verde en ícono +
+   nombre de la herramienta — nunca solo color, el fondo/borde ya cambian
+   también. El anillo de foco es el token global (base.css, [tabindex]
+   :focus-visible) — acá sólo se agrega el acento de color, sin redeclarar
+   el outline. */
+.es-case__body .es-findings__row:hover,
+.es-case__body .es-findings__row:focus-visible {
+	background: var(--es-paper-2);
+	border-color: var(--es-line-strong);
+}
+
+.es-case__body .es-findings__row:hover .es-findings__icon,
+.es-case__body .es-findings__row:focus-visible .es-findings__icon,
+.es-case__body .es-findings__row:hover .es-findings__tool,
+.es-case__body .es-findings__row:focus-visible .es-findings__tool {
+	color: var(--es-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-case__body .es-findings__row,
+	.es-case__body .es-findings__icon {
+		transition: none;
+	}
+}
+
+/* mobile: la MISMA fila se apila (ícono + nombre arriba, hallazgo
+   debajo) — nunca una tabla de tres columnas comprimida. */
+@media (max-width: 767px) {
+	.es-case__body .es-findings__row {
+		grid-template-columns: 28px 1fr;
+		grid-template-areas:
+			"icon tool"
+			"finding finding";
+		column-gap: 12px;
+		row-gap: 8px;
+		padding: 18px 2px;
+	}
+
+	.es-case__body .es-findings__row--no-icon {
+		grid-template-columns: 1fr;
+		grid-template-areas:
+			"tool"
+			"finding";
+	}
+
+	.es-case__body .es-findings__finding {
+		max-width: none;
+	}
+}
+
+/* ---------- quote / pullquote ---------- */
+
+.es-case__body .es-case-quote {
+	margin: clamp(28px, 3.5vw, 40px) 0;
+	padding: clamp(24px, 3vw, 32px) clamp(26px, 3.5vw, 40px);
+	border-left: 3px solid var(--es-accent);
+	background: var(--es-paper-2);
+	/* contenido de lectura: a medida, no a container completo */
+	max-width: var(--es-case-measure);
+}
+
+.es-case__body .es-case-quote p {
+	font-family: var(--es-serif);
+	font-weight: 400;
+	font-size: clamp(19px, 2.2vw, 25px);
+	line-height: 1.4;
+	color: var(--es-ink);
+	margin: 0;
+	max-width: 42ch;
+}
+
+.es-case__body .es-case-quote cite {
+	display: block;
+	margin-top: 14px;
+	font-style: normal;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	color: var(--es-ink-4);
+}
+
+/* ---------- grilla de status (verde = resuelto, naranja = atención —
+   mismos dos tokens semánticos que el resto del sistema, ningún color
+   nuevo: --es-accent y --es-decision) ---------- */
+
+.es-case__body .es-case-status {
+	display: grid;
+	/* 2 columnas (el componente es un par done/attention): con el viejo
+	   repeat(4, 1fr), dos columnas ocupaban solo la mitad izquierda del
+	   marco y la otra mitad quedaba como panel vacío */
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1px;
+	background: var(--es-line);
+	border: 1px solid var(--es-line);
+	margin: clamp(28px, 3.5vw, 40px) 0;
+}
+
+.es-case__body .es-case-status__col {
+	background: var(--es-paper-2);
+}
+
+.es-case__body .es-case-status__head {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	padding: 15px 18px;
+	border-bottom: 1px solid var(--es-line);
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--es-ink);
+}
+
+.es-case__body .es-case-status__head::before {
+	content: '';
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	background: var(--es-ink-4);
+	flex: none;
+}
+
+.es-case__body .es-case-status__col--done .es-case-status__head::before {
+	background: var(--es-accent);
+}
+
+.es-case__body .es-case-status__col--attention .es-case-status__head::before {
+	background: var(--es-decision);
+}
+
+.es-case__body .es-case-status__list {
+	list-style: none;
+	margin: 0;
+	padding: 16px 18px;
+	display: grid;
+	gap: 12px;
+}
+
+.es-case__body .es-case-status__list li {
+	position: relative;
+	padding-left: 16px;
+	font-size: 13.5px;
+	line-height: 1.5;
+	color: var(--es-ink-2);
+}
+
+.es-case__body .es-case-status__list li::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 8px;
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: var(--es-ink-4);
+}
+
+@media (max-width: 767px) {
+	.es-case__body .es-case-status {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ---------- details / accordion (nativo, sin JS) ---------- */
+
+.es-case__body .es-case-details {
+	margin: clamp(24px, 3vw, 32px) 0;
+	border: 1px solid var(--es-line);
+	background: var(--es-paper-2);
+	/* contenido de lectura: a medida, no a container completo */
+	max-width: var(--es-case-measure);
+}
+
+.es-case__body .es-case-details summary {
+	list-style: none;
+	cursor: pointer;
+	padding: 18px 22px;
+	font-family: var(--es-mono);
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--es-ink-2);
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	letter-spacing: 0.02em;
+}
+
+.es-case__body .es-case-details summary::-webkit-details-marker {
+	display: none;
+}
+
+.es-case__body .es-case-details summary::before {
+	content: '+';
+	color: var(--es-accent);
+	font-size: 16px;
+	width: 14px;
+	flex: none;
+	transition: transform 0.2s ease;
+}
+
+.es-case__body .es-case-details[open] summary::before {
+	transform: rotate(45deg);
+}
+
+.es-case__body .es-case-details__body {
+	padding: 6px 22px 24px;
+	border-top: 1px solid var(--es-line);
+}
+
+.es-case__body .es-case-details__body > * + * {
+	margin-top: 1.2em;
+}
+
+/* =========================================================================
+   Presupuestador × REstimator (Claude Design reference) adaptation
+   -------------------------------------------------------------------------
+   Two additive components, used the first time by the Presupuestador
+   master content (docs/content/presupuestador-case-study-{en,es}.html).
+   Same rules as every other entry in this library: only --es-* tokens, no
+   new colors/fonts, opt-in classes that do nothing unless used, no JS
+   (both are static — the existing global scroll-reveal in motion.js
+   already wraps the whole .es-case__body, and neither component animates
+   on its own, so prefers-reduced-motion has nothing to disable here).
+   ========================================================================= */
+
+/* ---------- stage ladder: a horizontal sequence of process/phase chips,
+   e.g. "diagnosis → documented criteria → MVP → ... → adoption" ---------- */
+
+.es-case__body .es-case-ladder {
+	list-style: none;
+	margin: clamp(28px, 3.5vw, 40px) 0;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px 0;
+}
+
+.es-case__body .es-case-ladder__step {
+	font-family: var(--es-mono);
+	font-size: 12px;
+	letter-spacing: 0.02em;
+	color: var(--es-ink-2);
+	background: var(--es-paper-2);
+	border: 1px solid var(--es-line);
+	padding: 8px 14px;
+	white-space: nowrap;
+}
+
+.es-case__body .es-case-ladder__step:not(:last-child)::after {
+	content: '→';
+	display: inline-block;
+	margin-left: 14px;
+	color: var(--es-ink-4);
+}
+
+/* current stage: same "active/on" semantics used everywhere else in the
+   system — --es-accent (green). Orange (--es-decision) stays reserved for
+   a single decision/focus moment per view, not a pipeline position. */
+.es-case__body .es-case-ladder__step--active {
+	color: var(--es-ink);
+	background: var(--es-accent-soft);
+	border-color: var(--es-accent-dim);
+	font-weight: 500;
+}
+
+/* completed stage (bloque case-ladder, estado "completed"): tilde con el
+   mismo token de acento — sin colores nuevos. El estado "future" es el
+   chip base, sin modificador. */
+.es-case__body .es-case-ladder__step--done::before {
+	content: '✓';
+	display: inline-block;
+	margin-right: 8px;
+	color: var(--es-accent);
+}
+
+@media (max-width: 767px) {
+	.es-case__body .es-case-ladder__step {
+		font-size: 11.5px;
+		padding: 7px 12px;
+	}
+}
+
+/* ---------- taxonomy: a root label + a grid of variable/category cards +
+   an optional "adjusted by" modifier row underneath ---------- */
+
+.es-case__body .es-case-taxonomy {
+	background: var(--es-surface);
+	border: 1px solid var(--es-line);
+	padding: clamp(20px, 2.6vw, 30px);
+	margin: clamp(28px, 3.5vw, 40px) 0;
+}
+
+.es-case__body .es-case-taxonomy__root {
+	display: inline-flex;
+	align-items: center;
+	font-family: var(--es-sans);
+	font-weight: 600;
+	font-size: 15px;
+	color: var(--es-ink);
+	background: var(--es-surface-2);
+	border: 1px solid var(--es-line-strong);
+	padding: 10px 16px;
+	margin-bottom: 22px;
+}
+
+.es-case__body .es-case-taxonomy__grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 10px;
+}
+
+.es-case__body .es-case-taxonomy__item {
+	background: var(--es-surface-2);
+	border: 1px solid var(--es-line);
+	padding: 13px 14px;
+}
+
+.es-case__body .es-case-taxonomy__item-title {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--es-ink);
+}
+
+.es-case__body .es-case-taxonomy__item-meta {
+	font-family: var(--es-mono);
+	font-size: 10px;
+	letter-spacing: 0.02em;
+	color: var(--es-ink-4);
+	margin-top: 5px;
+}
+
+.es-case__body .es-case-taxonomy__mods {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 18px;
+	align-items: start;
+	border-top: 1px dashed var(--es-line-strong);
+	margin-top: 22px;
+	padding-top: 22px;
+}
+
+.es-case__body .es-case-taxonomy__mods-label {
+	font-family: var(--es-mono);
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+	padding-top: 6px;
+	line-height: 1.5;
+}
+
+.es-case__body .es-case-taxonomy__mods-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.es-case__body .es-case-taxonomy__tag {
+	font-size: 12.5px;
+	color: var(--es-ink-2);
+	background: var(--es-surface-2);
+	border: 1px solid var(--es-line);
+	padding: 6px 11px;
+}
+
+@media (max-width: 767px) {
+	.es-case__body .es-case-taxonomy__grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.es-case__body .es-case-taxonomy__mods {
+		grid-template-columns: 1fr;
+		gap: 8px;
+	}
+}
+
+/* =========================================================================
+   Phase 0 — reusable Patterns (second-pass architecture review)
+   -------------------------------------------------------------------------
+   Three additive, opt-in rules for the three Patterns registered in the
+   plugin (Case Study — Persona / Comparison Table / Callout Panel; see
+   docs/DECISIONS.md for why these are Patterns, not new blocks). Same
+   rule as everything else in this file: only --es-* tokens, nothing
+   global, nothing that changes an existing component. The Persona pattern
+   needs no new CSS at all — it's built entirely from things already
+   styled above (case-figure, headings, lists, case-quote, Columns).
+   ========================================================================= */
+
+/* ---------- native Table (Comparison Table pattern) ----------
+   wp-block-library's own Table CSS never loads on this standalone
+   template — same reason Columns needed its own scoped fallback earlier
+   in this file. A bare <table> would have no visual structure and, at
+   several columns of prose, get crushed illegibly on narrow screens.
+   This reimplements only the essentials: a token-based header/border
+   treatment, and — per the pattern's own requirement — a horizontal-
+   scroll fallback (min-width on the table + overflow-x on its wrapper)
+   instead of shrinking text below a readable size. figcaption is already
+   covered by the generic .es-case__body figcaption rule above; no
+   table-specific duplicate needed. */
+
+.es-case__body .wp-block-table {
+	margin: clamp(28px, 3.5vw, 40px) 0;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+/* Editor-only: undo the horizontal-scroll rule above. CSS overflow is
+   linked per-axis — an element can't compute overflow-x:auto while
+   overflow-y stays "visible" (confirmed against real Chromium computed
+   styles), so the rule above also makes this element clip vertically,
+   not just scroll horizontally. That's the correct trade-off on the
+   frontend (a table wider than the viewport must go somewhere), but the
+   editor doesn't need it — editors work on real screens, not the
+   narrow-mobile case this exists for — and an unnecessary scroll/clip
+   container is one more thing that COULD interact badly with the block
+   toolbar's "Edit table" popover (row/column insert/delete — see the
+   README "Patterns Phase 0" section for exactly where that lives).
+   Removing it here costs nothing and rules that out entirely. */
+.editor-styles-wrapper .es-case__body .wp-block-table {
+	overflow: visible;
+}
+
+.es-case__body .wp-block-table table {
+	width: 100%;
+	min-width: 560px;
+	border-collapse: collapse;
+}
+
+.es-case__body .wp-block-table th,
+.es-case__body .wp-block-table td {
+	padding: 12px 16px;
+	border: 1px solid var(--es-line);
+	text-align: left;
+	vertical-align: top;
+	font-size: 13.5px;
+	line-height: 1.5;
+	color: var(--es-ink-2);
+}
+
+.es-case__body .wp-block-table th {
+	font-family: var(--es-sans);
+	font-weight: 600;
+	font-size: 12.5px;
+	color: var(--es-ink);
+	background: var(--es-surface-2);
+}
+
+/* ---------- callout panel (Callout Panel pattern) ----------
+   Background/border deliberately a class, not the Group block's native
+   Color panel: this theme has no theme.json palette mapping --es-*
+   tokens as selectable editor colors, so the panel would only offer
+   generic defaults or an arbitrary custom hex by default — this class
+   supplies a sensible token-based default instead. The native Color
+   panel is NOT disabled by this — it's a normal, unmodified core/group,
+   so an editor can still pick a custom background color from the block's
+   own Inspector controls; WordPress emits that as an inline
+   `style="background-color:…"` on the same element, which — by ordinary
+   CSS cascade (inline style beats a class selector) — automatically
+   overrides this default without any extra code.
+
+   max-width: bug fix — this used to match .es-case-quote/.es-case-details
+   (var(--es-case-measure), 820px), on the theory that a callout should
+   read as "reading width" like those two. Real-world testing showed
+   that reads as broken/constrained-left instead, especially inside a
+   full-width Case Section: unlike a quote or an accordion, a callout is
+   a full block-level panel, not inline reading prose, so it should fill
+   whatever container (case body, Case Section, or a Gutenberg Column)
+   it's placed in — full width of the immediate parent, same as
+   .es-case-taxonomy/.es-case-stats/.es-case-decisions/.es-case-status
+   below. */
+
+.es-case__body .es-case-callout {
+	background: var(--es-paper-2);
+	border: 1px solid var(--es-line);
+	padding: clamp(22px, 2.6vw, 30px);
+	margin: clamp(28px, 3.5vw, 40px) 0;
+	max-width: 100%;
+}
+
+.es-case__body .es-case-callout > * + * {
+	margin-top: 0.9em;
+}
+
+.es-case__body .es-case-callout .es-case-label {
+	margin-bottom: 0;
+}
+
+/* ---------- Checkmark List block style variation ----------
+   Registered via register_block_style('core/list', …) in the child theme
+   (inc/block-styles.php) — this is the CSS half only; the style
+   registration is what makes "Checkmark List" appear as an opt-in picker
+   option instead of changing every list. --es-accent (not a hardcoded
+   green) so it follows the Customizer accent switch like every other
+   checkmark glyph in this file (see .es-case-ladder__step--done above). */
+
+.es-case__body ul.is-style-checkmark {
+	list-style: none;
+	padding-left: 0;
+}
+
+.es-case__body ul.is-style-checkmark > li {
+	position: relative;
+	padding-left: 26px;
+}
+
+.es-case__body ul.is-style-checkmark > li::before {
+	content: '✓';
+	position: absolute;
+	left: 0;
+	top: 0;
+	color: var(--es-accent);
+	font-weight: 600;
+}
+
+/* list-style is inherited — without this reset, a nested list would
+   silently lose its own bullets/numbers too (inheriting "none" from the
+   checkmark parent) instead of just staying a normal nested list. */
+.es-case__body ul.is-style-checkmark li > ul {
+	list-style: disc;
+	margin-top: 0.5em;
+	padding-left: 1.3em;
+}
+
+.es-case__body ul.is-style-checkmark li > ol {
+	list-style: decimal;
+	margin-top: 0.5em;
+	padding-left: 1.3em;
+}

@@ -1,0 +1,248 @@
+<!--
+  ESTAVILLO — Case Study content: "Workshop Quoting System" (Presupuestador,
+  Guzmán Villalba) — EN, Gutenberg block edition
+  ============================================================================
+  HOW TO USE THIS FILE
+  ----------------------------------------------------------------------------
+  1. In wp-admin, create/open the English Case Study post (Case Studies
+     → Add New, or its Polylang translation — see
+     docs/content/workshop-quoting-system-fields-en.md for field values
+     and exact publishing order).
+  2. Open the block editor. Click the "⋮" (Options) menu → "Code editor"
+     (or press Ctrl+Shift+Alt+M / Cmd+Shift+Alt+M). Paste EVERYTHING
+     below the end of this instructional comment into the code editor.
+  3. Switch back to "Visual editor" from the same Options menu. WordPress
+     parses the pasted text into real, editable blocks — Case Section,
+     Columns, Case Figure, Case Taxonomy, Case Timeline, Case Decisions,
+     Case Status, Case Details, plus native Paragraph/Heading/List. If a
+     block ever shows "This block contains unexpected or invalid
+     content," that's a paste issue (partial paste, or an editor
+     auto-correction) — re-paste the whole block from this file, don't
+     hand-edit the recovered HTML.
+  4. Native fields (title, excerpt, tags, eyebrow, status, role, tools,
+     period, Case Index) are separate from this content — see
+     docs/content/workshop-quoting-system-fields-en.md for the exact
+     recommended values.
+  5. This is a content-production update of the case, superseding the
+     "App Alpha" narrative in the older presupuestador-case-study-en.html
+     draft and its Gutenberg pattern equivalent. It reflects the real
+     product state as of this update: a responsive V1 is deployed on
+     Vercel, the core quoting flow works end to end, and calibration with
+     the workshop's estimator (Guzmán) is ongoing. Do not reintroduce
+     "Alpha," "prototype," or unverified adoption/accuracy numbers when
+     editing this file further.
+  6. Every image is a real, replaceable Case Figure block with a
+     `{asset: ...}` placeholder label — select the block in the editor
+     and use "Replace" to swap in a real screenshot once one exists (see
+     the field sheet's image checklist). Nothing here is a fake/hardcoded
+     screenshot.
+  7. A short list of claims that still need the project owner's
+     confirmation before this goes live is called out at the end of
+     docs/content/workshop-quoting-system-fields-en.md — read that before
+     publishing, not just this file.
+  ============================================================================
+-->
+
+<!-- wp:estavillo/case-section {"anchor":"overview","label":"Fig. 00 — Overview","heading":"A quote that depended on one person's head, turned into criteria that can be written down, questioned, and improved.","lead":"Presupuestador is a production-ready decision-support and quoting system built for Guzmán Villalba, a custom metal-fabrication workshop in Montevideo. What began as one estimator's undocumented pricing judgment is now a structured decision framework — one that traveled from a Google Sheets model to a responsive V1 product, deployed and in real use, while a possible V2 for larger, project-based quotations stays a documented direction, not a built feature."} -->
+<!-- wp:estavillo/case-ladder {"steps":[{"label":"Operational diagnosis","state":"done"},{"label":"Documented criteria","state":"done"},{"label":"Google Sheets MVP","state":"done"},{"label":"Responsive V1 (deployed on Vercel)","state":"done"},{"label":"Calibration & documentation","state":"active"},{"label":"V2 — project-based estimation","state":"future"}]} /-->
+
+<!-- wp:paragraph {"className":"es-case-caption"} -->
+<p class="es-case-caption">Where the project actually stands: a working V1 is live and answering real quotes today. Calibrating its pricing criteria with the workshop's estimator, and documenting the rules behind it, is ongoing work — not a finished, closed step. A V2 for larger, more complex project-based quotes is an active area of investigation, not something built yet.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"context","label":"Fig. 01 — Context","heading":"A workshop that quotes well — just slowly, and from one person's head.","layout":"reading"} -->
+<!-- wp:paragraph -->
+<p>Guzmán Villalba is a custom metal-fabrication workshop in Montevideo (internally, the project described here is called <em>Presupuestador</em>). Every job — from a one-off staircase railing to a small production run of parts — starts with a quote. For years, that quote came from one estimator's judgment: material, labor, machine time, and margin, priced from memory and experience, not from a written system.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>That worked while volume stayed manageable. Then jobs started queuing up behind one person. Someone new on the team couldn't estimate without shadowing that process for months. And because the judgment lived only in his head, it couldn't be questioned, versioned, or improved — only repeated.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>A generic, off-the-shelf pricing calculator was never going to solve this. The workshop's jobs are custom by nature — no two railings, staircases, or production runs share the same combination of material, cut complexity, finishing, and logistics. A tool that assumed standard products, standard quantities, or a fixed catalog would have ignored the exact judgment the workshop actually depends on.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"problem","label":"Fig. 02 — The operational problem","heading":"A slow quote can lose the job before any metal gets cut."} -->
+<!-- wp:paragraph -->
+<p>A client calling for a rough number needs a fast, defensible answer. If the only path is a complete formal quote — and that quote depends on one specific person having time that week — the answer arrives late, or doesn't arrive at all.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Pricing judgment wasn't written down anywhere — it lived entirely in one person's experience.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>There was no fast way to give an orientative range without building the full quote first.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Adding people to the estimating side of the business meant, in practice, that one person had to walk each of them through every case individually.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>An unanswered or delayed quote can't convert into a job — the backlog isn't just an inconvenience, it's lost work.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>At times, more than ten quotations could sit pending or unsent at once — an observed range from the workshop's day-to-day operation, not a formally tracked metric. Some share of those never needed a full formal quote in the first place: a fast, orientative range, given up front, can already show a client that a job sits outside their expected budget — without spending the time to build a detailed quote that was never going to be accepted.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><em>[Internal working estimate, not yet measured — confirm before publishing:</em> the team's informal sense is that something in the order of <strong>70%</strong> of quotes that go unanswered fall into this category — work that an early range would have filtered out before a full quote was ever built. This is a working estimate used to motivate the project, not a validated business metric, and it should either be measured properly or removed before this case goes live.<em>]</em></p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"discovery","label":"Fig. 03 — Discovery and system framing","heading":"Watching quotes get built, not just asking how they get built."} -->
+<!-- wp:paragraph -->
+<p>Interviews alone undersold how much judgment was involved — the estimator himself struggled to put his own rules into words. Shadowing several real quotes end to end surfaced the actual variables in play, and the real work of this project turned out to be documenting materials, labor units, margins, cut and fabrication complexity, finishing steps, placement/installation, and external or outsourced supplies — not designing screens. The interface came later, and was the easier part once that documentation existed.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"60%"} -->
+<div class="wp-block-column" style="flex-basis:60%"><!-- wp:paragraph -->
+<p>The clearest finding: the judgment wasn't arbitrary, it was <em>consistent but undocumented</em> — which meant it could be captured as an explicit model, rather than replaced by a generic pricing formula that would have ignored the workshop's real constraints.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"width":"40%"} -->
+<div class="wp-block-column" style="flex-basis:40%"><!-- wp:estavillo/case-figure {"variant":"standard","tag":"01","caption":"[SCREENSHOT PENDING — photo from the shadowing sessions, or synthesized research notes.]","placeholderLabel":"discovery-notes","alt":"Placeholder for discovery research photo or notes"} /--></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"system","label":"Fig. 04 — Decision model","heading":"The variables the pricing model reads."} -->
+<!-- wp:estavillo/case-figure {"variant":"browser","browserLabel":"pricing-model-diagram","placeholderLabel":"architecture-diagram","alt":"Placeholder for the pricing model diagram","caption":"[DIAGRAM PENDING — replace with the real input → pricing model → output diagram once it exists as a final asset.]"} /-->
+
+<!-- wp:paragraph -->
+<p>The same pricing logic has been read by more than one surface over time — first the Google Sheets model, now the responsive V1 product — without the underlying criteria needing to be rebuilt each time. The variables below are the ones documented so far:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:estavillo/case-taxonomy {"root":"Pricing model — the inputs it reads","items":[{"title":"Material & thickness","meta":"cost driver"},{"title":"Labor units","meta":"labor driver"},{"title":"Cut & fabrication complexity","meta":"labor driver"},{"title":"Finishing","meta":"labor driver"},{"title":"Placement & installation","meta":"logistics driver"},{"title":"External & outsourced supplies","meta":"cost driver"},{"title":"Margin","meta":"pricing driver"}],"modsLabel":"Adjusted<br>by…","mods":["Client relationship","Urgency"]} /-->
+
+<!-- wp:paragraph {"className":"es-case-caption"} -->
+<p class="es-case-caption">This represents the variables identified and documented so far — it is not a claim that the model automatically covers every kind of job the workshop takes on. Atypical or highly custom work still routes through the estimator's direct judgment (more in AI &amp; Judgment and Limitations below).</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"mvp","label":"Fig. 05 — Operational MVP","heading":"Ship the logic before the interface."} -->
+<!-- wp:paragraph -->
+<p>The first version of the pricing model lived entirely in Google Sheets with Apps Script — deliberately, so the estimator could correct and extend the logic himself without waiting on a development cycle, and so the criteria could be validated against real quotes before any dedicated interface was built.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"50%"} -->
+<div class="wp-block-column" style="flex-basis:50%"><!-- wp:estavillo/case-figure {"variant":"browser","browserLabel":"presupuestador.xlsx — pricing model v1","placeholderLabel":"mvp-sheets-screenshot","alt":"Placeholder for MVP spreadsheet screenshot"} /--></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"width":"50%"} -->
+<div class="wp-block-column" style="flex-basis:50%"><!-- wp:paragraph -->
+<p>Every quote that ran through the sheet was logged. That growing base of quotes — not a business number, but the system's own working material — made it possible to compare the model's proposed number against the estimator's own judgment, case by case, and adjust the model's weighting before moving to a dedicated interface.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
+
+<!-- wp:estavillo/case-timeline {"items":[{"title":"Run a real quote through the model","text":"Same case, two judgments side by side: the model's and the estimator's."},{"title":"Flag matches and gaps","text":"Gaps weren't averaged away or ignored — each one was reviewed to find the missing or mis-weighted variable."},{"title":"Adjust the model, not the judgment","text":"The goal was for the model to learn to explain the estimator's judgment — not the other way around."}]} /-->
+
+<!-- wp:paragraph -->
+<p>This comparison loop wasn't a round of usability testing with outside users — it was, and still is, the estimator reviewing the model's output against his own. That loop didn't stop once the Sheets model gave way to the V1 product below; it's part of how the system continues to be calibrated today (more in Current Status).</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"v1-product","label":"Fig. 06 — V1 product","heading":"From a spreadsheet only one person could drive to a responsive product the team can open from a phone, tablet, or desktop."} -->
+<!-- wp:estavillo/case-figure {"variant":"browser","browserLabel":"workshop quoting system — V1","placeholderLabel":"v1-product-screenshot","alt":"Placeholder for the V1 product screenshot","caption":"[SCREENSHOT PENDING — real V1 product screenshot, from seeded/demo data, not a live client quote.]"} /-->
+
+<!-- wp:paragraph -->
+<p>The V1 is a responsive web product, deployed on Vercel, that reads the same pricing logic validated in the Sheets MVP — the criteria weren't rewritten, only re-surfaced behind a real interface. It has been tested and confirmed working on desktop, tablet, and mobile, and the primary quoting flow — from structured input to an orientative range, through to a full quote — is implemented and functional today.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:estavillo/case-timeline {"items":[{"title":"Same model, new front door","text":"The V1 reads the same pricing model validated in Sheets — no criteria were rewritten, only re-surfaced behind a real interface."},{"title":"Guided input instead of a blank spreadsheet","text":"A short structured form replaces free-form cells, so anyone on the team — not just the original estimator — can produce a consistently structured quote."},{"title":"Fast range first, detailed quote second","text":"The product answers a client-facing \"roughly how much\" quickly, then supports building the fuller, itemized quote afterward."}]} /-->
+
+<!-- wp:paragraph -->
+<p>This is presented as a working V1, not a finished, final commercial product. Minor fixes and calibration are still in progress — see Current Status below for exactly what that means today.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"ai","label":"Fig. 07 — AI and human judgment","heading":"AI as a production and reasoning partner — not as the one setting the price.","lead":"AI tools (Claude and ChatGPT, specifically) were used in a few concrete, reviewable parts of building this project — not as an autonomous feature inside the product itself. Everything below describes how they were actually used; nothing here is a claim about the shipped V1 making automatic decisions."} -->
+<!-- wp:estavillo/case-decisions {"taskLabel":"Task","guardrailLabel":"Reviewed by","items":[{"num":"01","title":"Structuring documented criteria","task":"Turning shadowing notes and interview material into an explicit, organized set of pricing rules and variables.","guardrail":"Every rule checked and confirmed against the estimator's own judgment before being treated as final."},{"num":"02","title":"Development support for the V1","task":"Assisting with writing and debugging the code behind the responsive V1 product.","guardrail":"All logic reviewed before deployment — nothing shipped without a human review pass."},{"num":"03","title":"Drafting and organizing documentation","task":"Helping draft and structure internal documentation, and this case study itself.","guardrail":"Reviewed and corrected against the real project facts before publishing."}]} /-->
+
+<!-- wp:paragraph -->
+<p><em>Future exploration, not built:</em> ideas like AI-assisted anomaly flagging on unusual quotes, or smarter suggested ranges drawn from historical data, have come up as possible directions — most likely relevant to a future V2 rather than the current V1. These are not implemented today and are noted here only as a direction under consideration, not a feature in progress.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The system doesn't replace the workshop's estimator — it structures his judgment and puts it into operation. Fast ranges are for answering quickly and doing an early viability check; an unusual case, with conditions the documented model doesn't cover well yet, still needs the estimator's judgment before a quote is confirmed.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"status","label":"Fig. 08 — Current status","heading":"Where the system stands today.","lead":"Presupuestador is a system in real, active use — not a finished, closed product. Here's what can be said with confidence today, and what's still genuinely in progress."} -->
+<!-- wp:estavillo/case-status {"columns":[{"heading":"True today","style":"done","items":["A responsive V1 is deployed on Vercel and answers real quotes.","The primary quoting flow — structured input to orientative range to full quote — is implemented and functional.","Confirmed working on desktop, tablet, and mobile.","Pricing judgment is written down and versioned — it no longer lives only in one person's head.","Every quote that runs through the system gets logged, rather than disappearing into a conversation or a scrap of paper."]},{"heading":"Still in progress","style":"attention","items":["Pricing dimensions, measures, and criteria are still being calibrated directly with the workshop's estimator.","Documentation of workshop rules and criteria continues to evolve — it isn't a closed reference yet.","Minor fixes remain before the V1 is considered fully settled.","Unusual or atypical cases still rely on the estimator's direct judgment — there isn't enough documented history yet to cover them with confidence.","No validated business-impact numbers (response time, adoption, conversion) exist yet — see Limitations."]}]} /-->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"limitations","label":"Fig. 09 — Limitations","heading":"What the system doesn't do yet."} -->
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Complex, fully custom, or project-scale work still gets resolved primarily through the estimator's manual judgment — the documented model covers the common pattern well, not every exceptional case.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Calibration of the V1's pricing criteria with the estimator is incomplete — some dimensions and measures are still being adjusted.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Tacit workshop criteria are still being documented — not everything the estimator knows has been captured yet.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>No validated business-impact metrics exist yet — response time, adoption, or conversion improvements are not currently measured or claimed.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>The system depends on the estimator continuing to review and correct it for atypical jobs — the judgment doesn't maintain itself.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"learnings","label":"Fig. 10 — What I learned","heading":"The hard part was never the screen.","layout":"reading"} -->
+<!-- wp:paragraph -->
+<p>The real design work was making explicit a judgment that one person had never had to put into words — clear enough to write down, question, and correct. The interface was, by comparison, the easier step once that documentation existed.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>I also learned to distrust the temptation to replace expert judgment with a tidy formula: a model that ignored the workshop's real constraints — client relationship, urgency, what's actually documented versus what's still tacit — would have been simpler to build, and worse. The system had to learn from the estimator, not correct him from the outside.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Working with AI tools throughout this project reinforced the same principle from a different angle: Claude and ChatGPT were genuinely useful as a production and reasoning partner — structuring documented criteria, supporting development, helping organize documentation — but every output stayed reviewable, and nothing was presented as an autonomous decision. The interesting design problem wasn't how to automate the estimator away; it was how to move fast without letting speed quietly erode operational reliability or the trust the system depends on.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"next","label":"Fig. 11 — Next steps","heading":"Where this goes from here."} -->
+<!-- wp:estavillo/case-details {"summary":"Finish calibrating the V1"} -->
+<!-- wp:paragraph -->
+<p>Continue working directly with the workshop's estimator to calibrate pricing dimensions, measures, and criteria until the V1's output consistently matches his own judgment across the common range of jobs.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-details -->
+
+<!-- wp:estavillo/case-details {"summary":"Improve documentation and measurement"} -->
+<!-- wp:paragraph -->
+<p>Keep documenting workshop rules and tacit criteria as they surface, and put real measurement in place — starting with tracking estimated quotes against actual production outcomes — instead of relying on informal impressions.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-details -->
+
+<!-- wp:estavillo/case-details {"summary":"Track estimated vs. actual results"} -->
+<!-- wp:paragraph -->
+<p>Once enough quotes have gone through the V1, compare what was quoted against what a job actually cost and took to produce — the first real evidence base for any future claim about accuracy or business impact.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-details -->
+
+<!-- wp:estavillo/case-details {"summary":"Explore a V2 for project-based, larger-complexity quotations"} -->
+<!-- wp:paragraph -->
+<p>Investigate what a V2 would need to support larger, more complex, project-based estimation — work that doesn't fit the current item-by-item quoting model well. This is an active area of investigation only: no V2 has been built, and it is not represented anywhere in this case as an existing feature.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-details -->
+<!-- /wp:estavillo/case-section -->

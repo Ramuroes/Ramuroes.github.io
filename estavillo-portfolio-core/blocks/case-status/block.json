@@ -1,0 +1,28 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/case-status",
+	"title": "Case Status",
+	"category": "estavillo-case",
+	"icon": "columns",
+	"description": "Par de columnas de estado (.es-case-status): heading + bullets por columna, con semántica done (verde) / attention (naranja) — los dos tokens semánticos del sistema, nunca azul.",
+	"keywords": [ "estavillo", "case", "status", "resultados" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"columns": {
+			"type": "array",
+			"default": [
+				{ "heading": "", "style": "done", "items": [] },
+				{ "heading": "", "style": "attention", "items": [] }
+			],
+			"items": { "type": "object" }
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-case-block-case-status",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}

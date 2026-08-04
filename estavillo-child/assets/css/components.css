@@ -1,0 +1,576 @@
+/* =========================================================================
+   ESTAVILLO — Componentes
+   Botones, links con flecha, pills, cards, indicador "en vivo".
+   ========================================================================= */
+
+/* ---------- botón principal (outline pill con flecha) ----------
+   Sprint interaction-state fix: extendido a CUALQUIER core/button sin
+   clase dentro de .es-page (p.ej. "Descargar Póster (PDF)" de Trazur).
+   Antes de esto, ningún estilo de este design system tocaba
+   .wp-block-button__link/.wp-element-button dentro de un Case Study —
+   quedaban con el color primario por defecto de Kadence/WP (azul), sin
+   ninguna hoja que lo pisara. Es la MISMA regla, extendida — nunca un
+   tratamiento nuevo — así que un botón sin clase y un .es-btn explícito
+   (Currículum, hero) se ven y comportan idénticos. El estilo nativo
+   "Outline" de Gutenberg (.is-style-outline) resuelve al mismo look: acá
+   no existe una variante "rellena" aparte que inventar. */
+.es-btn,
+.es-page .wp-block-button__link,
+.es-page a.wp-element-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	padding: 15px 26px;
+	border: 1px solid var(--es-accent-dim);
+	border-radius: 40px;
+	background: transparent;
+	font-family: var(--es-sans);
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--es-ink) !important;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease,
+		gap 0.2s var(--es-ease);
+}
+
+/* hover y focus-visible: texto claro, borde verde, fondo verde translúcido.
+   Nunca texto azul (antes el texto heredaba el a:hover azul de Kadene).
+   Se declara el borde completo + box-shadow:none para que Kadence no meta
+   otro borde/anillo en a:hover / a:focus. !important en todos los estados
+   de link (incl. :active) — un test adversarial mostró que sin esto una
+   hoja externa agresiva podía ganar igual con especificidad clase+pseudo. */
+.es-btn:hover,
+.es-btn:focus-visible,
+.es-btn:active,
+.es-page .wp-block-button__link:hover,
+.es-page .wp-block-button__link:focus-visible,
+.es-page .wp-block-button__link:active,
+.es-page a.wp-element-button:hover,
+.es-page a.wp-element-button:focus-visible,
+.es-page a.wp-element-button:active {
+	color: var(--es-ink) !important;
+	background: var(--es-accent-soft);
+	border: 1px solid var(--es-accent);
+	box-shadow: none;
+}
+
+/* el desplazamiento de la flecha (gap) solo en hover: sin salto en foco teclado */
+.es-btn:hover {
+	gap: 18px;
+}
+
+/* el CTA conserva texto claro en todos los estados de link */
+.es-btn:link,
+.es-btn:visited,
+.es-page .wp-block-button__link:link,
+.es-page .wp-block-button__link:visited,
+.es-page a.wp-element-button:link,
+.es-page a.wp-element-button:visited {
+	color: var(--es-ink) !important;
+}
+
+.es-btn__arrow {
+	color: var(--es-accent);
+}
+
+/* foco de teclado visible incluso en un botón sin clase: mismo anillo
+   verde del resto del sitio. .es-btn ya lo hereda del selector genérico
+   ".es-page a:focus-visible" (base.css) porque .es-btn siempre vive
+   dentro de .es-page; se declara explícito acá para que no dependa de
+   esa herencia si el bloque llega a usarse fuera de ese wrapper. */
+.es-page .wp-block-button__link:focus-visible,
+.es-page a.wp-element-button:focus-visible {
+	outline: 2px solid var(--es-accent);
+	outline-offset: 3px;
+}
+
+/* Reset defensivo de los DOS niveles de wrapper (.wp-block-buttons y
+   .wp-block-button) — nunca del link. pages.css ya hace esto mismo, pero
+   sólo bajo la clase .es-btn-group (documentado ahí: "el CV mostraba dos
+   contornos visibles"); ese archivo no carga en un Case Study. Generalizado
+   acá a CUALQUIER wp:buttons dentro de .es-page para que un botón sin
+   clase (el póster) quede con la misma protección, no sólo los que ya
+   usan es-btn-group explícito. */
+.es-page .wp-block-buttons,
+.es-page .wp-block-button {
+	border: none !important;
+	background: none !important;
+	border-radius: 0 !important;
+	padding: 0 !important;
+	box-shadow: none !important;
+}
+
+/* ---------- link con flecha ----------
+   Microinteracción ESTÁNDAR (correction ticket §7): un único lenguaje para
+   todos los CTAs direccionales de la Home ("See the full process", "Read the
+   case study", "All work", "More about me", "All ways to connect", etc.),
+   copiado del CTA que ya funcionaba bien en las cards de Selected Work
+   (.es-card__cta / .es-card__arrow):
+
+     · reposo    → texto en su color normal, flecha en su posición normal;
+     · hover /
+       focus-visible → texto al verde de identidad + la flecha se desliza
+       apenas a la derecha (3px, transform — NO gap → sin salto de layout),
+       transición corta y contenida (~180ms).
+
+   La flecha es SIEMPRE una sola, generada por CSS (::after): así el copy
+   editable de Gutenberg queda texto puro (sin &rarr; ni <span> frágiles que
+   se dupliquen o se pierdan al editar) y nunca hay flecha doble. El hero se
+   excluye (su link secundario lleva un punto "vivo", no flecha — ver más
+   abajo y hero.css). */
+
+.es-link-arrow {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--es-accent) !important;
+	text-decoration: none;
+}
+
+/* la flecha generada: decorativa, acompaña al texto; lo ÚNICO que se mueve.
+   translateX (no gap) → no recalcula el layout del texto contiguo. color:
+   currentColor la ata SIEMPRE al color del texto del link → cuando el texto
+   pasa al verde en hover/focus-visible, la flecha lo hace con él (nunca queda
+   una flecha de otro color). */
+.es-link-arrow::after {
+	content: '\2192';
+	display: inline-block;
+	color: currentColor;
+	transition: transform 0.18s var(--es-ease);
+	will-change: transform;
+}
+
+.es-link-arrow:hover::after,
+.es-link-arrow:focus-visible::after {
+	transform: translateX(3px);
+}
+
+/* reduced motion: sin desplazamiento de la flecha; el color y el foco siguen
+   dando la señal de interacción (§8). */
+@media (prefers-reduced-motion: reduce) {
+	.es-link-arrow::after {
+		transition: none;
+	}
+
+	.es-link-arrow:hover::after,
+	.es-link-arrow:focus-visible::after {
+		transform: none;
+	}
+}
+
+/* verde de identidad en todos los estados interactivos (aplica a plain y quiet;
+   el REST de cada variante lo definen las reglas base). Nunca azul. Usado en
+   toda la Home (hero secundario, About, Selected Work "All work", Connect,
+   How I Work) y en el single de Case Study — !important en todos los estados
+   de link, mismo motivo que el resto del chrome (ver site.css). */
+.es-link-arrow:hover,
+.es-link-arrow:focus,
+.es-link-arrow:active {
+	color: var(--es-accent) !important;
+}
+
+.es-link-arrow:visited {
+	color: var(--es-accent) !important;
+}
+
+/* Verde consistente en hover Y focus-visible, para TODOS los CTAs con flecha
+   (plain, --quiet, .es-featured__cta) — UNA sola regla reusable, no una por
+   sección. El scope .es-page sube la especificidad a (0,3,0) para ganarle a
+   cualquier color de link definido a nivel de sección o por Kadence sin
+   depender de reglas one-off; el !important es el mismo recurso targeted que
+   ya usa el resto del chrome (Kadence emite a:hover con su propio !important,
+   ver site.css). La flecha ::after (currentColor) sigue este color. Antes el
+   verde vivía en reglas por variante a (0,2,0) y en :focus (no focus-visible),
+   así que un color de link por sección de igual/mayor peso podía dejar el
+   texto sin pasar al verde aunque la flecha sí se moviera. */
+.es-page .es-link-arrow:hover,
+.es-page .es-link-arrow:focus-visible {
+	color: var(--es-accent) !important;
+}
+
+.es-link-arrow--quiet {
+	font-weight: 500;
+	font-size: 14.5px;
+	color: var(--es-ink-2) !important;
+	transition: color var(--es-dur-fast) ease;
+}
+
+.es-link-arrow--quiet:hover,
+.es-link-arrow--quiet:focus,
+.es-link-arrow--quiet:active {
+	color: var(--es-accent) !important;
+}
+
+/* El link con flecha (primario secundario "See how I work", CTAs de sección,
+   etc.) es SIEMPRE texto inline: nunca caja, borde, pill, fondo ni box-shadow
+   en reposo/hover/focus/active — aunque Kadence intente agregarlos en a:hover /
+   a:focus. No se toca padding → sin cambio de layout. El único indicador de
+   foco es el anillo verde de :focus-visible (solo teclado, ver base.css). */
+.es-link-arrow,
+.es-link-arrow:hover,
+.es-link-arrow:focus,
+.es-link-arrow:active {
+	border: 0;
+	background: none;
+	box-shadow: none;
+	border-radius: 0;
+}
+
+.es-link-arrow--quiet:visited {
+	color: var(--es-ink-2) !important;
+}
+
+/* El hero se excluye de la flecha generada: su link secundario ("See how I
+   work") lleva un punto "vivo" (señal verde que respira), NO una flecha — el
+   bloque lo dibuja con su propio ::after de mayor especificidad, y el fallback
+   PHP usa un <span class="es-live-dot">. Sin esta regla el fallback mostraría
+   punto + flecha. */
+.es-hero .es-link-arrow::after {
+	content: none;
+}
+
+/* Featured Case CTA ("Read the case study"): usa el markup existente
+   .es-link-arrow SIN el modificador --quiet, así que heredaba el verde
+   permanente de la variante "plana" (pensada para quedar siempre verde,
+   pero no es el caso de uso correcto acá). Se corrige solo el color, sin
+   tocar el template ni la variante --quiet: reposo neutro, verde en
+   hover/foco, igual que el resto de los CTAs secundarios de Home.
+   !important por el mismo motivo que .es-mobile-menu__link (ver site.css):
+   el color de link/visited de Kadence se emite con su propio !important. */
+.es-featured__cta {
+	color: var(--es-ink-2) !important;
+}
+
+.es-featured__cta:hover,
+.es-featured__cta:focus,
+.es-featured__cta:active {
+	color: var(--es-accent) !important;
+}
+
+.es-featured__cta:visited {
+	color: var(--es-ink-2) !important;
+}
+
+/* ---------- pill de skill/tag ---------- */
+
+.es-pill {
+	display: inline-block;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	letter-spacing: 0.08em;
+	color: var(--es-ink-3);
+	border: 1px solid var(--es-line-strong);
+	border-radius: 30px;
+	padding: 8px 14px;
+}
+
+/* ---------- indicador "en vivo" (señal verde que respira) ----------
+   El punto vive en un contenedor de tamaño FIJO y solo anima opacidad.
+   Antes animaba transform:scale, lo que en un inline-flex con
+   align-items:center recalculaba el centrado de la línea en cada frame
+   y hacía "vibrar" el texto contiguo (visible sobre todo en mobile).
+   Ahora la caja no cambia de tamaño y el repintado queda contenido. */
+
+.es-live-dot {
+	position: relative;
+	display: inline-flex;
+	width: 7px;
+	height: 7px;
+	flex: none;
+	vertical-align: middle;
+}
+
+.es-live-dot::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: 50%;
+	background: var(--es-signal); /* señal viva = verde (§05) */
+	animation: es-pulse 2.6s ease-in-out infinite;
+	will-change: opacity;
+}
+
+/* solo opacidad: no toca el layout */
+@keyframes es-pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.32;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-live-dot::before {
+		animation: none;
+		opacity: 1;
+	}
+}
+
+/* ---------- card de caso ---------- */
+
+.es-card {
+	display: block;
+	text-decoration: none;
+	color: var(--es-ink) !important; /* evita que el ancla herede el azul de link de Kadence, incl. :active/:visited */
+	background: var(--es-paper-2);
+	border: 1px solid var(--es-line);
+	border-radius: var(--es-radius);
+	overflow: hidden;
+	transition: transform var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease;
+}
+
+.es-card:hover,
+.es-card:focus-visible,
+.es-card:active,
+.es-card:visited {
+	color: var(--es-ink) !important;
+}
+
+.es-card:hover {
+	transform: translateY(-2px);
+	border-color: var(--es-line-strong);
+}
+
+.es-card__media {
+	position: relative;
+	aspect-ratio: 4 / 3;
+	background: var(--es-surface);
+	border-bottom: 1px solid var(--es-line);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.es-card__media img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.es-card__body {
+	padding: 20px 22px 24px;
+}
+
+.es-card__num {
+	font-family: var(--es-mono);
+	font-size: 12px;
+	color: var(--es-accent);
+	margin-bottom: 10px;
+}
+
+.es-card__kicker {
+	font-family: var(--es-mono);
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+	margin-bottom: 12px;
+}
+
+.es-card__title {
+	font-family: var(--es-serif);
+	font-size: 24px;
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	color: var(--es-ink);
+	margin-bottom: 8px;
+}
+
+.es-card__excerpt {
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+	margin-bottom: 16px;
+}
+
+.es-card__cta {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--es-ink);
+	transition: color var(--es-dur-fast) ease;
+}
+
+/* verde solo al hover/foco de la card entera (no permanente). Nunca azul. */
+.es-card:hover .es-card__cta,
+.es-card:focus-visible .es-card__cta {
+	color: var(--es-accent);
+}
+
+/* flecha de la card: mismo lenguaje que el hero — pequeña, se desliza unos px
+   y queda verde al hover. Nada de íconos de link externo, nada azul. */
+.es-card__arrow {
+	display: inline-block;
+	transition: transform 0.2s var(--es-ease);
+	will-change: transform;
+}
+
+.es-card:hover .es-card__arrow,
+.es-card:focus-visible .es-card__arrow {
+	transform: translateX(4px);
+}
+
+/* meta row (label + kicker) para las cards de Selected Work */
+.es-card__meta {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+	margin-bottom: 12px;
+}
+
+.es-card__label {
+	font-family: var(--es-mono);
+	font-size: 10px;
+	font-weight: 500;
+	letter-spacing: 0.14em;
+	color: var(--es-accent);
+}
+
+.es-card__meta .es-card__kicker {
+	margin-bottom: 0;
+}
+
+.es-card__tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 14px 0 16px;
+}
+
+.es-card__tags .es-pill {
+	padding: 6px 12px;
+	font-size: 10px;
+	border-color: var(--es-line);
+	background: var(--es-paper-2);
+}
+
+/* card ancha: media a un lado, texto al otro */
+.es-card--wide {
+	display: grid;
+	grid-template-columns: 1.05fr 1fr;
+}
+
+.es-card--wide .es-card__media {
+	aspect-ratio: auto;
+	min-height: 250px;
+	border-bottom: none;
+	border-right: 1px solid var(--es-line);
+}
+
+.es-card--wide .es-card__body {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	padding: clamp(22px, 2.8vw, 36px);
+}
+
+.es-card--wide .es-card__title {
+	font-size: clamp(26px, 2.6vw, 32px);
+	margin-bottom: 10px;
+}
+
+.es-card--wide .es-card__excerpt {
+	font-size: 14.5px;
+	line-height: 1.65;
+	max-width: 48ch;
+}
+
+@media (max-width: 767px) {
+	.es-card--wide {
+		grid-template-columns: 1fr;
+	}
+	.es-card--wide .es-card__media {
+		min-height: 190px;
+		border-right: none;
+		border-bottom: 1px solid var(--es-line);
+	}
+}
+
+/* pill de estado "en vivo" (In progress) */
+.es-status-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--es-ink-2);
+	border: 1px solid var(--es-block-line);
+	background: var(--es-block-2);
+	border-radius: 30px;
+	padding: 8px 14px;
+}
+
+/* ---------- placeholder de asset (marco punteado con diagonales) ---------- */
+
+.es-placeholder {
+	position: relative;
+	border: 1px dashed var(--es-line-strong);
+	border-radius: var(--es-radius);
+	background: var(--es-paper-2);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+}
+
+.es-placeholder__tag {
+	position: relative;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	color: var(--es-ink-4);
+	letter-spacing: 0.06em;
+	background: var(--es-paper-2);
+	border: 1px solid var(--es-line);
+	border-radius: var(--es-radius-sm);
+	padding: 6px 10px;
+}
+
+/* ---------- reveal on scroll (motion.js agrega .es-in) ----------
+   Visible por defecto: el estado oculto SOLO se activa bajo html.es-motion,
+   una clase que motion.js agrega inmediatamente antes de empezar a observar.
+   Si el JS nunca corre (bloqueado, error, optimizador que lo difiere), nada
+   se oculta — el contenido jamás depende de JS para leerse. Este gate es el
+   fix permanente del bug "case study invisible" de producción (antes,
+   .es-reveal ocultaba incondicionalmente y el reveal podía no llegar). */
+
+html.es-motion .es-reveal {
+	opacity: 0;
+	transform: translateY(14px);
+	transition: opacity var(--es-dur) ease-out, transform var(--es-dur) ease-out;
+	transition-delay: var(--es-reveal-delay, 0ms);
+}
+
+html.es-motion .es-reveal.es-in {
+	opacity: 1;
+	transform: none;
+}
+
+/* refuerzos explícitos (redundantes con el gate, a propósito — cinturón y
+   tirantes): sin JS, con motion apagado, o con reduced motion, todo visible */
+.no-js .es-reveal,
+html.es-motion-off .es-reveal {
+	opacity: 1 !important;
+	transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html.es-motion .es-reveal,
+	.es-reveal {
+		opacity: 1 !important;
+		transform: none !important;
+		transition: none;
+	}
+}

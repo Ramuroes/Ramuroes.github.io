@@ -1,0 +1,562 @@
+/* =========================================================================
+   ESTAVILLO — Hero home
+   -------------------------------------------------------------------------
+   El system map es SIEMPRE una capa de fondo (nunca un bloque aparte):
+   - Desktop: ocupa el área derecha/fondo del hero, detrás y al costado
+     del copy. Un mask de degradado lo desvanece hacia la zona de texto.
+   - Mobile: capa absoluta detrás del texto, opacidad baja, sin empujar
+     contenido hacia abajo.
+   ========================================================================= */
+
+.es-hero {
+	position: relative;
+	overflow: hidden;
+	/* Progreso de scroll 0→1 que setea assets/js/hero-scroll.js mientras el
+	   hero está en viewport (rAF). Base 0 para que sin JS / con reduced
+	   motion el hero quede totalmente visible y estático. */
+	--es-hero-progress: 0;
+}
+
+/* transición suave hacia la sección siguiente: la constelación se disuelve en
+   el papel (sin borde duro). No toca el motor ni el layout del hero. */
+.es-hero::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: clamp(90px, 14vh, 170px);
+	background: linear-gradient(to bottom, transparent, var(--es-paper));
+	pointer-events: none;
+	z-index: 0;
+}
+
+/* ---------- capa visual (SVG inyectado por hero-system-map.js) ----------
+   .es-hero__bg envuelve la capa visual: SIEMPRE la misma caja de fondo
+   (absolute inset:0, z-index:0), en STANDARD y en PARALLAX. En modo PARALLAX
+   (desktop) esta capa se ancla con un transform contra-scroll (no sticky, no
+   background-attachment:fixed — ver §2–4 más abajo), pero sigue siendo un
+   hijo absoluto recortado por el overflow:hidden del hero. El JS sigue
+   inyectando el SVG en .es-hero__visual[data-es-hero-map], sin cambios. */
+.es-hero__bg {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none; /* la interacción se captura a nivel .es-hero */
+}
+
+.es-hero__visual {
+	position: absolute;
+	inset: 0;
+}
+
+.es-hero__visual svg {
+	position: absolute;
+	top: 50%;
+	right: 0;
+	transform: translateY(-50%);
+	height: 100%;
+	max-height: 640px;
+	width: min(62vw, 860px);
+	opacity: 0.9;
+	/* desvanece hacia la columna de texto para preservar legibilidad */
+	-webkit-mask-image: linear-gradient(to right, transparent 0%, #000 34%);
+	mask-image: linear-gradient(to right, transparent 0%, #000 34%);
+}
+
+/* ---------- contenido ---------- */
+
+.es-hero__inner {
+	position: relative;
+	z-index: 1;
+	padding-top: clamp(56px, 8vw, 110px);
+	padding-bottom: clamp(56px, 8vw, 100px);
+	min-height: min(78vh, 760px);
+	/* svh = "small viewport height" (chrome del navegador expandido): garantiza
+	   que el hero nunca reclame más del 78% del alto REALMENTE disponible, así
+	   los CTAs / el indicador no quedan tapados por el chrome en pantallas
+	   bajas. Fallback en vh arriba para navegadores sin svh. No uso dvh acá a
+	   propósito: cambiaría el alto durante el scroll en mobile (jank). */
+	min-height: min(78svh, 760px);
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.es-hero__content {
+	max-width: 620px;
+}
+
+.es-hero__eyebrow {
+	margin-bottom: 26px;
+}
+
+.es-hero__title {
+	margin-bottom: 26px;
+}
+
+.es-hero__lead {
+	margin-bottom: 38px;
+}
+
+.es-hero__actions {
+	display: flex;
+	align-items: center;
+	gap: 16px clamp(18px, 3vw, 34px);
+	flex-wrap: wrap;
+}
+
+/* botón secundario: caja estable, sin saltos al envolver en mobile */
+.es-hero__actions .es-link-arrow {
+	min-height: 44px;
+	align-items: center;
+}
+
+/* telefonos reales: el CTA secundario ya no envuelve por accidente debajo del
+   primario — a este ancho se apilan a propósito, alineados a la izquierda con
+   spacing intencional. Mismo breakpoint "phone" que el resto del theme. */
+@media (max-width: 680px) {
+	.es-hero__actions {
+		flex-direction: column;
+		align-items: flex-start;
+		flex-wrap: nowrap;
+		gap: 18px;
+	}
+
+	/* El botón primario tiene padding interno (26px): sin este ajuste, el
+	   texto del link secundario arrancaba ~26px más a la izquierda que el
+	   label del botón — mismo borde de caja, texto desalineado — y el
+	   apilado se leía como un wrap accidental en vez de una decisión de
+	   layout. Alineando el texto del link con el texto del botón, el par
+	   se lee como un grupo diseñado a propósito. No cambia el componente
+	   (sigue siendo el mismo link de texto plano que en el resto del
+	   sitio), solo su posición dentro del stack del hero. */
+	.es-hero__actions .es-link-arrow--quiet {
+		padding-left: 26px;
+	}
+}
+
+/* ---------- desktop de poca altura (short-screen) ----------
+   En desktops bajos (1366×768, 1440×800, 1280×720, laptops con la admin bar
+   de WP o toolbars del navegador que reducen el alto útil), el padding
+   vertical grande del hero + el header sticky de 66px podían empujar los CTAs
+   o el indicador de scroll fuera del viewport visible. Acá se COMPACTA solo el
+   espaciado vertical (padding + gaps) — NO se escala el hero entero — y solo
+   en pantallas anchas Y bajas. El min-height sigue en 78svh, así que el hero
+   queda más corto que el viewport y How I Work asoma. El desktop alto normal
+   (max-height > 820) no se toca; mobile tampoco (su min-height ya es 0). */
+@media (min-width: 1024px) and (max-height: 820px) {
+	.es-hero__inner {
+		padding-top: clamp(40px, 7vh, 72px);
+		padding-bottom: clamp(36px, 6vh, 60px);
+	}
+
+	.es-hero__eyebrow {
+		margin-bottom: 18px;
+	}
+
+	.es-hero__title {
+		margin-bottom: 18px;
+	}
+
+	.es-hero__lead {
+		margin-bottom: 26px;
+	}
+}
+
+/* Muy bajo (~720p): además, reducir apenas el headline para dar aire a copy
+   más largo (p. ej. el titular en español) sin escalar el hero completo.
+   .es-hero__title (hero.css, cargado después de base.css) gana sobre .es-h1
+   por orden de fuente a igual especificidad. */
+@media (min-width: 1024px) and (max-height: 740px) {
+	.es-hero__title {
+		font-size: clamp(38px, 4.6vw, 58px);
+	}
+}
+
+/* ---------- mobile: mapa detrás del texto, sutil ---------- */
+
+@media (max-width: 1023px) {
+	.es-hero__visual svg {
+		top: 0;
+		right: -10%;
+		transform: none;
+		width: 120%;
+		height: 100%;
+		max-height: none;
+		opacity: 0.55;
+		-webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 92%);
+		mask-image: linear-gradient(to bottom, #000 0%, transparent 92%);
+	}
+
+	/* la variante "subtle" del Customizer baja aún más la presencia */
+	.es-hero[data-hero-mobile='system_map_subtle'] .es-hero__visual svg {
+		opacity: 0.3;
+	}
+
+	.es-hero__inner {
+		min-height: 0;
+	}
+
+	.es-hero__content {
+		max-width: 560px;
+	}
+}
+
+/* ---------- variant network_constellation: SVG a sangre completa ----------
+   La constelación NO va en columna derecha: llena el hero y vive detrás del
+   texto (la legibilidad la asegura la zona de exclusión del motor + el
+   z-index del contenido). Esta clase (.es-net-svg) pisa el posicionamiento
+   base de `.es-hero__visual svg` por mayor especificidad. */
+
+.es-hero__visual svg.es-net-svg {
+	position: absolute;
+	inset: 0;
+	top: 0;
+	right: 0;
+	transform: none;
+	width: 100%;
+	height: 100%;
+	max-height: none;
+	opacity: 0.92;
+	-webkit-mask-image: none;
+	mask-image: none;
+}
+
+@media (max-width: 1023px) {
+	/* mobile subtle: capa tenue detrás del texto, nunca un bloque aparte */
+	.es-hero__visual svg.es-net-svg {
+		opacity: 0.5;
+	}
+}
+
+/* respiración idle de la constelación (halo + nodos), muy sutil */
+@keyframes es-net-breathe {
+	0%,
+	100% {
+		opacity: 0.075;
+	}
+	50% {
+		opacity: 0.13;
+	}
+}
+
+@keyframes es-net-breathe-node {
+	0%,
+	100% {
+		opacity: 0.82;
+	}
+	50% {
+		opacity: 0.58;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-net-svg circle {
+		animation: none !important;
+	}
+}
+
+/* ---------- fallback estático: el JS dibuja el frame final sin animar ---------- */
+
+.es-hero--static .es-hero__visual svg {
+	opacity: 0.75;
+}
+
+/* ---------- variant blueprint_flow: retícula técnica de fondo ----------
+   El motor blueprint dibuja el flujo inputs → decide → resolve sobre esta
+   grilla (§12). Muy baja presencia y con mask hacia la columna de texto. */
+
+.es-hero[data-hero-desktop='blueprint_flow'] .es-hero__visual::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background-image: linear-gradient(var(--es-line) 1px, transparent 1px),
+		linear-gradient(90deg, var(--es-line) 1px, transparent 1px);
+	background-size: 34px 34px;
+	opacity: 0.55;
+	-webkit-mask-image: linear-gradient(to right, transparent 0%, #000 42%);
+	mask-image: linear-gradient(to right, transparent 0%, #000 42%);
+}
+
+@media (max-width: 1023px) {
+	.es-hero[data-hero-mobile='blueprint_flow'] .es-hero__visual::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background-image: linear-gradient(var(--es-line) 1px, transparent 1px),
+			linear-gradient(90deg, var(--es-line) 1px, transparent 1px);
+		background-size: 30px 30px;
+		opacity: 0.3;
+		-webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 88%);
+		mask-image: linear-gradient(to bottom, #000 0%, transparent 88%);
+	}
+	/* en desktop-only el pseudo de blueprint no debe colarse en mobile */
+	.es-hero[data-hero-desktop='blueprint_flow']:not([data-hero-mobile='blueprint_flow'])
+		.es-hero__visual::before {
+		display: none;
+	}
+}
+
+/* ---------- hero como bloque Gutenberg (estavillo/home-hero) ----------
+   La rama Gutenberg de Home arma el hero con el bloque híbrido del plugin:
+   render.php emite este mismo cascarón (.es-hero + visual + variantes) y
+   el copy llega como InnerBlocks — así que todo lo de arriba aplica igual.
+   Las 3 reglas de abajo cubren solo las diferencias de markup del copy
+   como bloques, scopeadas a la clase que get_block_wrapper_attributes()
+   agrega al cascarón (nunca tocan el hero PHP del fallback):
+
+   1. Las CTAs viven cada una dentro de un <p> (core/paragraph) — sin
+      margen, para que el gap del flex de .es-hero__actions mande igual
+      que con los <a> sueltos del fallback.
+   2/3. La flecha del botón primario (.es-btn__arrow) y el punto "vivo"
+      (.es-live-dot) del secundario eran <span>s inline en el fallback —
+      dentro de RichText un span con clase no es un formato registrado y
+      puede no sobrevivir la edición, así que en la rama Gutenberg los
+      reproduce el CSS como ::after (mismo color de acento, mismo pulso,
+      espaciados por el mismo gap del inline-flex de cada componente),
+      y el contenido editable queda texto + link puros, imposibles de
+      invalidar. */
+
+/* CTA layout robusto (correction ticket): el grupo de CTAs usa layout flex
+   NATIVO de Gutenberg (is-layout-flex, emitido por core) para que
+   previsualice horizontal en el editor y quede lado a lado en el front sin
+   depender de que la clase suelta sobreviva la cascada. Esta regla refuerza
+   ese comportamiento en el front con especificidad de compuesto (gana sobre
+   .wp-block-group de Kadence y sobre el :where() de core), y mantiene el par
+   en fila en desktop Y tablet. En mobile no fuerza columna: flex-wrap deja
+   que envuelvan SOLO cuando no entran, con gap compacto y alineados a la
+   izquierda. */
+.wp-block-estavillo-home-hero .es-hero__actions {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 16px clamp(18px, 3vw, 34px);
+}
+
+.wp-block-estavillo-home-hero .es-hero__actions p {
+	margin: 0;
+}
+
+.wp-block-estavillo-home-hero .es-btn::after {
+	content: '\2192';
+	color: var(--es-accent);
+}
+
+.wp-block-estavillo-home-hero .es-link-arrow--quiet::after {
+	content: '';
+	width: 7px;
+	height: 7px;
+	flex: none;
+	border-radius: 50%;
+	background: var(--es-signal);
+	animation: es-pulse 2.6s ease-in-out infinite;
+	will-change: opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.wp-block-estavillo-home-hero .es-link-arrow--quiet::after {
+		animation: none;
+		opacity: 1;
+	}
+}
+
+/* =========================================================================
+   Hero → How I Work — transición de scroll + indicador (correction ticket)
+   -------------------------------------------------------------------------
+   Restrained, editorial, NO cinematográfico. assets/js/hero-scroll.js setea
+   --es-hero-progress (0→1) por rAF SOLO mientras el hero está en viewport
+   (IntersectionObserver arranca/para el listener — sin listener permanente
+   pesado). Sin sticky-pin (evita pin excesivo / espacio vacío / snap): el
+   fondo "permanece" un instante vía un parallax sutil + fade tardío, y el
+   texto sube y se desvanece al acercarse How I Work, que entra como
+   contenido normal. Toda la coreografía va detrás de
+   prefers-reduced-motion: no-preference — con reduced motion el hero queda
+   completo, estático y en flujo normal.
+   ========================================================================= */
+
+@media (prefers-reduced-motion: no-preference) {
+	/* Modo STANDARD (default) y el hero PHP de fallback (sin la clase de
+	   modo): la coreografía suave de siempre. El :not() deja que el modo
+	   parallax defina su propia coreografía más abajo sin heredar ésta. */
+	.es-hero:not(.es-hero--scroll-parallax) .es-hero__content {
+		transform: translateY(calc(var(--es-hero-progress) * -48px));
+		opacity: calc(1 - var(--es-hero-progress) * 0.92);
+		will-change: transform, opacity;
+	}
+
+	/* El fondo permanece más que el texto: parallax leve hacia abajo y fade
+	   cuadrático (se va recién cerca del final del recorrido). */
+	.es-hero:not(.es-hero--scroll-parallax) .es-hero__visual {
+		transform: translateY(calc(var(--es-hero-progress) * 34px));
+		opacity: calc(1 - var(--es-hero-progress) * var(--es-hero-progress) * 0.7);
+		will-change: transform, opacity;
+	}
+}
+
+/* =========================================================================
+   Modo PARALLAX (opt-in, atributo scrollMode = parallax) — §2–4
+   -------------------------------------------------------------------------
+   Corrección (correction ticket §2–3). El fondo animado debe sentirse
+   ANCLADO desde el primer movimiento de scroll — nunca "se mueve con el
+   texto y después se traba". Se logra con un transform CONTRA-SCROLL, no con
+   sticky: hero-scroll.js publica --es-hero-scroll-px (los px scrolleados) y
+   la capa de fondo se traslada esa misma cantidad hacia abajo, quedando
+   visualmente fija respecto al viewport mientras el hero sube. El copy tiene
+   su PROPIO transform + fade (sube y se va PRIMERO); el fondo tiene su PROPIO
+   transform (anclaje) + su PROPIA opacidad — nunca comparten el transform.
+
+   El fondo sigue siendo un hijo `absolute` recortado por el `overflow:hidden`
+   base del hero (ya NO se libera a overflow:visible, ya NO hay sticky ni
+   margin negativo). Ese recorte ocurre en el borde inferior del hero, justo
+   donde vive el gradiente .es-hero::after (transparent → papel), que funde la
+   constelación con el papel EN ese borde → sin corte/sombra horizontal y sin
+   el "salto" que dejaba el borde duro del sticky (§3). La opacidad del fondo
+   llega a ~0 antes de que How I Work domine (~90%), así que abajo no queda
+   ninguna arista.
+
+   Sin background-attachment:fixed, sin snap, sin pin, sin librería, sin
+   listener extra. Solo DESKTOP + motion permitido; mobile y reduced-motion
+   caen al fade estándar / flujo normal (§4).
+
+   Progresión (tuneable):
+     --es-hero-copy-out : progreso al que el copy termina de desvanecerse.
+     --es-hero-bg-out   : progreso al que el fondo llega a ~0. */
+.es-hero--scroll-parallax {
+	--es-hero-copy-out: 0.55;
+	--es-hero-bg-out: 0.86;
+}
+
+/* Mobile / tablet: SIN anclaje ni sticky (evita saltos de viewport, §4). Fade
+   simplificado — el mismo lenguaje que el modo standard. */
+@media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+	.es-hero--scroll-parallax .es-hero__content {
+		transform: translateY(calc(var(--es-hero-progress) * -48px));
+		opacity: calc(1 - var(--es-hero-progress) * 0.92);
+		will-change: transform, opacity;
+	}
+
+	.es-hero--scroll-parallax .es-hero__visual {
+		transform: translateY(calc(var(--es-hero-progress) * 34px));
+		opacity: calc(1 - var(--es-hero-progress) * var(--es-hero-progress) * 0.7);
+		will-change: transform, opacity;
+	}
+}
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+	/* Copy: transform + fade PROPIOS. Sube y se desvanece PRIMERO (clamp para
+	   que la opacidad no baje de 0 aunque el progreso pase de copy-out). */
+	.es-hero--scroll-parallax .es-hero__content {
+		transform: translateY(calc(var(--es-hero-progress) * -72px));
+		opacity: calc(1 - clamp(0, calc(var(--es-hero-progress) / var(--es-hero-copy-out)), 1));
+		will-change: transform, opacity;
+	}
+
+	/* Fondo: transform de ANCLAJE (contra-scroll en px, lo setea el JS) +
+	   opacidad PROPIA. No hereda el transform del copy. La opacidad baja muy
+	   sutil al principio y llega a ~0 en --es-hero-bg-out (~90%): el fondo
+	   permanece fijo mientras se desvanece de forma progresiva. */
+	.es-hero--scroll-parallax .es-hero__bg {
+		transform: translateY(var(--es-hero-scroll-px, 0px));
+		opacity: clamp(0, calc(1.04 - var(--es-hero-progress) / var(--es-hero-bg-out)), 1);
+		will-change: transform, opacity;
+	}
+}
+
+/* ---------- indicador de scroll ---------- */
+
+.es-hero__scroll {
+	position: absolute;
+	left: 50%;
+	bottom: clamp(16px, 3vh, 30px);
+	transform: translateX(-50%);
+	z-index: 2;
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 9px;
+	color: var(--es-ink-3);
+	text-decoration: none;
+	font-family: var(--es-mono);
+	font-size: 10px;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	/* se desvanece con la transición para no competir con How I Work */
+	opacity: calc(1 - var(--es-hero-progress));
+	transition: color var(--es-dur-fast) ease;
+}
+
+.es-hero__scroll:hover,
+.es-hero__scroll:focus-visible {
+	color: var(--es-accent);
+}
+
+.es-hero__scroll-line {
+	position: relative;
+	width: 1px;
+	height: 42px;
+	overflow: hidden;
+	background: linear-gradient(to bottom, var(--es-line-strong), transparent);
+}
+
+/* punto de acento que "viaja" hacia abajo por la línea: la única animación,
+   sutil y en loop lento */
+.es-hero__scroll-line::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 1px;
+	height: 45%;
+	background: var(--es-accent);
+	opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.es-hero__scroll-line::after {
+		animation: es-hero-scroll-travel 2.6s ease-in-out infinite;
+	}
+}
+
+@keyframes es-hero-scroll-travel {
+	0% {
+		transform: translateY(-100%);
+		opacity: 0;
+	}
+	35% {
+		opacity: 1;
+	}
+	100% {
+		transform: translateY(230%);
+		opacity: 0;
+	}
+}
+
+/* mobile: se simplifica (solo la línea, sin label) para no ensuciar */
+@media (max-width: 680px) {
+	.es-hero__scroll-label {
+		display: none;
+	}
+
+	.es-hero__scroll-line {
+		height: 34px;
+	}
+}
+
+/* desktop bajo (short-screen): el indicador de scroll se vuelve MENOS
+   prominente (línea más corta, pegado abajo, gap chico) para no acercarse a
+   los CTAs cuando el hero se compacta — sigue VISIBLE (nunca se oculta antes
+   que contenido importante, §2). Va acá, DESPUÉS de las reglas base del
+   indicador, para ganarles por orden de fuente (un @media no agrega
+   especificidad). */
+@media (min-width: 1024px) and (max-height: 820px) {
+	.es-hero__scroll {
+		bottom: clamp(10px, 1.8vh, 20px);
+		gap: 6px;
+	}
+
+	.es-hero__scroll-line {
+		height: 28px;
+	}
+}

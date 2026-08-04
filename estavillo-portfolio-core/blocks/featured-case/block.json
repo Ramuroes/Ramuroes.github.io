@@ -1,0 +1,17 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/featured-case",
+	"title": "Featured Case Study",
+	"category": "estavillo-pages",
+	"icon": "star-filled",
+	"description": "Muestra el Case Study marcado \"Feature this case on Home\" (checkbox del CPT Case Study) — no hay nada que elegir/ordenar acá: la selección vive en el propio Case Study, este bloque solo puentea ese dato hacia Gutenberg. Delega en la misma función del child theme que ya usaba template-parts/featured-case.php, así el fallback placeholder y el markup nunca se duplican.",
+	"keywords": [ "estavillo", "featured case", "case study", "home" ],
+	"textdomain": "estavillo-portfolio-core",
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-pages-block-featured-case",
+	"render": "file:./render.php"
+}

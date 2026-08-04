@@ -1,0 +1,339 @@
+<!--
+  ESTAVILLO — Case Study content: "Presupuestador" (Guzmán Villalba) — EN
+  ============================================================================
+  HOW TO USE THIS FILE
+  ----------------------------------------------------------------------------
+  1. In wp-admin, create/open the English Case Study post (Case Studies
+     → Add New, or its Polylang translation once the Spanish post
+     exists — see docs/content/presupuestador-wordpress-publish.md for
+     the exact linking order).
+  2. In the block editor, add a "Custom HTML" block and paste EVERYTHING
+     below the end of this instructional comment.
+  3. Native fields go separately — see
+     docs/content/presupuestador-case-study-fields.md for the exact
+     recommended English values (Title, Excerpt, Tags, Eyebrow, Status,
+     Role, Tools, Period, Hero layout, Case index).
+  4. This is a real editorial adaptation of
+     docs/content/presupuestador-case-study-es.html — same facts, same
+     structure, same anchor IDs, same placeholders — not a literal
+     machine translation.
+  5. Same editorial note as the Spanish version: earlier drafts of this
+     case contained specific numbers ("3–5 day turnaround," "2 people
+     unable to estimate independently") that had no verifiable source
+     anywhere in this repository. This file replaces them with honest
+     qualitative language or explicit [DATA PENDING VALIDATION — ...]
+     placeholders. Replace a placeholder with the real figure if/when
+     you have it — don't leave it blank, and don't invent a number.
+  6. No signed quote, for the same reason: the closing reflection is
+     written as first-person prose, not a pull-quote attributed as a
+     verbatim statement.
+  ============================================================================
+-->
+
+<div class="es-case-section" id="overview">
+	<div class="es-case-label">Fig. 00 — Overview</div>
+	<h2 class="es-case-heading">A quote that depended on one person's head, turned into criteria that can be written down, questioned, and improved.</h2>
+	<p class="es-case-lead">Presupuestador is a decision-support system for a metal fabrication workshop in Montevideo. The goal was never a generic quoting app — it was making explicit a pricing judgment that had only ever lived in one person's head, and putting it within reach of the rest of the team without losing the expert judgment behind it.</p>
+
+	<ol class="es-case-ladder">
+		<li class="es-case-ladder__step">Operational diagnosis</li>
+		<li class="es-case-ladder__step">Documented criteria</li>
+		<li class="es-case-ladder__step">Google Sheets MVP</li>
+		<li class="es-case-ladder__step">Calibration against the estimator</li>
+		<li class="es-case-ladder__step es-case-ladder__step--active">App Alpha</li>
+		<li class="es-case-ladder__step">Team-wide adoption</li>
+	</ol>
+	<p class="es-case-caption">Where the project actually stands: App Alpha is built and answering real quotes today; the step after it — the whole team quoting independently — is the goal, not yet a measured result (more in Results and Limitations below).</p>
+</div>
+
+<div class="es-case-section" id="context">
+	<div class="es-case-label">Fig. 01 — Context</div>
+	<h2 class="es-case-heading">A workshop that quotes well — just slowly, and from one person's head.</h2>
+	<p class="es-case-lead">Guzmán Villalba is a metal fabrication workshop in Montevideo. Every job — from a custom staircase railing to a full production run of parts — starts with a quote. For years, that quote came from one estimator's judgment: material, labor, machine time, and margin, priced from memory and experience, not from a written system.</p>
+	<p>That worked while volume stayed manageable. Then jobs started queuing up behind one person. Someone new on the team couldn't estimate without shadowing that process for months. And because the judgment lived only in his head, it couldn't be questioned, versioned, or improved — only repeated.</p>
+</div>
+
+<div class="es-case-section" id="problem">
+	<div class="es-case-label">Fig. 02 — The operational problem</div>
+	<h2 class="es-case-heading">A slow quote can lose the job before any metal gets cut.</h2>
+	<p class="es-case-lead">A client calling for a rough number needs a fast, defensible answer. If the only path is a complete formal quote — and that quote depends on one specific person having time that week — the answer arrives late, or doesn't arrive at all.</p>
+	<ul>
+		<li>Pricing judgment wasn't written down anywhere — it lived entirely in one person's experience.</li>
+		<li>There was no fast way to give an orientative range without building the full quote.</li>
+		<li>Adding people to the estimating side of the business meant, in practice, that one person had to walk each of them through every case.</li>
+	</ul>
+	<p>[DATA PENDING VALIDATION — if a real average response time exists (e.g. typical days of wait for a formal quote), replace this paragraph with that concrete figure. No number is included here because there's no verifiable source for one in this repository.]</p>
+</div>
+
+<div class="es-case-section" id="discovery">
+	<div class="es-case-label">Fig. 03 — Understanding the real workflow</div>
+	<h2 class="es-case-heading">Watching quotes get built, not just asking how they get built.</h2>
+	<div class="es-case-cols">
+		<div>
+			<p>Interviews alone undersold how much judgment was involved — the estimator himself struggled to put his own rules into words. Shadowing several real quotes end to end surfaced the actual variables in play: material type and thickness, cut complexity, finishing steps, machine availability that week, and a margin that flexed with client relationship and urgency.</p>
+			<p>The clearest finding: the judgment wasn't arbitrary, it was <em>consistent but undocumented</em> — which meant it could be captured as an explicit model, rather than replaced by a generic pricing formula that would have ignored the workshop's real constraints.</p>
+		</div>
+		<figure class="es-case-figure">
+			<div class="es-placeholder" role="img" aria-label="Placeholder for discovery research photo or notes">
+				<span class="es-placeholder__tag">{asset: discovery-notes}</span>
+			</div>
+			<figcaption class="es-case-caption">
+				<span class="es-case-caption__tag">01</span>
+				<span>[SCREENSHOT PENDING — photo from the shadowing sessions or synthesized research notes.]</span>
+			</figcaption>
+		</figure>
+	</div>
+</div>
+
+<div class="es-case-section" id="system">
+	<div class="es-case-label">Fig. 04 — Design hypothesis and architecture</div>
+	<h2 class="es-case-heading">One pricing model, several surfaces.</h2>
+	<p class="es-case-lead">The starting hypothesis: if the estimator's judgment could be made explicit, it didn't need replacing — it needed a shape that someone else could use, question, and improve. Rather than building one monolithic app up front, the system separates the <em>pricing logic</em> (versioned, inspectable, owned by the workshop) from the <em>surfaces</em> that read it — so the estimator could keep working from day one, and the interface could evolve without touching the logic underneath.</p>
+
+	<div class="es-case-cols">
+		<div class="es-case-browser">
+			<div class="es-case-browser__bar">
+				<span class="es-case-browser__dot"></span>
+				<span class="es-case-browser__dot"></span>
+				<span class="es-case-browser__dot"></span>
+				<span class="es-case-browser__label">system-diagram</span>
+			</div>
+			<div class="es-placeholder" role="img" aria-label="Placeholder for system architecture diagram">
+				<span class="es-placeholder__tag">{asset: architecture-diagram}</span>
+			</div>
+		</div>
+		<div>
+			<p>Inputs (material, dimensions, finish, urgency) feed a single pricing model. That model returns both a fast orientative range and, once confirmed, a full itemized quote. The same model is queried from the Sheets MVP and, later, from the Alpha app — switching surfaces never means re-deriving the logic.</p>
+			<p>[DIAGRAM PENDING — replace the placeholder with the real input → pricing model → output flow once it exists as a final asset.]</p>
+		</div>
+	</div>
+
+	<div class="es-case-taxonomy">
+		<div class="es-case-taxonomy__root">Pricing model — the inputs it reads</div>
+		<div class="es-case-taxonomy__grid">
+			<div class="es-case-taxonomy__item">
+				<div class="es-case-taxonomy__item-title">Material &amp; thickness</div>
+				<div class="es-case-taxonomy__item-meta">cost driver</div>
+			</div>
+			<div class="es-case-taxonomy__item">
+				<div class="es-case-taxonomy__item-title">Cut complexity</div>
+				<div class="es-case-taxonomy__item-meta">labor driver</div>
+			</div>
+			<div class="es-case-taxonomy__item">
+				<div class="es-case-taxonomy__item-title">Finishing steps</div>
+				<div class="es-case-taxonomy__item-meta">labor driver</div>
+			</div>
+			<div class="es-case-taxonomy__item">
+				<div class="es-case-taxonomy__item-title">Machine availability that week</div>
+				<div class="es-case-taxonomy__item-meta">capacity, not price</div>
+			</div>
+		</div>
+		<div class="es-case-taxonomy__mods">
+			<div class="es-case-taxonomy__mods-label">Adjusted<br>by…</div>
+			<div class="es-case-taxonomy__mods-tags">
+				<span class="es-case-taxonomy__tag">Client relationship</span>
+				<span class="es-case-taxonomy__tag">Urgency</span>
+			</div>
+		</div>
+	</div>
+	<p class="es-case-caption">The same variables surfaced during discovery — material and thickness, cut complexity, finishing, and machine time set the cost and labor pull; client relationship and urgency adjust it from there.</p>
+
+	<div class="es-case-stats">
+		<div class="es-case-stat">
+			<div class="es-case-stat__num">1</div>
+			<div class="es-case-stat__label">single, versioned pricing model</div>
+		</div>
+		<div class="es-case-stat">
+			<div class="es-case-stat__num">2</div>
+			<div class="es-case-stat__label">surfaces reading it (Sheets and App Alpha)</div>
+		</div>
+		<div class="es-case-stat">
+			<div class="es-case-stat__num">2</div>
+			<div class="es-case-stat__label">output types per query: fast range and itemized quote</div>
+		</div>
+	</div>
+	<p class="es-case-caption">These three numbers describe system design decisions (how many models, how many surfaces, how many output types) — not business metrics about the workshop.</p>
+</div>
+
+<div class="es-case-section" id="mvp">
+	<div class="es-case-label">Fig. 05 — MVP in Google Sheets + Apps Script</div>
+	<h2 class="es-case-heading">Ship the logic before the interface.</h2>
+	<p class="es-case-lead">The first version of the pricing model lived entirely in Google Sheets with Apps Script — deliberately, so the estimator could correct and extend the logic himself without waiting on a development cycle, and so the system could be validated against real quotes before any interface was built.</p>
+
+	<div class="es-case-browser">
+		<div class="es-case-browser__bar">
+			<span class="es-case-browser__dot"></span>
+			<span class="es-case-browser__dot"></span>
+			<span class="es-case-browser__dot"></span>
+			<span class="es-case-browser__label">presupuestador.xlsx — pricing model v1</span>
+		</div>
+		<div class="es-placeholder" role="img" aria-label="Placeholder for MVP spreadsheet screenshot">
+			<span class="es-placeholder__tag">{asset: mvp-sheets-screenshot}</span>
+		</div>
+	</div>
+
+	<p>Every quote that ran through the sheet was logged. That growing base of quotes — not a business number, but the system's own working material — is what later made it possible to compare the model against the estimator's own judgment and adjust its weighting before moving to a dedicated interface.</p>
+</div>
+
+<div class="es-case-section" id="testing">
+	<div class="es-case-label">Fig. 06 — Testing and iteration</div>
+	<h2 class="es-case-heading">The estimator as the reference, not as a test subject.</h2>
+	<p class="es-case-lead">Validation wasn't a round of usability testing with outside users — it was comparing, quote by quote, what the model proposed against what the estimator himself would say. When they agreed, that confirmed a rule. When they didn't, the gap was the signal to revisit the model, not to dismiss the disagreement.</p>
+
+	<ol class="es-case-timeline">
+		<li class="es-case-timeline__item">
+			<div class="es-case-timeline__title">Run a real quote through the model</div>
+			<div class="es-case-timeline__text">Same case, two judgments side by side: the model's and the estimator's.</div>
+		</li>
+		<li class="es-case-timeline__item">
+			<div class="es-case-timeline__title">Flag matches and gaps</div>
+			<div class="es-case-timeline__text">Gaps weren't averaged away or ignored — each one was reviewed to find the missing or mis-weighted variable.</div>
+		</li>
+		<li class="es-case-timeline__item">
+			<div class="es-case-timeline__title">Adjust the model, not the judgment</div>
+			<div class="es-case-timeline__text">The goal was for the model to learn to explain the estimator's judgment — not the other way around.</div>
+		</li>
+	</ol>
+
+	<p>[DATA PENDING VALIDATION — if a real accuracy or coverage figure exists for how often the model matched the estimator's judgment within an acceptable range, add it here with its source. Until then, this process is described qualitatively because no confirmed figure exists.]</p>
+</div>
+
+<div class="es-case-section" id="app-alpha">
+	<div class="es-case-label">Fig. 07 — App Alpha</div>
+	<h2 class="es-case-heading">From a spreadsheet only one person could drive to a tool the team can use.</h2>
+
+	<div class="es-case-browser">
+		<div class="es-case-browser__bar">
+			<span class="es-case-browser__dot"></span>
+			<span class="es-case-browser__dot"></span>
+			<span class="es-case-browser__dot"></span>
+			<span class="es-case-browser__label">app.presupuestador — alpha</span>
+		</div>
+		<div class="es-placeholder" role="img" aria-label="Placeholder for App Alpha screenshot">
+			<span class="es-placeholder__tag">{asset: app-alpha-screenshot}</span>
+		</div>
+	</div>
+
+	<ol class="es-case-timeline">
+		<li class="es-case-timeline__item">
+			<div class="es-case-timeline__title">Same model, new front door</div>
+			<div class="es-case-timeline__text">The Alpha app reads the same pricing model validated in Sheets — no logic was rewritten, only re-surfaced.</div>
+		</li>
+		<li class="es-case-timeline__item">
+			<div class="es-case-timeline__title">Guided input instead of a blank spreadsheet</div>
+			<div class="es-case-timeline__text">A short structured form replaces free-form cells, so anyone on the team — not just the original estimator — can produce a consistent quote.</div>
+		</li>
+		<li class="es-case-timeline__item">
+			<div class="es-case-timeline__title">Fast range first, precise quote second</div>
+			<div class="es-case-timeline__text">The app answers a client-facing "roughly how much" in seconds, then supports building the full itemized quote afterward.</div>
+		</li>
+	</ol>
+</div>
+
+<div class="es-case-section" id="ai">
+	<div class="es-case-label">Fig. 08 — The role of AI, and where human judgment stays essential</div>
+	<h2 class="es-case-heading">AI assists the quote. It never sets the price on its own.</h2>
+	<p class="es-case-lead">AI is used in three narrow, inspectable places in the flow — each one assistive, each one reviewable by the person actually building the quote.</p>
+
+	<div class="es-case-decisions">
+		<div class="es-case-decision">
+			<div class="es-case-decision__num">01</div>
+			<h3 class="es-case-decision__title">Reading raw input</h3>
+			<dl class="es-case-decision__row">
+				<dt>Task</dt>
+				<dd>Extract dimensions or material notes from a photo or a client's free-text description.</dd>
+				<dt>Guardrail</dt>
+				<dd>Always shown back to the estimator as editable fields before the model runs.</dd>
+			</dl>
+		</div>
+		<div class="es-case-decision">
+			<div class="es-case-decision__num">02</div>
+			<h3 class="es-case-decision__title">Suggesting a range</h3>
+			<dl class="es-case-decision__row">
+				<dt>Task</dt>
+				<dd>Propose an orientative range from past quotes with similar inputs.</dd>
+				<dt>Guardrail</dt>
+				<dd>Labeled explicitly as a suggestion — the pricing model's own logic sets the final number, not the AI.</dd>
+			</dl>
+		</div>
+		<div class="es-case-decision">
+			<div class="es-case-decision__num">03</div>
+			<h3 class="es-case-decision__title">Flagging anomalies</h3>
+			<dl class="es-case-decision__row">
+				<dt>Task</dt>
+				<dd>Flag a quote that falls far outside the historical pattern, so someone reviews it before it goes out.</dd>
+				<dt>Guardrail</dt>
+				<dd>Advisory only — it never blocks sending a quote, it only asks for a second look.</dd>
+			</dl>
+		</div>
+	</div>
+
+	<p>The system doesn't replace the workshop's estimator — it structures his judgment and puts it into operation. Ranges are for answering fast and doing an early viability check; an unusual case, with conditions the model doesn't cover well yet, still needs a person's judgment before it's confirmed.</p>
+</div>
+
+<div class="es-case-section" id="results">
+	<div class="es-case-label">Fig. 09 — Current state</div>
+	<h2 class="es-case-heading">Where the system stands today.</h2>
+	<p class="es-case-lead">Presupuestador is a system in real use, not a finished product. Here's what can be said with confidence today, and what still needs more evidence before it can be claimed as a result.</p>
+
+	<div class="es-case-status">
+		<div class="es-case-status__col es-case-status__col--done">
+			<div class="es-case-status__head">True today</div>
+			<ul class="es-case-status__list">
+				<li>Pricing judgment is written down, versioned, and no longer lives only in one person's head.</li>
+				<li>A single model answers from both Sheets and the Alpha app.</li>
+				<li>Every quote that runs through the system gets logged — it doesn't disappear into a conversation or a piece of paper.</li>
+			</ul>
+		</div>
+		<div class="es-case-status__col es-case-status__col--attention">
+			<div class="es-case-status__head">Needs more evidence</div>
+			<ul class="es-case-status__list">
+				<li>[DATA PENDING VALIDATION — real impact on client response time, once there's enough usage data to measure it with confidence.]</li>
+				<li>[DATA PENDING VALIDATION — how many people on the team, beyond the original estimator, already quote independently using the system.]</li>
+				<li>Unusual cases still rely on the estimator's direct judgment — the system doesn't have enough history yet to cover them with confidence.</li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<div class="es-case-section" id="limitations">
+	<div class="es-case-label">Fig. 10 — Limitations</div>
+	<h2 class="es-case-heading">What the system doesn't do yet.</h2>
+	<ul>
+		<li>Unusual or fully custom jobs still get resolved with manual judgment — the model covers the common pattern well, not the exceptional case.</li>
+		<li>There's no flow yet designed mobile-first for the shop floor.</li>
+		<li>The AI-suggested range needs more quote history to stay accurate as material costs shift.</li>
+		<li>The system depends on the estimator continuing to review and correct the model — the judgment doesn't maintain itself.</li>
+	</ul>
+</div>
+
+<div class="es-case-section" id="learnings">
+	<div class="es-case-label">Fig. 11 — What I learned</div>
+	<h2 class="es-case-heading">The hard part was never the screen.</h2>
+	<p>The real design work was making explicit a judgment that one person had never had to put into words — clear enough to write down, argue with, and correct. The app was, by comparison, the easiest step once that was done.</p>
+	<p>I also learned to distrust the temptation to replace expert judgment with a tidy formula: a model that ignores the workshop's real constraints — the client relationship, the urgency, machine availability that week — would have been simpler to build, and worse. The system had to learn from the estimator, not correct him from the outside.</p>
+</div>
+
+<div class="es-case-section" id="next">
+	<div class="es-case-label">Fig. 12 — Next steps</div>
+	<h2 class="es-case-heading">Where this goes from here.</h2>
+
+	<details class="es-case-details">
+		<summary>Extend the model to unusual and fully custom jobs</summary>
+		<div class="es-case-details__body">
+			<p>[DATA PENDING VALIDATION — describe the concrete plan for covering the non-standard jobs that still rely on manual judgment today.]</p>
+		</div>
+	</details>
+	<details class="es-case-details">
+		<summary>Build a flow designed for the shop floor</summary>
+		<div class="es-case-details__body">
+			<p>[DATA PENDING VALIDATION — describe the concrete plan for a lightweight quoting flow usable directly from a phone on the workshop floor.]</p>
+		</div>
+	</details>
+	<details class="es-case-details">
+		<summary>Formalize the AI-assisted range with more history</summary>
+		<div class="es-case-details__body">
+			<p>[DATA PENDING VALIDATION — describe how the historical quote base will keep growing to improve the suggested range's accuracy over time.]</p>
+		</div>
+	</details>
+</div>

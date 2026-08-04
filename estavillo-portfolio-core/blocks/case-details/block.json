@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/case-details",
+	"title": "Case Details",
+	"category": "estavillo-case",
+	"icon": "editor-expand",
+	"description": "Acordeón nativo (.es-case-details): <details>/<summary> accesibles, sin JS, con contenido libre adentro (InnerBlocks).",
+	"keywords": [ "estavillo", "case", "details", "acordeón" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"summary": { "type": "string", "default": "" }
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-case-block-case-details",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}

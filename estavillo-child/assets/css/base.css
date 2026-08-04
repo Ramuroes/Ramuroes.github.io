@@ -1,0 +1,195 @@
+/* =========================================================================
+   ESTAVILLO — Base
+   -------------------------------------------------------------------------
+   Todo scopeado bajo .es-page (el wrapper que imprime el page template)
+   para no interferir con Kadence ni con el resto del sitio en vivo.
+   ========================================================================= */
+
+.es-page {
+	background: var(--es-paper);
+	color: var(--es-ink);
+	font-family: var(--es-sans);
+	-webkit-font-smoothing: antialiased;
+	/* NO overflow-x acá (bug real, encontrado en el sprint de infra/polish):
+	   .es-page es ancestro de .es-site-header y .es-case-index
+	   (position: sticky) en TODOS los templates. Por spec, poner overflow-x
+	   en un valor distinto de 'visible' sin tocar overflow-y hace que el
+	   navegador calcule overflow-y como 'auto' igual — .es-page pasaba a
+	   ser su propio contenedor de scroll, y eso rompe position:sticky de
+	   sus descendientes (quedan "sticky" dentro de .es-page, no respecto al
+	   viewport, así que visualmente nunca se sentían pegados al hacer
+	   scroll real). El único bleed horizontal real conocido (el SVG del
+	   hero en mobile, right:-10%/width:120%) ya se contiene solo con
+	   .es-hero { overflow: hidden } (hero.css) — ese contenedor está
+	   DESPUÉS del header en el DOM, así que no afecta su sticky. Si aparece
+	   un bleed horizontal nuevo en el futuro, conténé ESE elemento
+	   puntualmente (como ya hace .es-hero) — no vuelvas a poner overflow-x
+	   acá arriba.
+	*/
+}
+
+.es-page *,
+.es-page *::before,
+.es-page *::after {
+	box-sizing: border-box;
+}
+
+.es-page ::selection {
+	background: var(--es-accent);
+	color: var(--es-paper);
+}
+
+/* ---------- voces tipográficas ---------- */
+
+.es-serif {
+	font-family: var(--es-serif);
+	font-weight: 500;
+	letter-spacing: -0.015em;
+}
+
+.es-mono {
+	font-family: var(--es-mono);
+}
+
+/* etiqueta técnica en mono (eyebrows, labels de sección) */
+.es-eyebrow {
+	font-family: var(--es-mono);
+	font-size: 11.5px;
+	font-weight: 500;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--es-accent);
+}
+
+.es-label {
+	font-family: var(--es-mono);
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+}
+
+/* ---------- headings ---------- */
+
+.es-page h1,
+.es-page h2,
+.es-page h3 {
+	margin: 0;
+	color: var(--es-ink);
+}
+
+.es-h1 {
+	font-family: var(--es-serif);
+	font-size: clamp(42px, 5.8vw, 74px);
+	font-weight: 500;
+	letter-spacing: -0.015em;
+	line-height: 1.04;
+	text-wrap: balance;
+}
+
+.es-h1 em,
+.es-h2 em {
+	font-style: italic;
+}
+
+.es-h1 .es-accent-word {
+	color: var(--es-accent);
+}
+
+.es-h2 {
+	font-family: var(--es-serif);
+	font-size: clamp(28px, 3.4vw, 42px);
+	font-weight: 500;
+	letter-spacing: -0.012em;
+	line-height: 1.1;
+}
+
+/* ---------- texto ---------- */
+
+.es-lead {
+	font-size: clamp(15.5px, 1.35vw, 17.5px);
+	line-height: 1.65;
+	color: var(--es-ink-2);
+	max-width: 46ch;
+}
+
+.es-body {
+	font-size: 15.5px;
+	line-height: 1.7;
+	color: var(--es-ink-2);
+}
+
+.es-muted {
+	color: var(--es-ink-3);
+}
+
+/* ---------- accesibilidad + estados interactivos (identidad, cero azul) ------
+   El azul heredado del navegador / WordPress / Kadence se neutraliza acá:
+   1) tap-highlight transparente → sin flash azul al tocar en mobile.
+   2) :focus sin el outline azul del navegador; el foco visible es verde.
+   3) red de seguridad: ningún estado de link cae al azul de Kadence
+      (color:inherit nunca es azul). Los componentes con color propio ganan
+      por especificidad (ver components.css / site.css / pages-home.css).
+   Paleta de estados: verde --es-accent (identidad), tintas --es-ink*, y
+   transparencias. Nunca azul. ------------------------------------------------ */
+
+.es-page a,
+.es-page button,
+.es-page [role='button'],
+.es-page input,
+.es-page textarea,
+.es-page select,
+.es-page summary,
+.es-page label {
+	-webkit-tap-highlight-color: transparent;
+}
+
+/* foco: quita el anillo azul del navegador; el foco visible (teclado) es verde */
+.es-page a:focus,
+.es-page button:focus,
+.es-page [tabindex]:focus {
+	outline: none;
+}
+
+.es-page a:focus-visible,
+.es-page button:focus-visible,
+.es-page [tabindex]:focus-visible,
+.es-page [role='button']:focus-visible {
+	outline: 2px solid var(--es-accent);
+	outline-offset: 3px;
+	border-radius: 2px;
+}
+
+/* red de seguridad anti-azul (baja especificidad vía :where → los componentes
+   con color propio ganan; solo evita que un link herede el azul de Kadence) */
+:where(.es-page) a:hover,
+:where(.es-page) a:focus,
+:where(.es-page) a:active,
+:where(.es-page) a:visited {
+	color: inherit;
+}
+
+.es-visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* ---------- reduced motion: corta todo lo animado por CSS ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.es-page *,
+	.es-page *::before,
+	.es-page *::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}

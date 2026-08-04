@@ -1,0 +1,27 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/case-decisions",
+	"title": "Case Decisions",
+	"category": "estavillo-case",
+	"icon": "index-card",
+	"description": "Cards de decisión (.es-case-decisions): número, título y el par tarea/resguardo por card. Las etiquetas del par se editan una sola vez para todo el bloque (inspector).",
+	"keywords": [ "estavillo", "case", "decisions", "cards", "ia" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"items": {
+			"type": "array",
+			"default": [],
+			"items": { "type": "object" }
+		},
+		"taskLabel": { "type": "string", "default": "Task" },
+		"guardrailLabel": { "type": "string", "default": "Guardrail" }
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-case-block-case-decisions",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}

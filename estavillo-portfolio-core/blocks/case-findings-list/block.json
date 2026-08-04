@@ -1,0 +1,27 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/case-findings-list",
+	"title": "Case Findings List",
+	"category": "estavillo-case",
+	"icon": "list-view",
+	"description": "Lista editorial de evidencia (.es-findings): ícono + herramienta/técnica + hallazgo, una fila por técnica. Reemplaza una tabla de dos columnas angosta por un componente responsive real — en mobile cada fila se apila (ícono+nombre arriba, hallazgo debajo), en vez de forzar una tabla comprimida.",
+	"keywords": [ "estavillo", "case", "findings", "evidencia", "research", "hallazgos" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"title": { "type": "string", "default": "" },
+		"subtitle": { "type": "string", "default": "" },
+		"items": {
+			"type": "array",
+			"default": [],
+			"items": { "type": "object" }
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-case-block-case-findings-list",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}

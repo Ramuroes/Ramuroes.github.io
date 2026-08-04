@@ -1,0 +1,32 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/case-taxonomy",
+	"title": "Case Taxonomy",
+	"category": "estavillo-case",
+	"icon": "networking",
+	"description": "Diagrama de taxonomía (.es-case-taxonomy): raíz + grilla de variables/categorías + fila opcional de modificadores (\"se ajusta según…\").",
+	"keywords": [ "estavillo", "case", "taxonomy", "variables", "diagrama" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"root": { "type": "string", "default": "" },
+		"items": {
+			"type": "array",
+			"default": [],
+			"items": { "type": "object" }
+		},
+		"modsLabel": { "type": "string", "default": "" },
+		"mods": {
+			"type": "array",
+			"default": [],
+			"items": { "type": "string" }
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-case-block-case-taxonomy",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}

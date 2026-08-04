@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Spline+Sans+Mono:wght@400;500;600&display=swap">
+<style>
+  *{box-sizing:border-box;}
+  :root{
+    --es-paper:#131211; --es-paper-2:#181614; --es-surface:#1D1B18; --es-surface-2:#23201D;
+    --es-line:#2B2825; --es-line-strong:#403C37;
+    --es-ink:#EBE7DF; --es-ink-2:#C8C2B8; --es-ink-3:#9A948B; --es-ink-4:#6F6961;
+    --es-green:#58B183; --es-green-dim:rgba(88,177,131,.42); --es-green-soft:rgba(88,177,131,.12);
+    --es-block:#0D0C0B; --es-block-2:#141210; --es-block-line:#28241F;
+    --es-serif:'Newsreader',Georgia,'Times New Roman',serif;
+    --es-sans:'Instrument Sans',system-ui,sans-serif;
+    --es-mono:'Spline Sans Mono',ui-monospace,monospace;
+  }
+  [data-theme="light"]{
+    --es-paper:#FAF9F6; --es-paper-2:#F3F1EC; --es-surface:#FFFFFF; --es-surface-2:#F0EDE7;
+    --es-line:#E7E4DE; --es-line-strong:#D0CCC4;
+    --es-ink:#161513; --es-ink-2:#4A463F; --es-ink-3:#7A746B; --es-ink-4:#9C968C;
+    --es-green:#2D6A4F; --es-green-dim:rgba(45,106,79,.45); --es-green-soft:rgba(45,106,79,.10);
+    --es-block:#14211B; --es-block-2:#1A2A22; --es-block-line:#28382F;
+  }
+  body{margin:0;background:var(--es-paper);}
+  ::selection{background:#58B183;color:#131211;}
+  @keyframes esPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.35;transform:scale(.72);}}
+  @keyframes esBreathe{0%,100%{opacity:.075;}50%{opacity:.13;}}
+  @keyframes esBreatheNode{0%,100%{opacity:.82;}50%{opacity:.58;}}
+  @media (prefers-reduced-motion: reduce){ *{animation:none !important;transition:none !important;} }
+  @media(max-width:1023px){
+    #es-net{opacity:.55;}
+    [data-feat]{grid-template-columns:1fr !important;}
+    [data-about]{grid-template-columns:1fr !important;}
+    [data-about-portrait]{max-width:320px;}
+    [data-cards]{grid-template-columns:1fr 1fr !important;}
+    [data-wide]{grid-template-columns:1fr !important;}
+    [data-wide-thumb]{border-right:none !important;border-bottom:1px solid var(--es-line);min-height:190px !important;}
+  }
+  @media(max-width:1023px) and (min-width:681px){
+    [data-steps]{grid-template-columns:repeat(2,1fr) !important;}
+  }
+  @media(max-width:919px){
+    [data-navlinks]{display:none !important;}
+    [data-burger]{display:inline-flex !important;}
+  }
+  @media(max-width:680px){
+    [data-steps]{grid-template-columns:1fr !important;}
+    [data-cards]{grid-template-columns:1fr !important;}
+  }
+</style>
+</helmet>
+
+<div id="es-root" data-theme="{{ themeAttr }}" style="min-height:100vh;background:var(--es-paper);color:var(--es-ink);font-family:var(--es-sans);-webkit-font-smoothing:antialiased;overflow-x:hidden;">
+
+  <!-- ================= NAV ================= -->
+  <header data-screen-label="Nav" style="position:sticky;top:0;z-index:60;background:color-mix(in srgb, var(--es-paper) 88%, transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--es-line);">
+    <nav aria-label="Main" style="max-width:1140px;margin:0 auto;padding:0 clamp(20px,4.5vw,48px);height:66px;display:flex;align-items:center;justify-content:space-between;gap:24px;">
+      <a data-pt href="Estavillo - Home v4.dc.html" aria-current="page" style="font-size:14px;font-weight:700;letter-spacing:0.22em;color:var(--es-ink);text-decoration:none;" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">ESTAVILLO</a>
+      <div data-navlinks style="display:flex;align-items:center;gap:clamp(20px,2.6vw,36px);">
+        <a data-pt href="Estavillo - Work v1.dc.html" style="font-size:14px;font-weight:500;color:var(--es-ink-2);text-decoration:none;padding:6px 0;background:linear-gradient(var(--es-ink), var(--es-ink)) left bottom / 0 1px no-repeat;transition:background-size .2s ease,color .15s;" style-hover="color:var(--es-ink);background-size:100% 1px;" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">Work</a>
+        <a data-pt href="Estavillo - How I Work v1.dc.html" style="font-size:14px;font-weight:500;color:var(--es-ink-2);text-decoration:none;padding:6px 0;background:linear-gradient(var(--es-ink), var(--es-ink)) left bottom / 0 1px no-repeat;transition:background-size .2s ease,color .15s;" style-hover="color:var(--es-ink);background-size:100% 1px;" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">How I Work</a>
+        <a data-pt href="Estavillo - About v1.dc.html" style="font-size:14px;font-weight:500;color:var(--es-ink-2);text-decoration:none;padding:6px 0;background:linear-gradient(var(--es-ink), var(--es-ink)) left bottom / 0 1px no-repeat;transition:background-size .2s ease,color .15s;" style-hover="color:var(--es-ink);background-size:100% 1px;" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">About</a>
+        <a data-pt href="Estavillo - Connect v1.dc.html" style="font-size:14px;font-weight:500;color:var(--es-ink-2);text-decoration:none;padding:6px 0;background:linear-gradient(var(--es-ink), var(--es-ink)) left bottom / 0 1px no-repeat;transition:background-size .2s ease,color .15s;" style-hover="color:var(--es-ink);background-size:100% 1px;" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">Connect</a>
+        <span style="font-family:var(--es-mono);font-size:11px;letter-spacing:0.12em;color:var(--es-ink-4);" aria-label="Language: English active, Spanish coming later"><span style="color:var(--es-ink);">EN</span> / ES</span>
+      </div>
+      <button data-burger type="button" onClick="{{ openMenu }}" aria-label="Open menu" style="display:none;align-items:center;justify-content:center;width:44px;height:44px;margin-right:-10px;background:none;border:none;cursor:pointer;color:var(--es-ink);border-radius:7px;" style-focus="outline:2px solid var(--es-green);outline-offset:2px;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><line x1="2" y1="6.5" x2="18" y2="6.5"></line><line x1="2" y1="13.5" x2="18" y2="13.5"></line></svg>
+      </button>
+    </nav>
+  </header>
+
+  <!-- mobile menu -->
+  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Mobile menu" role="dialog" aria-label="Menu" style="position:fixed;inset:0;z-index:80;background:var(--es-paper);display:flex;flex-direction:column;padding:0 24px;">
+      <div style="height:66px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--es-line);">
+        <span style="font-size:14px;font-weight:700;letter-spacing:0.22em;color:var(--es-ink);">ESTAVILLO</span>
+        <button type="button" onClick="{{ closeMenu }}" aria-label="Close menu" style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin-right:-10px;background:none;border:none;cursor:pointer;color:var(--es-ink);border-radius:7px;" style-focus="outline:2px solid var(--es-green);outline-offset:2px;">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="3" x2="15" y2="15"></line><line x1="15" y1="3" x2="3" y2="15"></line></svg>
+        </button>
+      </div>
+      <nav aria-label="Mobile" style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:8px;">
+        <a data-pt href="Estavillo - Work v1.dc.html" style="display:flex;align-items:baseline;gap:16px;padding:14px 0;font-family:var(--es-serif);font-size:34px;font-weight:500;letter-spacing:-0.01em;color:var(--es-ink);text-decoration:none;border-bottom:1px solid var(--es-line);"><span style="font-family:var(--es-mono);font-size:12px;color:var(--es-green);">01</span>Work</a>
+        <a data-pt href="Estavillo - How I Work v1.dc.html" style="display:flex;align-items:baseline;gap:16px;padding:14px 0;font-family:var(--es-serif);font-size:34px;font-weight:500;letter-spacing:-0.01em;color:var(--es-ink);text-decoration:none;border-bottom:1px solid var(--es-line);"><span style="font-family:var(--es-mono);font-size:12px;color:var(--es-green);">02</span>How I Work</a>
+        <a data-pt href="Estavillo - About v1.dc.html" style="display:flex;align-items:baseline;gap:16px;padding:14px 0;font-family:var(--es-serif);font-size:34px;font-weight:500;letter-spacing:-0.01em;color:var(--es-ink);text-decoration:none;border-bottom:1px solid var(--es-line);"><span style="font-family:var(--es-mono);font-size:12px;color:var(--es-green);">03</span>About</a>
+        <a data-pt href="Estavillo - Connect v1.dc.html" style="display:flex;align-items:baseline;gap:16px;padding:14px 0;font-family:var(--es-serif);font-size:34px;font-weight:500;letter-spacing:-0.01em;color:var(--es-ink);text-decoration:none;"><span style="font-family:var(--es-mono);font-size:12px;color:var(--es-green);">04</span>Connect</a>
+      </nav>
+      <div style="padding:24px 0 32px;border-top:1px solid var(--es-line);font-family:var(--es-mono);font-size:12px;letter-spacing:0.12em;color:var(--es-ink-4);"><span style="color:var(--es-ink);">EN</span> / ES</div>
+    </div>
+  </sc-if>
+
+  <main id="top">
+
+    <!-- ================= HERO · v1 congelado (2A refinado) ================= -->
+    <section id="es-hero" data-screen-label="Hero" style="position:relative;border-bottom:1px solid var(--es-line);overflow:hidden;">
+      <div data-hero-wrap style="position:relative;z-index:1;max-width:1140px;margin:0 auto;padding:clamp(48px,7vw,104px) clamp(20px,4.5vw,48px) clamp(56px,8vw,110px);min-height:clamp(540px,72vh,760px);display:flex;align-items:center;">
+        <div data-hero-text style="max-width:600px;">
+          <div data-hr style="font-family:var(--es-mono);font-size:11.5px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--es-green);margin-bottom:28px;">Product Designer · Montevideo</div>
+          <h1 data-hr style="margin:0 0 26px;font-family:var(--es-serif);font-size:clamp(42px,5.8vw,74px);font-weight:500;letter-spacing:-0.015em;line-height:1.04;color:var(--es-ink);text-wrap:balance;">Design that works <em style="font-style:italic;">inside the system,</em> not around it.</h1>
+          <p data-hr style="margin:0 0 36px;max-width:46ch;font-size:clamp(15.5px,1.35vw,17.5px);line-height:1.65;color:var(--es-ink-2);">Industrial Design background. UX training. Product thinking. I design systems, interfaces and processes that solve real operational problems.</p>
+          <ul data-hr style="list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px;">
+            <li style="font-family:var(--es-mono);font-size:10.5px;letter-spacing:0.08em;color:var(--es-ink-3);border:1px solid var(--es-line-strong);border-radius:30px;padding:8px 14px;background:color-mix(in srgb, var(--es-paper) 72%, transparent);">Product Design</li>
+            <li style="font-family:var(--es-mono);font-size:10.5px;letter-spacing:0.08em;color:var(--es-ink-3);border:1px solid var(--es-line-strong);border-radius:30px;padding:8px 14px;background:color-mix(in srgb, var(--es-paper) 72%, transparent);">Systems Thinking</li>
+            <li style="font-family:var(--es-mono);font-size:10.5px;letter-spacing:0.08em;color:var(--es-ink-3);border:1px solid var(--es-line-strong);border-radius:30px;padding:8px 14px;background:color-mix(in srgb, var(--es-paper) 72%, transparent);">UX / UI</li>
+            <li style="font-family:var(--es-mono);font-size:10.5px;letter-spacing:0.08em;color:var(--es-ink-3);border:1px solid var(--es-line-strong);border-radius:30px;padding:8px 14px;background:color-mix(in srgb, var(--es-paper) 72%, transparent);">AI-Assisted Workflows</li>
+            <li style="font-family:var(--es-mono);font-size:10.5px;letter-spacing:0.08em;color:var(--es-ink-3);border:1px solid var(--es-line-strong);border-radius:30px;padding:8px 14px;background:color-mix(in srgb, var(--es-paper) 72%, transparent);">Industrial Design</li>
+          </ul>
+        </div>
+      </div>
+      <div id="es-net" aria-hidden="true" style="position:absolute;inset:0;z-index:0;"></div>
+    </section>
+
+    <!-- ================= FEATURED ================= -->
+    <section id="featured" data-screen-label="Featured case" data-reveal style="background:var(--es-block);border-bottom:1px solid var(--es-block-line);">
+      <div style="max-width:1140px;margin:0 auto;padding:clamp(64px,8vw,112px) clamp(20px,4.5vw,48px);">
+        <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:clamp(36px,4vw,52px);">
+          <span style="font-family:var(--es-mono);font-size:12px;color:var(--es-green);">01</span>
+          <h2 style="margin:0;font-family:var(--es-mono);font-size:11px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--es-ink-4);">Main case</h2>
+        </div>
+        <div data-feat style="display:grid;grid-template-columns:.95fr 1.05fr;gap:clamp(32px,5vw,72px);align-items:center;">
+          <div>
+            <div style="font-family:var(--es-mono);font-size:11px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--es-green);margin-bottom:18px;">Product + System Design · In progress</div>
+            <h3 style="margin:0 0 20px;font-family:var(--es-serif);font-size:clamp(34px,4vw,52px);font-weight:500;letter-spacing:-0.015em;line-height:1.06;color:var(--es-ink);text-wrap:balance;">A decision system for <em style="font-style:italic;">metal workshop budgeting.</em></h3>
+            <p style="margin:0 0 18px;max-width:56ch;font-size:15.5px;line-height:1.7;color:var(--es-ink-2);">A metal fabrication workshop that quotes well — but slowly, and from one person's head. Estimates queue up, and hours go into requests that end up not closing. I'm designing a system that turns that tacit knowledge into explicit, versioned criteria: consistent, transferable, and able to answer early with an orientative range before hours are committed.</p>
+            <p style="margin:0 0 24px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;font-size:13px;line-height:1.6;color:var(--es-ink-3);"><span>Developed and implemented at Guzmán Villalba — metal fabrication workshop, Montevideo.</span><span style="font-family:var(--es-mono);font-size:9px;letter-spacing:.12em;color:var(--es-ink-4);border:1px dashed var(--es-line-strong);border-radius:5px;padding:3px 7px;flex:none;">DRAFT</span></p>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:30px;">
+              <span style="display:inline-flex;align-items:center;gap:8px;font-family:var(--es-mono);font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--es-ink-2);border:1px solid var(--es-block-line);background:var(--es-block-2);border-radius:30px;padding:8px 14px;"><span style="width:6px;height:6px;border-radius:50%;background:var(--es-green);animation:esPulse 2.6s ease-in-out infinite;"></span>In progress</span>
+              <span style="font-family:var(--es-mono);font-size:10px;letter-spacing:0.04em;color:var(--es-ink-4);border:1px dashed var(--es-line-strong);border-radius:7px;padding:8px 11px;">{pending:gv-data → project start year}</span>
+            </div>
+            <a data-pt href="Estavillo - Work v1.dc.html" aria-label="Read the case study — main case, full case page pending, links to Work" style="display:inline-flex;align-items:center;gap:10px;font-size:15px;font-weight:600;color:var(--es-green);text-decoration:none;transition:gap .2s ease;" style-hover="gap:16px;" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">Read the case study <span aria-hidden="true">→</span></a>
+          </div>
+          <div style="position:relative;aspect-ratio:16/10;border:1px dashed var(--es-line-strong);border-radius:13px;background:var(--es-block-2);display:flex;align-items:center;justify-content:center;overflow:hidden;" role="img" aria-label="Placeholder for the featured case visual: system diagram or curated capture composition, per Master section 9.1">
+            <svg viewBox="0 0 160 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;opacity:.3;" aria-hidden="true"><line x1="0" y1="0" x2="160" y2="100" stroke="var(--es-line-strong)" stroke-width="0.5"></line><line x1="160" y1="0" x2="0" y2="100" stroke="var(--es-line-strong)" stroke-width="0.5"></line></svg>
+            <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:0 20px;">
+              <span style="font-family:var(--es-mono);font-size:11px;color:var(--es-ink-3);letter-spacing:0.06em;background:var(--es-block);border:1px solid var(--es-block-line);border-radius:7px;padding:7px 11px;">{asset:featured-gv}</span>
+              <span style="font-family:var(--es-mono);font-size:10px;color:var(--es-ink-4);letter-spacing:0.04em;">system diagram or curated capture composition · Master §9.1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PROCESS ================= -->
+    <section id="process" data-screen-label="How I work" data-reveal style="border-bottom:1px solid var(--es-line);">
+      <div style="max-width:1140px;margin:0 auto;padding:clamp(64px,8vw,112px) clamp(20px,4.5vw,48px);">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:clamp(36px,4vw,52px);">
+          <div style="display:flex;align-items:baseline;gap:14px;">
+            <span style="font-family:var(--es-mono);font-size:12px;color:var(--es-green);">02</span>
+            <h2 style="margin:0;font-family:var(--es-mono);font-size:11px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--es-ink-4);">How I work</h2>
+          </div>
+          <a data-pt href="Estavillo - How I Work v1.dc.html" style="display:inline-flex;align-items:center;gap:10px;font-size:14.5px;font-weight:500;color:var(--es-ink-2);text-decoration:none;transition:color .15s,gap .2s ease;" style-hover="color:var(--es-green);gap:16px;" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">See my process <span aria-hidden="true">→</span></a>
+        </div>
+        <ol data-steps style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(22px,2.8vw,36px) clamp(24px,3vw,40px);">
+          <li style="border-top:1px solid var(--es-line);padding-top:20px;">
+            <div style="font-family:var(--es-mono);font-size:12px;color:var(--es-green);margin-bottom:14px;">01</div>
+            <h3 style="margin:0 0 8px;font-size:17.5px;font-weight:600;letter-spacing:-0.005em;color:var(--es-ink);">Understand the system</h3>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:var(--es-ink-3);">Map the operational context before touching any screen.</p>
+          </li>
+          <li style="border-top:1px solid var(--es-line);padding-top:20px;">
+            <div style="font-family:var(--es-mono);font-size:12px;color:var(--es-green);margin-bottom:14px;">02</div>
+            <h3 style="margin:0 0 8px;font-size:17.5px;font-weight:600;letter-spacing:-0.005em;color:var(--es-ink);">Map the flows</h3>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:var(--es-ink-3);">Make the invisible process visible and shared.</p>
+          </li>
+          <li style="border-top:1px solid var(--es-line);padding-top:20px;">
+            <div style="font-family:var(--es-mono);font-size:12px;color:var(--es-green);margin-bottom:14px;">03</div>
+            <h3 style="margin:0 0 8px;font-size:17.5px;font-weight:600;letter-spacing:-0.005em;color:var(--es-ink);">Identify bottlenecks</h3>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:var(--es-ink-3);">Find where decisions, information or knowledge break down.</p>
+          </li>
+          <li style="border-top:1px solid var(--es-line);padding-top:20px;">
+            <div style="font-family:var(--es-mono);font-size:12px;color:var(--es-green);margin-bottom:14px;">04</div>
+            <h3 style="margin:0 0 8px;font-size:17.5px;font-weight:600;letter-spacing:-0.005em;color:var(--es-ink);">Design interventions</h3>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:var(--es-ink-3);">Prototype the logic before the interface.</p>
+          </li>
+          <li style="border-top:1px solid var(--es-line);padding-top:20px;">
+            <div style="font-family:var(--es-mono);font-size:12px;color:var(--es-green);margin-bottom:14px;">05</div>
+            <h3 style="margin:0 0 8px;font-size:17.5px;font-weight:600;letter-spacing:-0.005em;color:var(--es-ink);">Validate in the real world</h3>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:var(--es-ink-3);">Real users, real data, real pressure.</p>
+          </li>
+          <li style="border-top:1px solid var(--es-line);padding-top:20px;">
+            <div style="font-family:var(--es-mono);font-size:12px;color:var(--es-green);margin-bottom:14px;">06</div>
+            <h3 style="margin:0 0 8px;font-size:17.5px;font-weight:600;letter-spacing:-0.005em;color:var(--es-ink);">Document and scale</h3>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:var(--es-ink-3);">Good design must survive the designer.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ================= SELECTED WORK ================= -->
+    <section id="selected" data-screen-label="Selected work" data-reveal style="border-bottom:1px solid var(--es-line);">
+      <div style="max-width:1140px;margin:0 auto;padding:clamp(64px,8vw,112px) clamp(20px,4.5vw,48px);">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:clamp(36px,4vw,52px);">
+          <div style="display:flex;align-items:baseline;gap:14px;">
+            <span style="font-family:var(--es-mono);font-size:12px;color:var(--es-green);">03</span>
+            <h2 style="margin:0;font-family:var(--es-mono);font-size:11px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--es-ink-4);">Selected work</h2>
+          </div>
+          <a data-pt href="Estavillo - Work v1.dc.html" style="display:inline-flex;align-items:center;gap:10px;font-size:14.5px;font-weight:500;color:var(--es-ink-2);text-decoration:none;transition:color .15s,gap .2s ease;" style-hover="color:var(--es-green);gap:16px;" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">All work <span aria-hidden="true">→</span></a>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:clamp(16px,2vw,24px);">
+
+          <a data-pt data-wide href="Estavillo - Work v1.dc.html" aria-label="Trazur — thesis case study: UX research, service design and applied AI in digital education. Links to Work" style="display:grid;grid-template-columns:1.05fr 1fr;text-decoration:none;background:var(--es-paper-2);border:1px solid var(--es-line);border-radius:13px;overflow:hidden;transition:transform .15s ease,border-color .15s ease;" style-hover="transform:translateY(-2px);border-color:var(--es-line-strong);" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">
+            <div data-wide-thumb style="position:relative;min-height:250px;background:var(--es-surface);border-right:1px solid var(--es-line);display:flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 160 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;opacity:.3;" aria-hidden="true"><line x1="0" y1="0" x2="160" y2="100" stroke="var(--es-line-strong)" stroke-width="0.5"></line><line x1="160" y1="0" x2="0" y2="100" stroke="var(--es-line-strong)" stroke-width="0.5"></line></svg>
+              <span style="position:relative;font-family:var(--es-mono);font-size:10.5px;color:var(--es-ink-4);letter-spacing:0.06em;background:var(--es-paper-2);border:1px solid var(--es-line);border-radius:7px;padding:6px 10px;">{asset:thumb-trazur} · 16:10</span>
+            </div>
+            <div style="padding:clamp(22px,2.8vw,36px);display:flex;flex-direction:column;justify-content:center;">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+                <span style="font-family:var(--es-mono);font-size:10px;font-weight:500;letter-spacing:0.14em;color:var(--es-green);">Case 02</span>
+                <span style="font-family:var(--es-mono);font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--es-ink-4);">Thesis · Digital education</span>
+                <span style="font-family:var(--es-mono);font-size:9px;letter-spacing:.12em;color:var(--es-ink-4);border:1px dashed var(--es-line-strong);border-radius:5px;padding:2px 6px;">DRAFT</span>
+              </div>
+              <div style="font-family:var(--es-serif);font-size:clamp(26px,2.6vw,32px);font-weight:500;letter-spacing:-0.01em;color:var(--es-ink);margin-bottom:10px;">Trazur</div>
+              <div style="font-size:14.5px;line-height:1.65;color:var(--es-ink-3);margin-bottom:18px;max-width:48ch;">Degree thesis turned case study: research-driven redesign of an e-learning product — UX research, service design and applied AI in digital education.</div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <span style="font-family:var(--es-mono);font-size:10px;letter-spacing:0.08em;color:var(--es-ink-3);border:1px solid var(--es-line);border-radius:30px;padding:6px 12px;">UX Research</span>
+                <span style="font-family:var(--es-mono);font-size:10px;letter-spacing:0.08em;color:var(--es-ink-3);border:1px solid var(--es-line);border-radius:30px;padding:6px 12px;">Service Design</span>
+                <span style="font-family:var(--es-mono);font-size:10px;letter-spacing:0.08em;color:var(--es-ink-3);border:1px solid var(--es-line);border-radius:30px;padding:6px 12px;">Applied AI</span>
+                <span style="font-family:var(--es-mono);font-size:10px;letter-spacing:0.08em;color:var(--es-ink-3);border:1px solid var(--es-line);border-radius:30px;padding:6px 12px;">E-learning</span>
+              </div>
+            </div>
+          </a>
+
+          <div data-cards style="display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(16px,2vw,24px);">
+
+          <a data-pt href="Estavillo - Work v1.dc.html" aria-label="French Bakery — academic UX case from the Google UX Design Certificate, links to Work" style="display:block;text-decoration:none;background:var(--es-paper-2);border:1px solid var(--es-line);border-radius:13px;overflow:hidden;transition:transform .15s ease,border-color .15s ease;" style-hover="transform:translateY(-2px);border-color:var(--es-line-strong);" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">
+            <div style="position:relative;aspect-ratio:16/10;background:var(--es-surface);border-bottom:1px solid var(--es-line);display:flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 160 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;opacity:.3;" aria-hidden="true"><line x1="0" y1="0" x2="160" y2="100" stroke="var(--es-line-strong)" stroke-width="0.5"></line><line x1="160" y1="0" x2="0" y2="100" stroke="var(--es-line-strong)" stroke-width="0.5"></line></svg>
+              <span style="position:relative;font-family:var(--es-mono);font-size:10.5px;color:var(--es-ink-4);letter-spacing:0.06em;background:var(--es-paper-2);border:1px solid var(--es-line);border-radius:7px;padding:6px 10px;">{asset:thumb-frenchbakery} · 16:10</span>
+            </div>
+            <div style="padding:20px 22px 24px;">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+                <span style="font-family:var(--es-mono);font-size:10px;font-weight:500;letter-spacing:0.14em;color:var(--es-green);">Case 03</span>
+                <span style="font-family:var(--es-mono);font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--es-green);border:1px solid var(--es-green-dim);border-radius:30px;padding:4px 10px;">Academic UX Case · Google UX Design Certificate</span>
+              </div>
+              <div style="font-family:var(--es-serif);font-size:24px;font-weight:500;letter-spacing:-0.01em;color:var(--es-ink);margin-bottom:8px;">French Bakery</div>
+              <div style="font-size:14px;line-height:1.6;color:var(--es-ink-3);">End-to-end UX process — research, wireframes, usability testing — from the Google UX Design Professional Certificate.</div>
+            </div>
+          </a>
+
+          <a data-pt href="Estavillo - Work v1.dc.html" aria-label="Samic — legacy project: industrial e-commerce and visual systems, links to Work" style="display:block;text-decoration:none;background:transparent;border:1px solid var(--es-line);border-radius:13px;overflow:hidden;transition:transform .15s ease,border-color .15s ease;" style-hover="transform:translateY(-2px);border-color:var(--es-line-strong);" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">
+            <div style="position:relative;aspect-ratio:16/10;background:var(--es-paper-2);border-bottom:1px solid var(--es-line);display:flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 160 100" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;opacity:.3;" aria-hidden="true"><line x1="0" y1="0" x2="160" y2="100" stroke="var(--es-line-strong)" stroke-width="0.5"></line><line x1="160" y1="0" x2="0" y2="100" stroke="var(--es-line-strong)" stroke-width="0.5"></line></svg>
+              <span style="position:relative;font-family:var(--es-mono);font-size:10.5px;color:var(--es-ink-4);letter-spacing:0.06em;background:var(--es-paper-2);border:1px solid var(--es-line);border-radius:7px;padding:6px 10px;">{asset:thumb-samic} · 16:10</span>
+            </div>
+            <div style="padding:20px 22px 24px;">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+                <span style="font-family:var(--es-mono);font-size:10px;font-weight:500;letter-spacing:0.14em;color:var(--es-green);">Case 04</span>
+                <span style="font-family:var(--es-mono);font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--es-ink-4);">Legacy · Industrial e-commerce</span>
+              </div>
+              <div style="font-family:var(--es-serif);font-size:24px;font-weight:500;letter-spacing:-0.01em;color:var(--es-ink);margin-bottom:8px;">Samic</div>
+              <div style="font-size:14px;line-height:1.6;color:var(--es-ink-3);">E-commerce and visual systems for an industrial parts distributor.</div>
+            </div>
+          </a>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ABOUT ================= -->
+    <section id="about" data-screen-label="About teaser" data-reveal style="border-bottom:1px solid var(--es-line);">
+      <div data-about style="max-width:1140px;margin:0 auto;padding:clamp(64px,8vw,112px) clamp(20px,4.5vw,48px);display:grid;grid-template-columns:300px 1fr;gap:clamp(32px,5vw,72px);align-items:start;">
+        <div data-about-portrait style="position:relative;aspect-ratio:3/4;border:1px dashed var(--es-line-strong);border-radius:13px;background:var(--es-paper-2);display:flex;align-items:center;justify-content:center;overflow:hidden;" role="img" aria-label="Placeholder for the editorial portrait of Ramiro Estavillo, per DOC-SHOOT-BRIEF R1">
+          <svg viewBox="0 0 90 120" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;opacity:.3;" aria-hidden="true"><line x1="0" y1="0" x2="90" y2="120" stroke="var(--es-line-strong)" stroke-width="0.5"></line><line x1="90" y1="0" x2="0" y2="120" stroke="var(--es-line-strong)" stroke-width="0.5"></line></svg>
+          <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:0 16px;">
+            <span style="font-family:var(--es-mono);font-size:10.5px;color:var(--es-ink-3);letter-spacing:0.06em;background:var(--es-surface);border:1px solid var(--es-line);border-radius:7px;padding:6px 10px;">{asset:retrato}</span>
+            <span style="font-family:var(--es-mono);font-size:10px;color:var(--es-ink-4);letter-spacing:0.04em;">editorial portrait · DOC-SHOOT-BRIEF R1</span>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:28px;">
+            <span style="font-family:var(--es-mono);font-size:12px;color:var(--es-green);">04</span>
+            <h2 style="margin:0;font-family:var(--es-mono);font-size:11px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--es-ink-4);">About</h2>
+          </div>
+          <p style="margin:0 0 30px;max-width:50ch;font-family:var(--es-serif);font-size:clamp(20px,2.3vw,27px);font-weight:400;line-height:1.5;letter-spacing:-0.005em;color:var(--es-ink-2);">I'm Ramiro Estavillo, Product Designer. I studied Industrial Design and have spent over a decade designing across physical products, communication systems, digital interfaces and operational workflows. What connects all of it is a preference for understanding how things actually work before proposing how they could work better.</p>
+          <a data-pt href="Estavillo - About v1.dc.html" style="display:inline-flex;align-items:center;gap:10px;font-size:14.5px;font-weight:500;color:var(--es-ink-2);text-decoration:none;transition:color .15s,gap .2s ease;" style-hover="color:var(--es-green);gap:16px;" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">More about me <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CONNECT ================= -->
+    <section id="connect" data-screen-label="Connect" data-reveal>
+      <div style="max-width:1140px;margin:0 auto;padding:clamp(72px,9vw,128px) clamp(20px,4.5vw,48px);">
+        <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:clamp(28px,3vw,40px);">
+          <span style="font-family:var(--es-mono);font-size:12px;color:var(--es-green);">05</span>
+          <h2 style="margin:0;font-family:var(--es-mono);font-size:11px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--es-ink-4);">Connect</h2>
+        </div>
+        <p style="margin:0 0 26px;font-family:var(--es-serif);font-size:clamp(48px,7vw,88px);font-weight:500;letter-spacing:-0.015em;line-height:1;color:var(--es-ink);">Let's <em style="font-style:italic;">talk.</em></p>
+        <p style="margin:0 0 40px;max-width:56ch;font-size:clamp(15.5px,1.35vw,17px);line-height:1.65;color:var(--es-ink-3);">I'm selectively open to product design opportunities with operational depth — especially systems, workflows and AI-assisted products.</p>
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:24px;">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <a href="/cdn-cgi/l/email-protection#c8a0ada4a4a788baa9a5a1baa7adbbbca9bea1a4a4a7e6aba7a5" style="font-family:var(--es-mono);font-size:clamp(17px,2.4vw,24px);color:var(--es-ink);text-decoration:none;border-bottom:1px solid var(--es-green);padding-bottom:3px;transition:color .15s;" style-hover="color:var(--es-green);" style-focus="outline:2px solid var(--es-green);outline-offset:4px;"><span class="__cf_email__" data-cfemail="cca4a9a0a0a38cbeada1a5bea3a9bfb8adbaa5a0a0a3e2afa3a1">[email&#160;protected]</span></a>
+            <span style="font-family:var(--es-mono);font-size:10px;letter-spacing:0.04em;color:var(--es-ink-4);border:1px dashed var(--es-line-strong);border-radius:7px;padding:6px 9px;">provisional (D5)</span>
+          </div>
+          <a data-pt href="Estavillo - Connect v1.dc.html" style="display:inline-flex;align-items:center;gap:10px;font-size:14.5px;font-weight:500;color:var(--es-ink-2);text-decoration:none;transition:color .15s,gap .2s ease;" style-hover="color:var(--es-green);gap:16px;" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">All ways to connect <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer data-screen-label="Footer" style="border-top:1px solid var(--es-line);">
+    <div style="max-width:1140px;margin:0 auto;padding:28px clamp(20px,4.5vw,48px) 30px;display:flex;flex-direction:column;gap:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;">
+        <span style="font-size:12px;font-weight:700;letter-spacing:0.22em;color:var(--es-ink-3);">ESTAVILLO</span>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+          <a data-pt href="Estavillo - Work v1.dc.html" style="font-size:13px;font-weight:500;color:var(--es-ink-3);text-decoration:none;transition:color .15s;" style-hover="color:var(--es-ink);" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">Work</a>
+          <a data-pt href="Estavillo - How I Work v1.dc.html" style="font-size:13px;font-weight:500;color:var(--es-ink-3);text-decoration:none;transition:color .15s;" style-hover="color:var(--es-ink);" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">How I Work</a>
+          <a data-pt href="Estavillo - About v1.dc.html" style="font-size:13px;font-weight:500;color:var(--es-ink-3);text-decoration:none;transition:color .15s;" style-hover="color:var(--es-ink);" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">About</a>
+          <a data-pt href="Estavillo - Connect v1.dc.html" style="font-size:13px;font-weight:500;color:var(--es-ink-3);text-decoration:none;transition:color .15s;" style-hover="color:var(--es-ink);" style-focus="outline:2px solid var(--es-green);outline-offset:3px;">Connect</a>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-top:1px solid var(--es-line);padding-top:18px;">
+        <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-family:var(--es-mono);font-size:11px;letter-spacing:0.08em;color:var(--es-ink-4);">
+          <a href="/cdn-cgi/l/email-protection#355d5059595a754754585c475a50464154435c59595a1b565a58" style="color:var(--es-ink-4);text-decoration:none;transition:color .15s;" style-hover="color:var(--es-ink-2);" style-focus="outline:2px solid var(--es-green);outline-offset:3px;"><span class="__cf_email__" data-cfemail="1179747d7d7e5163707c78637e7462657067787d7d7e3f727e7c">[email&#160;protected]</span></a>
+          <span title="URL pending (bio-facts)">LinkedIn</span>
+          <span title="URL pending (bio-facts)">Behance</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-family:var(--es-mono);font-size:11px;letter-spacing:0.08em;color:var(--es-ink-4);">
+          <span>Montevideo, Uruguay</span>
+          <span>© 2026</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</div>
+</x-dc>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;},&quot;heroIntro&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Hero&quot;},&quot;scrollReveal&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Motion&quot;}}">
+class Component extends DCLogic {
+  state = { menuOpen: false };
+
+  componentDidMount() {
+    this._reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    this._prevIntro = this.props.heroIntro ?? true;
+    this.applyTheme();
+    this.initPageTransitions();
+    this.initHeroReveal();
+    this.initReveal();
+    this.initNetwork();
+  }
+
+  componentDidUpdate() {
+    this.applyTheme();
+    const intro = this.props.heroIntro ?? true;
+    if (intro && !this._prevIntro && this._eng) this._eng.replay();
+    this._prevIntro = intro;
+  }
+
+  applyTheme() {
+    document.documentElement.setAttribute('data-theme', this.props.theme === 'light' ? 'light' : 'dark');
+    if (this._eng) this._eng.recolor();
+  }
+
+  motionEnabled() { return (this.props.scrollReveal ?? true) && !this._reduced; }
+
+  /* ---- shared page transition: fade in on load, fade out on internal nav ---- */
+  initPageTransitions() {
+    const root = document.getElementById('es-root');
+    if (!root) return;
+    if (!this._reduced) {
+      root.style.opacity = '0';
+      root.style.transform = 'translateY(6px)';
+      root.style.transition = 'opacity .3s ease-out, transform .3s ease-out';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        root.style.opacity = '1'; root.style.transform = 'none';
+      }));
+    }
+    document.addEventListener('click', (e) => {
+      const a = e.target && e.target.closest ? e.target.closest('a[data-pt]') : null;
+      if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
+      const href = a.getAttribute('href');
+      if (!href || href.charAt(0) === '#') return;
+      e.preventDefault();
+      if (this._reduced) { window.location.href = href; return; }
+      root.style.opacity = '0';
+      root.style.transform = 'translateY(-4px)';
+      setTimeout(() => { window.location.href = href; }, 230);
+    });
+  }
+
+  initHeroReveal() {
+    if (!this.motionEnabled()) return;
+    const items = Array.from(document.querySelectorAll('[data-hr]'));
+    items.forEach((el, i) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(14px)';
+      el.style.transition = 'opacity .55s ease-out, transform .55s ease-out';
+      el.style.transitionDelay = (140 + i * 110) + 'ms';
+    });
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      items.forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; });
+    }));
+  }
+
+  initReveal() {
+    const els = Array.from(document.querySelectorAll('[data-reveal]'));
+    if (!this.motionEnabled() || !('IntersectionObserver' in window)) return;
+    els.forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(12px)';
+      el.style.transition = 'opacity .4s ease-out, transform .4s ease-out';
+    });
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (en.isIntersecting) { en.target.style.opacity = '1'; en.target.style.transform = 'none'; io.unobserve(en.target); }
+      });
+    }, { threshold: 0.12 });
+    els.forEach(el => io.observe(el));
+  }
+
+  /* ===================================================================
+     HERO v1 — El mapa de relaciones (2A, congelado)
+     Intro única ~2.6s: los nodos aparecen sueltos, las conexiones se
+     dibujan propagándose desde un nodo raíz (BFS), el foco se ilumina,
+     todo se asienta. Idle: respiración CSS mínima. Hover: campo de
+     proximidad amortiguado — brillo, opacidad y un lean de ≤3px.
+     Mobile: banda propia bajo el texto; el scroll desplaza la atención.
+     SVG + rAF vanilla, 0 dependencias, el rAF duerme al asentarse.
+     =================================================================== */
+  initNetwork() {
+    const host = document.getElementById('es-net');
+    const hero = document.getElementById('es-hero');
+    if (!host || !hero || this._eng) return;
+    const NS = 'http://www.w3.org/2000/svg';
+    const self = this;
+    const smooth = t => t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t);
+    const hoverCapable = !!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+
+    /* resolved colors for smooth JS lerps (re-resolved on theme change) */
+    let C = {};
+    const parseCol = (str) => {
+      str = (str || '').trim();
+      if (str.charAt(0) === '#') {
+        const h = str.substring(1);
+        const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h;
+        return [parseInt(f.substr(0, 2), 16), parseInt(f.substr(2, 2), 16), parseInt(f.substr(4, 2), 16)];
+      }
+      const m = str.match(/([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/);
+      return m ? [+m[1], +m[2], +m[3]] : [128, 128, 128];
+    };
+    const recolor = () => {
+      const cs = getComputedStyle(host);
+      C = {
+        ink4: parseCol(cs.getPropertyValue('--es-ink-4')),
+        ink3: parseCol(cs.getPropertyValue('--es-ink-3')),
+        ink2: parseCol(cs.getPropertyValue('--es-ink-2')),
+        green: parseCol(cs.getPropertyValue('--es-green')),
+        line: parseCol(cs.getPropertyValue('--es-line-strong'))
+      };
+    };
+    recolor();
+    const mix = (a, b, t) => 'rgb(' + Math.round(a[0] + (b[0] - a[0]) * t) + ',' + Math.round(a[1] + (b[1] - a[1]) * t) + ',' + Math.round(a[2] + (b[2] - a[2]) * t) + ')';
+
+    let seed = 0;
+    const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+
+    let nodes = [], edges = [], svg = null, halo = null, ring = null, gAll = null;
+    let W = 0, H = 0, bandLayout = false, introDone = false, introT0 = 0, INTRO = 2650;
+    let raf = 0, mouse = { x: -1e4, y: -1e4, on: false }, drift = { p: 0.5, cur: 0.5 };
+
+    const el = (name, attrs, parent) => {
+      const n = document.createElementNS(NS, name);
+      for (const k in attrs) n.setAttribute(k, attrs[k]);
+      (parent || svg).appendChild(n);
+      return n;
+    };
+
+    /* ---------- build graph in pixel space ---------- */
+    const build = (settled) => {
+      host.innerHTML = '';
+      const r = host.getBoundingClientRect();
+      W = Math.max(300, r.width | 0); H = Math.max(240, r.height | 0);
+      bandLayout = window.matchMedia('(max-width: 1023px)').matches;
+      seed = 20260704;
+      svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      svg.setAttribute('preserveAspectRatio', 'none');
+      svg.setAttribute('aria-hidden', 'true');
+      svg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;';
+      host.appendChild(svg);
+
+      const defs = el('defs', {});
+      const grad = el('radialGradient', { id: 'esHaloG' }, defs);
+      const s0 = el('stop', { offset: '0%' }, grad); s0.style.stopColor = 'var(--es-green)'; s0.style.stopOpacity = '.6';
+      const s1 = el('stop', { offset: '100%' }, grad); s1.style.stopColor = 'var(--es-green)'; s1.style.stopOpacity = '0';
+      gAll = el('g', {});
+
+      /* exclusion: measure the text block (desktop overlay layout only) */
+      let ex = null;
+      if (!bandLayout) {
+        const txt = document.querySelector('[data-hero-text]');
+        if (txt) {
+          const tr = txt.getBoundingClientRect();
+          ex = { x0: tr.left - r.left - 34, y0: tr.top - r.top - 34, x1: tr.right - r.left + 44, y1: tr.bottom - r.top + 40 };
+        }
+      }
+
+      /* nodes on a jittered lattice */
+      nodes = []; edges = [];
+      const s = bandLayout ? 84 : 116;
+      const cols = Math.ceil(W / s), rows = Math.ceil(H / s);
+      for (let cx = 0; cx < cols; cx++) for (let cy = 0; cy < rows; cy++) {
+        const x = cx * s + s * 0.5 + (rnd() - 0.5) * s * 0.78;
+        const y = cy * s + s * 0.5 + (rnd() - 0.5) * s * 0.72;
+        if (x < 22 || x > W - 22 || y < 22 || y > H - 22) continue;
+        if (ex && x > ex.x0 && x < ex.x1 && y > ex.y0 && y < ex.y1 && rnd() > 0.08) continue;
+        nodes.push({ x, y, cur: 0, tgt: 0, damp: 0.055 + rnd() * 0.07, ph: rnd(), depth: 99, deg: 0 });
+      }
+      /* edges: 2-3 nearest, dedupe */
+      const seen = new Set();
+      nodes.forEach((n, i) => {
+        const cand = nodes.map((m, j) => ({ j, d: Math.hypot(m.x - n.x, m.y - n.y) }))
+          .filter(o => o.j !== i && o.d < s * 1.72).sort((a, b) => a.d - b.d).slice(0, 3);
+        cand.forEach((o, k) => {
+          const key = Math.min(i, o.j) + '-' + Math.max(i, o.j);
+          if (seen.has(key)) return;
+          if (k === 2 && rnd() < 0.55) return;
+          seen.add(key);
+          edges.push({ a: i, b: o.j, len: o.d, depth: 99 });
+        });
+      });
+      const adj = nodes.map(() => []);
+      edges.forEach((ed, k) => { adj[ed.a].push({ n: ed.b, e: k }); adj[ed.b].push({ n: ed.a, e: k }); });
+      nodes.forEach((n, i) => { n.deg = adj[i].length; });
+
+      /* root + BFS depths; stitch unreachable clusters so all connect */
+      const rx = bandLayout ? W * 0.55 : W * 0.72, ry = bandLayout ? H * 0.68 : H * 0.42;
+      let root = 0, bd = 1e18;
+      nodes.forEach((n, i) => { const d = (n.x - rx) ** 2 + (n.y - ry) ** 2; if (d < bd) { bd = d; root = i; } });
+      const bfs = () => {
+        nodes.forEach(n => { n.depth = 99; });
+        const q = [root]; nodes[root].depth = 0;
+        while (q.length) {
+          const i = q.shift();
+          adj[i].forEach(o => { if (nodes[o.n].depth > nodes[i].depth + 1) { nodes[o.n].depth = nodes[i].depth + 1; q.push(o.n); } });
+        }
+      };
+      bfs();
+      let guard = 0;
+      while (guard++ < 40) {
+        const orphan = nodes.findIndex(n => n.depth === 99);
+        if (orphan < 0) break;
+        let bi = -1, bj = -1, best = 1e18;
+        nodes.forEach((n, i) => {
+          if (n.depth === 99) return;
+          nodes.forEach((m, j) => {
+            if (m.depth !== 99) return;
+            const d = (n.x - m.x) ** 2 + (n.y - m.y) ** 2;
+            if (d < best) { best = d; bi = i; bj = j; }
+          });
+        });
+        if (bi < 0) break;
+        const len = Math.hypot(nodes[bi].x - nodes[bj].x, nodes[bi].y - nodes[bj].y);
+        edges.push({ a: bi, b: bj, len, depth: 99 });
+        adj[bi].push({ n: bj, e: edges.length - 1 }); adj[bj].push({ n: bi, e: edges.length - 1 });
+        bfs();
+      }
+      edges.forEach(ed => { ed.depth = Math.min(nodes[ed.a].depth, nodes[ed.b].depth); });
+      const maxDepth = nodes.reduce((m, n) => n.depth < 99 ? Math.max(m, n.depth) : m, 1);
+
+      /* halo + focus ring behind everything */
+      const rootN = nodes[root];
+      const hr = Math.max(120, Math.min(210, Math.min(W, H) * 0.34));
+      halo = el('circle', { cx: rootN.x, cy: rootN.y, r: hr, fill: 'url(#esHaloG)' }, gAll);
+      halo.style.opacity = '0';
+
+      /* draw edges then nodes */
+      edges.forEach(ed => {
+        const A = nodes[ed.a], B = nodes[ed.b];
+        ed.n = el('line', { x1: A.x, y1: A.y, x2: B.x, y2: B.y }, gAll);
+        ed.focus = ed.depth <= 0;
+        ed.baseOp = ed.focus ? 0.75 : 0.42;
+        ed.baseW = ed.focus ? 1.4 : 1;
+        ed.t0 = 700 + ed.depth * 150 + rnd() * 130;
+        ed.n.setAttribute('stroke-dasharray', String(ed.len));
+        ed.n.setAttribute('stroke-dashoffset', String(ed.len));
+        ed.n.style.stroke = ed.focus ? 'var(--es-green-dim)' : 'var(--es-line-strong)';
+        ed.n.style.strokeWidth = ed.baseW + 'px';
+        ed.n.style.opacity = '0';
+        ed.connT = ed.t0 + 470;
+      });
+      let breathePick = 0;
+      nodes.forEach((n, i) => {
+        n.isRoot = i === root;
+        n.focus = n.depth <= 1;
+        n.baseR = n.isRoot ? 3.6 : n.focus ? 2.9 : 2.2;
+        n.baseOp = n.isRoot ? 1 : n.focus ? 0.9 : 0.72;
+        n.appearT = 90 + rnd() * 880;
+        n.connT = 1e9;
+        adj[i].forEach(o => { n.connT = Math.min(n.connT, edges[o.e].connT); });
+        n.dot = el('circle', { cx: n.x, cy: n.y, r: n.baseR }, gAll);
+        n.dot.style.fill = 'var(--es-ink-4)';
+        n.dot.style.opacity = '0';
+        /* two secondary nodes breathe very slowly in idle */
+        if (!n.focus && n.depth >= 2 && n.depth < 99 && breathePick < 3 && rnd() < 0.22) { n.breathe = true; breathePick++; }
+      });
+      ring = el('circle', { cx: rootN.x, cy: rootN.y, r: 8.5, fill: 'none' }, gAll);
+      const circ = 2 * Math.PI * 8.5;
+      ring.setAttribute('stroke-dasharray', String(circ));
+      ring.setAttribute('stroke-dashoffset', String(circ));
+      ring.style.cssText = 'stroke:var(--es-green);stroke-width:1;opacity:0;';
+
+      this._graph = { root, maxDepth };
+      if (settled) settleNow(); else { introDone = false; }
+    };
+
+    /* ---------- settled (final) state ---------- */
+    const settleNow = () => {
+      introDone = true;
+      edges.forEach(ed => {
+        ed.n.setAttribute('stroke-dasharray', 'none');
+        ed.n.setAttribute('stroke-dashoffset', '0');
+        ed.n.style.opacity = String(ed.baseOp);
+      });
+      nodes.forEach(n => {
+        n.dot.style.opacity = String(n.baseOp);
+        n.dot.style.fill = n.focus ? 'var(--es-green)' : (n.depth < 99 ? 'var(--es-ink-3)' : 'var(--es-ink-4)');
+        if (n.breathe && !self._reduced) n.dot.style.animation = 'esBreatheNode ' + (10 + n.ph * 4).toFixed(1) + 's ease-in-out ' + (-n.ph * 8).toFixed(1) + 's infinite';
+      });
+      halo.style.opacity = '0.09';
+      if (!self._reduced) halo.style.animation = 'esBreathe 9s ease-in-out infinite';
+      ring.setAttribute('stroke-dashoffset', '0');
+      ring.style.opacity = '0.85';
+    };
+
+    /* ---------- intro timeline (runs once, then rAF sleeps) ---------- */
+    const introFrame = (now) => {
+      const t = now - introT0;
+      nodes.forEach(n => {
+        const ka = smooth((t - n.appearT) / 480);
+        const kc = smooth((t - n.connT) / 420);
+        const kf = n.focus ? smooth((t - 1750) / 520) : 0;
+        const op = ka * (0.55 + 0.2 * kc + (n.baseOp - 0.75) * kf + (n.focus ? 0.15 * kf : 0));
+        n.dot.style.opacity = String(Math.max(0, Math.min(n.baseOp, ka * 0.55 + kc * (n.baseOp - 0.55) * 0.6 + kf * n.baseOp * 0.4)));
+        const rr = n.baseR * (0.55 + 0.45 * ka) + (n.isRoot ? 0 : 0);
+        n.dot.setAttribute('r', String(rr));
+        if (n.focus) n.dot.style.fill = kf > 0 ? mix(C.ink4, C.green, kf) : 'rgb(' + C.ink4.join(',') + ')';
+        else if (kc > 0) n.dot.style.fill = mix(C.ink4, C.ink3, kc);
+      });
+      edges.forEach(ed => {
+        const k = smooth((t - ed.t0) / 520);
+        ed.n.setAttribute('stroke-dashoffset', String(ed.len * (1 - k)));
+        ed.n.style.opacity = String(ed.baseOp * k);
+      });
+      const kh = smooth((t - 1900) / 620);
+      halo.style.opacity = String(0.09 * kh);
+      const kr = smooth((t - 1950) / 480);
+      ring.setAttribute('stroke-dashoffset', String((2 * Math.PI * 8.5) * (1 - kr)));
+      ring.style.opacity = String(0.85 * kr);
+      if (t >= INTRO) { settleNow(); return false; }
+      return true;
+    };
+
+    /* ---------- hover / drift field ---------- */
+    const fieldFrame = () => {
+      let energy = 0;
+      const R = bandLayout ? 190 : 250;
+      const scale = hoverCapable ? 1 : 0.6;
+      nodes.forEach(n => {
+        let t = 0;
+        if (mouse.on) {
+          const d = Math.hypot(n.x - mouse.x, n.y - mouse.y);
+          t = smooth(1 - d / R) * scale;
+        }
+        n.tgt = t;
+        const dd = (n.tgt - n.cur) * n.damp * (1 + n.ph * 0.5);
+        n.cur += dd; energy += Math.abs(dd);
+        if (n.cur > 0.004) {
+          const lean = 3 * n.cur;
+          const dx = mouse.on ? (mouse.x - n.x) : 0, dy = mouse.on ? (mouse.y - n.y) : 0;
+          const dl = Math.hypot(dx, dy) || 1;
+          n.vx = n.x + dx / dl * lean; n.vy = n.y + dy / dl * lean;
+          n.dot.setAttribute('cx', String(n.vx)); n.dot.setAttribute('cy', String(n.vy));
+          n.dot.setAttribute('r', String(n.baseR + 1.7 * n.cur));
+          n.dot.style.opacity = String(Math.min(1, n.baseOp + 0.3 * n.cur));
+          if (!n.focus) {
+            const base = n.depth < 99 ? C.ink3 : C.ink4;
+            let col = mix(base, C.ink2, Math.min(1, n.cur * 0.9));
+            if (n.cur > 0.72) col = mix(parseCol(col), C.green, (n.cur - 0.72) / 0.28 * 0.4);
+            n.dot.style.fill = col;
+          }
+          n.moved = true;
+        } else if (n.moved) {
+          n.moved = false; n.vx = n.x; n.vy = n.y;
+          n.dot.setAttribute('cx', String(n.x)); n.dot.setAttribute('cy', String(n.y));
+          n.dot.setAttribute('r', String(n.baseR));
+          n.dot.style.opacity = String(n.baseOp);
+          if (!n.focus) n.dot.style.fill = n.depth < 99 ? 'var(--es-ink-3)' : 'var(--es-ink-4)';
+        }
+      });
+      edges.forEach(ed => {
+        const A = nodes[ed.a], B = nodes[ed.b];
+        const m = Math.max(A.cur, B.cur);
+        if (m > 0.004) {
+          ed.n.setAttribute('x1', String(A.vx || A.x)); ed.n.setAttribute('y1', String(A.vy || A.y));
+          ed.n.setAttribute('x2', String(B.vx || B.x)); ed.n.setAttribute('y2', String(B.vy || B.y));
+          ed.n.style.opacity = String(Math.min(1, ed.baseOp + 0.32 * m));
+          ed.n.style.strokeWidth = (ed.baseW + 0.45 * m) + 'px';
+          ed.moved = true;
+        } else if (ed.moved) {
+          ed.moved = false;
+          ed.n.setAttribute('x1', String(A.x)); ed.n.setAttribute('y1', String(A.y));
+          ed.n.setAttribute('x2', String(B.x)); ed.n.setAttribute('y2', String(B.y));
+          ed.n.style.opacity = String(ed.baseOp);
+          ed.n.style.strokeWidth = ed.baseW + 'px';
+        }
+      });
+      /* mobile: gentle parallax of the whole field with scroll */
+      if (!hoverCapable) {
+        const dd = (drift.p - drift.cur) * 0.06;
+        drift.cur += dd; energy += Math.abs(dd) * 4;
+        gAll.setAttribute('transform', 'translate(0,' + ((0.5 - drift.cur) * 12).toFixed(2) + ')');
+      }
+      return energy;
+    };
+
+    const frame = (now) => {
+      let alive = false;
+      if (!introDone) alive = introFrame(now) || alive;
+      const e = introDone ? fieldFrame() : 0;
+      if (introDone && e < 0.0015) { raf = 0; return; }
+      raf = requestAnimationFrame(frame);
+    };
+    const wake = () => { if (!raf) raf = requestAnimationFrame(frame); };
+    const startIntro = () => {
+      if (self._reduced) { settleNow(); return; }
+      introT0 = performance.now();
+      introDone = false;
+      wake();
+    };
+
+    /* ---------- listeners ---------- */
+    if (!this._reduced && hoverCapable) {
+      hero.addEventListener('pointermove', (e) => {
+        if (!introDone) return;
+        const r = host.getBoundingClientRect();
+        mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; mouse.on = true;
+        wake();
+      });
+      hero.addEventListener('pointerleave', () => { mouse.on = false; wake(); });
+    }
+    if (!this._reduced && !hoverCapable) {
+      window.addEventListener('scroll', () => {
+        if (!introDone) return;
+        const r = host.getBoundingClientRect();
+        const vh = window.innerHeight || 1;
+        const p = Math.max(0, Math.min(1, (vh - r.top) / (vh + r.height)));
+        drift.p = p;
+        /* a soft attention point slides across the band */
+        mouse.x = W * (0.25 + 0.5 * p); mouse.y = H * 0.62; mouse.on = true;
+        wake();
+      }, { passive: true });
+    }
+    let rsT = 0;
+    window.addEventListener('resize', () => {
+      clearTimeout(rsT);
+      rsT = setTimeout(() => {
+        const r = host.getBoundingClientRect();
+        const modeNow = window.matchMedia('(max-width: 1023px)').matches;
+        if (Math.abs(r.width - W) > 70 || Math.abs(r.height - H) > 70 || modeNow !== bandLayout) build(true);
+      }, 260);
+    });
+
+    /* ---------- boot ---------- */
+    build(this._reduced);
+    if (!this._reduced) {
+      if (hoverCapable && !bandLayout) startIntro();
+      else if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((ents) => {
+          ents.forEach(en => { if (en.isIntersecting) { startIntro(); io.disconnect(); } });
+        }, { threshold: 0.25 });
+        io.observe(host);
+      } else startIntro();
+    }
+
+    this._eng = {
+      recolor,
+      replay: () => { if (!self._reduced) { build(false); startIntro(); } }
+    };
+  }
+
+  renderVals() {
+    return {
+      themeAttr: this.props.theme ?? 'dark',
+      menuOpen: this.state.menuOpen,
+      openMenu: () => { document.body.style.overflow = 'hidden'; this.setState({ menuOpen: true }); },
+      closeMenu: () => { document.body.style.overflow = ''; this.setState({ menuOpen: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

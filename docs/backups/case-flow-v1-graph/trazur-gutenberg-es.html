@@ -1,0 +1,510 @@
+<!--
+  ESTAVILLO — Case Study content: "Trazur Cursos" (IA + UX Research) — ES,
+  Gutenberg block edition
+  ============================================================================
+  HOW TO USE THIS FILE
+  ----------------------------------------------------------------------------
+  1. In wp-admin: Case Studies → Add New (or open the existing draft for
+     this case if one exists — don't create a duplicate). See
+     docs/content/trazur-fields-es.md for every native field value and
+     the exact Case Index block.
+  2. Open the block editor. Click the "⋮" (Options) menu → "Code editor"
+     (or Ctrl+Shift+Alt+M / Cmd+Shift+Alt+M). Paste EVERYTHING below the
+     end of this instructional comment into the code editor.
+  3. Switch back to "Visual editor" from the same Options menu. WordPress
+     parses the pasted text into real, editable blocks — Case Section,
+     Columns, Case Figure, Case Stats, Case Decisions, Case Quote, Case
+     Details, Case Timeline, Case Ladder, plus native Heading/Paragraph/
+     List/Table/Group/Buttons. If a block ever shows "This block contains
+     unexpected or invalid content," that's a paste issue (partial paste,
+     or an editor auto-correction) — re-paste the whole block from this
+     file, don't hand-edit the recovered HTML.
+  4. This is the SPANISH version only. Do not paste this into an English
+     post or translate it inline — the English version is a separate,
+     later task.
+  5. Source: migrated and edited from the project owner's Trabajo de
+     Grado PDF ("IA + UX Research en Trazur Cursos"), reorganized for
+     editorial clarity per an approved outline. Two rounds of editorial
+     correction were applied before this file was written — see
+     docs/content/trazur-fields-es.md, "Claims that still need
+     confirmation," for what's still open.
+  6. KPI percentages are labeled "(meta)" everywhere they appear and are
+     never presented as measured results — the case-stats block appears
+     ONCE (Objetivos y KPIs); "Impacto esperado" deliberately does not
+     repeat it, and instead explains how those targets would actually be
+     measured post-deployment. Do not reintroduce a second stats block
+     there, and do not relabel any target as an achieved result.
+  7. Every image is a real, replaceable Case Figure block with a
+     `{asset: ...}` placeholder label — select the block in the editor
+     and use "Replace" to swap in a real image once one exists (see the
+     field sheet's image checklist). Nothing here is a fake/hardcoded
+     screenshot. The Journey Map and Flow Diagram are intentionally kept
+     as images (not rebuilt as HTML) — see the Phase 0 architecture
+     review in estavillo-child/README.md for why.
+  8. The Persona section (Juan Pablo Techera) uses the same native-blocks
+     composition as the approved "Case Study — Persona" pattern, filled
+     with this case's real research data — not the pattern's fictional
+     placeholder copy. It is ordinary, fully editable content once
+     pasted: no locking, no template restrictions.
+  9. A short list of claims that still need the project owner's
+     confirmation before this goes live is called out in
+     docs/content/trazur-fields-es.md — read that before publishing, not
+     just this file.
+  ============================================================================
+-->
+<!-- wp:estavillo/case-section {"anchor":"overview","label":"Resumen","heading":"Investigar IA y UX en un contexto donde la conectividad no puede darse por sentada.","lead":"Trazur Cursos es una plataforma de e-learning especializada en trazabilidad ganadera para productores rurales uruguayos. Este trabajo investiga cómo la inteligencia artificial puede acelerar la UX Research y el rediseño de esa plataforma — sin reemplazar el juicio humano ni la validación con usuarios reales."} -->
+<!-- wp:estavillo/case-ladder {"steps":[{"label":"Diagnóstico","state":"done"},{"label":"Investigación comparativa: heurísticas + IA","state":"done"},{"label":"Hallazgos y persona","state":"done"},{"label":"Prototipado y propuesta de rediseño","state":"done"},{"label":"Validación con usuarios reales","state":"future"}]} /-->
+
+<!-- wp:paragraph -->
+<p>Este caso fue mi Trabajo de Grado. Tuve un rol central en la investigación UX, el análisis asistido por IA y el diseño de la propuesta, trabajando junto a Renzo Morandi y con la tutoría de Alejandra Capocasale; lo que sigue documenta el trabajo completo del equipo.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"className":"es-case-caption"} -->
+<p class="es-case-caption">Alcance: trabajo académico, validado mediante heurísticas, IA y prototipado — todavía no con usuarios reales del perfil objetivo. Los porcentajes de este caso son metas del rediseño, no resultados medidos.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"contexto","label":"Contexto","heading":"Uruguay es referencia mundial en trazabilidad ganadera. La capacitación digital sostiene ese estándar — pero no llega igual a todos."} -->
+<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"60%"} -->
+<div class="wp-block-column" style="flex-basis:60%"><!-- wp:paragraph -->
+<p>Uruguay es referente mundial en trazabilidad ganadera, y la capacitación digital es clave para sostener ese estándar. Los trabajadores rurales — los principales destinatarios de estos cursos — enfrentan baja alfabetización digital, conectividad limitada y barreras geográficas y culturales que dificultan su acceso a la formación.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Trazur Cursos, una plataforma de e-learning especializada en trazabilidad ganadera para el entorno rural, enfrenta esos mismos desafíos: navegación compleja, microcopy poco accesible y baja finalización de cursos. Rediseñar la experiencia de aprendizaje digital para este contexto es la oportunidad central de este proyecto.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"width":"40%"} -->
+<div class="wp-block-column" style="flex-basis:40%"><!-- wp:estavillo/case-figure {"variant":"standard","placeholderLabel":"trazur-contexto-rural-ia","tag":"01","caption":"Imagen conceptual generada por Ramiro Estavillo junto a ChatGPT, representando el contexto rural y el acceso digital.","alt":"Ilustración conceptual generada con IA: un productor ganadero a caballo consulta una app en su celular, con la silueta holográfica de una vaca sobre un fondo de campo uruguayo."} /--></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"problema","label":"El problema","heading":"Una plataforma pensada para cualquier usuario terminaba dejando afuera al usuario que más la necesitaba.","lead":"Trazur Cursos tenía navegación confusa, textos extensos, poco feedback visual y fricción real en la inscripción y la compra. Para un productor rural con baja alfabetización digital y conexión intermitente, cada uno de esos obstáculos podía significar abandonar el curso."} -->
+<!-- wp:paragraph -->
+<p>La dirección de trabajo fue clara desde el diagnóstico: simplificar la arquitectura de información, escribir microcopy accesible, mostrar estados de navegación claros y sumar un asistente contextual — apoyándonos en IA para acelerar el análisis, siempre bajo validación humana (más en Método y Hallazgos clave).</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"objetivos","label":"Objetivos y KPIs","heading":"Profundizar cómo la IA puede mejorar la UX de una plataforma e-learning rural sobre trazabilidad ganadera."} -->
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Objetivos específicos</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list {"className":"is-style-checkmark"} -->
+<ul class="wp-block-list is-style-checkmark"><!-- wp:list-item -->
+<li>Explorar usos de IA en investigación UX.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Evaluar herramientas de IA en análisis de usabilidad.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Proponer un rediseño funcional basado en evidencia.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Señales iniciales (diagnóstico)</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list {"className":"is-style-checkmark"} -->
+<ul class="wp-block-list is-style-checkmark"><!-- wp:list-item -->
+<li>Tasa de rebote alta en páginas de curso.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Porcentaje elevado de inscripciones incompletas.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Scroll profundo y desorientación, visibles en los mapas de calor de Clarity.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Dificultad en los flujos de compra y en la comprensión de textos, según simulaciones exploratorias con Synthetic Users.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Metas del rediseño</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Objetivos de impacto definidos antes del rediseño — no resultados medidos (ver Impacto esperado).</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:estavillo/case-stats {"items":[{"num":"−20%","label":"tasa de rebote en páginas de curso (meta)"},{"num":"+25%","label":"inscripciones completas (meta)"},{"num":"+30%","label":"finalización de cursos y certificados (meta)"},{"num":"+40%","label":"comprensión de contenidos, test de satisfacción (meta)"},{"num":"−30%","label":"tiempo de inscripción (meta)"}]} /-->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"metodo","label":"Método","heading":"Una estrategia comparativa: métodos tradicionales y herramientas de IA, siempre leídas en conjunto.","lead":"Se aplicó una estrategia comparativa entre métodos tradicionales y herramientas de IA para diagnosticar la plataforma actual — cada herramienta aportó una evidencia distinta."} -->
+<!-- wp:paragraph -->
+<p><strong>Heurísticas de Nielsen.</strong> Identificaron problemas de consistencia, navegación y feedback — la base del diagnóstico inicial.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Google Analytics.</strong> Reveló una tasa de rebote alta y clics erráticos en las páginas de curso.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Microsoft Clarity.</strong> Los mapas de calor mostraron scroll profundo y desorientación, especialmente en mobile.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Synthetic Users.</strong> Simulación exploratoria: generó hipótesis sobre trabas en el flujo de compra y en la comprensión de texto — apoyo para priorizar, no un equivalente a analítica de comportamiento real ni a pruebas con usuarios reales.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Benchmarking.</strong> Comparada con plataformas similares, Trazur mostró carencias estructurales en navegación y usabilidad.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:estavillo/case-figure {"variant":"wide","placeholderLabel":"trazur-estrategia-metodologica","tag":"02","alt":"Diagrama con tres columnas — métodos tradicionales, herramientas de IA y herramientas mixtas — convergiendo en un enfoque comparativo y de rediseño."} /-->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"ia-analisis","label":"IA en el análisis","heading":"¿Puede la IA acelerar una evaluación heurística sin perder profundidad?","lead":"Para responder esa pregunta se comparó una evaluación heurística manual contra el mismo ejercicio hecho con tres modelos de IA — ChatGPT, Gemini y LLaMA 3 — evaluando qué encontraba cada uno, qué se le escapaba y con qué profundidad."} -->
+<!-- wp:table -->
+<figure class="wp-block-table"><table><thead><tr><th>Herramienta</th><th>Aspectos destacados positivos</th><th>Principales problemas detectados</th><th>Estilo y profundidad del análisis</th></tr></thead><tbody><tr><td>Manual</td><td>Observaciones precisas y realistas. Considera restricciones reales del usuario.</td><td>Texto excesivo, navegación confusa, errores en feedback.</td><td>Exhaustivo y empático, basado en experiencia directa.</td></tr><tr><td>ChatGPT</td><td>Buen orden temático. Destaca principios de Nielsen. Sugiere IA como asistencia.</td><td>Omite barreras reales. Sensibilidad contextual limitada.</td><td>Metódico y claro, pero algo genérico.</td></tr><tr><td>Gemini</td><td>Lenguaje accesible. Sugerencias concretas y buenas prácticas.</td><td>Poca jerarquización. Análisis superficial, sin ejemplos claros.</td><td>Sintético y apto para no expertos.</td></tr><tr><td>LLaMA 3 (POE)</td><td>Buen desglose por heurística. Problemas y soluciones con referencias actuales.</td><td>Observaciones repetidas. Poca contextualización.</td><td>Técnico, directo y moderno, aunque menos personalizado.</td></tr></tbody></table></figure>
+<!-- /wp:table -->
+
+<!-- wp:paragraph {"className":"es-case-caption"} -->
+<p class="es-case-caption">El análisis manual siguió siendo el más preciso y sensible al contexto real de uso, apoyado en experiencia directa. Los modelos de IA aceleraron el proceso y ordenaron bien los hallazgos según heurísticas conocidas, pero mostraron límites reales: ChatGPT tendió a omitir barreras reales del usuario; Gemini entregó un análisis más superficial; LLaMA fue técnico pero repetitivo y menos personalizado. Lectura honesta: la IA acelera la primera pasada, no reemplaza el criterio de quien investiga.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"hallazgos","label":"Hallazgos clave","heading":"La evaluación combinada — métodos tradicionales y herramientas de IA — reveló patrones de confusión y fricciones críticas."} -->
+<!-- wp:list {"className":"is-style-checkmark"} -->
+<ul class="wp-block-list is-style-checkmark"><!-- wp:list-item -->
+<li>Navegación confusa y poco intuitiva.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Textos extensos y microcopy poco accesible.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Falta de feedback visual — errores, carga, estados.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Scroll excesivo en mobile, que generaba desorientación.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Fricción en inscripción y compra, que llevaba al abandono.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:estavillo/case-findings-list {"title":"Evaluación UX: herramientas y hallazgos","subtitle":"Seis fuentes de evidencia, cada una con su propio ángulo — leídas en conjunto, no por separado.","items":[{"icon":"heuristics","title":"Heurísticas (Nielsen)","finding":"Problemas de consistencia, navegación confusa, falta de feedback visual.","visible":true},{"icon":"clarity","title":"Microsoft Clarity","finding":"Mapas de calor y profundidad de scroll revelan desorientación y falta de foco.","visible":true},{"icon":"analytics","title":"Google Analytics","finding":"Datos cuantitativos sobre rebotes, clics erráticos y tiempo en página.","visible":true},{"icon":"synthetic-users","title":"Synthetic Users","finding":"Simulación exploratoria: reveló dificultades en flujos de compra y en la comprensión de textos, a validar con usuarios reales.","visible":true},{"icon":"benchmarking","title":"Benchmarking","finding":"Comparación con plataformas similares mostró carencias en estructura y usabilidad.","visible":true},{"icon":"compare","title":"Comparativa IA vs. análisis manual","finding":"La IA complementa y agiliza el análisis, pero requiere interpretación y validación.","visible":true}]} /-->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"persona","label":"Persona","heading":"A partir de los hallazgos, una persona arquetipo para priorizar el rediseño.","lead":"Navegación confusa, textos densos, feedback débil y fricción en inscripción/pago: a partir de esos hallazgos sintetizamos una persona arquetipo, su journey end-to-end y un flujo ideal para el camino crítico — inscribirse, cursar, certificar. Estos artefactos guían el rediseño y la priorización de mejoras."} -->
+<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"35%"} -->
+<div class="wp-block-column" style="flex-basis:35%"><!-- wp:estavillo/case-figure {"variant":"standard","placeholderLabel":"trazur-persona-juan-pablo","alt":"Retrato de Juan Pablo Techera, productor ganadero familiar de Tacuarembó, con boina y camisa de campo."} /-->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Juan Pablo Techera</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Productor ganadero familiar.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Edad: 53</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Sexo: masculino</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Estudios: ciclo básico completo</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Nivel de alfabetización digital: bajo</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Localización: Tacuarembó, Uruguay</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Dispositivo principal: celular Android gama media, con conexión intermitente</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"width":"65%"} -->
+<div class="wp-block-column" style="flex-basis:65%"><!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Biografía</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Juan Pablo tiene 53 años y vive en Rincón del Sauce, Tacuarembó. Dirige un establecimiento ganadero familiar junto con su esposa e hijo. Tiene conocimientos prácticos del campo pero escasa formación formal en tecnología. Accede a internet a través de su celular Android, con conexión irregular. Es autodidacta y valora las herramientas que le permiten seguir aprendiendo sin dejar de lado su trabajo cotidiano.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"50%"} -->
+<div class="wp-block-column" style="flex-basis:50%"><!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Objetivos</h4>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Cumplir con la normativa de trazabilidad sin depender de terceros.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Aprender a registrar y consultar datos del ganado de forma autónoma.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Formarse para transmitirle el manejo de la información a su hijo.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"width":"50%"} -->
+<div class="wp-block-column" style="flex-basis:50%"><!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Frustraciones</h4>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Plataformas lentas o que no cargan con mala señal.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Textos largos o sin ejemplos prácticos.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Pasos de inscripción que requieren ayuda externa.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
+
+<!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Intereses</h4>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Producción ganadera eficiente dentro de la norma.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Tecnologías aplicadas al agro.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Capacitación accesible para personas del campo.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:estavillo/case-quote {"quote":"Me gustaría que me llevara de la mano, porque en estas cosas me pierdo fácil.","cite":"Juan Pablo Techera, productor ganadero familiar"} /-->
+
+<!-- wp:paragraph {"className":"es-case-caption"} -->
+<p class="es-case-caption">Persona “Juan Pablo” — elaboración propia, Trabajo de Grado 2025.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"journey","label":"Journey map","heading":"El recorrido de Juan Pablo, de la búsqueda a la certificación."} -->
+<!-- wp:estavillo/case-figure {"variant":"wide","placeholderLabel":"trazur-journey-map","tag":"03","caption":"Journey Map — elaboración propia, Trabajo de Grado 2025.","alt":"Mapa de recorrido de Juan Pablo desde la búsqueda del curso hasta la certificación, con acciones, pensamientos, puntos de dolor y oportunidades en seis etapas."} /-->
+
+<!-- wp:paragraph -->
+<p>El journey map documenta el recorrido de Juan Pablo desde la búsqueda del curso hasta la certificación, con sus acciones, pensamientos, puntos de dolor y oportunidades en cada etapa — desde el primer clic hasta el certificado descargado.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Puntos de dolor más relevantes</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list {"className":"is-style-checkmark"} -->
+<ul class="wp-block-list is-style-checkmark"><!-- wp:list-item -->
+<li>En la búsqueda: nombres parecidos y resultados poco claros en los buscadores.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>En la inscripción: el formulario traba el registro y no hay ayuda visible en el momento.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Durante el curso: no hay señal clara de avance, y cortar la conexión obliga a repetir módulos.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>En la evaluación: el proceso de certificación es confuso, con pasos poco claros para completar el curso.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"decisiones","label":"De los hallazgos a las decisiones","heading":"Cada decisión de rediseño responde a un hallazgo concreto — no a una preferencia estética."} -->
+<!-- wp:estavillo/case-decisions {"taskLabel":"Hallazgo","guardrailLabel":"Decisión de diseño","items":[{"num":"01","title":"Navegación confusa","task":"Heurísticas y Google Analytics mostraron una arquitectura de información poco clara, con rebotes altos en páginas de curso.","guardrail":"Simplificar la arquitectura de información, con jerarquía clara desde el Home."},{"num":"02","title":"Textos y microcopy poco accesibles","task":"Las heurísticas y las simulaciones exploratorias con Synthetic Users señalaron textos extensos y difíciles de entender para el perfil objetivo.","guardrail":"Reescribir el microcopy en lenguaje claro, con pasos cortos en la inscripción."},{"num":"03","title":"Falta de feedback visual","task":"Se identificaron estados de carga, error y avance poco visibles o inexistentes.","guardrail":"Sumar estados de navegación explícitos y una barra de progreso durante el curso."},{"num":"04","title":"Fricción en inscripción y compra","task":"Microsoft Clarity mostró scroll excesivo y desorientación en mobile; la simulación con Synthetic Users señaló posibles trabas en el flujo de compra.","guardrail":"Reducir la inscripción a pasos cortos, con un asistente contextual en los puntos más críticos."}]} /-->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"prototipado","label":"Prototipado y fidelidad","heading":"Tres niveles de fidelidad para validar hipótesis antes de comprometer una dirección visual final."} -->
+<!-- wp:estavillo/case-timeline {"items":[{"title":"Baja fidelidad (Balsamiq)","text":"Definió los flujos principales — inscripción, catálogo, checkout — sin distracciones visuales."},{"title":"Media fidelidad (Relume)","text":"Testeó jerarquía, navegación simplificada y microcopy accesible."},{"title":"Alta fidelidad","text":"Integró una propuesta visual con barra de progreso, estados claros de curso aprobado y un asistente virtual contextual (chatbot) para reducir dudas en tiempo real."}]} /-->
+
+<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"33.33%"} -->
+<div class="wp-block-column" style="flex-basis:33.33%"><!-- wp:estavillo/case-figure {"variant":"browser","browserLabel":"trazur.uy — inscripción","placeholderLabel":"trazur-wireframe-baja-fidelidad-inscripcion","caption":"Pantalla de inscripción (baja fidelidad).","alt":"Wireframe de baja fidelidad en Balsamiq de la pantalla de inscripción."} /--></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"width":"33.33%"} -->
+<div class="wp-block-column" style="flex-basis:33.33%"><!-- wp:estavillo/case-figure {"variant":"browser","browserLabel":"trazur.uy — cursado","placeholderLabel":"trazur-wireframe-media-fidelidad-cursado","caption":"Cursado con barra de progreso (media fidelidad).","alt":"Wireframe de media fidelidad en Relume de la pantalla de cursado con barra de progreso."} /--></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"width":"33.33%"} -->
+<div class="wp-block-column" style="flex-basis:33.33%"><!-- wp:estavillo/case-figure {"variant":"browser","browserLabel":"trazur.uy — confirmación","placeholderLabel":"trazur-mockup-alta-fidelidad-confirmacion","caption":"Confirmación de curso aprobado (alta fidelidad).","alt":"Mockup de alta fidelidad de la pantalla de confirmación de curso aprobado, con mensaje de felicitaciones y botón para descargar el certificado."} /--></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"propuesta","label":"Propuesta de experiencia","heading":"Un flujo unificado, con pasos cortos, feedback visible y un asistente en los puntos críticos.","lead":"El flujo ideal unifica el proceso en la plataforma, con pasos cortos, feedback visible y un asistente virtual en los puntos críticos. Se alinea directamente con las metas del rediseño."} -->
+<!-- wp:list {"className":"is-style-checkmark"} -->
+<ul class="wp-block-list is-style-checkmark"><!-- wp:list-item -->
+<li>Home con acceso directo a cursos y jerarquía clara.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Curso con beneficios, requisitos y un único CTA.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Inscripción en pasos cortos, con estados visibles.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Checkout y confirmación de compra claros.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Cursado con barra de progreso y asistente contextual para dudas.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Certificado accesible al finalizar.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:estavillo/case-flow {"sectionLabel":"Flujo de usuario ideal","startLabel":"Catálogo de cursos","endLabel":"Certificado descargado","detailLabel":"Ver detalle","closeLabel":"Cerrar","stepLabel":"Paso","aiLegend":"Asistente virtual inteligente disponible en puntos clave.","nodes":[{"id":"inicio","kind":"start","accent":"signal","num":"","title":"Inicio","text":"","edgeLabel":"","ai":false,"detail":[],"edges":[{"to":"catalogo","label":""}]},{"id":"catalogo","kind":"step","accent":"","num":"01","title":"Catálogo de cursos","text":"Explora opciones y compara cursos.","edgeLabel":"Acceso principal al sitio","ai":false,"detail":[{"label":"Punto de dolor","text":"Arquitectura de información poco clara, con rebotes altos en las páginas de curso."},{"label":"Decisión de diseño","text":"Simplificar la arquitectura de información, con jerarquía clara desde el Home."},{"label":"Evidencia","text":"Heurísticas (Nielsen) y Google Analytics."}],"edges":[{"to":"curso","label":""}]},{"id":"curso","kind":"step","accent":"","num":"02","title":"Curso individual","text":"Visualiza detalles, precio y contenido.","edgeLabel":"","ai":false,"detail":[{"label":"Punto de dolor","text":"Textos extensos y difíciles de entender para el perfil objetivo."},{"label":"Decisión de diseño","text":"Reescribir el microcopy en lenguaje claro y dejar un solo llamado a la acción."},{"label":"Evidencia","text":"Heurísticas y simulación exploratoria con Synthetic Users."}],"edges":[{"to":"login","label":""}]},{"id":"login","kind":"decision","accent":"decision","num":"03","title":"¿Está logueado?","text":"Verifica el estado de sesión activa.","edgeLabel":"Verifica sesión","ai":false,"detail":[{"label":"Punto de dolor","text":"Scroll excesivo y desorientación en mobile durante el flujo de inscripción."},{"label":"Decisión de diseño","text":"Reducir la inscripción a pasos cortos, con estados de navegación explícitos."},{"label":"Evidencia","text":"Microsoft Clarity — mapas de calor y profundidad de scroll."}],"edges":[{"to":"checkout","label":"Sí"},{"to":"registro","label":"No"}]},{"id":"registro","kind":"step","accent":"","num":"","title":"Registro / Crear cuenta","text":"Formulario breve para nuevos usuarios.","edgeLabel":"","ai":false,"detail":[{"label":"Decisión de diseño","text":"El alta no expulsa del checkout: se resuelve en el camino y se vuelve a la compra."}],"edges":[{"to":"checkout","label":""}]},{"id":"checkout","kind":"step","accent":"","num":"04","title":"Checkout / Finalizar compra","text":"Elige forma de pago y confirma.","edgeLabel":"","ai":true,"detail":[{"label":"Asistencia de IA","text":"Asistente virtual contextual (chatbot) para reducir dudas en tiempo real."},{"label":"Decisión de diseño","text":"Ubicar la asistencia en los puntos más críticos, no como un widget global permanente."},{"label":"Evidencia","text":"Synthetic Users — posibles trabas en el flujo de compra, a validar con usuarios reales."}],"edges":[{"to":"compra-ok","label":""}]},{"id":"compra-ok","kind":"step","accent":"","num":"05","title":"Pantalla de éxito de compra","text":"Confirmación y acceso al curso comprado.","edgeLabel":"","ai":false,"detail":[{"label":"Punto de dolor","text":"Estados de carga, error y avance poco visibles o inexistentes."},{"label":"Decisión de diseño","text":"Confirmación explícita, sin ambigüedad sobre el estado de la transacción."}],"edges":[{"to":"dashboard","label":""}]},{"id":"dashboard","kind":"step","accent":"","num":"06","title":"Escritorio (Dashboard)","text":"Gestiona cursos, datos y certificados.","edgeLabel":"","ai":true,"detail":[{"label":"Decisión de diseño","text":"Un único lugar donde la persona ve sus cursos, su progreso y sus certificados."},{"label":"Asistencia de IA","text":"El asistente queda disponible para dudas sobre la cuenta y el avance."}],"edges":[{"to":"cursando","label":""}]},{"id":"cursando","kind":"step","accent":"signal","num":"07","title":"Acceso al curso","text":"Comienza a cursar y ver progreso.","edgeLabel":"Entra al contenido","ai":true,"detail":[{"label":"Punto de dolor","text":"Falta de feedback visual sobre el avance dentro del curso."},{"label":"Decisión de diseño","text":"Sumar una barra de progreso durante el curso y estados claros de avance."},{"label":"Evidencia","text":"Heurísticas (Nielsen) — visibilidad del estado del sistema."}],"edges":[{"to":"modulos","label":""}]},{"id":"modulos","kind":"decision","accent":"decision","num":"08","title":"¿Completó los módulos y la prueba final?","text":"El estado de aprobación queda visible en todo momento.","edgeLabel":"","ai":false,"detail":[{"label":"Decisión de diseño","text":"Estados claros de curso aprobado, definidos en el prototipo de alta fidelidad."}],"edges":[{"to":"aprobado","label":"Sí"},{"to":"retomar","label":"No"}]},{"id":"retomar","kind":"step","accent":"","num":"","title":"Vuelve a cursar","text":"Retoma el curso donde lo dejó.","edgeLabel":"","ai":false,"detail":[{"label":"Decisión de diseño","text":"La barra de progreso muestra exactamente qué módulo falta, así que volver no se siente un castigo."}],"edges":[{"to":"cursando","label":""}]},{"id":"aprobado","kind":"step","accent":"","num":"09","title":"Pantalla de éxito / Curso aprobado","text":"Muestra el resultado y los accesos.","edgeLabel":"","ai":false,"detail":[{"label":"Decisión de diseño","text":"Cerrar el ciclo con un estado de aprobación explícito antes del certificado."}],"edges":[{"to":"certificado","label":""}]},{"id":"certificado","kind":"step","accent":"signal","num":"10","title":"Descarga certificado","text":"Accede al certificado al finalizar.","edgeLabel":"Certificación disponible","ai":false,"detail":[{"label":"Decisión de diseño","text":"Certificado disponible en la propia plataforma al aprobar el curso."},{"label":"Valor de negocio","text":"El flujo ideal unifica el proceso en la plataforma: el recorrido se cierra dentro del producto."}],"edges":[{"to":"fin","label":""}]},{"id":"fin","kind":"end","accent":"signal","num":"","title":"Fin","text":"","edgeLabel":"","ai":false,"detail":[],"edges":[]}]} /-->
+
+<!-- wp:paragraph {"className":"es-case-caption"} -->
+<p class="es-case-caption">Flujo ideal — elaboración propia, Trabajo de Grado 2025.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"className":"es-case-caption"} -->
+<p class="es-case-caption">Hipótesis de diseño fundamentada en heurísticas y prototipado — todavía sin validar con usuarios reales del perfil objetivo (ver Próximos pasos).</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"impacto-esperado","label":"Impacto esperado","heading":"Cómo se va a medir esto, no solo qué se espera.","lead":"Las metas cuantitativas ya están definidas en Objetivos y KPIs. Todavía no hay datos reales que las confirmen — la propuesta no fue desplegada en producción ni medida con usuarios reales."} -->
+<!-- wp:paragraph -->
+<p>Medir el impacto real requiere desplegar el rediseño y observarlo en uso: Google Analytics y Microsoft Clarity para rebote, tiempo de inscripción y comportamiento de navegación; finalización de curso y descarga de certificado como tareas completadas; y pruebas de usabilidad con el perfil objetivo para validar comprensión y satisfacción. Sin ese ciclo, las metas siguen siendo una hipótesis de diseño, no un resultado.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"limitaciones","label":"Limitaciones","heading":"Lo que este proyecto todavía no puede afirmar."} -->
+<!-- wp:list {"className":"is-style-checkmark"} -->
+<ul class="wp-block-list is-style-checkmark"><!-- wp:list-item -->
+<li>Synthetic Users es un generador de hipótesis, no un reemplazo de analítica de comportamiento real ni de pruebas con personas reales.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Todavía no se hicieron pruebas de usabilidad con productores rurales reales del perfil objetivo.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>El análisis con IA mostró límites de sensibilidad contextual: en algunos casos omitió barreras reales o entregó lecturas superficiales (ver IA en el análisis).</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Este es un proyecto académico, no un producto en producción — las metas del rediseño siguen sin medir (ver Impacto esperado).</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"proximos-pasos","label":"Próximos pasos","heading":"Cómo convertir esta propuesta de rediseño en una mejora validada y medida."} -->
+<!-- wp:estavillo/case-details {"summary":"Validar con usuarios reales"} -->
+<!-- wp:paragraph -->
+<p>Pruebas de usabilidad con el perfil objetivo (remotas y presenciales), midiendo tareas clave: inscripción, comienzo del curso y descarga del certificado. En paralelo, verificación en terreno con conectividad limitada y dispositivos de gama media/baja.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-details -->
+
+<!-- wp:estavillo/case-details {"summary":"Iterar copy, componentes y accesibilidad"} -->
+<!-- wp:paragraph -->
+<p>Ajustar copy y componentes según evidencia real — claridad del CTA único, estados, mensajes de error — y correr un checklist de accesibilidad WCAG AA: contraste, tamaño táctil, foco visible, teclado y estados.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-details -->
+
+<!-- wp:estavillo/case-details {"summary":"Desplegar de forma incremental, con instrumentación"} -->
+<!-- wp:paragraph -->
+<p>Lanzamiento incremental en producción con Google Analytics y Microsoft Clarity activos — eventos, embudos, heatmaps — para comparar contra la línea base, y ajustar el peso de imágenes, video y caché según el rendimiento real con conectividad limitada.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-details -->
+
+<!-- wp:estavillo/case-details {"summary":"Pilotar el asistente contextual"} -->
+<!-- wp:paragraph -->
+<p>Piloto del asistente con FAQs y glosario, monitoreando dudas frecuentes para refinar sus prompts y sus límites.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-details -->
+
+<!-- wp:estavillo/case-details {"summary":"Documentar el proceso de IA en UX Research"} -->
+<!-- wp:paragraph -->
+<p>Avanzar en una guía práctica de IA aplicada a UX Research — prompts, criterios éticos, flujo de validación — pensada para equipos con recursos limitados.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-details -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"aprendizajes","label":"Aprendizajes clave","heading":"Lo que más me llevo de este proyecto.","layout":"reading"} -->
+<!-- wp:group {"className":"es-case-callout"} -->
+<div class="wp-block-group es-case-callout"><!-- wp:paragraph {"className":"es-case-label"} -->
+<p class="es-case-label">Reflexión</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">La IA acelera, no reemplaza.</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Este proyecto fue un ejercicio profundo de investigación y diseño. La IA potenció el análisis, la priorización y las variantes de copy — pero la validación humana siguió siendo irremplazable para la accesibilidad, el contexto y las decisiones finales.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Método híbrido = profundidad + eficiencia. Combinar heurísticas y analítica con IA mejoró los tiempos sin perder interpretación ni empatía de diseño.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>El verdadero desafío no es diseñar con IA, sino diseñar para personas reales: quienes navegan con señal inestable, usan un celular básico y aprenden mientras trabajan en el campo.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Medir y aprender en ciclo corto: instrumentar KPIs, lanzar en pequeño, observar comportamiento real e iterar.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></div>
+<!-- /wp:group -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"poster","label":"Póster del proyecto","heading":"El resumen visual completo del Trabajo de Grado."} -->
+<!-- wp:paragraph -->
+<p>El póster oficial del Trabajo de Grado resume visualmente el caso completo — heurísticas, método, prototipos y conclusiones.</p>
+<!-- /wp:paragraph -->
+
+<!-- PENDIENTE: reemplazar el href por la URL real del póster una vez subido a la Biblioteca de medios (archivo sugerido: trazur-poster-tdg-2025.pdf). -->
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"className":"es-btn"} -->
+<div class="wp-block-button es-btn"><a class="wp-block-button__link wp-element-button" href="#">Descargar Póster (PDF)</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->
+<!-- /wp:estavillo/case-section -->

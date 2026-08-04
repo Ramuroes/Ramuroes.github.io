@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/case-flow",
+	"title": "Case Flow",
+	"category": "estavillo-case",
+	"icon": "randomize",
+	"description": "Diagrama de flujo interactivo y editable (.es-flow). El dato es un grafo: cada nodo declara a qué otros nodos sale, así que una decisión tiene ramas reales, una rama puede pasar por su propia pantalla y volver al flujo, y puede haber bucles y caminos de retorno. El layout (fila, columna, carril y conectores) se calcula solo. Sirve para Process Flow, User Journey, Service Blueprint, Decision Tree, IA Workflow y System Diagram.",
+	"keywords": [ "estavillo", "flow", "flujo", "process", "journey", "blueprint", "decision", "diagram" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"sectionLabel": { "type": "string", "default": "" },
+		"nodes": {
+			"type": "array",
+			"default": [],
+			"items": { "type": "object" }
+		},
+		"startLabel": { "type": "string", "default": "" },
+		"endLabel": { "type": "string", "default": "" },
+		"detailLabel": { "type": "string", "default": "Details" },
+		"closeLabel": { "type": "string", "default": "Close" },
+		"stepLabel": { "type": "string", "default": "Step" },
+		"aiLegend": { "type": "string", "default": "" },
+		"density": { "type": "string", "default": "comfortable" }
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-case-block-case-flow",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}

@@ -1,0 +1,35 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/how-i-work-illustration",
+	"title": "How I Work — Illustration",
+	"category": "estavillo-pages",
+	"icon": "art",
+	"description": "Una de las seis ilustraciones aprobadas de How I Work (assets/images/how-i-work/ en el child theme), resuelta a SVG SIEMPRE server-side vía es_how_work_illustration_svg() — el bloque nunca guarda ni expone el markup SVG, solo el paso elegido y tres flags de presentación. Preview real en el editor vía ServerSideRender, así el toggle de acentos se ve tal cual queda en el frontend sin duplicar los seis SVG en el bundle del editor.",
+	"keywords": [ "estavillo", "how i work", "illustration", "process", "ilustración" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"step": {
+			"type": "number",
+			"default": 1
+		},
+		"context": {
+			"type": "string",
+			"default": "page"
+		},
+		"showAccents": {
+			"type": "boolean",
+			"default": true
+		},
+		"decorative": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-pages-block-how-i-work-illustration",
+	"render": "file:./render.php"
+}
