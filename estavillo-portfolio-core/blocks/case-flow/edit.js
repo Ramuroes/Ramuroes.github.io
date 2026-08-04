@@ -68,9 +68,6 @@
 							o.onChange(ui.listUpdate(rows, ri, { text: v }));
 						},
 					}),
-					o.extraFields ? o.extraFields(row, function (patch) {
-						o.onChange(ui.listUpdate(rows, ri, patch));
-					}) : null,
 					ui.itemBar({
 						index: ri,
 						count: rows.length,
@@ -98,6 +95,76 @@
 
 			function updateNode(i, patch) {
 				set({ nodes: ui.listUpdate(nodes, i, patch) });
+			}
+
+			/**
+			 * Salidas de un nodo: a qué otro(s) nodo(s) va. Es LA pieza que
+			 * convierte la lista de pasos en un diagrama de flujo de verdad.
+			 *
+			 * Convenciones que el editor deja explícitas, porque son las que
+			 * gobiernan cómo se dibuja todo:
+			 *  - la PRIMERA salida es la línea principal (la que sigue derecho);
+			 *  - una salida hacia un nodo que no está en esa línea abre una
+			 *    pantalla intermedia, que se dibuja en su propio carril;
+			 *  - una salida hacia un nodo ANTERIOR es un bucle (volver atrás).
+			 * Nada de esto hay que declararlo: sale de a dónde apunta cada
+			 * salida.
+			 */
+			function edgeList(node, i) {
+				var edges = node.edges || [];
+				// Un nodo sólo puede salir hacia otro que tenga id: es lo que
+				// hace que reordenar en la Vista de lista no rompa el grafo.
+				var targets = [{ label: __('— choose a node —', 'estavillo-portfolio-core'), value: '' }];
+				nodes.forEach(function (other, oi) {
+					if (oi !== i && other.id) {
+						targets.push({ label: (other.num ? other.num + ' · ' : '') + (other.title || other.id), value: other.id });
+					}
+				});
+
+				return el(
+					'div',
+					{ className: 'es-caseb-sub' },
+					el('p', { className: 'es-caseb-sub__title' }, __('Goes to (outgoing paths)', 'estavillo-portfolio-core')),
+					edges.map(function (edge, ei) {
+						return el(
+							'div',
+							{ className: 'es-caseb-sub__row', key: 'e-' + i + '-' + ei },
+							el(SelectControl, {
+								label: 0 === ei
+									? __('Main path — continues to', 'estavillo-portfolio-core')
+									: __('Branch — goes to', 'estavillo-portfolio-core'),
+								value: edge.to || '',
+								options: targets,
+								onChange: function (v) {
+									updateNode(i, { edges: ui.listUpdate(edges, ei, { to: v }) });
+								},
+							}),
+							el(TextControl, {
+								label: __('Label on this path', 'estavillo-portfolio-core'),
+								help: 0 === ei
+									? __('Usually blank. On a decision, e.g. "Yes".', 'estavillo-portfolio-core')
+									: __('e.g. "No" — shown on the connector itself.', 'estavillo-portfolio-core'),
+								value: edge.label || '',
+								onChange: function (v) {
+									updateNode(i, { edges: ui.listUpdate(edges, ei, { label: v }) });
+								},
+							}),
+							ui.itemBar({
+								index: ei,
+								count: edges.length,
+								onMove: function (from, to) {
+									updateNode(i, { edges: ui.listMove(edges, from, to) });
+								},
+								onRemove: function (idx) {
+									updateNode(i, { edges: ui.listRemove(edges, idx) });
+								},
+							})
+						);
+					}),
+					ui.addButton(__('Add outgoing path', 'estavillo-portfolio-core'), function () {
+						updateNode(i, { edges: ui.listAdd(edges, { to: '', label: '' }) });
+					})
+				);
 			}
 
 			return el(
@@ -234,6 +301,14 @@
 											})
 										),
 										el(TextControl, {
+											label: __('Node ID', 'estavillo-portfolio-core'),
+											help: __('Short, unique, no spaces (e.g. "checkout"). Other nodes point here by this ID, so the flow survives reordering.', 'estavillo-portfolio-core'),
+											value: node.id || '',
+											onChange: function (v) {
+												updateNode(i, { id: v });
+											},
+										}),
+										el(TextControl, {
 											label: __('Label on the incoming arrow', 'estavillo-portfolio-core'),
 											help: __('e.g. "Main entry to the site". Blank = no label.', 'estavillo-portfolio-core'),
 											value: node.edgeLabel || '',
@@ -302,56 +377,7 @@
 												updateNode(i, { detail: rows });
 											},
 										}),
-										subList({
-											title: __('Branches (decision yes/no)', 'estavillo-portfolio-core'),
-											keyPrefix: 'b-' + i + '-',
-											rows: node.branches || [],
-											labelLabel: __('Branch label', 'estavillo-portfolio-core'),
-											textLabel: __('Outcome', 'estavillo-portfolio-core'),
-											addLabel: __('Add branch', 'estavillo-portfolio-core'),
-											onChange: function (rows) {
-												updateNode(i, { branches: rows });
-											},
-											// Rama con pantalla propia: si esta salida NO es
-											// "sigue directo al próximo nodo" sino que pasa por
-											// una pantalla intermedia (p. ej. "No" -> Crear
-											// cuenta), esa pantalla se vuelve visible en el
-											// diagrama (nunca sólo texto adentro del panel).
-											// Vacío = comportamiento de siempre, sin tarjeta.
-											extraFields: function (row, onChangeRow) {
-												return el(
-													'div',
-													{ className: 'es-caseb-sub__row' },
-													el(TextControl, {
-														label: __('Detour screen (optional)', 'estavillo-portfolio-core'),
-														help: __('If this branch leads to its own screen (not straight to the next node), name it here — it becomes a visible node.', 'estavillo-portfolio-core'),
-														value: row.detourTitle || '',
-														onChange: function (v) {
-															onChangeRow({ detourTitle: v });
-														},
-													}),
-													row.detourTitle
-														? el(TextControl, {
-															label: __('Detour description', 'estavillo-portfolio-core'),
-															value: row.detourText || '',
-															onChange: function (v) {
-																onChangeRow({ detourText: v });
-															},
-														})
-														: null,
-													row.detourTitle
-														? el(TextControl, {
-															label: __('Reconnect caption', 'estavillo-portfolio-core'),
-															help: __('e.g. "Continues to Checkout" — where this detour rejoins the flow.', 'estavillo-portfolio-core'),
-															value: row.detourNext || '',
-															onChange: function (v) {
-																onChangeRow({ detourNext: v });
-															},
-														})
-														: null
-												);
-											},
-										})
+										edgeList(node, i, nodes)
 									)
 								);
 							})

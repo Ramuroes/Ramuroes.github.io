@@ -33,6 +33,11 @@
 	   filas), y si el marcador compartiera esa variable quedaría pegado
 	   a "Inicio" — exactamente el bug que corrige este ticket. */
 	--es-flow-marker-gap: 10px;
+	/* Alto real de la pastilla Inicio/Fin (padding + línea de texto). Es un
+	   valor del propio componente, no del contenido: lo usa el anclaje de
+	   los marcadores de contexto para apoyarse en el borde de la pastilla
+	   sin medir nada en JS. */
+	--es-flow-pill-h: 47px;
 	--es-flow-node-bg: var(--es-surface);
 	--es-flow-mark: var(--es-ink-4);
 	--es-flow-mark-2: var(--es-signal-2);
@@ -111,6 +116,10 @@
 	background: var(--es-ink-4);
 }
 
+/* Los marcadores viven DENTRO del nodo que describen (ver render.php), así
+   que en la narrativa vertical basta con el espacio normal antes/después:
+   su posición sale sola de la pastilla, no de un cálculo sobre el diagrama
+   entero. */
 .es-flow .es-flow__marker--start {
 	margin-bottom: var(--es-flow-marker-gap);
 }
@@ -185,6 +194,29 @@
 .es-flow__track > .es-flow__item {
 	margin-top: 0;
 }
+
+/* Prolongación del trazo principal a través de un carril de ramas. Es un
+   item de grilla vacío, puro trazo: sólo existe en el grid de desktop
+   (ver la regla con su geometría más abajo), donde una fila de ramas se
+   interpone entre dos filas del camino principal y el conector tiene que
+   atravesarla sin cortarse. En mobile no hay carriles, así que no se
+   imprime nada. */
+.es-flow .es-flow__pass {
+	display: none;
+	margin-top: 0;
+}
+
+/* ---------- pantalla intermedia (rama) en la narrativa vertical ----------
+   Sin grid (mobile/tablet) la rama es el bloque siguiente de la lectura.
+   Para que NO se confunda con un paso más del camino principal se indenta
+   y se marca con una guía naranja: se lee "esto pasa sólo si la decisión
+   sale por acá". El texto "Sí"/"No" del propio conector (--in) queda a la
+   vista arriba, así que la lógica sigue siendo explícita. */
+.es-flow__item--branch {
+	padding-left: 18px;
+	border-left: 1px dashed var(--es-decision-dim);
+}
+
 
 /* ---------- franja compartida de la forma ----------
    Pastilla, rectángulo y rombo tienen alturas MUY distintas (47 / ~70 /
@@ -646,124 +678,82 @@
 	transition: transform var(--es-dur-fast) var(--es-ease);
 }
 
-/* ---------- ramas de una decisión — pastillas compactas, siempre visibles ----------
-   Sólo la etiqueta (Sí/No): comunican de un vistazo que el rombo tiene dos
-   salidas sin competir en peso visual con la forma. El texto completo de
-   cada rama vive en el panel de detalle, como filas más del mismo <dl>
-   (ver estilo --branches más abajo) — nunca en una tarjeta aparte. */
+/* ---------- ramas de una decisión ----------
+   Una decisión de verdad tiene DOS salidas reales, cada una con su propio
+   conector rotulado (Sí / No). Las dos salen del mismo rombo: la primera
+   sigue derecho por la línea principal, la segunda pasa por una pantalla
+   propia — un nodo más del diagrama, no una nota — y vuelve a entrar al
+   flujo (o vuelve hacia atrás, si es un bucle).
 
-.es-flow .es-flow__branches {
-	list-style: none;
-	margin: 10px 0 0;
-	padding: 0;
-	display: flex;
-	flex-wrap: wrap;
-	gap: 6px;
-}
+   Nada de esto es específico de un diagrama: quién es rama, dónde cae y
+   qué conector le toca lo calcula render.php leyendo el grafo. */
 
-.es-flow .es-flow__branch {
-	/* .es-case__body pone "li + li { margin-top: 0.5em }" para prosa —
-	   sin este reset, la segunda pastilla (Sí) caería más abajo que la
-	   primera (No) en vez de compartir línea con el gap:6px del padre. */
-	margin: 0;
-	display: inline-flex;
-	align-items: center;
-	padding: 3px 10px;
-	border: 1px solid var(--es-decision-dim);
+/* Etiqueta Sí/No apoyada sobre su conector. Misma tipografía mono de las
+   etiquetas de arista que ya existían — es la MISMA familia de rótulo, no
+   un elemento nuevo: sólo cambia de color, porque un rótulo de decisión
+   usa el naranja semántico del rombo del que sale. */
+.es-flow__edge-label {
+	display: inline-block;
+	z-index: 2;
+	width: max-content;
+	margin-bottom: 7px;
+	padding: 1px 6px;
 	border-radius: 999px;
-	background: var(--es-decision-soft);
-}
-
-.es-flow__branch-label {
+	background: var(--es-paper);
 	font-family: var(--es-mono);
-	font-size: 9.5px;
+	font-size: 9px;
 	font-weight: 600;
 	letter-spacing: 0.1em;
+	line-height: 1.6;
 	text-transform: uppercase;
 	color: var(--es-decision);
 }
 
-/* Pastilla cuya salida tiene pantalla propia (ver .es-flow__satellite más
-   abajo): una flechita chica es la única pista extra — el pill en sí no
-   cambia de tamaño ni de peso. */
-.es-flow__branch--detour::after {
-	content: '↓';
-	margin-left: 5px;
-	font-size: 9px;
-}
-
-/* ---------- rama con pantalla propia (satélite) ----------
-   Una decisión real tiene dos salidas; la que NO sigue derecho al
-   siguiente nodo (típicamente "No") pasa antes por una pantalla propia
-   del recorrido — eso tiene que ser un nodo visible, no una frase adentro
-   del panel colapsable. Se cuelga chico y silenciado de su branch pill,
-   con el mismo criterio de peso que .es-flow__branch: nunca compite con
-   la forma principal del diagrama. reconnectLabel (es-flow__satellite-next)
-   es texto libre, no un cálculo "vuelve al nodo X" — mantiene el
-   componente genérico para cualquier flujo futuro (User Journey, Service
-   Blueprint, Decision Tree), no sólo esta decisión puntual. */
-.es-flow__satellites {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 12px;
-	margin-top: 12px;
-}
-
-.es-flow__satellite {
-	display: flex;
-	flex-direction: column;
-	max-width: 260px;
-}
-
-.es-flow__satellite-connector {
-	display: block;
-	width: 14px;
-	height: 16px;
-	margin-left: 10px;
-	color: var(--es-decision-dim);
-}
-
-.es-flow__satellite-connector svg {
-	display: block;
-	width: 100%;
-	height: 100%;
+/* Punta de flecha suelta de las ramas: tamaño fijo, nunca se deforma con
+   el ancho de la columna (por eso va aparte y no dentro de un svg
+   estirado). Rota según hacia dónde entra. */
+.es-flow__tip {
+	position: absolute;
+	width: 11px;
+	height: 11px;
 	fill: none;
-	stroke: currentColor;
+	stroke: var(--es-line-strong);
 	stroke-width: 1.25;
 	stroke-linecap: round;
 	stroke-linejoin: round;
 }
 
-.es-flow__satellite-card {
-	padding: 10px 12px;
-	border: 1px dashed var(--es-decision-dim);
-	border-radius: var(--es-radius-sm);
-	background: var(--es-paper-2);
+.es-flow__tip--up {
+	transform: rotate(180deg);
 }
 
-.es-flow__satellite-title {
-	display: block;
-	font-size: 12px;
-	font-weight: 600;
-	color: var(--es-ink-2);
+.es-flow__tip--left {
+	transform: rotate(90deg);
 }
 
-.es-flow__satellite-text {
-	display: block;
-	margin-top: 4px;
-	font-size: 11.5px;
-	line-height: 1.5;
-	color: var(--es-ink-3);
+.es-flow__tip--right {
+	transform: rotate(-90deg);
 }
 
-.es-flow__satellite-next {
+/* En mobile/tablet la rama es simplemente el siguiente bloque de la
+   narrativa vertical: el conector en "L" no aplica (alcanza con el riel
+   vertical que ya usan todos los pasos), pero su RÓTULO sí — "No" es
+   justamente lo que explica por qué aparece esta pantalla. Así que el
+   elemento se queda en el flujo, sin trazo, mostrando sólo la etiqueta.
+   La "L" y sus puntas aparecen recién en el grid de desktop (más abajo). */
+.es-flow__branch-link {
 	display: block;
-	margin-top: 7px;
-	font-family: var(--es-mono);
-	font-size: 9px;
-	letter-spacing: 0.05em;
-	text-transform: uppercase;
-	color: var(--es-ink-4);
+	position: relative;
+}
+
+.es-flow__branch-link .es-flow__tip {
+	display: none;
+}
+
+/* La vuelta al flujo no aporta nada en lectura vertical: en mobile el
+   siguiente bloque YA es el nodo al que se vuelve. */
+.es-flow__branch-link--out {
+	display: none;
 }
 
 /* ---------- panel de detalle ----------
@@ -775,16 +765,6 @@
 	border: 1px solid var(--es-line);
 	border-radius: var(--es-radius-sm);
 	background: var(--es-paper-2);
-}
-
-/* Las filas de rama (Sí/No + su explicación), cuando conviven en el mismo
-   panel con las filas de detalle (punto de dolor / decisión / evidencia):
-   un separador liviano marca el quiebre de "por qué" a "qué pasa después",
-   sin una segunda tarjeta ni un color distinto. */
-.es-flow__detail + .es-flow__detail--branches {
-	margin-top: 14px;
-	padding-top: 14px;
-	border-top: 1px dashed var(--es-line);
 }
 
 .es-flow__detail {
@@ -1055,7 +1035,7 @@
 	   compartida (--es-flow-shape-h), no el grid. */
 	.es-flow .es-flow__track {
 		display: grid;
-		grid-template-columns: repeat(4, minmax(0, 1fr));
+		grid-template-columns: repeat(var(--es-flow-cols, 4), minmax(0, 1fr));
 		gap: var(--es-flow-row-gap) var(--es-flow-col);
 		align-items: start;
 	}
@@ -1066,52 +1046,55 @@
 		min-width: 0;
 	}
 
-	/* Filas 1 y 3 (items 1–4 y 9–12) cierran en un rombo: comparten su
-	   altura de 190px para que pastilla/rectángulo/rombo se centren en
-	   el mismo eje. La fila 2 (5–8, sin decisión) usa el default de
-	   arriba. Acoplado a esta serpentina de 12 nodos en concreto — igual
-	   que el resto de esta sección (mismo criterio ya usado más abajo
-	   para la serpentina y los giros). */
-	.es-flow__item:nth-child(-n + 4),
-	.es-flow__item:nth-child(n + 9) {
+	/* Una banda que contenga un rombo comparte su altura (190px) para que
+	   pastilla, rectángulo y rombo caigan en el mismo eje y el conector
+	   pueda tocar el centro de todos. Qué banda la necesita lo decide el
+	   PHP mirando el grafo (.is-tall), no un nth-child atado a un diagrama
+	   concreto. */
+	.es-flow__item.is-tall {
 		--es-flow-shape-h: 190px;
 	}
 
-	/* ---- SERPENTINA: fila 2 (04→05→06→07) se coloca en espejo ----
-	   El orden semántico del DOM no cambia (sigue siendo 5,6,7,8 —
-	   lectores de pantalla y List View ven la secuencia real); sólo su
-	   UBICACIÓN en el grid se invierte, así 04 queda debajo del rombo 03
-	   (misma columna 4) y 07 queda debajo de donde arranca la fila 3
-	   (misma columna 1). Las filas 1 y 3 no necesitan posición explícita:
-	   el auto-placement del grid las ubica solo, en orden de DOM, en las
-	   celdas que la fila 2 no ocupó. */
-	.es-flow__item:nth-child(5) {
-		grid-row: 2;
-		grid-column: 4;
+	/* ---- SERPENTINA, ahora dirigida por el DATO ----
+	   La posición de cada nodo la calcula render.php a partir del grafo y
+	   la escribe en --r / --c. Antes esto era una lista de nth-child atada
+	   a una serpentina de 12 nodos exactos: cualquier flujo con otro largo,
+	   o con una rama, quedaba mal colocado. Ahora el CSS no sabe cuántos
+	   nodos hay ni dónde están las decisiones — sólo obedece la grilla que
+	   le pasan, así que el mismo archivo sirve para cualquier diagrama.
+
+	   El orden del DOM sigue siendo el narrativo real (lectores de pantalla
+	   y Vista de lista ven la secuencia verdadera); sólo la UBICACIÓN
+	   visual la decide el grid. */
+	.es-flow__item {
+		grid-row: var(--r);
+		grid-column: var(--c);
 	}
 
-	.es-flow__item:nth-child(6) {
-		grid-row: 2;
-		grid-column: 3;
+	/* Banda que se lee al revés (derecha → izquierda): el conector entra por
+	   el otro lado y el trazo se espeja. .is-rtl lo pone el PHP según la
+	   paridad de la banda — nunca un nth-child. */
+	.es-flow__item.is-rtl .es-flow__rail--h {
+		left: 100%;
+		right: auto;
 	}
 
-	.es-flow__item:nth-child(7) {
-		grid-row: 2;
-		grid-column: 2;
+	.es-flow__item.is-rtl .es-flow__rail--h .es-flow__connector {
+		transform: scaleX(-1);
 	}
 
-	.es-flow__item:nth-child(8) {
-		grid-row: 2;
-		grid-column: 1;
+	.es-flow__item.is-rtl .es-flow__edge {
+		left: auto;
+		right: 0;
+		text-align: right;
 	}
 
-	/* Riel horizontal por default: entra en el gap de la grilla, a la
-	   izquierda del nodo, apuntando hacia la derecha (misma dirección de
-	   lectura fila 1 y fila 3). top:50% cae en el centro de la FRANJA
-	   compartida — el mismo eje en el que ya se centra la forma — así que
-	   sirve igual para el rectángulo más chico de la fila que para el
-	   rombo, sin ningún ajuste por nodo. */
-	.es-flow__rail {
+	/* Riel horizontal: entra en el gap de la grilla, a la izquierda del
+	   nodo. top:50% cae en el centro de la FRANJA compartida — el mismo eje
+	   en el que ya se centra la forma — así que sirve igual para el
+	   rectángulo más chico de la fila que para el rombo, sin ningún ajuste
+	   por nodo. */
+	.es-flow__rail--h {
 		left: auto;
 		right: 100%;
 		top: 50%;
@@ -1121,23 +1104,21 @@
 		height: 22px;
 	}
 
-	.es-flow__line--v,
-	.es-flow__head--v {
+	.es-flow__rail--h .es-flow__line--v,
+	.es-flow__rail--h .es-flow__head--v {
 		display: none;
 	}
 
-	.es-flow__line--h,
-	.es-flow__head--h {
+	.es-flow__rail--h .es-flow__line--h,
+	.es-flow__rail--h .es-flow__head--h {
 		display: block;
 	}
 
-	/* ---- Los dos giros de fila (03→04 y 07→08): caída vertical simple ----
-	   El nodo de llegada queda en la MISMA columna que el nodo de salida
-	   (col. 4 y col. 1 respectivamente, por la serpentina de arriba), así
-	   que el giro no necesita ningún desvío horizontal — sólo mostrar el
-	   trazo vertical del propio svg, del alto exacto del salto de fila. */
-	.es-flow__item:nth-child(5) .es-flow__rail,
-	.es-flow__item:nth-child(9) .es-flow__rail {
+	/* Salto de banda: caída vertical recta. El nodo de llegada queda en la
+	   MISMA columna que el de salida (lo garantiza la serpentina), así que
+	   no hace falta ningún desvío horizontal — sólo el trazo vertical del
+	   propio svg, del alto exacto del salto de fila. */
+	.es-flow__rail--v {
 		left: 50%;
 		right: auto;
 		top: auto;
@@ -1147,43 +1128,292 @@
 		height: var(--es-flow-row-gap);
 	}
 
-	.es-flow__item:nth-child(5) .es-flow__line--h,
-	.es-flow__item:nth-child(5) .es-flow__head--h,
-	.es-flow__item:nth-child(9) .es-flow__line--h,
-	.es-flow__item:nth-child(9) .es-flow__head--h {
+	.es-flow__rail--v .es-flow__line--h,
+	.es-flow__rail--v .es-flow__head--h {
 		display: none;
 	}
 
-	.es-flow__item:nth-child(5) .es-flow__line--v,
-	.es-flow__item:nth-child(5) .es-flow__head--v,
-	.es-flow__item:nth-child(9) .es-flow__line--v,
-	.es-flow__item:nth-child(9) .es-flow__head--v {
+	.es-flow__rail--v .es-flow__line--v,
+	.es-flow__rail--v .es-flow__head--v {
 		display: block;
 	}
 
-	/* ---- Fila 2 en espejo: 06 y 07 reciben la flecha desde su DERECHA ----
-	   (04 no necesita rail horizontal — llega por el giro vertical de
-	   arriba). El riel pasa al otro lado del nodo y el propio conector se
-	   espeja: mismo trazo, apuntando a la izquierda, nunca un svg nuevo. */
-	.es-flow__item:nth-child(6) .es-flow__rail,
-	.es-flow__item:nth-child(7) .es-flow__rail,
-	.es-flow__item:nth-child(8) .es-flow__rail {
+	/* =====================================================================
+	   RAMAS REALES — la decisión se bifurca de verdad
+	   ---------------------------------------------------------------------
+	   Cuando una decisión tiene una salida que pasa por su propia pantalla,
+	   esa pantalla cae en un CARRIL propio (una fila de grilla extra que
+	   render.php inserta encima de la banda) y en la columna vecina. Así:
+
+	     · la salida principal sigue bajando recta por el centro de su
+	       columna, sin desviarse ni un pixel;
+	     · la otra salida se abre en "L" hacia el carril, entra a la
+	       pantalla intermedia y vuelve a la línea principal con otra "L";
+	     · las dos salidas nacen del MISMO punto del rombo, que es lo que
+	       hace que se lea como una bifurcación y no como dos cosas sueltas.
+
+	   Las "L" son dos bordes CSS, no un svg estirado: un borde recto no se
+	   deforma nunca, sea cual sea el ancho de columna, mientras que un svg
+	   con preserveAspectRatio="none" deformaría la punta de flecha. La
+	   punta va aparte, en su propio svg de tamaño fijo, apoyada en el
+	   extremo de la L.
+	   ===================================================================== */
+
+	/* Prolongación de la línea principal a través del carril: sin esto el
+	   conector llegaría sólo hasta el borde del carril y quedaría cortado
+	   justo donde la rama se abre — que es exactamente donde más importa
+	   que se vea continuo. */
+	.es-flow .es-flow__pass {
+		display: block;
+		grid-row: var(--r);
+		grid-column: var(--c);
+		align-self: stretch;
+		justify-self: center;
+		width: 1px;
+		/* se mete en los dos gaps de fila para empalmar con los rieles */
+		margin: calc(-1 * var(--es-flow-row-gap)) 0;
+		background: var(--es-line-strong);
+	}
+
+	/* La pantalla intermedia es secundaria: ocupa algo menos que una celda
+	   entera y se alinea del lado de su columna principal, para que el
+	   carril no compita en peso con la línea del flujo. */
+	.es-flow__item--branch {
+		padding-left: 0;
+		border-left: 0;
+	}
+
+	.es-flow__item--branch .es-flow__shape {
+		padding: 10px 13px;
+	}
+
+	.es-flow__item--branch .es-flow__title {
+		font-size: 13px;
+	}
+
+	.es-flow__item--branch .es-flow__text {
+		font-size: 11.5px;
+	}
+
+	/* --- la "L" que abre la rama y la que la devuelve al flujo ---
+	   Cada una entra y sale por un LADO DISTINTO de la tarjeta. Dos razones:
+	   (a) debajo de la forma vive la descripción del propio nodo ("Ver
+	   detalle" incluido), así que un conector que pasara por ahí cruzaría
+	   texto; (b) si entrada y salida se engancharan en el mismo borde
+	   quedarían como un doble trazo paralelo y la rama se leería como una
+	   conexión suelta, no como un recorrido de ida y vuelta.
+
+	   Rama hacia adelante:  entra por ARRIBA,     sale por la DERECHA.
+	   Bucle (vuelve atrás): entra por la IZQUIERDA, sale por ARRIBA.
+
+	   Son dos bordes CSS, no un svg estirado: un borde recto no se deforma
+	   nunca, sea cual sea el ancho de columna, mientras que un svg con
+	   preserveAspectRatio="none" deformaría la punta de flecha. La punta va
+	   aparte, en su propio svg de tamaño fijo, apoyada en el extremo. */
+	.es-flow__branch-link {
+		display: block;
+		position: absolute;
+		border-color: var(--es-line-strong);
+		border-style: solid;
+		border-width: 0;
+	}
+
+	.es-flow__branch-link .es-flow__tip {
+		display: block;
+	}
+
+	/* La geometría depende SÓLO de dónde está el otro extremo respecto de la
+	   tarjeta — no de si la rama "va hacia adelante" o "vuelve atrás". Con eso
+	   quedan cubiertos los tres casos que produce el algoritmo: el carril
+	   entre dos bandas (decisión arriba, reingreso abajo), el bucle (decisión
+	   abajo, destino arriba) y la rama que nace y muere en la misma banda
+	   (los dos extremos abajo). is-side-* sólo dice hacia qué lado queda la
+	   columna principal, para saber por dónde estirar el tramo horizontal. */
+
+	/* viene de ARRIBA → entra por el techo de la tarjeta */
+	.es-flow__branch-link--in.is-from-above {
+		bottom: 100%;
+		height: var(--es-flow-row-gap);
+		width: calc(100% + var(--es-flow-col));
+		border-top-width: 1px;
+	}
+
+	.is-side-right .es-flow__branch-link--in.is-from-above {
+		left: 50%;
+		border-left-width: 1px;
+		border-top-left-radius: 5px;
+	}
+
+	.is-side-left .es-flow__branch-link--in.is-from-above {
+		right: 50%;
+		border-right-width: 1px;
+		border-top-right-radius: 5px;
+	}
+
+	/* viene de ABAJO → entra por el costado (nunca por la base: ahí está la
+	   descripción del propio nodo) */
+	.es-flow__branch-link--in.is-from-below {
+		top: 50%;
+		height: calc(50% + var(--es-flow-row-gap));
+		border-top-width: 1px;
+	}
+
+	.is-side-left .es-flow__branch-link--in.is-from-below {
+		right: 100%;
+		width: calc(26% + var(--es-flow-col));
+		border-left-width: 1px;
+		border-top-left-radius: 5px;
+	}
+
+	/* columna principal a la derecha: la entrada igual baja por la izquierda,
+	   así no choca con la salida, que usa el lado derecho. */
+	.is-side-right .es-flow__branch-link--in.is-from-below {
+		right: 100%;
+		width: 26px;
+		border-left-width: 1px;
+		border-top-left-radius: 5px;
+	}
+
+	/* va hacia ABAJO → sale por el costado y cae sobre el eje de la columna
+	   principal: "me salí de la línea, pasé por acá, vuelvo a la misma línea" */
+	.es-flow__branch-link--out.is-to-below {
+		top: 50%;
+		height: calc(50% + var(--es-flow-row-gap));
+		border-top-width: 1px;
+	}
+
+	.is-side-right .es-flow__branch-link--out.is-to-below {
 		left: 100%;
+		width: calc(var(--es-flow-col) + 50%);
+		border-right-width: 1px;
+		border-top-right-radius: 5px;
+	}
+
+	.is-side-left .es-flow__branch-link--out.is-to-below {
+		right: 100%;
+		width: calc(var(--es-flow-col) + 50%);
+		border-left-width: 1px;
+		border-top-left-radius: 5px;
+	}
+
+	/* va hacia ARRIBA (retorno) → sale por el techo. Los verticales del
+	   retorno NO se apoyan sobre el eje de la columna: corren en paralelo a la
+	   línea principal y en sentido contrario, así que si compartieran eje se
+	   leerían como una sola línea. */
+	.es-flow__branch-link--out.is-to-above {
+		bottom: 100%;
+		height: var(--es-flow-row-gap);
+		border-top-width: 1px;
+	}
+
+	.is-side-left .es-flow__branch-link--out.is-to-above {
+		right: 50%;
+		width: calc(76% + var(--es-flow-col));
+		border-right-width: 1px;
+		border-top-right-radius: 5px;
+	}
+
+	.is-side-right .es-flow__branch-link--out.is-to-above {
+		left: 50%;
+		width: calc(76% + var(--es-flow-col));
+		border-left-width: 1px;
+		border-top-left-radius: 5px;
+	}
+
+	/* Punta de flecha en el extremo de cada "L", apoyada sobre el borde de la
+	   forma a la que llega. */
+	.es-flow__branch-link--in.is-from-above .es-flow__tip {
+		bottom: -6px;
+	}
+
+	.is-side-right .es-flow__branch-link--in.is-from-above .es-flow__tip {
+		left: -5.5px;
+	}
+
+	.is-side-left .es-flow__branch-link--in.is-from-above .es-flow__tip {
+		right: -5.5px;
+	}
+
+	.es-flow__branch-link--in.is-from-below .es-flow__tip {
+		right: -6px;
+		top: -5.5px;
+	}
+
+	.es-flow__branch-link--out.is-to-below .es-flow__tip {
+		bottom: -6px;
+	}
+
+	.is-side-right .es-flow__branch-link--out.is-to-below .es-flow__tip {
+		right: -5.5px;
+	}
+
+	.is-side-left .es-flow__branch-link--out.is-to-below .es-flow__tip {
+		left: -5.5px;
+	}
+
+	.es-flow__branch-link--out.is-to-above .es-flow__tip {
+		top: -6px;
+	}
+
+	.is-side-left .es-flow__branch-link--out.is-to-above .es-flow__tip {
+		left: -5.5px;
+	}
+
+	.is-side-right .es-flow__branch-link--out.is-to-above .es-flow__tip {
+		right: -5.5px;
+	}
+
+	/* En el grid, TODO rótulo de arista se despega del flujo:
+	   .es-flow__shape-band es un flex en columna, así que un rótulo en flujo
+	   normal empujaría la forma hacia abajo y rompería el eje compartido de
+	   la fila. */
+	.es-flow__edge-label {
+		position: absolute;
+		margin: 0;
+	}
+
+	/* El rótulo Sí/No va del lado del rombo del que sale, sobre su propio
+	   conector: es el conector el que explica la lógica. La vuelta al flujo
+	   no lleva rótulo — ya se leyó al abrirse. */
+	.es-flow__branch-link--in.is-from-above .es-flow__edge-label {
+		top: -7px;
+	}
+
+	.es-flow__branch-link--in.is-from-below .es-flow__edge-label {
+		bottom: -7px;
+	}
+
+	.is-side-right .es-flow__branch-link--in.is-from-above .es-flow__edge-label {
+		right: 5px;
+	}
+
+	.is-side-left .es-flow__branch-link--in.is-from-above .es-flow__edge-label {
+		left: 5px;
+	}
+
+	.es-flow__branch-link--in.is-from-below .es-flow__edge-label {
+		left: 3px;
+	}
+
+	.es-flow__edge-label--out {
+		display: none;
+	}
+
+	/* Rótulo de un tramo recto (una decisión cuya salida principal sigue
+	   derecho): va pegado al riel, del lado por el que entra. */
+	.es-flow__rail--v + .es-flow__edge-label {
+		left: calc(50% + 7px);
+		bottom: calc(100% + 6px);
+	}
+
+	.es-flow__rail--h + .es-flow__edge-label {
+		right: calc(100% + 4px);
+		top: calc(50% - 22px);
+	}
+
+	.is-rtl .es-flow__rail--h + .es-flow__edge-label {
 		right: auto;
-	}
-
-	.es-flow__item:nth-child(6) .es-flow__connector,
-	.es-flow__item:nth-child(7) .es-flow__connector,
-	.es-flow__item:nth-child(8) .es-flow__connector {
-		transform: scaleX(-1);
-	}
-
-	.es-flow__item:nth-child(6) .es-flow__edge,
-	.es-flow__item:nth-child(7) .es-flow__edge,
-	.es-flow__item:nth-child(8) .es-flow__edge {
-		left: auto;
-		right: 0;
-		text-align: right;
+		left: calc(100% + 4px);
 	}
 
 	.es-flow__node {
@@ -1206,51 +1436,28 @@
 		text-align: left;
 	}
 
-	/* Las pastillas de inicio/fin se alinean con la COLUMNA de su nodo
-	   (1 y 4), no con el borde del contenedor: mismo ancho que una
-	   columna del grid (misma fórmula que minmax(0,1fr) con 4 fracciones
-	   iguales) + text-align:center, así el CENTRO del marcador coincide
-	   con el centro real de "Inicio"/"Fin" (que sí ocupa la columna
-	   entera) sin depender de ningún px fijo — no sólo un borde en común.
-	   WIDTH, no max-width: margin-left:auto sólo reparte espacio cuando
-	   'width' es un valor definido — con max-width solo, 'width' sigue
-	   siendo auto y el margen automático se ignora (la caja queda pegada
-	   a la izquierda). */
-	.es-flow .es-flow__marker--start,
-	.es-flow .es-flow__marker--end {
-		width: calc((100% - 3 * var(--es-flow-col)) / 4);
-		text-align: center;
+	/* Marcadores de contexto anclados a SU PROPIA pastilla.
+	   Antes vivían sueltos arriba y abajo del diagrama y se los acercaba con
+	   un translateY a ojo — un número que dependía del alto real de la última
+	   fila y que había que reajustar cada vez que cambiaba el contenido.
+	   Ahora el marcador es hijo del nodo, y su posición se deriva de la
+	   geometría que ya gobierna la forma: la pastilla está centrada en la
+	   franja (50%), así que su borde está a media pastilla del centro y el
+	   marcador se apoya justo después del gap. Cero acoplamiento al contenido:
+	   sirve igual para un flujo de 6 nodos o de 30. */
+	.es-flow__item .es-flow__marker {
+		position: absolute;
+		left: 0;
+		right: 0;
+		margin: 0;
 	}
 
-	.es-flow .es-flow__marker--end {
-		margin-left: auto;
+	.es-flow__item .es-flow__marker--start {
+		bottom: calc(50% + var(--es-flow-pill-h) / 2 + var(--es-flow-marker-gap));
 	}
 
-	/* Pulido de "conexión visual": Inicio/Fin comparten fila de grid con
-	   un rombo de decisión (03 / 08), y esa fila usa la franja de alto
-	   compartido (--es-flow-shape-h, ver más abajo) para que el rombo y
-	   la pastilla queden centrados en el MISMO eje — el mismo mecanismo
-	   que alinea los conectores. Como Inicio/Fin son mucho más bajos que
-	   esa franja, quedan centrados muy por debajo/encima de su propio
-	   borde de fila, y el marcador (que sigue el flujo normal, pegado al
-	   borde de la fila) termina mucho más lejos de la pastilla real de lo
-	   que --es-flow-marker-gap por sí solo sugiere. transform (no margin)
-	   a propósito: sólo la etiqueta se desliza hacia el nodo — la franja,
-	   la fila y los conectores quedan exactamente donde ya estaban.
-
-	   El valor de Fin es mayor que el de Inicio porque su fila (08–End)
-	   además tiene una rama con nodo satélite propio (ver
-	   .es-flow__satellite más abajo): el satélite cuelga DEBAJO del
-	   rombo, en la misma fila, y estira su alto real bastante más allá
-	   de --es-flow-shape-h. Valor medido contra el contenido real (los
-	   dos idiomas dan el mismo resultado); si el texto de una rama
-	   detour cambia mucho de longitud, puede necesitar reajuste. */
-	.es-flow .es-flow__marker--start {
-		transform: translateY(64px);
-	}
-
-	.es-flow .es-flow__marker--end {
-		transform: translateY(-292px);
+	.es-flow__item .es-flow__marker--end {
+		top: calc(50% + var(--es-flow-pill-h) / 2 + var(--es-flow-marker-gap));
 	}
 
 	.es-flow.is-enhanced .es-flow__trigger:hover,
