@@ -115,37 +115,77 @@
    encola en el single de Case Study — ahora viven en el chrome
    compartido, así que cargan en cualquier página que los use. */
 
+/* Metadata editorial, no una segunda barra de navegación. En el Case
+   Study vive DEBAJO del índice sticky (header → índice → breadcrumb →
+   hero), y todo acá está calibrado para que se lea claramente por debajo
+   de ese índice: 10px contra 11px, peso liviano, interlínea corta,
+   padding mínimo y sin ningún cromo (ni fondo, ni borde, ni cápsula, ni
+   sombra) — el índice de arriba ya aporta la única línea divisoria que
+   necesita esta zona.
+
+   CONTRASTE — corrección respecto de la iteración anterior: acá se venía
+   usando un gris de ~3.15:1 justificado con el umbral de 3:1 de WCAG
+   1.4.11, pero ese criterio es para componentes de interfaz NO textuales
+   (bordes, íconos). Esto es texto de enlace, así que el criterio que
+   corresponde es 1.4.3, que pide 4.5:1 por debajo de 18pt. --es-ink-4
+   puro (3.45:1) tampoco alcanza. La mezcla de acá es el gris más apagado
+   que todavía cumple 4.5:1 (≈4.53:1 medido sobre --es-paper): la bajada
+   de protagonismo la hacen el tamaño, el peso y el espaciado, no un
+   contraste ilegible.
+
+   Los separadores "/" sí pueden ir más tenues (≈3:1): son puntuación
+   decorativa — la jerarquía real la comunica el marcado <ol>/<li>, no el
+   glifo. */
 .es-breadcrumbs {
-	padding: 14px 0;
-	border-bottom: 1px solid var(--es-line);
+	--es-breadcrumbs-ink: color-mix(in srgb, var(--es-ink-3) 45%, var(--es-ink-4));
+	--es-breadcrumbs-sep: color-mix(in srgb, var(--es-ink-4) 90%, var(--es-paper));
+	padding: 13px 0 0;
+	border-bottom: 0;
 }
 
 .es-breadcrumbs__list {
 	display: flex;
-	flex-wrap: wrap;
+	/* nowrap SIEMPRE, no sólo en mobile: nunca se quiere una segunda línea,
+	   en ningún viewport — ver .es-breadcrumbs__item--current más abajo,
+	   que es el único ítem que puede encogerse y truncar. */
+	flex-wrap: nowrap;
 	align-items: center;
 	gap: 0;
 	margin: 0;
 	padding: 0;
 	list-style: none;
 	font-family: var(--es-mono);
-	font-size: 11px;
-	letter-spacing: 0.04em;
+	font-size: 10px;
+	font-weight: 400;
+	line-height: 1.2;
+	letter-spacing: 0.03em;
 }
 
 .es-breadcrumbs__item {
 	display: flex;
 	align-items: center;
+	/* Todos los niveles quedan a su ancho natural — nunca se comprimen ni
+	   se ocultan. El único que puede achicarse es --current (ver abajo),
+	   así que un título largo nunca empuja "Home"/"Work" fuera de la fila
+	   ni los corta a la mitad. */
+	flex: none;
+}
+
+/* El crumb actual (último, sin link): el único que se banca perder ancho
+   — ahí es donde tiene que caer el ellipsis si no entra todo. */
+.es-breadcrumbs__item--current {
+	flex: 1 1 auto;
+	min-width: 0;
 }
 
 .es-breadcrumbs__item:not(:first-child)::before {
 	content: '/';
-	margin: 0 9px;
-	color: var(--es-ink-4);
+	margin: 0 7px;
+	color: var(--es-breadcrumbs-sep);
 }
 
 .es-breadcrumbs__link {
-	color: var(--es-ink-3) !important;
+	color: var(--es-breadcrumbs-ink) !important;
 	text-decoration: none;
 	transition: color var(--es-dur-fast) ease;
 }
@@ -157,59 +197,16 @@
 }
 
 .es-breadcrumbs__link:visited {
-	color: var(--es-ink-3) !important;
+	color: var(--es-breadcrumbs-ink) !important;
 }
 
 .es-breadcrumbs__current {
-	color: var(--es-ink-4);
-	max-width: 40ch;
+	display: block;
+	color: var(--es-breadcrumbs-ink);
+	max-width: 60ch;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-}
-
-/* El "…" del colapso mobile: sólo existe visualmente por debajo de 600px
-   (ver el media query de abajo). Se imprime siempre en el markup para no
-   necesitar JS, pero acá arranca oculto — en desktop el trail va completo. */
-.es-breadcrumbs__item--ellipsis {
-	display: none;
-}
-
-/* ---------- mobile: breadcrumb SIEMPRE en una línea ----------
-   Con 3+ crumbs (hoy: sólo el Case Study) los del medio se ocultan y
-   aparece "…" en su lugar: "Home › … › Nombre del caso". Con 2 crumbs —
-   Work, About, How I Work y Contact — este bloque no tiene efecto: no hay
-   ítems .--collapsible y la <nav> ni siquiera lleva la clase --collapsible,
-   así que esas 4 plantillas quedan exactamente como estaban.
-
-   flex-wrap:nowrap es lo que garantiza la única línea; el título final ya
-   trunca solo por el text-overflow:ellipsis de .es-breadcrumbs__current, y
-   min-width:0 es lo que le permite encogerse dentro del flex (sin eso, un
-   ítem flex no baja de su content size y el truncado nunca se dispara). */
-@media (max-width: 599px) {
-	.es-breadcrumbs__list {
-		flex-wrap: nowrap;
-	}
-
-	.es-breadcrumbs--collapsible .es-breadcrumbs__item--collapsible {
-		display: none;
-	}
-
-	.es-breadcrumbs--collapsible .es-breadcrumbs__item--ellipsis {
-		display: flex;
-	}
-
-	.es-breadcrumbs__ellipsis {
-		color: var(--es-ink-4);
-	}
-
-	.es-breadcrumbs__item:last-child {
-		min-width: 0;
-	}
-
-	.es-breadcrumbs__current {
-		max-width: none;
-	}
 }
 
 .es-nav {

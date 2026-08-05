@@ -39,7 +39,33 @@
    Work/Contact), no solo acá, así que viven en el CSS de chrome
    compartido en vez de en este archivo Case-Study-only. Ver site.css. */
 
-/* ---------- índice sticky en-página (opcional, manual) ---------- */
+/* ---------- índice sticky en-página (opcional, manual) ----------
+   Jerarquía visual del encabezado de un Case Study, de más a menos peso:
+   Header (site-header) > Breadcrumb (site.css, casi metadata) > este menú
+   (navegación real, pero discreta) > ... > Hero (protagonista absoluto,
+   sin tocar acá). Este bloque tiene que leerse claramente por ENCIMA del
+   breadcrumb — es navegación funcional, no sólo ubicación — pero muy por
+   DEBAJO del Hero: de ahí el tamaño/peso contenido y los botones sin caja
+   de más abajo. */
+
+/* .es-case hereda el padding-top de .es-section (--es-section-y, token
+   COMPARTIDO por toda sección del sitio: Home, About, How I Work...) —
+   64-112px según viewport, pensado para separar secciones INDEPENDIENTES
+   entre sí. Acá arriba ya hay índice sticky + breadcrumb recortando el
+   recorrido visual hasta el Hero; ese mismo espacio grande vuelve a
+   sumarse antes de que el Hero empiece, atrasándolo.
+
+   Se pisa SÓLO el padding-top y SÓLO para .es-case: no se toca
+   --es-section-y ni ninguna otra plantilla (Home, About, How I Work
+   siguen con su ritmo de siempre), y el padding-bottom queda intacto
+   (ese es el aire antes del footer, otro problema).
+
+   El valor es el tramo breadcrumb → Hero. Sumado a los 13px de
+   padding-top del breadcrumb, el total desde la línea del índice hasta
+   el Hero queda en ~40px de escritorio, contra los ~90-110px de antes. */
+.es-case {
+	padding-top: clamp(18px, 2.2vw, 26px);
+}
 
 .es-case-index {
 	position: sticky;
@@ -105,8 +131,21 @@
 	white-space: nowrap;
 	color: var(--es-ink-3) !important;
 	text-decoration: none;
-	padding: 12px 11px 13px;
+	/* Compacto pero real: menos protagonismo que antes, sin dejar de ser
+	   una barra de navegación (el breadcrumb, arriba, es el que va a peso
+	   de metadata). */
+	padding: 9px 9px 10px;
 	transition: color var(--es-dur-fast) ease;
+}
+
+/* El padding horizontal de cada link también funciona como el espacio
+   ENTRE ellos (gap:2px + este padding) — necesario para que no queden
+   pegados, pero hace que el PRIMER link arranque ~9px a la derecha del
+   borde del contenedor, desalineado del breadcrumb y del título del Hero
+   (que no tienen ese padding propio). Se cancela sólo acá, sin tocar el
+   resto: rompería el espaciado entre links si se sacara del todos. */
+.es-case-index__link:first-child {
+	padding-left: 0;
 }
 
 /* nunca azul — mismo refuerzo !important que el resto del chrome (site.css) */
@@ -159,11 +198,23 @@
 	transition: transform var(--es-dur) var(--es-ease), width var(--es-dur) var(--es-ease);
 }
 
-/* ---------- botones de desplazamiento ----------
+/* ---------- flechas de desplazamiento: sólo el ícono, nada más ----------
    Arrancan [hidden] desde el markup: sin JS no aparecen nunca (el menú se
    sigue scrolleando con gesto/trackpad/teclado — son un atajo, no el único
-   camino). El degradado los despega del texto que pasa por debajo sin
-   meter una caja opaca. */
+   camino).
+
+   Sin degradado de fondo: la ronda anterior usaba un fundido con
+   --es-paper para separar el ícono del texto que pasa por debajo, pero
+   seguía leyéndose como "una superficie" — acá no queda ningún fondo, ni
+   siquiera el del propio papel del sitio. El único píxel con color es el
+   trazo del SVG (14px, sólo línea). El texto puede rozar el ícono al
+   scrollear; es el costo aceptado de "sólo la flecha, nada de caja".
+
+   appearance:none resetea el chrome nativo del <button> (Safari en
+   particular redondea/sombrea botones por default): sin esto el foco de
+   teclado dibuja un óvalo que se lee como "botón". border-radius sólo
+   importa para el HALO de foco (ver :focus-visible más abajo) — sin fondo
+   ni borde propios, no dibuja ninguna forma visible en reposo/hover. */
 .es-case-index__arrow {
 	position: absolute;
 	top: 0;
@@ -172,51 +223,104 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 34px;
+	width: 32px;
 	padding: 0;
 	border: 0;
+	/* 50%: en un botón casi cuadrado esto da una elipse/círculo — un aro
+	   redondo alrededor del ícono, no una caja con esquinas. Sólo importa
+	   para la FORMA del outline de foco (ver :focus-visible más abajo);
+	   sin fondo ni borde propios, no se ve nada distinto en reposo/hover. */
+	border-radius: 50%;
 	background: none;
 	color: var(--es-ink-3);
 	cursor: pointer;
-	transition: color var(--es-dur-fast) var(--es-ease);
+	appearance: none;
+	-webkit-appearance: none;
+	transition: color var(--es-dur) var(--es-ease);
 }
 
 .es-case-index__arrow[hidden] {
 	display: none;
 }
 
-.es-case-index__arrow:hover,
-.es-case-index__arrow:focus-visible {
-	color: var(--es-ink);
+/* Área táctil invisible de 44×44 (WCAG 2.5.5). La barra mide ~31px de
+   alto y la flecha 32px de ancho: agrandar el botón para llegar a 44
+   engordaría el índice entero, justo lo contrario de lo que se buscó.
+   Este pseudo-elemento extiende sólo la zona clickeable — el dibujo
+   sigue siendo la flecha sola.
+
+   Se ancla al borde EXTERNO de cada flecha (left:0 en la de "anterior",
+   right:0 en la de "siguiente") en vez de centrarse: centrado, los 6px
+   sobrantes de la flecha derecha caían fuera del viewport y generaban
+   desborde horizontal de página en mobile (medido: 396px sobre un
+   dispositivo de 390px). Anclado hacia adentro, los 12px extra crecen
+   sobre la zona de links — que el padding de .has-prev/.has-next de más
+   abajo ya deja libre. */
+.es-case-index__arrow::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	width: 44px;
+	height: 44px;
+	transform: translateY(-50%);
 }
 
-.es-case-index__arrow:focus-visible {
-	outline: 2px solid var(--es-accent);
-	outline-offset: -3px;
+.es-case-index__arrow--prev::before {
+	left: 0;
+}
+
+.es-case-index__arrow--next::before {
+	right: 0;
+}
+
+/* Gris por defecto, verde en hover Y en active — nunca blanco, nunca azul.
+   Mismo verde que el segmento activo del riel, así la flecha se lee como
+   parte del mismo sistema de "esto está vivo/interactivo". */
+.es-case-index__arrow:hover,
+.es-case-index__arrow:active {
+	color: var(--es-accent);
+}
+
+/* Foco: un halo MUY sutil, no el mismo verde sólido de hover/active — un
+   tono mezclado con transparencia, offset generoso para que se lea como
+   un aro alrededor del ícono y no como el borde de una caja pegada a él.
+   Selector calificado con .es-case-index (no sólo .es-case-index__arrow):
+   la regla global ".es-page button:focus-visible" de base.css tiene más
+   especificidad que un solo .arrow:focus-visible (button+clase vs. sólo
+   2 clases) y pisaba tanto el color como el border-radius — esa regla
+   global también fuerza border-radius:2px en CUALQUIER botón al
+   enfocarse (para que el outline le quede prolijo a botones cuadrados
+   normales), lo que acá convertía el aro redondo en un rectángulo con
+   esquinas apenas curvas. Se repite el 50% acá para que gane. */
+.es-case-index .es-case-index__arrow:focus-visible {
+	color: var(--es-accent);
+	outline: 2px solid color-mix(in srgb, var(--es-accent) 55%, transparent);
+	outline-offset: 3px;
+	border-radius: 50%;
 }
 
 .es-case-index__arrow--prev {
 	left: 0;
-	justify-content: flex-start;
-	padding-left: 4px;
-	background: linear-gradient(to right, var(--es-paper) 55%, transparent);
 }
 
 .es-case-index__arrow--next {
 	right: 0;
-	justify-content: flex-end;
-	padding-right: 4px;
-	background: linear-gradient(to left, var(--es-paper) 55%, transparent);
 }
 
-/* Con botones visibles, el primer/último link no debe quedar tapado por
-   el degradado: el JS agrega estas clases junto con cada botón. */
+/* Con flechas visibles, el primer/último link no debe quedar tapado por
+   la zona clickeable de la flecha (que mide 44px aunque el dibujo sea de
+   32): el JS agrega estas clases junto con cada botón. 40px deja el área
+   táctil completa libre sin pisar ningún link.
+
+   Importante para la alineación: .has-prev sólo existe cuando el índice
+   YA fue desplazado. En reposo (scroll 0) el padding-left es 0, que es lo
+   que mantiene el primer link alineado con el breadcrumb y el Hero. */
 .es-case-index__viewport.has-prev .es-case-index__inner {
-	padding-left: 30px;
+	padding-left: 40px;
 }
 
 .es-case-index__viewport.has-next .es-case-index__inner {
-	padding-right: 30px;
+	padding-right: 40px;
 }
 
 /* ---------- hero del caso: grilla editorial 2 columnas en desktop ----------

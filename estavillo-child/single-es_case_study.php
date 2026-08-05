@@ -158,9 +158,17 @@ if ( function_exists( 'wp_body_open' ) ) {
 				}
 			}
 			?>
-			<?php get_template_part( 'template-parts/breadcrumbs', null, array( 'trail' => $es_breadcrumb_trail ) ); ?>
 			<?php
 			/*
+			 * ORDEN DE LA ZONA SUPERIOR (decidido comparando 3 arquitecturas):
+			 *   header → índice sticky → breadcrumb → hero → contenido.
+			 *
+			 * El índice va ANTES del breadcrumb, pegado al header: es
+			 * navegación real del documento y el único de los dos que queda
+			 * sticky. El breadcrumb va después, como metadata editorial —
+			 * más chico, más apagado, sin borde ni fondo — y scrollea
+			 * normalmente con la página junto al hero.
+			 *
 			 * Índice sticky. El scroll horizontal ya lo hacía el CSS
 			 * (overflow-x:auto sobre __inner); lo que suma este markup es:
 			 *   - los dos botones de desplazamiento, que arrancan ocultos
@@ -194,6 +202,7 @@ if ( function_exists( 'wp_body_open' ) ) {
 					</div>
 				</nav>
 			<?php endif; ?>
+			<?php get_template_part( 'template-parts/breadcrumbs', null, array( 'trail' => $es_breadcrumb_trail ) ); ?>
 			<article class="es-section es-case">
 				<div class="es-container es-case__hero<?php echo esc_attr( $es_hero_layout_class . $es_hero_text_width_class ); ?>" data-es-reveal>
 					<div class="es-case__hero-content">
