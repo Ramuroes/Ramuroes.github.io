@@ -69,6 +69,49 @@ function es_is_estavillo_static_page() {
 }
 
 /**
+ * ¿Hay al menos un estavillo/case-figure con el zoom activado en el post
+ * actual? A diferencia de Case Flow, acá `has_block()` no alcanza: dice si
+ * el BLOQUE existe, no si ESTA instancia tiene `enableZoom` — y el visor
+ * (dialog + JS de pan/zoom) es exactamente el tipo de peso que no debería
+ * pedirse en las páginas que no lo usan. parse_blocks() sobre el propio
+ * post_content ya trae los atributos serializados del bloque, así que no
+ * hace falta ningún acoplamiento con el plugin (ni una bandera global
+ * seteada desde render.php): el theme lee el mismo dato crudo que
+ * Gutenberg guardó.
+ *
+ * @return bool
+ */
+function es_post_has_case_figure_zoom() {
+	if ( ! is_singular() ) {
+		return false;
+	}
+	$post = get_post();
+	if ( ! $post || false === strpos( (string) $post->post_content, 'estavillo/case-figure' ) ) {
+		return false; // atajo: ni vale la pena parsear si el bloque ni aparece
+	}
+	return es_blocks_contain_case_figure_zoom( parse_blocks( $post->post_content ) );
+}
+
+/**
+ * Recorre un árbol de bloques (parse_blocks()) buscando un case-figure con
+ * enableZoom=true, en cualquier nivel de anidamiento (columnas, grupos…).
+ *
+ * @param array $blocks
+ * @return bool
+ */
+function es_blocks_contain_case_figure_zoom( $blocks ) {
+	foreach ( $blocks as $block ) {
+		if ( 'estavillo/case-figure' === ( $block['blockName'] ?? '' ) && ! empty( $block['attrs']['enableZoom'] ) ) {
+			return true;
+		}
+		if ( ! empty( $block['innerBlocks'] ) && es_blocks_contain_case_figure_zoom( $block['innerBlocks'] ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
  * Versión de cache-bust por archivo: usa filemtime() para que CADA cambio de
  * un asset genere un ?ver= nuevo y el navegador/CDN vuelva a bajarlo.
  *
@@ -256,6 +299,31 @@ function es_child_enqueue_assets() {
 	 */
 	if ( $es_has_flow_v2 ) {
 		wp_enqueue_style( 'es-case-flow-v2', ES_CHILD_URI . '/assets/css/case-flow-v2.css', array( 'es-case-flow' ), es_asset_ver( 'assets/css/case-flow-v2.css' ) );
+	}
+
+	/*
+	 * Case Figure lightbox: visor compartido por página (un solo <dialog>),
+	 * opt-in por instancia vía el toggle "Permitir ampliar imagen" del
+	 * bloque. Sin ninguna figura con zoom activo, ni el CSS ni el JS se
+	 * piden — ver es_post_has_case_figure_zoom() arriba.
+	 */
+	if ( es_post_has_case_figure_zoom() ) {
+		wp_enqueue_style(
+			'es-case-figure-lightbox',
+			ES_CHILD_URI . '/assets/css/case-figure-lightbox.css',
+			array( 'es-components' ),
+			es_asset_ver( 'assets/css/case-figure-lightbox.css' )
+		);
+		wp_enqueue_script(
+			'es-case-figure-lightbox',
+			ES_CHILD_URI . '/assets/js/case-figure-lightbox.js',
+			array(),
+			es_asset_ver( 'assets/js/case-figure-lightbox.js' ),
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
+		);
 	}
 }
 add_action( 'wp_enqueue_scripts', 'es_child_enqueue_assets' );

@@ -18,6 +18,7 @@
 	var TextControl = wp.components.TextControl;
 	var TextareaControl = wp.components.TextareaControl;
 	var SelectControl = wp.components.SelectControl;
+	var ToggleControl = wp.components.ToggleControl;
 	var Button = wp.components.Button;
 
 	function dots() {
@@ -26,6 +27,21 @@
 			el('span', { className: 'es-case-browser__dot', key: 'd2' }),
 			el('span', { className: 'es-case-browser__dot', key: 'd3' }),
 		];
+	}
+
+	// Lupa con "+": mismo trazo lineal que el resto de los íconos del
+	// portfolio (case-flow, hobbies) — nada de librerías ni emoji. Sólo un
+	// indicador en el editor de que el zoom está activo; el real (con el
+	// mismo dibujo) lo emite render.php en el frontend.
+	function zoomBadge() {
+		return el(
+			'svg',
+			{ className: 'es-case-figure__zoom-badge', viewBox: '0 0 20 20', 'aria-hidden': 'true', focusable: 'false' },
+			el('circle', { cx: '8', cy: '8', r: '5.5' }),
+			el('line', { x1: '12.2', y1: '12.2', x2: '17', y2: '17' }),
+			el('line', { x1: '5.2', y1: '8', x2: '10.8', y2: '8' }),
+			el('line', { x1: '8', y1: '5.2', x2: '8', y2: '10.8' })
+		);
 	}
 
 	wp.blocks.registerBlockType('estavillo/case-figure', {
@@ -135,6 +151,59 @@
 										set({ browserLabel: v });
 									},
 							  })
+							: null,
+						el(ToggleControl, {
+							label: __('Permitir ampliar imagen', 'estavillo-portfolio-core'),
+							help: __(
+								'Suma un visor a pantalla completa (click o tap) con zoom y desplazamiento. Recomendado para Journey Maps, tablas y diagramas — el contenido interno queda chico en mobile sin esto.',
+								'estavillo-portfolio-core'
+							),
+							checked: !! a.enableZoom,
+							onChange: function (v) {
+								set({ enableZoom: v });
+							},
+						}),
+						a.enableZoom
+							? el(
+									Fragment,
+									null,
+									el(TextControl, {
+										label: __('Texto accesible del disparador', 'estavillo-portfolio-core'),
+										help: __('Nombre accesible del botón que abre el visor (lectores de pantalla).', 'estavillo-portfolio-core'),
+										value: a.zoomLabel,
+										onChange: function (v) {
+											set({ zoomLabel: v });
+										},
+									}),
+									el(TextControl, {
+										label: __('Texto accesible de "Cerrar"', 'estavillo-portfolio-core'),
+										value: a.zoomCloseLabel,
+										onChange: function (v) {
+											set({ zoomCloseLabel: v });
+										},
+									}),
+									el(TextControl, {
+										label: __('Texto accesible de "Acercar"', 'estavillo-portfolio-core'),
+										value: a.zoomInLabel,
+										onChange: function (v) {
+											set({ zoomInLabel: v });
+										},
+									}),
+									el(TextControl, {
+										label: __('Texto accesible de "Alejar"', 'estavillo-portfolio-core'),
+										value: a.zoomOutLabel,
+										onChange: function (v) {
+											set({ zoomOutLabel: v });
+										},
+									}),
+									el(TextControl, {
+										label: __('Texto accesible de "Restablecer"', 'estavillo-portfolio-core'),
+										value: a.zoomResetLabel,
+										onChange: function (v) {
+											set({ zoomResetLabel: v });
+										},
+									})
+							  )
 							: null
 					)
 				),
@@ -143,7 +212,13 @@
 					blockProps,
 					el(
 						'figure',
-						{ className: 'es-case-figure' + (a.variant === 'standard' ? ' es-case-figure--standard' : '') },
+						{
+							className:
+								'es-case-figure' +
+								(a.variant === 'standard' ? ' es-case-figure--standard' : '') +
+								(a.enableZoom ? ' es-case-figure--zoomable' : ''),
+						},
+						a.enableZoom ? zoomBadge() : null,
 						media,
 						el(
 							'figcaption',

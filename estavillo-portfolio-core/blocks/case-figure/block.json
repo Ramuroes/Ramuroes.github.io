@@ -5,7 +5,7 @@
 	"title": "Case Figure",
 	"category": "estavillo-case",
 	"icon": "format-image",
-	"description": "Figura de Case Study: imagen de la Biblioteca de medios (o placeholder {asset: …} mientras no exista), con caption numerada y tres variantes — standard (a medida de lectura), browser (marco tipo navegador) y wide (ancho completo).",
+	"description": "Figura de Case Study: imagen de la Biblioteca de medios (o placeholder {asset: …} mientras no exista), con caption numerada y tres variantes — standard (a medida de lectura), browser (marco tipo navegador) y wide (ancho completo). Zoom opcional: abre la imagen en un visor a pantalla completa con zoom y desplazamiento, pensado para Journey Maps, tablas y diagramas que en mobile quedan chicos.",
 	"keywords": [ "estavillo", "case", "figure", "imagen", "screenshot" ],
 	"textdomain": "estavillo-portfolio-core",
 	"attributes": {
@@ -16,7 +16,13 @@
 		"tag": { "type": "string", "default": "" },
 		"variant": { "type": "string", "default": "standard", "enum": [ "standard", "browser", "wide" ] },
 		"placeholderLabel": { "type": "string", "default": "" },
-		"browserLabel": { "type": "string", "default": "" }
+		"browserLabel": { "type": "string", "default": "" },
+		"enableZoom": { "type": "boolean", "default": false },
+		"zoomLabel": { "type": "string", "default": "Zoom image" },
+		"zoomCloseLabel": { "type": "string", "default": "Close image" },
+		"zoomInLabel": { "type": "string", "default": "Zoom in" },
+		"zoomOutLabel": { "type": "string", "default": "Zoom out" },
+		"zoomResetLabel": { "type": "string", "default": "Reset zoom" }
 	},
 	"supports": {
 		"html": false,
