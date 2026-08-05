@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Estavillo Portfolio Core
  * Description: Editable content for the Estavillo portfolio — the Case Study CPT (Selected Work, Featured Case), a Home Content options page (About, How I Work, Connect, Header, Footer), and the "Estavillo Case Study" Gutenberg block library + Presupuestador patterns for editing cases visually. Decoupled from the theme via WordPress filters, so Home always falls back to its placeholder content if this plugin is deactivated or a field is left empty.
- * Version: 1.5.29
+ * Version: 1.5.30
  * Author: Ramiro Estavillo
  * Text Domain: estavillo-portfolio-core
  *

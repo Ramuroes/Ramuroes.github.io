@@ -7,10 +7,11 @@
  * (`edges`), así que una decisión puede tener dos salidas reales, una rama
  * puede pasar por una pantalla propia y volver al camino principal, y una
  * rama puede volver hacia atrás (bucle). El layout — en qué fila/columna
- * cae cada nodo y qué conector lo une con el anterior — lo CALCULA este
- * archivo a partir del grafo; no hay ni un nth-child atado a este diagrama
- * en particular, así que el mismo componente sirve para Trazur, para el
- * Presupuestador o para cualquier flujo futuro sin tocar una línea de CSS.
+ * cae cada nodo y qué arista lo une con el anterior — lo CALCULA este archivo
+ * a partir del grafo. El JS mide después las formas visibles y dibuja la
+ * geometría final de cada conector; no hay ni un nth-child ni coordenadas
+ * atadas a este diagrama en particular, así que el mismo componente sirve
+ * para Trazur, para el Presupuestador o para cualquier flujo futuro.
  *
  * MODELO DE DATOS
  *   nodes[]: { id, kind, accent, num, title, text, ai, detail[], edges[] }
@@ -79,11 +80,10 @@ if ( ! function_exists( 'es_flow_node_kind' ) ) {
 }
 
 /**
- * Conector recto entre dos nodos consecutivos del camino principal. Emite UN
+ * Fallback sin JS entre dos nodos consecutivos del camino principal. Emite UN
  * svg con dos paths — uno horizontal y uno vertical — y el CSS muestra el que
- * corresponde al layout activo (desktop horizontal / mobile vertical). Así el
- * conector es siempre vectorial y nítido en los dos ejes sin duplicar markup
- * por viewport ni recalcular nada en JS.
+ * corresponde al layout activo. Cuando el JS logra medir las formas, reemplaza
+ * estos rieles por el overlay SVG anclado a su geometría real.
  *
  * `vector-effect="non-scaling-stroke"` mantiene el grosor real en 1.25px
  * aunque el svg se estire con preserveAspectRatio="none".
@@ -102,7 +102,7 @@ if ( ! function_exists( 'es_flow_connector_svg' ) ) {
 }
 
 /**
- * Punta de flecha suelta, tamaño fijo, para los conectores de rama.
+ * Punta de flecha suelta, tamaño fijo, para el fallback CSS de las ramas.
  *
  * Las ramas se dibujan como una "L" hecha con dos bordes CSS (ver
  * .es-flow__branch-link en case-flow.css) en vez de un svg estirado: un
@@ -339,9 +339,9 @@ if ( ! function_exists( 'es_flow_layout' ) ) {
 		}
 
 		// ---- 7. conectores ---------------------------------------------------
-		// Cada arista se traduce al conector que la dibuja, y se cuelga del nodo
-		// que lo hospeda en el DOM (siempre uno de los dos extremos), para que
-		// su posición se resuelva sola contra ese nodo — sin medir nada en JS.
+		// Cada arista recibe extremos y tipo de ruta estables. El descriptor se
+		// hospeda en uno de los nodos para sostener el fallback CSS; el overlay JS
+		// lee from/to/route y mide directamente las dos formas visibles.
 		foreach ( $nodes as $i => $node ) {
 			$nodes[ $i ]['_links'] = array();
 		}
@@ -371,9 +371,12 @@ if ( ! function_exists( 'es_flow_layout' ) ) {
 					$decision_edge = ( 'decision' === es_flow_node_kind( $node['kind'] ?? 'step' ) )
 						|| ( 'decision' === es_flow_node_kind( $nodes[ $j ]['kind'] ?? 'step' ) );
 					$nodes[ $j ]['_links'][] = array(
-						'type'   => $same_band ? 'h' : 'v',
-						'label'  => $label,
-						'wide'   => $same_band && $decision_edge,
+						'type'  => $same_band ? 'h' : 'v',
+						'label' => $label,
+						'wide'  => $same_band && $decision_edge,
+						'from'  => $nodes[ $i ]['_id'],
+						'to'    => $nodes[ $j ]['_id'],
+						'route' => 'main',
 					);
 					// Si el salto de banda atraviesa un carril de ramas, hay que
 					// prolongar la línea a través de esa fila (si no, el conector
@@ -395,6 +398,9 @@ if ( ! function_exists( 'es_flow_layout' ) ) {
 						'type'  => 'in',
 						'label' => $label,
 						'row'   => $nodes[ $i ]['_row'],
+						'from'  => $nodes[ $i ]['_id'],
+						'to'    => $nodes[ $j ]['_id'],
+						'route' => 'branch',
 					);
 				} else {
 					// Salida de una pantalla intermedia de vuelta al flujo.
@@ -402,6 +408,9 @@ if ( ! function_exists( 'es_flow_layout' ) ) {
 						'type'  => 'out',
 						'label' => $label,
 						'row'   => $nodes[ $j ]['_row'],
+						'from'  => $nodes[ $i ]['_id'],
+						'to'    => $nodes[ $j ]['_id'],
+						'route' => ! empty( $nodes[ $i ]['_isloop'] ) ? 'loop' : 'rejoin',
 					);
 				}
 			}
@@ -496,7 +505,11 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 		<span class="es-flow__progress-current" data-es-flow-current>01</span><span class="es-flow__progress-sep">/</span><span class="es-flow__progress-total"><?php echo esc_html( sprintf( '%02d', $es_total ) ); ?></span>
 	</p>
 
-	<ol class="es-flow__track">
+	<div class="es-flow__diagram" data-es-flow-diagram>
+		<svg class="es-flow__connections" data-es-flow-connectors aria-hidden="true" focusable="false"></svg>
+		<div class="es-flow__connector-labels" data-es-flow-connector-labels aria-hidden="true"></div>
+
+		<ol class="es-flow__track">
 		<?php
 		// Prolongaciones del conector principal a través de un carril de ramas.
 		// Son items de grilla vacíos (puro trazo), no nodos: por eso van fuera
@@ -536,7 +549,7 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 			$es_item_class .= ! empty( $es_node['_rtl'] ) ? ' is-rtl' : '';
 			$es_item_class .= ! empty( $es_node['_tall'] ) ? ' is-tall' : '';
 			?>
-			<li class="<?php echo esc_attr( $es_item_class ); ?>" data-es-flow-item data-es-flow-index="<?php echo esc_attr( (string) ( $es_i + 1 ) ); ?>" style="--r: <?php echo esc_attr( (string) ( $es_node['_row'] ?? 1 ) ); ?>; --c: <?php echo esc_attr( (string) ( ( $es_node['_col'] ?? 0 ) + 1 ) ); ?>">
+			<li class="<?php echo esc_attr( $es_item_class ); ?>" data-es-flow-item data-es-flow-node-id="<?php echo esc_attr( (string) $es_node['_id'] ); ?>" data-es-flow-node-kind="<?php echo esc_attr( $es_kind ); ?>" data-es-flow-index="<?php echo esc_attr( (string) ( $es_i + 1 ) ); ?>" style="--r: <?php echo esc_attr( (string) ( $es_node['_row'] ?? 1 ) ); ?>; --c: <?php echo esc_attr( (string) ( ( $es_node['_col'] ?? 0 ) + 1 ) ); ?>">
 
 				<?php
 				/*
@@ -575,9 +588,13 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 							<?php
 							foreach ( $es_links as $es_link ) :
 								$es_edge = trim( (string) ( $es_node['edgeLabel'] ?? '' ) );
+								$es_link_from  = (string) ( $es_link['from'] ?? '' );
+								$es_link_to    = (string) ( $es_link['to'] ?? '' );
+								$es_link_route = (string) ( $es_link['route'] ?? 'main' );
+								$es_link_label = (string) ( $es_link['label'] ?? '' );
 								if ( 'h' === $es_link['type'] || 'v' === $es_link['type'] ) :
 									/*
-									 * Tramo recto del camino principal. El riel cuelga de
+									 * Fallback del camino principal. El riel cuelga de
 									 * .es-flow__shape-band, la franja de altura compartida
 									 * por fila: así top:50% del riel apunta siempre al
 									 * centro REAL de la fila — el mismo eje en el que la
@@ -587,7 +604,7 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 									 * rombo compartía fila con una pastilla mucho más baja.
 									 */
 									?>
-									<span class="es-flow__rail es-flow__rail--<?php echo esc_attr( $es_link['type'] ); ?><?php echo ! empty( $es_link['wide'] ) ? ' is-decision-edge' : ''; ?>" aria-hidden="true">
+									<span class="es-flow__rail es-flow__rail--<?php echo esc_attr( $es_link['type'] ); ?><?php echo ! empty( $es_link['wide'] ) ? ' is-decision-edge' : ''; ?>" data-es-flow-edge data-es-flow-from="<?php echo esc_attr( $es_link_from ); ?>" data-es-flow-to="<?php echo esc_attr( $es_link_to ); ?>" data-es-flow-route="<?php echo esc_attr( $es_link_route ); ?>" data-es-flow-label="<?php echo esc_attr( $es_link_label ); ?>" aria-hidden="true">
 										<?php echo es_flow_connector_svg(); // phpcs:ignore WordPress.Security.EscapeOutput -- SVG del propio plugin, sin dato de usuario. ?>
 									</span>
 									<?php if ( '' !== $es_link['label'] ) : ?>
@@ -629,7 +646,7 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 									// rótulo "Sí"/"No" que va adentro es contenido real —
 									// es lo que explica por qué existe esta pantalla.
 									?>
-									<span class="es-flow__branch-link es-flow__branch-link--<?php echo esc_attr( $es_link['type'] ); ?> <?php echo esc_attr( $es_where ); ?>">
+									<span class="es-flow__branch-link es-flow__branch-link--<?php echo esc_attr( $es_link['type'] ); ?> <?php echo esc_attr( $es_where ); ?>" data-es-flow-edge data-es-flow-from="<?php echo esc_attr( $es_link_from ); ?>" data-es-flow-to="<?php echo esc_attr( $es_link_to ); ?>" data-es-flow-route="<?php echo esc_attr( $es_link_route ); ?>" data-es-flow-label="<?php echo esc_attr( $es_link_label ); ?>">
 										<?php echo es_flow_tip_svg( $es_tip ); // phpcs:ignore WordPress.Security.EscapeOutput -- SVG del propio plugin, sin dato de usuario. ?>
 										<?php if ( '' !== $es_link['label'] ) : ?>
 											<?php
@@ -645,7 +662,7 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 								endif;
 							endforeach;
 							?>
-							<span class="es-flow__shape">
+							<span class="es-flow__shape" data-es-flow-shape>
 								<span class="es-flow__shape-inner">
 									<?php if ( '' !== $es_num ) : ?>
 										<span class="es-flow__num">
@@ -712,7 +729,8 @@ $es_classes = 'es-flow es-flow--' . $es_density;
 				<?php endif; ?>
 			</li>
 		<?php endforeach; ?>
-	</ol>
+		</ol>
+	</div>
 
 	<?php
 	// Leyenda del marcador (IA), una sola vez al pie. Sólo se imprime si
