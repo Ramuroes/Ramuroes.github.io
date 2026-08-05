@@ -74,19 +74,36 @@ if ( function_exists( 'wp_body_open' ) ) {
 				$es_case_tags = array();
 			}
 
-			// Orden pedido: Status, Role, Period, Tools — Tools al final
-			// porque es sistemáticamente el campo más largo (una lista de
-			// herramientas), así que le conviene ser el último en leerse y,
-			// en desktop, el que ocupa la fila propia de la grilla (ver
-			// .es-case__meta en case-study.css).
+			// Status ya NO vive en esta grilla: se muestra como badge junto a
+			// los tags del hero (ver más abajo). Lo que queda es la terna
+			// Rol/Período/Herramientas — tres campos homogéneos, todos
+			// "ficha técnica" del proyecto, que ahora sí forman una caja
+			// coherente. Tools va último porque es sistemáticamente el más
+			// largo (una lista), y en desktop ocupa la columna más ancha.
 			$es_case_meta = array_filter(
 				array(
-					'status' => get_post_meta( $es_case_id, '_es_case_label', true ),
 					'role'   => get_post_meta( $es_case_id, '_es_case_role', true ),
 					'period' => get_post_meta( $es_case_id, '_es_case_period', true ),
 					'tools'  => get_post_meta( $es_case_id, '_es_case_tools', true ),
 				)
 			);
+
+			/*
+			 * Badge de estado. El texto sigue siendo el mismo meta de
+			 * siempre (_es_case_label, texto libre — no se deduce ni se
+			 * migra nada). El tono es un campo nuevo e independiente
+			 * (_es_case_status_tone): si el caso no lo tiene guardado —o
+			 * sea, todos los casos publicados hasta hoy— cae a 'neutral',
+			 * que es el gris que ya se venía viendo. Whitelist estricta
+			 * acá también, no sólo al guardar: el valor termina en un
+			 * nombre de clase CSS.
+			 */
+			$es_case_status      = get_post_meta( $es_case_id, '_es_case_label', true );
+			$es_status_tone      = get_post_meta( $es_case_id, '_es_case_status_tone', true );
+			$es_status_tones     = array( 'neutral', 'green', 'amber', 'blue', 'purple' );
+			if ( ! in_array( $es_status_tone, $es_status_tones, true ) ) {
+				$es_status_tone = 'neutral';
+			}
 
 			// Layout del hero: 'split-right' (default histórico, Sprint 4D) no
 			// suma clase modificadora — cero riesgo para casos ya publicados.
@@ -142,12 +159,38 @@ if ( function_exists( 'wp_body_open' ) ) {
 			}
 			?>
 			<?php get_template_part( 'template-parts/breadcrumbs', null, array( 'trail' => $es_breadcrumb_trail ) ); ?>
+			<?php
+			/*
+			 * Índice sticky. El scroll horizontal ya lo hacía el CSS
+			 * (overflow-x:auto sobre __inner); lo que suma este markup es:
+			 *   - los dos botones de desplazamiento, que arrancan ocultos
+			 *     (hidden) y sólo los muestra case-index.js si realmente
+			 *     hay contenido tapado de ese lado. Sin JS nunca aparecen y
+			 *     el menú se sigue scrolleando con gesto/trackpad/teclado:
+			 *     son un atajo, nunca el único camino.
+			 *   - el riel: una línea gris fina de ancho completo con un
+			 *     segmento verde que el JS mueve a la sección activa. Vive
+			 *     dentro de __inner (no de la <nav>) para poder medir en el
+			 *     mismo sistema de coordenadas que los links, incluso con el
+			 *     menú scrolleado. aria-hidden: es decoración pura; el
+			 *     estado real lo lleva aria-current en el link activo.
+			 */
+			?>
 			<?php if ( ! empty( $es_case_index ) ) : ?>
-				<nav class="es-case-index" aria-label="<?php echo esc_attr( es__( 'case_sections_aria' ) ); ?>">
-					<div class="es-case-index__inner">
-						<?php foreach ( $es_case_index as $es_index_item ) : ?>
-							<a class="es-case-index__link" href="<?php echo esc_url( $es_index_item['href'] ); ?>"><?php echo esc_html( $es_index_item['label'] ); ?></a>
-						<?php endforeach; ?>
+				<nav class="es-case-index" aria-label="<?php echo esc_attr( es__( 'case_sections_aria' ) ); ?>" data-es-case-index>
+					<div class="es-case-index__viewport">
+						<button type="button" class="es-case-index__arrow es-case-index__arrow--prev" data-es-index-prev aria-label="<?php echo esc_attr( es__( 'case_nav_prev' ) ); ?>" hidden>
+							<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8.6 3 4.6 7l4 4"/></svg>
+						</button>
+						<div class="es-case-index__inner" data-es-index-scroller>
+							<?php foreach ( $es_case_index as $es_index_item ) : ?>
+								<a class="es-case-index__link" href="<?php echo esc_url( $es_index_item['href'] ); ?>"><?php echo esc_html( $es_index_item['label'] ); ?></a>
+							<?php endforeach; ?>
+							<span class="es-case-index__rail" aria-hidden="true"><span class="es-case-index__rail-active" data-es-index-rail></span></span>
+						</div>
+						<button type="button" class="es-case-index__arrow es-case-index__arrow--next" data-es-index-next aria-label="<?php echo esc_attr( es__( 'case_nav_next' ) ); ?>" hidden>
+							<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5.4 3l4 4-4 4"/></svg>
+						</button>
 					</div>
 				</nav>
 			<?php endif; ?>
@@ -164,8 +207,26 @@ if ( function_exists( 'wp_body_open' ) ) {
 							<p class="es-lead es-case__excerpt"><?php echo esc_html( $es_case_excerpt ); ?></p>
 						<?php endif; ?>
 
-						<?php if ( ! empty( $es_case_tags ) ) : ?>
+						<?php
+						/*
+						 * Badge de estado + tags comparten la misma fila: el
+						 * badge entra como primer ítem del flex que ya
+						 * existía, no como un bloque nuevo con su propio
+						 * margen. Así queda "cerca de las etiquetas" sin
+						 * agregar una franja más al hero ni competir con el
+						 * eyebrow/título. La fila se imprime si hay tags O
+						 * si hay estado — un caso con estado y sin tags
+						 * (o al revés) sigue funcionando igual.
+						 */
+						?>
+						<?php if ( ! empty( $es_case_tags ) || ! empty( $es_case_status ) ) : ?>
 							<div class="es-case__tags">
+								<?php if ( ! empty( $es_case_status ) ) : ?>
+									<span class="es-case__status es-case__status--<?php echo esc_attr( $es_status_tone ); ?>">
+										<span class="es-case__status-dot" aria-hidden="true"></span>
+										<span class="es-case__status-text"><?php echo esc_html( $es_case_status ); ?></span>
+									</span>
+								<?php endif; ?>
 								<?php foreach ( $es_case_tags as $es_tag ) : ?>
 									<span class="es-pill"><?php echo esc_html( $es_tag->name ); ?></span>
 								<?php endforeach; ?>
@@ -208,7 +269,15 @@ if ( function_exists( 'wp_body_open' ) ) {
 						<dl class="es-case__meta">
 							<?php foreach ( $es_case_meta as $es_meta_key => $es_meta_value ) : ?>
 								<div class="es-case__meta-item es-case__meta-item--<?php echo esc_attr( $es_meta_key ); ?>">
-									<dt><?php echo esc_html( es__( 'case_meta_' . $es_meta_key ) ); ?></dt>
+									<dt>
+										<?php
+										// Whitelist cerrada por clave interna (role/period/
+										// tools), nunca contenido del admin — ver el
+										// docblock de es_case_meta_icon() en functions.php.
+										echo es_case_meta_icon( $es_meta_key ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+										?>
+										<span><?php echo esc_html( es__( 'case_meta_' . $es_meta_key ) ); ?></span>
+									</dt>
 									<dd><?php echo esc_html( $es_meta_value ); ?></dd>
 								</div>
 							<?php endforeach; ?>

@@ -61,15 +61,33 @@
 	}
 }
 
-.es-case-index__inner {
+/* El viewport centra el conjunto en el ancho del sistema y es el ancla
+   (position:relative) de los dos botones flotantes. El scroller de adentro
+   es el que realmente desborda. */
+.es-case-index__viewport {
+	position: relative;
 	max-width: var(--es-max-w);
 	margin: 0 auto;
 	padding: 0 var(--es-pad-x);
+}
+
+.es-case-index__inner {
+	position: relative;
 	display: flex;
 	gap: 2px;
 	overflow-x: auto;
 	scrollbar-width: none;
 	-ms-overflow-style: none;
+	/* pan-x deja pasar el gesto horizontal nativo (touch y trackpad) sin
+	   que el navegador secuestre el scroll vertical de la página. */
+	touch-action: pan-x;
+	scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-case-index__inner {
+		scroll-behavior: auto;
+	}
 }
 
 /* mobile: tira horizontal scrolleable, liviana — sin scrollbar visible */
@@ -79,6 +97,7 @@
 }
 
 .es-case-index__link {
+	position: relative;
 	flex: none;
 	font-family: var(--es-mono);
 	font-size: 11px;
@@ -86,9 +105,8 @@
 	white-space: nowrap;
 	color: var(--es-ink-3) !important;
 	text-decoration: none;
-	padding: 12px 11px;
-	border-bottom: 2px solid transparent;
-	transition: color var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease;
+	padding: 12px 11px 13px;
+	transition: color var(--es-dur-fast) ease;
 }
 
 /* nunca azul — mismo refuerzo !important que el resto del chrome (site.css) */
@@ -96,11 +114,109 @@
 .es-case-index__link:focus-visible,
 .es-case-index__link:active {
 	color: var(--es-ink) !important;
-	border-bottom-color: var(--es-accent);
 }
 
 .es-case-index__link:visited {
 	color: var(--es-ink-3) !important;
+}
+
+/* Sección activa: NO depende sólo del segmento verde del riel — el texto
+   sube de contraste, y el link lleva aria-current="location" (lo pone
+   case-index.js), que es lo que realmente anuncia un lector de pantalla. */
+.es-case-index__link[aria-current='location'] {
+	color: var(--es-ink) !important;
+}
+
+/* ---------- riel: línea gris fina de ancho completo ----------
+   Vive DENTRO del scroller para compartir su sistema de coordenadas: el
+   segmento verde se posiciona con el offsetLeft/offsetWidth crudos del
+   link activo, sin tener que compensar el scroll. Por eso su ancho es el
+   scrollWidth completo (100% de un flex item que ya creció), no el ancho
+   visible. */
+.es-case-index__rail {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 1px;
+	background: var(--es-line);
+	pointer-events: none;
+}
+
+/* El desplazamiento del segmento es una transición CSS común, así que ya
+   la neutraliza la regla global de reduced-motion de base.css (0.01ms
+   !important sobre todo lo que vive dentro de .es-page) — no hace falta
+   repetir un override acá. Lo que SÍ hace falta es apagar el
+   scroll-behavior de arriba, porque no es una transición y esa regla
+   global no lo alcanza. */
+.es-case-index__rail-active {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 0;
+	height: 1px;
+	background: var(--es-signal);
+	transition: transform var(--es-dur) var(--es-ease), width var(--es-dur) var(--es-ease);
+}
+
+/* ---------- botones de desplazamiento ----------
+   Arrancan [hidden] desde el markup: sin JS no aparecen nunca (el menú se
+   sigue scrolleando con gesto/trackpad/teclado — son un atajo, no el único
+   camino). El degradado los despega del texto que pasa por debajo sin
+   meter una caja opaca. */
+.es-case-index__arrow {
+	position: absolute;
+	top: 0;
+	bottom: 1px;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--es-ink-3);
+	cursor: pointer;
+	transition: color var(--es-dur-fast) var(--es-ease);
+}
+
+.es-case-index__arrow[hidden] {
+	display: none;
+}
+
+.es-case-index__arrow:hover,
+.es-case-index__arrow:focus-visible {
+	color: var(--es-ink);
+}
+
+.es-case-index__arrow:focus-visible {
+	outline: 2px solid var(--es-accent);
+	outline-offset: -3px;
+}
+
+.es-case-index__arrow--prev {
+	left: 0;
+	justify-content: flex-start;
+	padding-left: 4px;
+	background: linear-gradient(to right, var(--es-paper) 55%, transparent);
+}
+
+.es-case-index__arrow--next {
+	right: 0;
+	justify-content: flex-end;
+	padding-right: 4px;
+	background: linear-gradient(to left, var(--es-paper) 55%, transparent);
+}
+
+/* Con botones visibles, el primer/último link no debe quedar tapado por
+   el degradado: el JS agrega estas clases junto con cada botón. */
+.es-case-index__viewport.has-prev .es-case-index__inner {
+	padding-left: 30px;
+}
+
+.es-case-index__viewport.has-next .es-case-index__inner {
+	padding-right: 30px;
 }
 
 /* ---------- hero del caso: grilla editorial 2 columnas en desktop ----------
@@ -170,8 +286,80 @@
 .es-case__tags {
 	display: flex;
 	flex-wrap: wrap;
+	align-items: center;
 	gap: 8px;
 	margin-bottom: 28px;
+}
+
+/* ---------- badge de estado del proyecto ----------
+   Comparte fila con los tags (es el primer ítem del flex de arriba), así
+   que su altura y su ritmo tipográfico siguen los de .es-pill — no es un
+   componente que compita con el eyebrow ni con el título.
+
+   El texto sale de "Label / status" (texto libre de siempre) y el color
+   del punto de un campo aparte y opcional. Sin ese campo → .--neutral, que
+   es literalmente el gris que ya se veía: por eso los casos publicados
+   antes de que esto existiera no cambian de aspecto. */
+.es-case__status {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--es-ink-2);
+	border: 1px solid var(--es-line);
+	border-radius: 30px;
+	padding: 6px 12px;
+}
+
+.es-case__status-dot {
+	flex: none;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--es-ink-4);
+}
+
+/* Los 4 tonos. Verde y ámbar son los tokens de acento que el portfolio ya
+   usa (--es-signal / --es-decision). Azul y violeta no existían: se
+   definen ACÁ, locales al badge, con la misma saturación baja y la misma
+   luminosidad que esos dos, y no se suman al sistema global de acentos —
+   ningún otro componente puede tomarlos por accidente. El color vive en un
+   punto de 6px y en un borde apenas teñido: nunca en el texto, que sigue
+   leyéndose con el contraste de siempre (el color no es el único
+   portador de significado — al lado está el texto del estado). */
+.es-case__status--green .es-case__status-dot {
+	background: var(--es-signal);
+}
+
+.es-case__status--green {
+	border-color: color-mix(in srgb, var(--es-signal) 40%, var(--es-line));
+}
+
+.es-case__status--amber .es-case__status-dot {
+	background: var(--es-decision);
+}
+
+.es-case__status--amber {
+	border-color: color-mix(in srgb, var(--es-decision) 40%, var(--es-line));
+}
+
+.es-case__status--blue .es-case__status-dot {
+	background: #5b93b8;
+}
+
+.es-case__status--blue {
+	border-color: color-mix(in srgb, #5b93b8 40%, var(--es-line));
+}
+
+.es-case__status--purple .es-case__status-dot {
+	background: #9179b5;
+}
+
+.es-case__status--purple {
+	border-color: color-mix(in srgb, #9179b5 40%, var(--es-line));
 }
 
 /* ---------- metadata del proyecto: bloque propio después de la imagen ----------
@@ -196,56 +384,98 @@
 	margin: clamp(28px, 4vw, 44px) auto clamp(40px, 5.5vw, 64px);
 }
 
+/* Desktop: UNA caja, no tres tarjetas. El borde y el radio son del
+   contenedor; adentro las tres columnas se separan sólo con una línea
+   vertical de 1px (los ::before), que es el separador más silencioso
+   posible. Tools va última y más ancha (1.4fr) porque es sistemáticamente
+   una lista — con 1fr se parte en dos líneas mientras Rol/Período dejan
+   aire de sobra al lado. */
 .es-case__meta {
 	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 22px 32px;
+	/* Anchos desparejos a propósito: Período siempre es corto ("2024–2025")
+	   y con 1fr le sobraba medio ancho mientras Rol partía en dos líneas al
+	   lado. Tools se queda con la columna más grande porque es una lista. */
+	grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr) minmax(0, 1.5fr);
+	gap: 0;
 	margin: 0;
-	border-top: 1px solid var(--es-line);
-	padding-top: 24px;
+	border: 1px solid var(--es-line);
+	border-radius: var(--es-radius);
+	background: var(--es-paper-2);
+	padding: 0;
+	overflow: hidden;
 }
 
-.es-case__meta-item--tools {
-	grid-column: 1 / -1;
+.es-case__meta-item {
+	position: relative;
+	padding: 20px 24px;
+	min-width: 0;
+}
+
+/* Separadores: sólo ENTRE columnas, nunca en el borde exterior (de ahí el
+   :not(:first-child)) — y con inset arriba/abajo para que la línea no
+   toque el borde de la caja y se lea como un divisor, no como una grilla
+   de tabla. */
+.es-case__meta-item:not(:first-child)::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 16px;
+	bottom: 16px;
+	width: 1px;
+	background: var(--es-line);
 }
 
 .es-case__meta-item dt {
+	display: flex;
+	align-items: center;
+	gap: 7px;
 	font-family: var(--es-mono);
 	font-size: 10px;
 	font-weight: 500;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
 	color: var(--es-ink-4);
-	margin-bottom: 4px;
+	margin-bottom: 8px;
+}
+
+.es-case__meta-item dt svg {
+	flex: none;
+	/* un punto por debajo del texto: el ícono acompaña, no encabeza */
+	color: var(--es-ink-4);
+	opacity: 0.75;
 }
 
 .es-case__meta-item dd {
 	margin: 0;
 	font-size: 14px;
-	color: var(--es-ink-2);
+	line-height: 1.5;
+	color: var(--es-ink);
 }
 
-/* mobile: una columna, cada entrada separada por un divisor sutil (no un
-   hueco enorme) — la primera no lleva borde/padding arriba, ya tiene el
-   de .es-case__meta justo encima. */
+/* mobile: una columna. La caja se mantiene (sigue siendo un solo objeto),
+   pero los separadores pasan a ser horizontales entre filas y el padding
+   se comprime — sin convertir cada dato en su propia tarjeta ni dejar
+   huecos grandes entre ellos. */
 @media (max-width: 999px) {
 	.es-case__meta {
 		grid-template-columns: 1fr;
-		gap: 16px;
-	}
-
-	.es-case__meta-item--tools {
-		grid-column: auto;
 	}
 
 	.es-case__meta-item {
-		padding-top: 14px;
-		border-top: 1px solid var(--es-line);
+		padding: 14px 18px;
 	}
 
-	.es-case__meta-item:first-child {
-		padding-top: 0;
-		border-top: 0;
+	.es-case__meta-item:not(:first-child)::before {
+		left: 18px;
+		right: 18px;
+		top: 0;
+		bottom: auto;
+		width: auto;
+		height: 1px;
+	}
+
+	.es-case__meta-item dt {
+		margin-bottom: 5px;
 	}
 }
 

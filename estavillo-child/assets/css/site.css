@@ -168,6 +168,50 @@
 	white-space: nowrap;
 }
 
+/* El "…" del colapso mobile: sólo existe visualmente por debajo de 600px
+   (ver el media query de abajo). Se imprime siempre en el markup para no
+   necesitar JS, pero acá arranca oculto — en desktop el trail va completo. */
+.es-breadcrumbs__item--ellipsis {
+	display: none;
+}
+
+/* ---------- mobile: breadcrumb SIEMPRE en una línea ----------
+   Con 3+ crumbs (hoy: sólo el Case Study) los del medio se ocultan y
+   aparece "…" en su lugar: "Home › … › Nombre del caso". Con 2 crumbs —
+   Work, About, How I Work y Contact — este bloque no tiene efecto: no hay
+   ítems .--collapsible y la <nav> ni siquiera lleva la clase --collapsible,
+   así que esas 4 plantillas quedan exactamente como estaban.
+
+   flex-wrap:nowrap es lo que garantiza la única línea; el título final ya
+   trunca solo por el text-overflow:ellipsis de .es-breadcrumbs__current, y
+   min-width:0 es lo que le permite encogerse dentro del flex (sin eso, un
+   ítem flex no baja de su content size y el truncado nunca se dispara). */
+@media (max-width: 599px) {
+	.es-breadcrumbs__list {
+		flex-wrap: nowrap;
+	}
+
+	.es-breadcrumbs--collapsible .es-breadcrumbs__item--collapsible {
+		display: none;
+	}
+
+	.es-breadcrumbs--collapsible .es-breadcrumbs__item--ellipsis {
+		display: flex;
+	}
+
+	.es-breadcrumbs__ellipsis {
+		color: var(--es-ink-4);
+	}
+
+	.es-breadcrumbs__item:last-child {
+		min-width: 0;
+	}
+
+	.es-breadcrumbs__current {
+		max-width: none;
+	}
+}
+
 .es-nav {
 	height: 66px;
 	display: flex;

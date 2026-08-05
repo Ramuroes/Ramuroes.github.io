@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.43' );
+define( 'ES_CHILD_VERSION', '0.2.44' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -95,6 +95,8 @@ function es_child_ui_strings() {
 		'footer_wa_generic'   => 'Contact on WhatsApp',
 		'footer_wa_named'     => 'Contact %s on WhatsApp',
 		'case_sections_aria'  => 'Case sections',
+		'case_nav_prev'       => 'Previous sections',
+		'case_nav_next'       => 'More sections',
 		'case_media_ph_aria'  => 'Placeholder for the case visual',
 		'connect_cta_all'     => 'All ways to connect',
 		// Page-head eyebrow/H1/lead — deliberately outside the migrated
@@ -319,6 +321,33 @@ function es_process_icon_choices() {
 		'rocket'   => __( 'Rocket (scale)', 'estavillo-child' ),
 	);
 	return $labels;
+}
+
+/**
+ * Íconos de la caja de metadata del Case Study (Rol / Período /
+ * Herramientas). Mismo trazo fino de 16x16 y currentColor que
+ * es_process_icon_library() — no es una librería nueva, es el mismo
+ * lenguaje con las 3 figuras que esta caja necesita. Siempre
+ * aria-hidden en el markup: el <dt> de al lado ya nombra el campo, así
+ * que el ícono no aporta nada a un lector de pantalla.
+ *
+ * Whitelist cerrada por clave interna del template ('role'/'period'/
+ * 'tools'), nunca contenido del admin — cero superficie de XSS.
+ *
+ * @param string $key Clave del campo de metadata.
+ * @return string Markup SVG, o '' si la clave no está en la whitelist.
+ */
+function es_case_meta_icon( $key ) {
+	$stroke = 'fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"';
+	$icons  = array(
+		// persona: rol en el proyecto
+		'role'   => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . ' aria-hidden="true" focusable="false"><circle cx="8" cy="5.4" r="2.6"/><path d="M3.2 13.4a4.8 4.8 0 0 1 9.6 0"/></svg>',
+		// calendario: período
+		'period' => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . ' aria-hidden="true" focusable="false"><rect x="2.4" y="3.4" width="11.2" height="10.2" rx="1.2"/><path d="M2.4 6.6h11.2M5.6 2.2v2.4M10.4 2.2v2.4"/></svg>',
+		// llave: herramientas (mismo dibujo que 'tool' de How I Work)
+		'tools'  => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . ' aria-hidden="true" focusable="false"><path d="M9.7 3.3a2.6 2.6 0 0 0-3.4 3.4L2.9 10l1.6 1.6 3.3-3.4a2.6 2.6 0 0 0 3.4-3.4l-1.5 1.5-1.2-1.2Z"/></svg>',
+	);
+	return isset( $icons[ $key ] ) ? $icons[ $key ] : '';
 }
 
 /**

@@ -62,6 +62,26 @@ function es_case_hero_text_width_choices() {
 }
 
 /**
+ * Tono del badge de estado del caso. Campo OPCIONAL y totalmente
+ * independiente de "Label / status": ese sigue siendo texto libre y no se
+ * deduce ni se migra nada a partir de su contenido. Este select sólo elige
+ * el color del punto del badge; un caso guardado antes de que el campo
+ * existiera no tiene este meta y cae a 'neutral', que es exactamente el
+ * gris que ya se venía viendo — cero cambio visual para casos publicados.
+ *
+ * @return array<string,string> valor => label legible.
+ */
+function es_case_status_tone_choices() {
+	return array(
+		'neutral' => __( 'Neutral — no colour (default)', 'estavillo-portfolio-core' ),
+		'green'   => __( 'Green — validated / live', 'estavillo-portfolio-core' ),
+		'amber'   => __( 'Amber — in progress / MVP', 'estavillo-portfolio-core' ),
+		'blue'    => __( 'Blue — in production', 'estavillo-portfolio-core' ),
+		'purple'  => __( 'Purple — academic / research', 'estavillo-portfolio-core' ),
+	);
+}
+
+/**
  * Registra el CPT "Case Study" y su taxonomía de tags.
  */
 function es_register_case_study_cpt() {
@@ -156,6 +176,12 @@ function es_case_study_render_meta_box( $post ) {
 		// layout SÍ tenía ese tope, así que 'editorial' es su equivalente.
 		$hero_text_width = ( 'stacked' === $hero_layout ) ? 'wide' : 'editorial';
 	}
+	// Campo nuevo, opcional: sin meta guardado cae a 'neutral' (gris), que
+	// es lo que ya se veía antes de que existiera — no se toca ningún caso.
+	$status_tone = get_post_meta( $post->ID, '_es_case_status_tone', true );
+	if ( ! array_key_exists( $status_tone, es_case_status_tone_choices() ) ) {
+		$status_tone = 'neutral';
+	}
 	$show_on_home_raw  = get_post_meta( $post->ID, '_es_case_show_on_home', true );
 	$show_on_home      = ( '' === $show_on_home_raw ) ? true : ( '1' === $show_on_home_raw );
 	$featured          = '1' === get_post_meta( $post->ID, '_es_case_featured', true );
@@ -171,6 +197,15 @@ function es_case_study_render_meta_box( $post ) {
 	<p>
 		<label for="es_case_label"><strong><?php esc_html_e( 'Label / status (optional)', 'estavillo-portfolio-core' ); ?></strong></label><br>
 		<input type="text" id="es_case_label" name="es_case_label" class="widefat" value="<?php echo esc_attr( $label ); ?>" placeholder="<?php esc_attr_e( 'e.g. Case 02, In progress', 'estavillo-portfolio-core' ); ?>">
+	</p>
+	<p>
+		<label for="es_case_status_tone"><strong><?php esc_html_e( 'Status tone (optional)', 'estavillo-portfolio-core' ); ?></strong></label><br>
+		<select id="es_case_status_tone" name="es_case_status_tone">
+			<?php foreach ( es_case_status_tone_choices() as $es_tone_key => $es_tone_label ) : ?>
+				<option value="<?php echo esc_attr( $es_tone_key ); ?>" <?php selected( $status_tone, $es_tone_key ); ?>><?php echo esc_html( $es_tone_label ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<span class="description"><?php esc_html_e( 'Colour of the small dot next to the status badge on this case\'s single page. Purely visual — it never changes the "Label / status" text above, and leaving it Neutral keeps the badge exactly as it looked before this field existed.', 'estavillo-portfolio-core' ); ?></span>
 	</p>
 	<p>
 		<label for="es_case_placeholder_label"><strong><?php esc_html_e( 'Placeholder tag text', 'estavillo-portfolio-core' ); ?></strong></label><br>
@@ -288,6 +323,17 @@ function es_save_case_study_meta( $post_id ) {
 			$es_hero_text_width_choice = 'editorial';
 		}
 		update_post_meta( $post_id, '_es_case_hero_text_width', $es_hero_text_width_choice );
+	}
+
+	// Mismo criterio whitelist-o-default que los dos selects de arriba. El
+	// default 'neutral' es el gris de siempre: si alguien manda basura, el
+	// badge queda como estaba, nunca con un color inventado.
+	if ( isset( $_POST['es_case_status_tone'] ) ) {
+		$es_status_tone_choice = sanitize_key( wp_unslash( $_POST['es_case_status_tone'] ) );
+		if ( ! array_key_exists( $es_status_tone_choice, es_case_status_tone_choices() ) ) {
+			$es_status_tone_choice = 'neutral';
+		}
+		update_post_meta( $post_id, '_es_case_status_tone', $es_status_tone_choice );
 	}
 
 	update_post_meta( $post_id, '_es_case_show_on_home', isset( $_POST['es_case_show_on_home'] ) ? '1' : '0' );

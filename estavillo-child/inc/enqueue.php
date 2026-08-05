@@ -262,6 +262,26 @@ function es_child_enqueue_assets() {
 	// Capa específica del single de Case Study (prose body + meta row).
 	if ( es_is_case_study_single() ) {
 		wp_enqueue_style( 'es-case-study', ES_CHILD_URI . '/assets/css/case-study.css', array( 'es-site' ), es_asset_ver( 'assets/css/case-study.css' ) );
+
+		/*
+		 * Índice sticky: scrollspy + riel + botones de desplazamiento. Sólo
+		 * si el caso tiene el campo "Case index" cargado — sin ese campo el
+		 * <nav> ni siquiera se imprime, así que pedir el script sería peso
+		 * muerto. Es 100% mejora progresiva (ver el docblock de
+		 * case-index.js): sin él el menú se sigue scrolleando solo.
+		 */
+		if ( get_post_meta( get_the_ID(), '_es_case_index', true ) ) {
+			wp_enqueue_script(
+				'es-case-index',
+				ES_CHILD_URI . '/assets/js/case-index.js',
+				array(),
+				es_asset_ver( 'assets/js/case-index.js' ),
+				array(
+					'in_footer' => true,
+					'strategy'  => 'defer',
+				)
+			);
+		}
 	}
 
 	/*

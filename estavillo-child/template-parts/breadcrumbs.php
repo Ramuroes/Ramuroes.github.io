@@ -27,12 +27,37 @@ if ( empty( $es_trail ) ) {
 }
 
 $es_last_index = count( $es_trail ) - 1;
+
+/*
+ * Colapso en mobile (sólo CSS, sin JS y sin cambiar el desktop): con más
+ * de 2 crumbs, los del MEDIO llevan --collapsible y el CSS los oculta por
+ * debajo de 600px, dejando "Home › … › actual" en una sola línea. El "…"
+ * se imprime siempre pero sólo es visible en ese mismo breakpoint.
+ *
+ * Accesibilidad: el "…" es aria-hidden (decorativo puro) y los crumbs del
+ * medio se ocultan con display:none, no con visibility/opacity — o sea que
+ * un lector de pantalla en un viewport chico escucha "Home, Trazur", una
+ * ubicación comprensible, en vez de leer un "…" sin significado. Los links
+ * intermedios siguen siendo alcanzables en desktop, que es donde se ven.
+ * Con 2 crumbs o menos no hay nada que colapsar y el markup queda idéntico
+ * al de siempre — por eso las otras 4 plantillas que usan este archivo
+ * (Work/About/How I Work/Contact, todas de 2 crumbs) no cambian en nada.
+ */
+$es_has_collapse = $es_last_index >= 2;
 ?>
-<nav class="es-breadcrumbs" aria-label="<?php esc_attr_e( 'Breadcrumb', 'estavillo-child' ); ?>">
+<nav class="es-breadcrumbs<?php echo $es_has_collapse ? ' es-breadcrumbs--collapsible' : ''; ?>" aria-label="<?php esc_attr_e( 'Breadcrumb', 'estavillo-child' ); ?>">
 	<div class="es-container">
 		<ol class="es-breadcrumbs__list">
 			<?php foreach ( $es_trail as $es_i => $es_crumb ) : ?>
-				<li class="es-breadcrumbs__item">
+				<?php
+				$es_is_middle = $es_has_collapse && $es_i > 0 && $es_i < $es_last_index;
+				?>
+				<?php if ( $es_is_middle && 1 === $es_i ) : ?>
+					<li class="es-breadcrumbs__item es-breadcrumbs__item--ellipsis" aria-hidden="true">
+						<span class="es-breadcrumbs__ellipsis">&hellip;</span>
+					</li>
+				<?php endif; ?>
+				<li class="es-breadcrumbs__item<?php echo $es_is_middle ? ' es-breadcrumbs__item--collapsible' : ''; ?>">
 					<?php if ( $es_i < $es_last_index && ! empty( $es_crumb['url'] ) ) : ?>
 						<a class="es-breadcrumbs__link" href="<?php echo esc_url( $es_crumb['url'] ); ?>"><?php echo esc_html( $es_crumb['label'] ); ?></a>
 					<?php else : ?>
