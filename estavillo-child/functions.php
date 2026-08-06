@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.51' );
+define( 'ES_CHILD_VERSION', '0.2.52' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -165,7 +165,14 @@ function es_phone_digits( $number ) {
  * Fuente única de la NARRATIVA de la home. Cada entrada mapea una clave de
  * sección → su template part. El orden del array es el orden de render:
  *
- *   Hero → How I Work → Featured Case → Selected Work → About → Connect
+ *   Hero → How I Work → Tools → Featured Case → Selected Work → About → Connect
+ *
+ * Tools entra justo después de How I Work por continuidad editorial: la
+ * sección anterior cuenta CÓMO se trabaja, así que "con qué" es su
+ * continuación natural, y llega antes de los casos — que son la prueba. No
+ * es una sección nueva del tema: es el bloque reutilizable estavillo/tools
+ * invocado vía render_block(), el mismo que usa About (ver
+ * template-parts/tools.php).
  *
  * Reordenar / quitar / insertar secciones = filtrar 'es_home_sections' (p. ej.
  * desde Code Snippets), sin editar el template PHP:
@@ -189,6 +196,7 @@ function es_home_sections() {
 		array(
 			'hero'          => 'template-parts/hero-home',
 			'how-i-work'    => 'template-parts/how-i-work',
+			'tools'         => 'template-parts/tools',
 			'featured'      => 'template-parts/featured-case',
 			'selected-work' => 'template-parts/selected-work',
 			'about'         => 'template-parts/about-teaser',

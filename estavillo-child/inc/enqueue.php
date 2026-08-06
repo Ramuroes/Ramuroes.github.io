@@ -384,11 +384,21 @@ function es_child_enqueue_assets() {
 	 * encuentre el bloque, porque About tiene una rama de fallback PHP
 	 * (template-parts/about-content.php) que renderiza el bloque vía
 	 * render_block() directo — sin pasar por post_content real, así que
-	 * has_block() nunca lo vería ahí. El is_page_template() de abajo sólo
-	 * agrega ESE caso puntual; el bloque en sí sigue sin acoplarse a
+	 * has_block() nunca lo vería ahí. Los is_page_template() de abajo sólo
+	 * agregan ESOS casos puntuales; el bloque en sí sigue sin acoplarse a
 	 * ninguna plantilla.
+	 *
+	 * Home entra por el mismo motivo desde que su rama fallback incluye la
+	 * sección Tools (template-parts/tools.php, misma llamada a
+	 * render_block()). En la rama Gutenberg de cualquiera de las dos
+	 * páginas alcanza con has_block(), pero la condición cubre las dos
+	 * ramas sin tener que saber cuál está activa.
 	 */
-	$es_needs_tools = is_singular() && ( has_block( 'estavillo/tools' ) || is_page_template( 'templates/page-about.php' ) );
+	$es_needs_tools = is_singular() && (
+		has_block( 'estavillo/tools' )
+		|| is_page_template( 'templates/page-about.php' )
+		|| es_is_home_template()
+	);
 
 	if ( $es_needs_tools ) {
 		wp_enqueue_style( 'es-tools', ES_CHILD_URI . '/assets/css/tools.css', array( 'es-components' ), es_asset_ver( 'assets/css/tools.css' ) );

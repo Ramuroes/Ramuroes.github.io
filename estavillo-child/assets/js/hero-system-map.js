@@ -598,6 +598,26 @@
 			var r = host.getBoundingClientRect();
 			W = Math.max(300, r.width | 0); H = Math.max(240, r.height | 0);
 			bandLayout = window.matchMedia('(max-width: 1023px)').matches;
+			/*
+			 * Alto del hero SIN el sangrado inferior (hero.css §1B, sólo
+			 * desktop): la capa cubre hero + sangrado, así que H ya no
+			 * coincide con el área donde vive el copy. La trama de nodos sí
+			 * debe poblar los dos tramos — de eso se trata el sangrado —,
+			 * pero el ANCLA DEL FOCO (raíz, halo, anillo) tiene que seguir
+			 * referida al bloque de contenido: si se calcula contra H, el
+			 * punto de mayor energía se desplaza hacia abajo y se
+			 * desacopla del titular. Sin sangrado, bleed = 0 y Hc === H.
+			 *
+			 * Se lee el padding-bottom RESUELTO del hero, no la custom
+			 * property --es-hero-bleed: getComputedStyle() no resuelve una
+			 * custom property sin registrar con @property — devuelve el
+			 * token literal ("clamp(150px, 22svh, 240px)"), que parseFloat
+			 * lee como NaN. El padding-bottom es el mismo valor ya
+			 * calculado en px por el navegador, y es lo que realmente
+			 * define cuánto se extendió la caja.
+			 */
+			var bleed = parseFloat(getComputedStyle(hero).paddingBottom) || 0;
+			var Hc = Math.max(200, H - bleed);
 			seed = 20260704;
 			svg = document.createElementNS(NS, 'svg');
 			svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
@@ -622,15 +642,36 @@
 			}
 
 			nodes = []; edges = [];
-			var s = bandLayout ? 84 : 116;
+			/*
+			 * Paso de grilla. Mobile NO es el desktop escalado: en un hero de
+			 * ~390x600 la separación de 84px dejaba una constelación
+			 * literalmente vacía (medido: 3 nodos y 2 conexiones a 390px, vs
+			 * 50 y 74 en desktop) — no "nodos separados", directamente no
+			 * había red que leer. Con 62px la trama se cierra y la pieza
+			 * vuelve a leerse como una constelación a escala de teléfono.
+			 * El radio de conexión es s * 1.72, así que al bajar s las
+			 * aristas se acortan solas: no hay una segunda constante que
+			 * mantener sincronizada.
+			 */
+			var s = bandLayout ? 62 : 116;
 			var cols = Math.ceil(W / s), rows = Math.ceil(H / s);
 			for (var cxi = 0; cxi < cols; cxi++) for (var cyi = 0; cyi < rows; cyi++) {
 				var x = cxi * s + s * 0.5 + (rnd() - 0.5) * s * 0.78;
 				var y = cyi * s + s * 0.5 + (rnd() - 0.5) * s * 0.72;
 				if (x < 22 || x > W - 22 || y < 22 || y > H - 22) continue;
-				// desktop: excluye fuerte sobre el texto; mobile: aclara un poco
+				/*
+				 * Zona de exclusión sobre el bloque de texto. En desktop el
+				 * mapa vive AL COSTADO del copy, así que ahí se excluye
+				 * fuerte (se conserva el 8%). En mobile el mapa vive
+				 * DETRÁS del texto por diseño (hero.css lo baja a opacidad
+				 * .5) — excluirlo casi por completo era vaciar justamente
+				 * la franja central, que es donde la composición tiene que
+				 * tener cuerpo. Se conserva el 62%: el texto sigue
+				 * legible (nodos a .5 de --es-ink-4, 2.2px) y la
+				 * constelación deja de tener un agujero en el medio.
+				 */
 				if (ex && x > ex.x0 && x < ex.x1 && y > ex.y0 && y < ex.y1) {
-					if (rnd() > (bandLayout ? 0.22 : 0.08)) continue;
+					if (rnd() > (bandLayout ? 0.62 : 0.08)) continue;
 				}
 				nodes.push({ x: x, y: y, cur: 0, tgt: 0, damp: 0.055 + rnd() * 0.07, ph: rnd(), depth: 99, deg: 0 });
 			}
@@ -652,9 +693,42 @@
 			edges.forEach(function (ed, k) { adj[ed.a].push({ n: ed.b, e: k }); adj[ed.b].push({ n: ed.a, e: k }); });
 			nodes.forEach(function (n, i) { n.deg = adj[i].length; });
 
-			var rx = bandLayout ? W * 0.55 : W * 0.72, ry = bandLayout ? H * 0.68 : H * 0.42;
-			var root = 0, bd = 1e18;
-			nodes.forEach(function (n, i) { var d = (n.x - rx) * (n.x - rx) + (n.y - ry) * (n.y - ry); if (d < bd) { bd = d; root = i; } });
+			/*
+			 * Ancla del foco (nodo raíz + halo + anillo). En mobile estaba
+			 * al 68% del alto, o sea MUY por debajo del titular: el punto
+			 * de mayor energía visual caía en el vacío bajo los botones.
+			 * Al 38% queda a la altura del bloque de título (medido: el
+			 * centro del <h1> cae al ~36% del hero en 390x600), así que el
+			 * foco acompaña al texto en vez de competir desde abajo.
+			 */
+			var rx = bandLayout ? W * 0.58 : W * 0.72, ry = bandLayout ? Hc * 0.38 : Hc * 0.42;
+			/*
+			 * Elección del nodo raíz = el más cercano al ancla (rx, ry).
+			 * Dos correcciones sobre la distancia euclídea pura, las dos
+			 * medidas: con la trama densa el "más cercano" caía sistemáti-
+			 * camente demasiado abajo (desktop: ancla 295, raíz elegida
+			 * 441; mobile: ancla 228, raíz 300), porque una diferencia
+			 * horizontal grande pesa igual que una vertical y hay muchos
+			 * más candidatos a los costados que a la altura pedida.
+			 *   - Se pondera el eje Y (x1.9) SÓLO en mobile/tablet, donde el
+			 *     ancla se movió a propósito (0.38 del alto) y el eje X casi
+			 *     no tiene recorrido: sin ponderar, la raíz elegida quedaba
+			 *     70px por debajo del ancla. En desktop la distancia sin
+			 *     ponderar ya devuelve la misma raíz de siempre, así que se
+			 *     deja tal cual — la composición del hero no cambia.
+			 *   - Se descartan los nodos de la zona sangrada (y > Hc*0.92):
+			 *     el foco nunca puede vivir en el tramo que se está
+			 *     desvaneciendo. Sin sangrado, Hc === H y no descarta nada
+			 *     salvo la franja inferior, que tampoco es candidata.
+			 */
+			var root = -1, bd = 1e18;
+			nodes.forEach(function (n, i) {
+				if (n.y > Hc * 0.92) return;
+				var dx = n.x - rx, dy = (n.y - ry) * (bandLayout ? 1.9 : 1);
+				var d = dx * dx + dy * dy;
+				if (d < bd) { bd = d; root = i; }
+			});
+			if (root < 0) { root = 0; } // trama degenerada: no dejar sin raíz
 			function bfs() {
 				nodes.forEach(function (n) { n.depth = 99; });
 				var q = [root]; nodes[root].depth = 0;
@@ -687,7 +761,10 @@
 			edges.forEach(function (ed) { ed.depth = Math.min(nodes[ed.a].depth, nodes[ed.b].depth); });
 
 			var rootN = nodes[root] || { x: W * 0.7, y: H * 0.4 };
-			var hr = Math.max(120, Math.min(210, Math.min(W, H) * 0.34));
+			// Radio del halo contra el alto de CONTENIDO (Hc), no la caja
+			// extendida: con sangrado, Math.min(W,H) crecía y el halo se
+			// agrandaba sin que el hero visible hubiera cambiado.
+			var hr = Math.max(120, Math.min(210, Math.min(W, Hc) * 0.34));
 			halo = eln('circle', { cx: rootN.x, cy: rootN.y, r: hr, fill: 'url(#esHaloG)' }, gAll);
 			halo.style.opacity = '0';
 
@@ -728,22 +805,59 @@
 			if (settled) { settleNow(); } else { introDone = false; }
 		}
 
+		/*
+		 * Curva de respiración. El `ease-in-out` por defecto es una cúbica
+		 * cuya segunda derivada SALTA en cada keyframe (0% / 50% / 100%):
+		 * a ciclos largos eso se percibe como un micro-freno en los
+		 * extremos — el "tick" / la sensación de cortes. Esta bezier es la
+		 * aproximación estándar de un seno (easeInOutSine): velocidad y
+		 * aceleración continuas en todo el ciclo, así que el movimiento no
+		 * tiene principio ni fin perceptibles.
+		 */
+		var BREATHE_EASE = 'cubic-bezier(.37,0,.63,1)';
+
 		function settleNow() {
 			introDone = true;
 			edges.forEach(function (ed) {
 				ed.n.setAttribute('stroke-dasharray', 'none');
 				ed.n.setAttribute('stroke-dashoffset', '0');
 				ed.n.style.opacity = String(ed.baseOp);
+				/*
+				 * Sólo las aristas del foco respiran (las que tocan la
+				 * raíz: 3-4 en total, no las ~110 del mapa). Ver la nota de
+				 * hero.css sobre por qué animan `opacity` y no
+				 * stroke-opacity, aunque eso las deje sin realce de hover.
+				 */
+				if (ed.focus && !reduced) {
+					// duración y fase derivadas del largo de la arista: dos
+					// aristas del foco nunca respiran al mismo tiempo, y no
+					// hace falta guardar estado extra por arista.
+					ed.n.style.animation = 'es-net-breathe-edge ' + (16 + (ed.len % 5)).toFixed(1) + 's ' + BREATHE_EASE + ' ' + (-ed.len % 7).toFixed(1) + 's infinite';
+				}
 			});
 			nodes.forEach(function (n) {
 				n.dot.style.opacity = String(n.baseOp);
 				n.dot.style.fill = n.focus ? 'var(--es-signal)' : (n.depth < 99 ? 'var(--es-ink-3)' : 'var(--es-ink-4)');
-				if (n.breathe && !reduced) { n.dot.style.animation = 'es-net-breathe-node ' + (10 + n.ph * 4).toFixed(1) + 's ease-in-out ' + (-n.ph * 8).toFixed(1) + 's infinite'; }
+				/*
+				 * Períodos largos y deliberadamente NO armónicos entre sí
+				 * (13-19s los nodos, 11s el halo, 7.5s el anillo): si dos
+				 * ciclos comparten divisor, cada tantos segundos coinciden
+				 * en el extremo y el conjunto "late" a la vez — eso es lo
+				 * que se lee como pulso rígido. Sin múltiplos comunes, la
+				 * respiración nunca se sincroniza.
+				 */
+				if (n.breathe && !reduced) { n.dot.style.animation = 'es-net-breathe-node ' + (13 + n.ph * 6).toFixed(1) + 's ' + BREATHE_EASE + ' ' + (-n.ph * 11).toFixed(1) + 's infinite'; }
+				// El nodo raíz también respira, más corto y muy leve: es el
+				// punto que el ojo mira primero y estaba completamente fijo.
+				if (n.isRoot && !reduced) { n.dot.style.animation = 'es-net-breathe-root 5.9s ' + BREATHE_EASE + ' infinite'; }
 			});
 			halo.style.opacity = '0.09';
-			if (!reduced) { halo.style.animation = 'es-net-breathe 9s ease-in-out infinite'; }
+			if (!reduced) { halo.style.animation = 'es-net-breathe 11s ' + BREATHE_EASE + ' infinite'; }
 			ring.setAttribute('stroke-dashoffset', '0');
 			ring.style.opacity = '0.85';
+			// El anillo del foco estaba estático: un pulso muy corto de
+			// amplitud pequeña lo mantiene vivo sin llamar la atención.
+			if (!reduced) { ring.style.animation = 'es-net-pulse-ring 9.7s ' + BREATHE_EASE + ' infinite'; }
 		}
 
 		function introFrame(now) {
