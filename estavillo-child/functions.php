@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.49' );
+define( 'ES_CHILD_VERSION', '0.2.50' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -301,6 +301,27 @@ function es_process_icon_library() {
 		// comunica 3D, así que en vez de reusarlo se agrega una figura nueva
 		// a la misma librería compartida, con el mismo trazo 1.3.
 		'cube'     => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><path d="M8 2 13.5 5.2v5.6L8 14 2.5 10.8V5.2Z"/><path d="M8 8V2M8 8 2.5 5.2M8 8 13.5 5.2"/></svg>',
+		/*
+		 * Bloque siguiente: figuras sumadas para el ícono por stat de
+		 * estavillo/case-stats (un stat suele nombrar una medición, una
+		 * persona, un tiempo o una tendencia — vocabulario que la librería
+		 * original de How I Work no cubría). Mismo trazo 1.3 / 16x16 /
+		 * currentColor: no es una librería nueva, es la misma extendida, y
+		 * quedan disponibles para cualquier otro bloque que las necesite.
+		 *
+		 * 'chart' cubre tanto "chart" como "analytics" a propósito: dos
+		 * figuras de barras casi idénticas sólo fragmentarían el <select>
+		 * sin agregar significado.
+		 */
+		// Eje en L + dos barras: probado contra una variante de tres barras
+		// sobre línea de base — a 16px, que es el tamaño real de uso, tres
+		// barras se apelmazan y el dibujo se lee como ruido; con el eje y dos
+		// barras la figura se identifica como gráfico de un vistazo.
+		'chart'    => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><path d="M3 2.8V13h10.2"/><path d="M6.4 13V9.4M10.6 13V5.8"/></svg>',
+		'trend'    => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><path d="M2.4 11.4 6.2 7.6l2.4 2.4 4.8-4.8"/><path d="M9.8 5.2h3.6v3.6"/></svg>',
+		'clock'    => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.6"/></svg>',
+		'user'     => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><circle cx="8" cy="5.4" r="2.6"/><path d="M3.2 13.4a4.8 4.8 0 0 1 9.6 0"/></svg>',
+		'search'   => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><circle cx="7.2" cy="7.2" r="4.4"/><path d="M10.5 10.5 13.6 13.6"/></svg>',
 	);
 }
 
@@ -325,6 +346,11 @@ function es_process_icon_choices() {
 		'bulb'     => __( 'Bulb (idea)', 'estavillo-child' ),
 		'rocket'   => __( 'Rocket (scale)', 'estavillo-child' ),
 		'cube'     => __( 'Cube (3D)', 'estavillo-child' ),
+		'chart'    => __( 'Chart (analytics)', 'estavillo-child' ),
+		'trend'    => __( 'Trend (growth)', 'estavillo-child' ),
+		'clock'    => __( 'Clock (time)', 'estavillo-child' ),
+		'user'     => __( 'User (people)', 'estavillo-child' ),
+		'search'   => __( 'Search (find)', 'estavillo-child' ),
 	);
 	return $labels;
 }

@@ -82,29 +82,58 @@ function es_is_estavillo_static_page() {
  * @return bool
  */
 function es_post_has_case_figure_zoom() {
+	return es_post_has_block_flag( 'estavillo/case-figure', 'enableZoom' );
+}
+
+/**
+ * ¿Hay al menos un estavillo/case-stats con la animación de conteo activada?
+ * Mismo criterio opt-in por instancia que el zoom de case-figure: el bloque
+ * existe en casi todos los casos, pero el JS del contador sólo tiene sentido
+ * donde alguien prendió el toggle — y es mejora progresiva pura, así que no
+ * pedirlo no rompe nada (el número final ya está en el HTML).
+ *
+ * @return bool
+ */
+function es_post_has_case_stats_animation() {
+	return es_post_has_block_flag( 'estavillo/case-stats', 'animate' );
+}
+
+/**
+ * ¿El post actual tiene alguna instancia de $block_name con el atributo
+ * booleano $attr en true? A diferencia de has_block(), mira los ATRIBUTOS
+ * serializados, así que distingue "el bloque está" de "esta instancia pidió
+ * la función" — que es lo que decide si vale la pena mandar un asset extra.
+ *
+ * @param string $block_name Nombre completo del bloque (namespace incluido).
+ * @param string $attr       Atributo booleano a comprobar.
+ * @return bool
+ */
+function es_post_has_block_flag( $block_name, $attr ) {
 	if ( ! is_singular() ) {
 		return false;
 	}
 	$post = get_post();
-	if ( ! $post || false === strpos( (string) $post->post_content, 'estavillo/case-figure' ) ) {
+	if ( ! $post || false === strpos( (string) $post->post_content, $block_name ) ) {
 		return false; // atajo: ni vale la pena parsear si el bloque ni aparece
 	}
-	return es_blocks_contain_case_figure_zoom( parse_blocks( $post->post_content ) );
+	return es_blocks_contain_flag( parse_blocks( $post->post_content ), $block_name, $attr );
 }
 
 /**
- * Recorre un árbol de bloques (parse_blocks()) buscando un case-figure con
- * enableZoom=true, en cualquier nivel de anidamiento (columnas, grupos…).
+ * Recorre un árbol de bloques (parse_blocks()) buscando $block_name con
+ * $attr=true, en cualquier nivel de anidamiento (columnas, grupos…).
  *
- * @param array $blocks
+ * @param array  $blocks     Árbol de bloques.
+ * @param string $block_name Nombre completo del bloque.
+ * @param string $attr       Atributo booleano a comprobar.
  * @return bool
  */
-function es_blocks_contain_case_figure_zoom( $blocks ) {
+function es_blocks_contain_flag( $blocks, $block_name, $attr ) {
 	foreach ( $blocks as $block ) {
-		if ( 'estavillo/case-figure' === ( $block['blockName'] ?? '' ) && ! empty( $block['attrs']['enableZoom'] ) ) {
+		if ( $block_name === ( $block['blockName'] ?? '' ) && ! empty( $block['attrs'][ $attr ] ) ) {
 			return true;
 		}
-		if ( ! empty( $block['innerBlocks'] ) && es_blocks_contain_case_figure_zoom( $block['innerBlocks'] ) ) {
+		if ( ! empty( $block['innerBlocks'] ) && es_blocks_contain_flag( $block['innerBlocks'], $block_name, $attr ) ) {
 			return true;
 		}
 	}
@@ -363,6 +392,27 @@ function es_child_enqueue_assets() {
 
 	if ( $es_needs_tools ) {
 		wp_enqueue_style( 'es-tools', ES_CHILD_URI . '/assets/css/tools.css', array( 'es-components' ), es_asset_ver( 'assets/css/tools.css' ) );
+	}
+
+	/*
+	 * Contador de Case Stats: mismo criterio opt-in por instancia que el
+	 * lightbox de case-figure arriba — sin ningún bloque con "Animate
+	 * numbers" activo, el script no se pide. No hay CSS asociado: el estilo
+	 * del bloque (ícono incluido) ya vive en case-study.css, y el contador no
+	 * agrega ninguna regla propia. Mejora progresiva: sin este script el
+	 * número final ya está impreso en el HTML.
+	 */
+	if ( es_post_has_case_stats_animation() ) {
+		wp_enqueue_script(
+			'es-case-stats',
+			ES_CHILD_URI . '/assets/js/case-stats.js',
+			array(),
+			es_asset_ver( 'assets/js/case-stats.js' ),
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
+		);
 	}
 }
 add_action( 'wp_enqueue_scripts', 'es_child_enqueue_assets' );

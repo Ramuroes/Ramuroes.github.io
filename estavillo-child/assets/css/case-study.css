@@ -1418,6 +1418,21 @@
 	box-shadow: 0 0 0 1px var(--es-line);
 }
 
+/* Ícono lineal de la librería curada del theme, arriba del número. Es el
+   único elemento en acento de la celda: el número se queda en --es-ink para
+   que el acento marque la categoría del dato, no compita con él. line-height
+   0 en el contenedor evita el espacio fantasma del inline box del <svg>. */
+.es-case__body .es-case-stat__icon {
+	display: block;
+	line-height: 0;
+	color: var(--es-accent);
+	margin-bottom: 12px;
+}
+
+.es-case__body .es-case-stat__icon svg {
+	display: block;
+}
+
 .es-case__body .es-case-stat__num {
 	font-family: var(--es-mono);
 	font-size: clamp(24px, 3vw, 32px);
@@ -1425,6 +1440,11 @@
 	letter-spacing: -0.02em;
 	color: var(--es-ink);
 	line-height: 1;
+	/* Cifras de ancho fijo: con la animación de conteo activa el número
+	   cambia decenas de veces por segundo, y sin tabular-nums cada dígito
+	   tendría un ancho distinto — el número "temblaría" mientras cuenta.
+	   Inofensivo cuando la animación está apagada. */
+	font-variant-numeric: tabular-nums;
 }
 
 .es-case__body .es-case-stat__label {
@@ -1435,11 +1455,41 @@
 }
 
 @media (max-width: 767px) {
-	/* Mobile: exactamente 2 por fila (mismo layout de siempre). El flex-grow
-	   se encarga del impar — la última crece hasta el ancho completo sola,
-	   sin regla :nth-child ni tarjeta inventada. */
+	/* Mobile: una stat por fila, en lista con filete — no la grilla de dos
+	   columnas de antes. En dos columnas el número quedaba chico, la etiqueta
+	   se partía en tres o cuatro líneas y la celda se leía como una tarjeta
+	   apretada; a ancho completo el dato respira y la lista se lee como una
+	   enumeración editorial, no como un dashboard.
+	   La superficie (--es-paper-2) y el halo se apagan a propósito: apiladas
+	   a ancho completo, seis cajas rellenas seguidas pesan mucho más que seis
+	   filas separadas por una línea de 1px. El filete queda del lado superior
+	   de cada fila, así que la lista abre y cierra con línea sin necesidad de
+	   ninguna regla :first-child/:last-child. */
+	.es-case__body .es-case-stats {
+		gap: 0;
+		border-bottom: 1px solid var(--es-line);
+	}
+
 	.es-case__body .es-case-stat {
-		flex-basis: calc(50% - 1px);
+		flex-basis: 100%;
+		background: none;
+		box-shadow: none;
+		border-top: 1px solid var(--es-line);
+		padding: 20px 0;
+	}
+
+	.es-case__body .es-case-stat__icon {
+		margin-bottom: 10px;
+	}
+
+	.es-case__body .es-case-stat__num {
+		/* a ancho completo el número puede crecer sin riesgo de corte */
+		font-size: 30px;
+	}
+
+	.es-case__body .es-case-stat__label {
+		font-size: 13px;
+		margin-top: 8px;
 	}
 }
 
