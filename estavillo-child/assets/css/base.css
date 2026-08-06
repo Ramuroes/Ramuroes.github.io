@@ -145,20 +145,28 @@
 	-webkit-tap-highlight-color: transparent;
 }
 
-/* foco: quita el anillo azul del navegador; el foco visible (teclado) es verde */
+/* foco: quita el anillo azul del navegador; el foco visible (teclado) es
+   verde. !important en ambas reglas: esta es la red de seguridad de foco
+   de TODO el sitio (cualquier link/botón sin un :focus-visible propio cae
+   acá) — sin el refuerzo, Kadence puede pintar su propio anillo azul de
+   foco con su propio !important y ganar por ser la última regla cargada
+   (confirmado en vivo: círculo azul en las flechas del índice del Case
+   Study, mismo mecanismo). Ver también los overrides puntuales con su
+   propio !important en case-study.css/case-figure-lightbox.css para los
+   componentes que necesitan un color/offset distinto del default. */
 .es-page a:focus,
 .es-page button:focus,
 .es-page [tabindex]:focus {
-	outline: none;
+	outline: none !important;
 }
 
 .es-page a:focus-visible,
 .es-page button:focus-visible,
 .es-page [tabindex]:focus-visible,
 .es-page [role='button']:focus-visible {
-	outline: 2px solid var(--es-accent);
-	outline-offset: 3px;
-	border-radius: 2px;
+	outline: 2px solid var(--es-accent) !important;
+	outline-offset: 3px !important;
+	border-radius: 2px !important;
 }
 
 /* red de seguridad anti-azul (baja especificidad vía :where → los componentes

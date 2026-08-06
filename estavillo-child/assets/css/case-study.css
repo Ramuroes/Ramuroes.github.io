@@ -215,6 +215,14 @@
    teclado dibuja un óvalo que se lee como "botón". border-radius sólo
    importa para el HALO de foco (ver :focus-visible más abajo) — sin fondo
    ni borde propios, no dibuja ninguna forma visible en reposo/hover. */
+/* !important en border/background/box-shadow: Kadence (tema padre) pinta
+   sus propios <button> con un círculo azul relleno en :hover/:focus —
+   confirmado en vivo, algo que este harness de pruebas (que nunca carga
+   el CSS real de Kadence) no podía detectar. Mismo refuerzo que ya usa
+   el resto del chrome del sitio contra este problema exacto (ver
+   .es-nav__menu-btn en site.css y la "red de seguridad anti-azul" de
+   base.css): sin !important acá, Kadence gana por orden de carga aunque
+   nuestra regla sea más específica. */
 .es-case-index__arrow {
 	position: absolute;
 	top: 0;
@@ -225,13 +233,14 @@
 	justify-content: center;
 	width: 32px;
 	padding: 0;
-	border: 0;
+	border: 0 !important;
 	/* 50%: en un botón casi cuadrado esto da una elipse/círculo — un aro
 	   redondo alrededor del ícono, no una caja con esquinas. Sólo importa
 	   para la FORMA del outline de foco (ver :focus-visible más abajo);
 	   sin fondo ni borde propios, no se ve nada distinto en reposo/hover. */
 	border-radius: 50%;
-	background: none;
+	background: none !important;
+	box-shadow: none !important;
 	color: var(--es-ink-3);
 	cursor: pointer;
 	appearance: none;
@@ -275,10 +284,30 @@
 
 /* Gris por defecto, verde en hover Y en active — nunca blanco, nunca azul.
    Mismo verde que el segmento activo del riel, así la flecha se lee como
-   parte del mismo sistema de "esto está vivo/interactivo". */
+   parte del mismo sistema de "esto está vivo/interactivo". Fondo/borde/
+   sombra repetidos con !important en el estado hover/active: es
+   exactamente donde Kadence pinta su círculo azul, así que no alcanza
+   con heredar el "none" de la regla base sin refuerzo. */
 .es-case-index__arrow:hover,
 .es-case-index__arrow:active {
 	color: var(--es-accent);
+	background: none !important;
+	border: 0 !important;
+	box-shadow: none !important;
+}
+
+/* :focus PLANO (no sólo :focus-visible): un click de mouse deja el botón
+   realmente enfocado sin que el navegador necesariamente decida mostrar
+   un indicador visible (heurística de :focus-visible) — Kadence pinta
+   button:focus sin condicionarlo a esa heurística, así que sin esta
+   regla el círculo azul podía aparecer con sólo clickear la flecha, ni
+   siquiera con teclado. No toca color: sin indicador visible, el ícono
+   se queda gris (igual que en reposo) — el verde es sólo para hover,
+   active y focus-visible, que si tienen indicador. */
+.es-case-index__arrow:focus {
+	background: none !important;
+	border: 0 !important;
+	box-shadow: none !important;
 }
 
 /* Foco: un halo MUY sutil, no el mismo verde sólido de hover/active — un
@@ -294,9 +323,16 @@
    esquinas apenas curvas. Se repite el 50% acá para que gane. */
 .es-case-index .es-case-index__arrow:focus-visible {
 	color: var(--es-accent);
-	outline: 2px solid color-mix(in srgb, var(--es-accent) 55%, transparent);
-	outline-offset: 3px;
-	border-radius: 50%;
+	/* !important en el propio outline, no sólo en background/box-shadow:
+	   si Kadence también refuerza el suyo con !important (frecuente en
+	   estilos de foco "accesibles" de un tema), gana por ser la última
+	   regla cargada — sin este !important el halo verde podía terminar
+	   siendo el azul de Kadence, no sólo el relleno. */
+	outline: 2px solid color-mix(in srgb, var(--es-accent) 55%, transparent) !important;
+	outline-offset: 3px !important;
+	border-radius: 50% !important;
+	background: none !important;
+	box-shadow: none !important;
 }
 
 .es-case-index__arrow--prev {
@@ -1171,19 +1207,31 @@
    SÍ es un elemento interactivo real (a diferencia de .es-case-figure
    normal, que es sólo una figura), y tiene que verse idéntico a como se
    veía sin el wrapper. */
+/* !important en border/background: mismo problema que las flechas del
+   índice más arriba — Kadence pinta sus <button> con relleno/borde
+   propio en :hover/:focus y esta imagen es, técnicamente, un botón. */
 .es-case__body .es-case-figure__zoom-trigger {
 	position: relative;
 	display: block;
 	width: 100%;
 	margin: 0;
 	padding: 0;
-	border: 0;
-	background: none;
+	border: 0 !important;
+	background: none !important;
+	box-shadow: none !important;
 	font: inherit;
 	color: inherit;
 	text-align: left;
 	cursor: zoom-in;
 	appearance: none;
+}
+
+.es-case__body .es-case-figure__zoom-trigger:hover,
+.es-case__body .es-case-figure__zoom-trigger:focus,
+.es-case__body .es-case-figure__zoom-trigger:active {
+	border: 0 !important;
+	background: none !important;
+	box-shadow: none !important;
 }
 
 .es-case__body .es-case-figure__zoom-trigger img,
@@ -1244,13 +1292,16 @@
 }
 
 .es-case__body .es-case-figure__zoom-trigger:focus-visible {
-	outline: none;
+	outline: none !important;
 }
 
+/* !important en ambos: mismo refuerzo anti-azul de Kadence que el resto
+   de los controles custom del sitio (ver el comentario grande junto a
+   .es-case-index__arrow más arriba). */
 .es-case__body .es-case-figure__zoom-trigger:focus-visible img,
 .es-case__body .es-case-figure__zoom-trigger:focus-visible .es-case-browser {
-	outline: 2px solid var(--es-accent);
-	outline-offset: 2px;
+	outline: 2px solid var(--es-accent) !important;
+	outline-offset: 2px !important;
 }
 
 /* En touch no hay hover: la lupa queda siempre visible y un poco más

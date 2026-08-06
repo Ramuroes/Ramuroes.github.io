@@ -81,8 +81,8 @@
    esa herencia si el bloque llega a usarse fuera de ese wrapper. */
 .es-page .wp-block-button__link:focus-visible,
 .es-page a.wp-element-button:focus-visible {
-	outline: 2px solid var(--es-accent);
-	outline-offset: 3px;
+	outline: 2px solid var(--es-accent) !important;
+	outline-offset: 3px !important;
 }
 
 /* Reset defensivo de los DOS niveles de wrapper (.wp-block-buttons y

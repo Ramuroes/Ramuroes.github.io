@@ -95,7 +95,13 @@
 	}
 }
 
-/* ---------- cierre: fijo, siempre visible, respeta el safe area ---------- */
+/* ---------- cierre: fijo, siempre visible, respeta el safe area ----------
+   !important en border/background/box-shadow acá y en los controles de
+   abajo: Kadence pinta sus <button> con color/relleno propio en
+   :hover/:focus (confirmado en vivo con un círculo azul en las flechas
+   del índice — mismo mecanismo, cualquier <button> del sitio corre el
+   mismo riesgo). Sin el refuerzo, la superficie oscura de este botón
+   podía virar a azul en vez de quedarse en --es-surface/--es-surface-2. */
 .es-lightbox__close {
 	position: fixed;
 	top: calc(env(safe-area-inset-top, 0px) + 14px);
@@ -107,9 +113,10 @@
 	width: 44px;
 	height: 44px;
 	padding: 0;
-	border: 1px solid var(--es-line-strong);
+	border: 1px solid var(--es-line-strong) !important;
 	border-radius: 999px;
-	background: var(--es-surface);
+	background: var(--es-surface) !important;
+	box-shadow: none !important;
 	color: var(--es-ink);
 	cursor: pointer;
 	transition: border-color var(--es-dur-fast) var(--es-ease), background-color var(--es-dur-fast) var(--es-ease);
@@ -126,13 +133,24 @@
 
 .es-lightbox__close:hover,
 .es-lightbox__close:focus-visible {
-	border-color: var(--es-signal);
-	background: var(--es-surface-2);
+	border-color: var(--es-signal) !important;
+	background: var(--es-surface-2) !important;
+	box-shadow: none !important;
 }
 
 .es-lightbox__close:focus-visible {
-	outline: 2px solid var(--es-accent);
-	outline-offset: 2px;
+	outline: 2px solid var(--es-accent) !important;
+	outline-offset: 2px !important;
+}
+
+/* :focus PLANO (mouse click sin :focus-visible — ver el comentario grande
+   junto a .es-case-index__arrow en case-study.css): sin esto, la regla
+   base (menos específica que un button:focus de Kadence) perdía y el
+   círculo quedaba azul con sólo clickear, sin necesidad de teclado. */
+.es-lightbox__close:focus {
+	border-color: var(--es-line-strong) !important;
+	background: var(--es-surface) !important;
+	box-shadow: none !important;
 }
 
 /* ---------- controles de zoom: fijos abajo, alcance de pulgar ---------- */
@@ -158,9 +176,10 @@
 	min-width: 44px;
 	height: 44px;
 	padding: 0 14px;
-	border: 0;
+	border: 0 !important;
 	border-radius: 999px;
-	background: none;
+	background: none !important;
+	box-shadow: none !important;
 	font-family: var(--es-mono);
 	font-size: 11px;
 	font-weight: 600;
@@ -183,12 +202,24 @@
 .es-lightbox__controls button:hover,
 .es-lightbox__controls button:focus-visible {
 	color: var(--es-signal);
-	background: var(--es-surface-2);
+	border: 0 !important;
+	background: var(--es-surface-2) !important;
+	box-shadow: none !important;
 }
 
 .es-lightbox__controls button:focus-visible {
-	outline: 2px solid var(--es-accent);
-	outline-offset: -2px;
+	outline: 2px solid var(--es-accent) !important;
+	outline-offset: -2px !important;
+}
+
+/* :focus PLANO — mismo motivo que .es-lightbox__close:focus arriba: la
+   regla base (0,1,1 de especificidad) empataba con un button:focus de
+   Kadence también (0,1,1) y el desempate por orden de carga podía
+   perderse. Acá sube a (0,2,1), gana siempre. */
+.es-lightbox__controls button:focus {
+	border: 0 !important;
+	background: none !important;
+	box-shadow: none !important;
 }
 
 .es-lightbox__controls button:disabled {
@@ -198,7 +229,9 @@
 
 .es-lightbox__controls button:disabled:hover {
 	color: var(--es-ink-2);
-	background: none;
+	border: 0 !important;
+	background: none !important;
+	box-shadow: none !important;
 }
 
 /* ---------- caption: franja discreta, ocultable ---------- */
@@ -246,9 +279,10 @@
 	width: 36px;
 	height: 36px;
 	padding: 0;
-	border: 1px solid var(--es-line);
+	border: 1px solid var(--es-line) !important;
 	border-radius: 999px;
-	background: var(--es-surface);
+	background: var(--es-surface) !important;
+	box-shadow: none !important;
 	color: var(--es-ink-3);
 	cursor: pointer;
 }
@@ -266,12 +300,23 @@
 .es-lightbox__caption-toggle:hover,
 .es-lightbox__caption-toggle:focus-visible {
 	color: var(--es-signal);
-	border-color: var(--es-signal);
+	border-color: var(--es-signal) !important;
+	background: var(--es-surface) !important;
+	box-shadow: none !important;
 }
 
 .es-lightbox__caption-toggle:focus-visible {
-	outline: 2px solid var(--es-accent);
-	outline-offset: 2px;
+	outline: 2px solid var(--es-accent) !important;
+	outline-offset: 2px !important;
+}
+
+/* :focus PLANO — mismo motivo que los dos controles de arriba: la regla
+   base (0,1,0) ni siquiera empata con un button:focus de Kadence
+   (0,1,1), pierde directo. */
+.es-lightbox__caption-toggle:focus {
+	border-color: var(--es-line) !important;
+	background: var(--es-surface) !important;
+	box-shadow: none !important;
 }
 
 /* Sin caption: no reservar el lugar ni mostrar el toggle. */

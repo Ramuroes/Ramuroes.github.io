@@ -1160,12 +1160,18 @@
    pseudo) aunque esta última venga después en el archivo — el empate en
    la categoría de clases se rompe por la categoría de elementos, y ahí
    pierde. Con el prefijo pasa a 2 clases + 1 pseudo, que gana sin
-   depender del orden. */
+   depender del orden.
+
+   !important agregado acá: la regla genérica de base.css sumó su propio
+   !important (refuerzo anti-azul de Kadence, ver ese archivo) — entre
+   reglas !important la especificidad sigue siendo el desempate, así que
+   esto sigue ganando exactamente igual, pero sin el !important el de
+   base.css pasaría a ganar SIEMPRE sin importar especificidad. */
 /* SIN gate de .is-enhanced a propósito: el foco de teclado tiene que
    verse igual con o sin JS (mismo contrato de progressive enhancement
    que el resto del bloque — ver el docblock de render.php). */
 .es-flow .es-flow__trigger:focus-visible {
-	outline: none;
+	outline: none !important;
 }
 
 .es-flow__item:not(.es-flow__item--decision) .es-flow__trigger:focus-visible .es-flow__shape {
@@ -1180,7 +1186,7 @@
    rombo real. (El outline:none general de arriba ya cubre la decisión
    también — esta regla queda para dejar la intención explícita.) */
 .es-flow__item--decision .es-flow__trigger:focus-visible {
-	outline: none;
+	outline: none !important;
 }
 
 .es-flow__item--decision .es-flow__trigger:focus-visible .es-flow__shape::before {
