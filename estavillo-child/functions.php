@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.50' );
+define( 'ES_CHILD_VERSION', '0.2.51' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 

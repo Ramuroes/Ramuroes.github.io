@@ -1471,15 +1471,35 @@
 	}
 
 	.es-case__body .es-case-stat {
+		/* Icono y número en la misma fila (antes el icono flotaba arriba
+		   como un bullet, desconectado del dato). flex-basis: 100% en el
+		   label de abajo lo fuerza a su propia línea sin importar cuánto
+		   midan icono+número: la fila nunca llega a ocupar el ancho
+		   completo del contenedor, así que el label siempre desborda y
+		   pasa a la fila siguiente — sin depender de un ancho fijo. */
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		column-gap: 12px;
 		flex-basis: 100%;
 		background: none;
 		box-shadow: none;
 		border-top: 1px solid var(--es-line);
-		padding: 20px 0;
+		/* un poco más de aire entre estadísticas: +4px por borde (antes 20px) */
+		padding: 24px 0;
 	}
 
 	.es-case__body .es-case-stat__icon {
-		margin-bottom: 10px;
+		/* ya no apila arriba: se apaga el margen vertical del layout de
+		   desktop, el gap horizontal lo pone flex en el contenedor */
+		margin-bottom: 0;
+	}
+
+	.es-case__body .es-case-stat__icon svg {
+		/* levemente más grande sólo en mobile — mismo viewBox/stroke-width
+		   del SVG, así que el trazo escala proporcional (no más grueso) */
+		width: 21px;
+		height: 21px;
 	}
 
 	.es-case__body .es-case-stat__num {
@@ -1488,6 +1508,7 @@
 	}
 
 	.es-case__body .es-case-stat__label {
+		flex-basis: 100%;
 		font-size: 13px;
 		margin-top: 8px;
 	}
