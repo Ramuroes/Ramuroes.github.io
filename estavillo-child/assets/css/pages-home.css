@@ -342,6 +342,19 @@
 	gap: 14px;
 }
 
+/* ---------- home tools (cierre de referencia, sin numeración) ----------
+   Encabezado deliberadamente más liviano que .es-section-head: sin el
+   <span class="es-section-head__num"> en acento que le daba peso de
+   "capítulo" a la sección — acá sólo queda el label mono/ink-4, ya de por
+   sí discreto. Margen inferior más chico que el default (clamp 36-52px):
+   Tools ya no abre un capítulo nuevo de la narrativa, cierra uno como
+   referencia rápida antes de About. Scopeado a .es-home-tools: no toca
+   .es-section-head en ningún otro lugar (About sigue con su propio
+   encabezado numerado, sin cambios). */
+.es-home-tools__head {
+	margin-bottom: clamp(22px, 2.6vw, 32px);
+}
+
 /* ---------- about ---------- */
 
 .es-about__grid {

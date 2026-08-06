@@ -20,41 +20,55 @@
      — nunca bullets).
    ========================================================================= */
 
+/*
+ * Grilla compartida por las dos variantes: 3 columnas de ancho igual en
+ * desktop, 2 en tablet, 1 en mobile — MISMO mecanismo para editorial e
+ * inline (antes inline era flex-wrap con flex-basis:240px, que reparte
+ * filas según cuánto entra a lo ancho del contenedor, no una cantidad de
+ * columnas fija: con contenidos reales podía leerse 3+2, 2+2+1 o cualquier
+ * combinación según el ancho real de Home en cada breakpoint — nunca
+ * garantizaba "3 columnas" como tal). Con seis categorías (ver
+ * es_about_tools_defaults(), 6/3 = 2 filas exactas) grid resuelve solo el
+ * "sin espacios vacíos": nunca hay una fila incompleta que dejar en
+ * blanco ni una categoría para estirar.
+ */
 .es-tools__grid {
 	display: grid;
-}
-
-.es-tools--editorial .es-tools__grid {
 	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: clamp(34px, 4vw, 52px) clamp(32px, 4.5vw, 64px);
 }
 
 @media (max-width: 900px) {
-	.es-tools--editorial .es-tools__grid {
+	.es-tools__grid {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
 
 @media (max-width: 560px) {
-	.es-tools--editorial .es-tools__grid {
+	.es-tools__grid {
 		grid-template-columns: 1fr;
+	}
+}
+
+/* Cada variante conserva su propio ritmo de aire — no hay motivo para que
+   Home (más compacto, más abajo en la página) y About (más espacioso,
+   layout vertical) compartan el mismo gap. */
+.es-tools--editorial .es-tools__grid {
+	gap: clamp(34px, 4vw, 52px) clamp(32px, 4.5vw, 64px);
+}
+
+@media (max-width: 560px) {
+	.es-tools--editorial .es-tools__grid {
 		gap: 30px;
 	}
 }
 
 .es-tools--inline .es-tools__grid {
-	display: flex;
-	flex-wrap: wrap;
 	gap: clamp(26px, 3vw, 40px) clamp(36px, 4.5vw, 60px);
 }
 
-.es-tools--inline .es-tools__group {
-	flex: 1 1 240px;
-}
-
 @media (max-width: 560px) {
-	.es-tools--inline .es-tools__group {
-		flex: 1 1 100%;
+	.es-tools--inline .es-tools__grid {
+		gap: 26px;
 	}
 }
 

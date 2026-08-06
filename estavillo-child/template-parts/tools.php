@@ -8,12 +8,23 @@
  * estavillo/tools del plugin — exactamente el mismo patrón (y la misma
  * fuente de datos) que ya usa la sección Tools de About en
  * template-parts/about-content.php. Un único render.php, un único CSS, un
- * único bloque para About, Home y cualquier página futura.
+ * único bloque para About, Home y cualquier página futura. Este archivo no
+ * toca esa implementación: About sigue exactamente igual.
  *
  * Layout `inline` a propósito: en Home la sección es un resumen de una
  * línea por categoría, no el detalle vertical del About — es la variante
  * que el propio bloque ya trae para "espacios más chicos" (ver el control
- * Layout en blocks/tools/edit.js). Ningún estilo nuevo.
+ * Layout en blocks/tools/edit.js). Ningún estilo nuevo en el bloque.
+ *
+ * Ubicación y jerarquía (revisión de posicionamiento): va DESPUÉS de
+ * Featured/Selected Work y ANTES de About — ver es_home_sections() en
+ * functions.php, "primero criterio y trabajo, después herramientas". Sin
+ * numeración (a diferencia de las demás secciones de Home): no recibe
+ * $args['num'] porque page-home-estavillo.php excluye la clave 'tools' del
+ * contador, igual que 'hero'. El encabezado usa .es-home-tools__head, una
+ * envoltura más chica que .es-section-head (sin el número en acento que
+ * le daba protagonismo de "capítulo") — pages-home.css, scopeada a esta
+ * sección: no toca .es-section-head en ningún otro lugar del sitio.
  *
  * Los datos salen del mismo filtro que About ('es_about_tools' sobre
  * es_about_tools_defaults()), así que editar Tools en wp-admin actualiza
@@ -26,8 +37,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-$es_num = isset( $args['num'] ) ? $args['num'] : '02';
 
 if ( ! function_exists( 'es_about_tools_defaults' ) || ! function_exists( 'render_block' ) ) {
 	return;
@@ -47,11 +56,8 @@ if ( empty( $es_tools ) ) {
 
 <section class="es-section es-home-tools" id="tools">
 	<div class="es-container">
-		<div class="es-section-head" data-es-reveal>
-			<div class="es-section-head__title">
-				<span class="es-section-head__num"><?php echo esc_html( $es_num ); ?></span>
-				<h2 class="es-label"><?php echo esc_html( es__( 'case_meta_tools' ) ); ?></h2>
-			</div>
+		<div class="es-home-tools__head" data-es-reveal>
+			<h2 class="es-label"><?php echo esc_html( es__( 'case_meta_tools' ) ); ?></h2>
 		</div>
 		<div data-es-reveal>
 			<?php

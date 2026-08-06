@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.52' );
+define( 'ES_CHILD_VERSION', '0.2.53' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -165,14 +165,18 @@ function es_phone_digits( $number ) {
  * Fuente única de la NARRATIVA de la home. Cada entrada mapea una clave de
  * sección → su template part. El orden del array es el orden de render:
  *
- *   Hero → How I Work → Tools → Featured Case → Selected Work → About → Connect
+ *   Hero → How I Work → Featured Case → Selected Work → Tools → About → Connect
  *
- * Tools entra justo después de How I Work por continuidad editorial: la
- * sección anterior cuenta CÓMO se trabaja, así que "con qué" es su
- * continuación natural, y llega antes de los casos — que son la prueba. No
- * es una sección nueva del tema: es el bloque reutilizable estavillo/tools
- * invocado vía render_block(), el mismo que usa About (ver
- * template-parts/tools.php).
+ * Tools va DESPUÉS de los casos, no antes: primero criterio y trabajo
+ * (cómo se trabaja, qué se hizo), recién después el inventario de con qué
+ * — nunca antes de haber mostrado evidencia. Entra sin numeración (ver
+ * template-parts/tools.php: la rama fallback la excluye del contador de
+ * $es_section_num en templates/page-home-estavillo.php, igual que 'hero')
+ * y con un encabezado deliberadamente más liviano que el resto de la
+ * narrativa — es un cierre de referencia, no un capítulo con el mismo
+ * peso que Featured/Selected Work/About. No es una sección nueva del
+ * tema: es el bloque reutilizable estavillo/tools invocado vía
+ * render_block(), el mismo que usa About.
  *
  * Reordenar / quitar / insertar secciones = filtrar 'es_home_sections' (p. ej.
  * desde Code Snippets), sin editar el template PHP:
@@ -196,9 +200,9 @@ function es_home_sections() {
 		array(
 			'hero'          => 'template-parts/hero-home',
 			'how-i-work'    => 'template-parts/how-i-work',
-			'tools'         => 'template-parts/tools',
 			'featured'      => 'template-parts/featured-case',
 			'selected-work' => 'template-parts/selected-work',
+			'tools'         => 'template-parts/tools',
 			'about'         => 'template-parts/about-teaser',
 			'connect'       => 'template-parts/footer-cta',
 		)
@@ -1280,13 +1284,33 @@ function es_about_tools_defaults() {
 		array(
 			'title'               => 'Design',
 			'icon'                => 'layers',
-			'items'               => array( 'Figma', 'FigJam', 'Relume' ),
+			// Figma/FigJam/Relume = producto; Photoshop/Illustrator/InDesign/
+			// Premiere Pro suman el lado editorial/gráfico — mismo criterio
+			// "herramientas reales que uso", no exhaustividad de currículum.
+			'items'               => array( 'Figma', 'FigJam', 'Relume', 'Photoshop', 'Illustrator', 'InDesign', 'Premiere Pro' ),
 			'categoryDescription' => '',
 		),
 		array(
 			'title'               => 'AI',
 			'icon'                => 'bulb',
 			'items'               => array( 'Claude', 'Claude Code', 'Claude Cowork', 'ChatGPT', 'Codex' ),
+			'categoryDescription' => '',
+		),
+		/*
+		 * Sexta categoría (composición 3×2 ticket): definición de producto,
+		 * documentación, organización de procesos y seguimiento de trabajo —
+		 * deliberadamente NO "Skills"/soft skills, sigue siendo una lista de
+		 * herramientas reales, mismo criterio que el resto de las 5
+		 * categorías. Ninguno de estos 4 nombres se repite en otra
+		 * categoría (verificado contra las 5 anteriores antes de sumarlos).
+		 * Ícono 'flow' (dos nodos conectados): distinto de 'layers'/'tool'/
+		 * 'cube' ya usados acá, y ya comunica "proceso/sistema" en el resto
+		 * de la librería (case-flow).
+		 */
+		array(
+			'title'               => 'Product & Systems',
+			'icon'                => 'flow',
+			'items'               => array( 'Notion', 'Trello', 'Google Sheets', 'Apps Script' ),
 			'categoryDescription' => '',
 		),
 		array(
@@ -1298,6 +1322,9 @@ function es_about_tools_defaults() {
 		array(
 			'title'               => '3D',
 			'icon'                => 'cube',
+			// Rhino/AutoCAD: ya estaban acá antes de este ticket. El pedido
+			// de sumar "AutoCAD, Rhinoceros" se resuelve NO duplicándolos —
+			// ya son estos dos ítems (Rhino = Rhinoceros).
 			'items'               => array( 'Rhino', 'AutoCAD' ),
 			'categoryDescription' => '',
 		),

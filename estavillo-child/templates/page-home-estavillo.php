@@ -68,7 +68,12 @@ if ( function_exists( 'wp_body_open' ) ) {
 		else :
 			$es_section_num = 0;
 			foreach ( es_home_sections() as $es_key => $es_part ) {
-				if ( 'hero' === $es_key ) {
+				/*
+				 * 'tools' no lleva numeración (ver es_home_sections()):
+				 * mismo tratamiento que 'hero', así que tampoco consume un
+				 * número — el contador sigue igual para About/Connect.
+				 */
+				if ( 'hero' === $es_key || 'tools' === $es_key ) {
 					get_template_part( $es_part );
 					continue;
 				}
