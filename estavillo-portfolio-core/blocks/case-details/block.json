@@ -9,7 +9,8 @@
 	"keywords": [ "estavillo", "case", "details", "acordeón" ],
 	"textdomain": "estavillo-portfolio-core",
 	"attributes": {
-		"summary": { "type": "string", "default": "" }
+		"summary": { "type": "string", "default": "" },
+		"width": { "type": "string", "default": "reading", "enum": [ "reading", "content" ] }
 	},
 	"supports": {
 		"html": false,

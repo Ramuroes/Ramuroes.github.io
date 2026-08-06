@@ -8,9 +8,13 @@
 
 	var el = ui.el;
 	var __ = wp.i18n.__;
+	var Fragment = wp.element.Fragment;
 	var useBlockProps = wp.blockEditor.useBlockProps;
 	var RichText = wp.blockEditor.RichText;
 	var InnerBlocks = wp.blockEditor.InnerBlocks;
+	var InspectorControls = wp.blockEditor.InspectorControls;
+	var PanelBody = wp.components.PanelBody;
+	var SelectControl = wp.components.SelectControl;
 
 	wp.blocks.registerBlockType('estavillo/case-details', {
 		edit: function (props) {
@@ -18,35 +22,61 @@
 			var set = props.setAttributes;
 			var blockProps = useBlockProps({ className: ui.scopeClass('') });
 
-			return el(
-				'div',
-				blockProps,
+			var inspector = el(
+				InspectorControls,
+				null,
 				el(
-					'details',
-					{
-						className: 'es-case-details',
-						open: true,
-						onClick: function (e) {
-							// nunca plegar en el editor
-							if (e.target && e.target.closest && e.target.closest('summary')) {
-								e.preventDefault();
-							}
+					PanelBody,
+					{ title: __('Accordion', 'estavillo-portfolio-core'), initialOpen: true },
+					el(SelectControl, {
+						label: __('Width', 'estavillo-portfolio-core'),
+						help: __('Reading: a medida de lectura (default, el comportamiento de siempre). Content: ancho completo del contenedor — para tablas, diagramas o comparativas que a medida de lectura quedan apretadas. Mismos dos nombres que el Width de Case Section.', 'estavillo-portfolio-core'),
+						value: a.width || 'reading',
+						options: [
+							{ label: __('Reading', 'estavillo-portfolio-core'), value: 'reading' },
+							{ label: __('Content', 'estavillo-portfolio-core'), value: 'content' },
+						],
+						onChange: function (v) {
+							set({ width: v });
 						},
-					},
+					})
+				)
+			);
+
+			return el(
+				Fragment,
+				null,
+				inspector,
+				el(
+					'div',
+					blockProps,
 					el(
-						'summary',
-						null,
-						el(RichText, {
-							tagName: 'span',
-							placeholder: __('Título del acordeón…', 'estavillo-portfolio-core'),
-							value: a.summary,
-							allowedFormats: [],
-							onChange: function (v) {
-								set({ summary: v });
+						'details',
+						{
+							className: 'es-case-details' + ('content' === a.width ? ' es-case-details--content' : ''),
+							open: true,
+							onClick: function (e) {
+								// nunca plegar en el editor
+								if (e.target && e.target.closest && e.target.closest('summary')) {
+									e.preventDefault();
+								}
 							},
-						})
-					),
-					el('div', { className: 'es-case-details__body' }, el(InnerBlocks, null))
+						},
+						el(
+							'summary',
+							null,
+							el(RichText, {
+								tagName: 'span',
+								placeholder: __('Título del acordeón…', 'estavillo-portfolio-core'),
+								value: a.summary,
+								allowedFormats: [],
+								onChange: function (v) {
+									set({ summary: v });
+								},
+							})
+						),
+						el('div', { className: 'es-case-details__body' }, el(InnerBlocks, null))
+					)
 				)
 			);
 		},

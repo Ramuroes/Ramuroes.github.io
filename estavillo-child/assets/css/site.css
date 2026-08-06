@@ -78,6 +78,20 @@
 	border-radius: 50%;
 	background: var(--es-accent);
 	pointer-events: none;
+	/* mismo tiempo que el background-size del subrayado de .es-nav__link, para
+	   que el punto se apague exactamente mientras la línea entra */
+	transition: opacity 0.2s ease;
+}
+
+/* Nunca dos indicadores verdes a la vez: sobre el item activo, el hover/foco
+   REEMPLAZA al punto por la línea (no los suma). Se cruzan con la misma
+   duración, así se lee como un indicador que se transforma, no como dos.
+   opacity y no display/visibility: es lo único animable, y el punto ya está
+   absolutamente posicionado, así que en ningún caso mueve layout. */
+.es-nav__link.is-active:hover .es-nav__dot,
+.es-nav__link.is-active:focus-visible .es-nav__dot,
+.es-nav__link.is-active:active .es-nav__dot {
+	opacity: 0;
 }
 
 /* optional wordmark logo image (text wordmark stays the default) */

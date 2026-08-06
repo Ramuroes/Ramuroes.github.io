@@ -133,12 +133,17 @@ function es_nav_links_display() {
  * Server-side, page/context aware — no scroll tracking. Home stays neutral
  * (returns '') on purpose (§5).
  *
+ * Un Case Study TAMBIÉN queda neutro, a propósito: adentro de un caso el
+ * "dónde estoy" ya lo dicen el breadcrumb (Home / Work / Título, con el
+ * aria-current="page" en el crumb que de verdad ES la página actual) y el
+ * índice interno del caso, que es el que manda en esa pantalla. Marcar
+ * además "Work" en el menú era un tercer indicador redundante — y encima
+ * semánticamente incorrecto: Work es la sección padre, no la página en la
+ * que está el usuario, así que su aria-current="page" mentía.
+ *
  * @return string '' | 'work' | 'process' | 'about' | 'connect'
  */
 function es_nav_active_key() {
-	if ( defined( 'ES_CASE_STUDY_CPT' ) && is_singular( ES_CASE_STUDY_CPT ) ) {
-		return 'work'; // a single Case Study lives under Work
-	}
 	if ( is_page_template( 'templates/page-work.php' ) ) {
 		return 'work';
 	}

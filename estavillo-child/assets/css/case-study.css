@@ -1386,19 +1386,36 @@
 /* ---------- grilla de stats ---------- */
 
 .es-case__body .es-case-stats {
-	display: grid;
-	/* auto-fit: cualquier cantidad de stats llena la fila completa — con el
-	   viejo repeat(4, 1fr) fijo, 3 stats dejaban un panel vacío a la derecha */
-	grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+	/* flex-wrap y no grid: con grid, la última fila incompleta dejaba tracks
+	   sobrantes (una tarjeta sola y el resto de la fila vacío). Con flex, los
+	   ítems de la ÚLTIMA fila crecen solos hasta llenarla — para cualquier
+	   cantidad y en cualquier breakpoint, sin reglas :nth-child por cantidad
+	   de columnas. Impar en mobile: la última ocupa el ancho completo; si
+	   sobran dos, se reparten la fila. Nunca queda un hueco. */
+	display: flex;
+	flex-wrap: wrap;
 	gap: 1px;
-	background: var(--es-line);
-	border: 1px solid var(--es-line);
 	margin: clamp(28px, 3.5vw, 40px) 0;
 }
 
 .es-case__body .es-case-stat {
+	/* misma base que el minmax() del grid anterior: mismo umbral de corte */
+	flex: 1 1 170px;
+	min-width: 0;
 	background: var(--es-paper-2);
 	padding: 22px 20px;
+	/* La hairline la dibuja CADA tarjeta, no el fondo del contenedor.
+	   Antes el contenedor tenía background+border --es-line y las líneas eran
+	   ese fondo asomando por los gaps de 1px; el problema es que en una fila
+	   incompleta (cualquier cantidad que no llene la última fila) el hueco
+	   TAMBIÉN mostraba ese fondo, y se leía como una celda gris vacía —
+	   medido: 568px en tablet con 5 stats, 869px en desktop con 7.
+	   Con el halo por tarjeta, donde no hay tarjeta no hay nada que pintar,
+	   así que el cuadrado vacío no puede existir para ninguna combinación de
+	   cantidad y breakpoint. El resultado visual con la grilla completa es
+	   idéntico: gap de 1px + halo de 1px de cada vecina se superponen en la
+	   misma línea de siempre. box-shadow no ocupa layout ni genera scroll. */
+	box-shadow: 0 0 0 1px var(--es-line);
 }
 
 .es-case__body .es-case-stat__num {
@@ -1418,8 +1435,11 @@
 }
 
 @media (max-width: 767px) {
-	.es-case__body .es-case-stats {
-		grid-template-columns: repeat(2, 1fr);
+	/* Mobile: exactamente 2 por fila (mismo layout de siempre). El flex-grow
+	   se encarga del impar — la última crece hasta el ancho completo sola,
+	   sin regla :nth-child ni tarjeta inventada. */
+	.es-case__body .es-case-stat {
+		flex-basis: calc(50% - 1px);
 	}
 }
 
@@ -1911,6 +1931,14 @@
 	background: var(--es-paper-2);
 	/* contenido de lectura: a medida, no a container completo */
 	max-width: var(--es-case-measure);
+}
+
+/* Width: Content — ancho completo del contenedor, mismo criterio y mismo
+   nombre que .es-case-section--content. Opt-in desde el inspector: sin el
+   atributo (todos los acordeones ya publicados) manda la regla de arriba y
+   nada cambia. Para tablas/diagramas que a medida de lectura quedan apretados. */
+.es-case__body .es-case-details--content {
+	max-width: none;
 }
 
 .es-case__body .es-case-details summary {
