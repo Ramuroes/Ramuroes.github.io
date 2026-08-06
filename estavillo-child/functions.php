@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.48' );
+define( 'ES_CHILD_VERSION', '0.2.49' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -296,6 +296,11 @@ function es_process_icon_library() {
 		'document' => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><rect x="3.2" y="2" width="9.6" height="12" rx="1"/><path d="M5.6 5.8h4.8M5.6 8.4h4.8M5.6 11h3"/></svg>',
 		'bulb'     => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><path d="M8 2.2a4 4 0 0 1 2.2 7.3c-.4.3-.7.9-.7 1.4v.3H6.5v-.3c0-.5-.3-1.1-.7-1.4A4 4 0 0 1 8 2.2Z"/><path d="M6.6 13.4h2.8M7 14.8h2"/></svg>',
 		'rocket'   => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><path d="M8 2c1.8 1.4 2.8 3.6 2.8 6.2 0 1-.2 2-.6 2.9H5.8c-.4-.9-.6-1.9-.6-2.9C5.2 5.6 6.2 3.4 8 2Z"/><circle cx="8" cy="7" r="1"/><path d="M5.8 11.1 4.4 13M10.2 11.1l1.4 1.9M6.6 13.6v1.2M9.4 13.6v1.2"/></svg>',
+		// cubo isométrico (wireframe, 3 caras) — sumado para el bloque Tools
+		// (categoría "3D"): 'map' ya está tomado por How I Work ("plan") y no
+		// comunica 3D, así que en vez de reusarlo se agrega una figura nueva
+		// a la misma librería compartida, con el mismo trazo 1.3.
+		'cube'     => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><path d="M8 2 13.5 5.2v5.6L8 14 2.5 10.8V5.2Z"/><path d="M8 8V2M8 8 2.5 5.2M8 8 13.5 5.2"/></svg>',
 	);
 }
 
@@ -319,6 +324,7 @@ function es_process_icon_choices() {
 		'document' => __( 'Document (archive)', 'estavillo-child' ),
 		'bulb'     => __( 'Bulb (idea)', 'estavillo-child' ),
 		'rocket'   => __( 'Rocket (scale)', 'estavillo-child' ),
+		'cube'     => __( 'Cube (3D)', 'estavillo-child' ),
 	);
 	return $labels;
 }
@@ -592,6 +598,12 @@ function es_about_render_experience_item( $es_exp, $compact = false ) {
 							<li><?php echo esc_html( $es_line ); ?></li>
 						<?php endforeach; ?>
 					</ul>
+					<?php if ( ! empty( $es_exp['tools'] ) && is_array( $es_exp['tools'] ) ) : ?>
+						<p class="es-about-tools">
+							<span class="es-about-tools__label"><?php echo esc_html( es__( 'case_meta_tools' ) ); ?></span>
+							<span class="es-about-tools__list"><?php echo esc_html( implode( ' · ', $es_exp['tools'] ) ); ?></span>
+						</p>
+					<?php endif; ?>
 				</div>
 			</details>
 		<?php endif; ?>
@@ -904,7 +916,7 @@ function es_about_intro_paragraphs( $text ) {
  * a wp-admin en este entorno), así que no hay URL real que enlazar
  * todavía — no se inventa una.
  *
- * @return array<int,array{org:string,role:string,location:string,period:string,summary:string,contributions:string[],link_label:string,link_url:string}>
+ * @return array<int,array{org:string,role:string,location:string,period:string,summary:string,contributions:string[],tools:string[],link_label:string,link_url:string}>
  */
 function es_about_experience_selected_defaults() {
 	return array(
@@ -924,6 +936,7 @@ function es_about_experience_selected_defaults() {
 				'Defined a progressive roadmap from a quick-estimate MVP toward a broader project and approval system.',
 				'Documented the work as an evolving Product Design case study.',
 			),
+			'tools'         => array( 'Figma', 'Claude', 'ChatGPT', 'Codex', 'VS Code' ),
 			'link_label'    => '',
 			'link_url'      => '',
 		),
@@ -947,6 +960,7 @@ function es_about_experience_selected_defaults() {
 				'Explored how connectivity, trust and digital confidence affect adoption among rural users.',
 				'Contributed to the final degree project focused on the redesign of an e-learning platform for livestock traceability (not sole authorship — a collaborative thesis project).',
 			),
+			'tools'         => array( 'WordPress', 'Figma', 'ChatGPT' ),
 			'link_label'    => '',
 			'link_url'      => '',
 		),
@@ -967,6 +981,7 @@ function es_about_experience_selected_defaults() {
 				'Communicated project progress with stakeholders.',
 				'Helped improve workflows and operational coordination.',
 			),
+			'tools'         => array( 'Redmine', 'Trello', 'Miro' ),
 			'link_label'    => '',
 			'link_url'      => '',
 		),
@@ -985,7 +1000,7 @@ function es_about_experience_selected_defaults() {
  * nuevo — mismo campo, mismo tratamiento visual, sin inventar UI nueva
  * para un caso único.
  *
- * @return array<int,array{org:string,role:string,location:string,period:string,summary:string,contributions:string[],link_label:string,link_url:string}>
+ * @return array<int,array{org:string,role:string,location:string,period:string,summary:string,contributions:string[],tools:string[],link_label:string,link_url:string}>
  */
 function es_about_experience_previous_defaults() {
 	return array(
@@ -1009,6 +1024,11 @@ function es_about_experience_previous_defaults() {
 				'Implemented, taught and monitored the administrative software.',
 				'Identified and addressed logistics and warehouse problems.',
 			),
+			// Sin 'tools': el documento fuente no nombra ningún software
+			// específico para este rol ("a CRM", "administrative software" —
+			// ambos genéricos, sin marca) — no se inventa un nombre de
+			// producto que el documento no confirma.
+			'tools'         => array(),
 			'link_label'    => '',
 			'link_url'      => '',
 		),
@@ -1037,6 +1057,7 @@ function es_about_experience_previous_defaults() {
 				'Used Mailchimp for newsletter campaigns.',
 				'Contributed to a new digital sales channel, improved shopping experience and more organized operations.',
 			),
+			'tools'         => array( 'Photoshop', 'Illustrator', 'Figma', 'WordPress', 'Mailchimp' ),
 			'link_label'    => '',
 			'link_url'      => '',
 		),
@@ -1055,6 +1076,7 @@ function es_about_experience_previous_defaults() {
 				'Implemented and maintained the website.',
 				'Improved the user experience across digital touchpoints over time.',
 			),
+			'tools'         => array( 'WordPress', 'Mailchimp' ),
 			'link_label'    => '',
 			'link_url'      => '',
 		),
@@ -1191,6 +1213,59 @@ function es_about_languages_defaults() {
 		array(
 			'name'  => 'Portuguese',
 			'level' => 'Basic',
+		),
+	);
+}
+
+/**
+ * Defaults de "Tools" (About page) — sección de cierre que ahora renderiza
+ * el bloque reutilizable estavillo/tools (Design System ticket): esta
+ * función sólo sigue siendo la FUENTE DE DATOS (misma responsabilidad que
+ * es_about_languages_defaults() etc.), no dibuja nada — about-content.php
+ * pasa este array directo como 'groups' a render_block(), el mismo camino
+ * que usa el contenido Gutenberg real. Una sola implementación del bloque,
+ * dos orígenes de datos (este default PHP y los atributos guardados en
+ * Gutenberg), igual que el resto de las secciones editables del About.
+ *
+ * No es un inventario de todo lo que se usó alguna vez (eso ya lo cuenta
+ * cada 'tools' de Experience) — es lo que se maneja HOY. 'icon' es una
+ * clave de es_process_icon_library(); 'categoryDescription' queda vacía a
+ * propósito (atributo preparado para una evolución futura del bloque, no
+ * usado todavía — ver estavillo-portfolio-core/blocks/tools/block.json).
+ *
+ * @return array<int,array{title:string,icon:string,items:string[],categoryDescription:string}>
+ */
+function es_about_tools_defaults() {
+	return array(
+		array(
+			'title'               => 'Research',
+			'icon'                => 'compass',
+			'items'               => array( 'Google Analytics', 'Microsoft Clarity', 'Synthetic Users' ),
+			'categoryDescription' => '',
+		),
+		array(
+			'title'               => 'Design',
+			'icon'                => 'layers',
+			'items'               => array( 'Figma', 'FigJam', 'Relume' ),
+			'categoryDescription' => '',
+		),
+		array(
+			'title'               => 'AI',
+			'icon'                => 'bulb',
+			'items'               => array( 'Claude', 'Claude Code', 'Claude Cowork', 'ChatGPT', 'Codex' ),
+			'categoryDescription' => '',
+		),
+		array(
+			'title'               => 'Development',
+			'icon'                => 'tool',
+			'items'               => array( 'VS Code', 'WordPress', 'HTML', 'CSS', 'Git', 'GitHub' ),
+			'categoryDescription' => '',
+		),
+		array(
+			'title'               => '3D',
+			'icon'                => 'cube',
+			'items'               => array( 'Rhino', 'AutoCAD' ),
+			'categoryDescription' => '',
 		),
 	);
 }

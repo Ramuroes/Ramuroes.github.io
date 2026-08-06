@@ -1,0 +1,27 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "estavillo/tools",
+	"title": "Tools",
+	"category": "estavillo-about",
+	"icon": "admin-tools",
+	"description": "Grilla reutilizable de herramientas agrupadas por categoría (.es-tools) — Research/Design/AI/etc., cada una con ícono lineal opcional, título y lista de herramientas. Bloque de sistema: se usa igual en Home, About, Case Studies y páginas futuras, sin ninguna lógica específica de una página. Dos variantes: Editorial (lista vertical por categoría) e Inline (una línea por categoría, separadas por «·»).",
+	"keywords": [ "estavillo", "tools", "herramientas", "stack", "capabilities", "skills" ],
+	"textdomain": "estavillo-portfolio-core",
+	"attributes": {
+		"layout": { "type": "string", "default": "editorial", "enum": [ "editorial", "inline" ] },
+		"showIcons": { "type": "boolean", "default": true },
+		"groups": {
+			"type": "array",
+			"default": [],
+			"items": { "type": "object" }
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": true
+	},
+	"editorScript": "es-about-block-tools",
+	"editorStyle": "es-case-blocks-editor",
+	"render": "file:./render.php"
+}

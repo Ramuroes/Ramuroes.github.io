@@ -345,5 +345,24 @@ function es_child_enqueue_assets() {
 			)
 		);
 	}
+
+	/*
+	 * Tools (.es-tools): mismo criterio que Case Flow arriba — componente
+	 * del Design System, no exclusivo de ninguna página (Home/About/Case
+	 * Studies/landings futuras), así que se carga por has_block() y en
+	 * ningún otro lado. Único agregado sobre el patrón de Case Flow: el
+	 * template de About también dispara la carga aunque has_block() no
+	 * encuentre el bloque, porque About tiene una rama de fallback PHP
+	 * (template-parts/about-content.php) que renderiza el bloque vía
+	 * render_block() directo — sin pasar por post_content real, así que
+	 * has_block() nunca lo vería ahí. El is_page_template() de abajo sólo
+	 * agrega ESE caso puntual; el bloque en sí sigue sin acoplarse a
+	 * ninguna plantilla.
+	 */
+	$es_needs_tools = is_singular() && ( has_block( 'estavillo/tools' ) || is_page_template( 'templates/page-about.php' ) );
+
+	if ( $es_needs_tools ) {
+		wp_enqueue_style( 'es-tools', ES_CHILD_URI . '/assets/css/tools.css', array( 'es-components' ), es_asset_ver( 'assets/css/tools.css' ) );
+	}
 }
 add_action( 'wp_enqueue_scripts', 'es_child_enqueue_assets' );

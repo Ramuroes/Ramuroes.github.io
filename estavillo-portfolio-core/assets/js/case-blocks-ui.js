@@ -55,15 +55,19 @@
 	}
 
 	/**
-	 * Toolbar de un ítem repetible: subir / bajar / borrar.
+	 * Toolbar de un ítem repetible: subir / bajar / (duplicar) / borrar.
 	 *
-	 * @param {Object} o { index, count, onMove(from,to), onRemove(index) }
+	 * Duplicar es opcional (o.onDuplicate) — ningún bloque existente lo pasa,
+	 * así que para los 16 bloques de siempre esto renderiza exactamente igual
+	 * que antes. o.duplicateIcon acepta un ícono custom (string de dashicon o
+	 * elemento SVG); sin él cae a un dashicon genérico.
+	 *
+	 * @param {Object} o { index, count, onMove(from,to), onRemove(index), onDuplicate?(index), duplicateIcon? }
 	 */
 	function itemBar(o) {
-		return el(
-			'div',
-			{ className: 'es-caseb-itembar' },
+		var buttons = [
 			el(Button, {
+				key: 'up',
 				icon: 'arrow-up-alt2',
 				label: __('Move up', 'estavillo-portfolio-core'),
 				size: 'small',
@@ -73,6 +77,7 @@
 				},
 			}),
 			el(Button, {
+				key: 'down',
 				icon: 'arrow-down-alt2',
 				label: __('Move down', 'estavillo-portfolio-core'),
 				size: 'small',
@@ -81,7 +86,23 @@
 					o.onMove(o.index, o.index + 1);
 				},
 			}),
+		];
+		if (o.onDuplicate) {
+			buttons.push(
+				el(Button, {
+					key: 'duplicate',
+					icon: o.duplicateIcon || 'admin-page',
+					label: __('Duplicate', 'estavillo-portfolio-core'),
+					size: 'small',
+					onClick: function () {
+						o.onDuplicate(o.index);
+					},
+				})
+			);
+		}
+		buttons.push(
 			el(Button, {
+				key: 'remove',
 				icon: 'trash',
 				label: __('Remove', 'estavillo-portfolio-core'),
 				size: 'small',
@@ -91,6 +112,7 @@
 				},
 			})
 		);
+		return el('div', { className: 'es-caseb-itembar' }, buttons);
 	}
 
 	function addButton(label, onClick) {

@@ -38,6 +38,7 @@ $es_education        = apply_filters( 'es_about_education', es_about_education_d
 $es_certs_other      = apply_filters( 'es_about_certifications_other', es_about_certifications_other_defaults() );
 $es_languages        = apply_filters( 'es_about_languages', es_about_languages_defaults() );
 $es_hobbies          = es_about_hobbies_visible();
+$es_tools            = apply_filters( 'es_about_tools', es_about_tools_defaults() );
 ?>
 
 <section class="es-section es-about-page__intro" id="about">
@@ -251,3 +252,43 @@ $es_hobbies          = es_about_hobbies_visible();
 	</div>
 </section>
 <?php endif; ?>
+
+<?php
+/*
+ * Tools: única fuente de verdad = el bloque reutilizable estavillo/tools
+ * (Design System ticket). Este fallback ya NO dibuja su propia grilla —
+ * arma los mismos atributos que guardaría Gutenberg y llama a
+ * render_block(), la API nativa de WordPress para invocar un bloque
+ * dinámico registrado desde PHP plano, sin pasar por post_content. Mismo
+ * render.php, mismo CSS, mismo bloque que en la versión Gutenberg del
+ * About y en cualquier otra página — cero HTML/CSS duplicado.
+ */
+if ( ! empty( $es_tools ) && function_exists( 'render_block' ) ) :
+	?>
+<section class="es-section es-about-page__tools" id="tools">
+	<div class="es-container">
+		<div class="es-section-head" data-es-reveal>
+			<div class="es-section-head__title">
+				<span class="es-section-head__num">06</span>
+				<h2 class="es-label"><?php echo esc_html( es__( 'case_meta_tools' ) ); ?></h2>
+			</div>
+		</div>
+		<div data-es-reveal>
+			<?php
+			echo render_block( // phpcs:ignore WordPress.Security.EscapeOutput -- render_block() ya devuelve HTML escapado por el propio bloque (render.php).
+				array(
+					'blockName' => 'estavillo/tools',
+					'attrs'     => array(
+						'layout'    => 'editorial',
+						'showIcons' => true,
+						'groups'    => $es_tools,
+					),
+				)
+			);
+			?>
+		</div>
+	</div>
+</section>
+	<?php
+endif;
+?>

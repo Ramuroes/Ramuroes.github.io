@@ -45,11 +45,14 @@ function es_portfolio_get_home_content() {
  * es_about_experience_previous_defaults() en el tema). 'contributions' es
  * un <textarea>, una bullet por línea — se separa por salto de línea acá,
  * líneas vacías descartadas, para guardar el mismo array<string> que
- * espera about-content.php.
+ * espera about-content.php. 'tools' (final-polish ticket §2) es un
+ * <input> de una línea, separado por comas — mismo criterio de "una
+ * herramienta por vez, nunca inventar" que el resto del About: una fila
+ * sin ninguna coma sigue guardando un array de un solo elemento.
  *
  * @param array  $post   $_POST completo.
  * @param string $prefix Prefijo de los campos (p.ej. 'es_exp_sel').
- * @return array<int,array{org:string,role:string,location:string,period:string,summary:string,contributions:string[],link_label:string,link_url:string}>
+ * @return array<int,array{org:string,role:string,location:string,period:string,summary:string,contributions:string[],tools:string[],link_label:string,link_url:string}>
  */
 function es_portfolio_sanitize_experience_rows( $post, $prefix ) {
 	$orgs           = isset( $post[ "{$prefix}_org" ] ) ? wp_unslash( $post[ "{$prefix}_org" ] ) : array();
@@ -58,6 +61,7 @@ function es_portfolio_sanitize_experience_rows( $post, $prefix ) {
 	$periods        = isset( $post[ "{$prefix}_period" ] ) ? wp_unslash( $post[ "{$prefix}_period" ] ) : array();
 	$summaries      = isset( $post[ "{$prefix}_summary" ] ) ? wp_unslash( $post[ "{$prefix}_summary" ] ) : array();
 	$contributions  = isset( $post[ "{$prefix}_contributions" ] ) ? wp_unslash( $post[ "{$prefix}_contributions" ] ) : array();
+	$tools_raw      = isset( $post[ "{$prefix}_tools" ] ) ? wp_unslash( $post[ "{$prefix}_tools" ] ) : array();
 	$link_labels    = isset( $post[ "{$prefix}_link_label" ] ) ? wp_unslash( $post[ "{$prefix}_link_label" ] ) : array();
 	$link_urls      = isset( $post[ "{$prefix}_link_url" ] ) ? wp_unslash( $post[ "{$prefix}_link_url" ] ) : array();
 	$rows           = array();
@@ -71,6 +75,15 @@ function es_portfolio_sanitize_experience_rows( $post, $prefix ) {
 				}
 			}
 		}
+		$es_tools = array();
+		if ( isset( $tools_raw[ $i ] ) && '' !== trim( $tools_raw[ $i ] ) ) {
+			foreach ( explode( ',', $tools_raw[ $i ] ) as $es_tool ) {
+				$es_tool = sanitize_text_field( trim( $es_tool ) );
+				if ( '' !== $es_tool ) {
+					$es_tools[] = $es_tool;
+				}
+			}
+		}
 		$rows[ $i ] = array(
 			'org'           => sanitize_text_field( $org ),
 			'role'          => sanitize_text_field( $roles[ $i ] ?? '' ),
@@ -78,6 +91,7 @@ function es_portfolio_sanitize_experience_rows( $post, $prefix ) {
 			'period'        => sanitize_text_field( $periods[ $i ] ?? '' ),
 			'summary'       => sanitize_textarea_field( $summaries[ $i ] ?? '' ),
 			'contributions' => $es_lines,
+			'tools'         => $es_tools,
 			'link_label'    => sanitize_text_field( $link_labels[ $i ] ?? '' ),
 			'link_url'      => isset( $link_urls[ $i ] ) ? esc_url_raw( $link_urls[ $i ] ) : '',
 		);
@@ -126,7 +140,7 @@ function es_portfolio_merge_keyed_rows( $default, $saved, $key_field ) {
  * solo para no pagar el costo de este chequeo en cada admin_init una vez
  * que TODOS los grupos conocidos ya están sembrados).
  */
-define( 'ES_PORTFOLIO_ABOUT_DEFAULTS_VERSION', 1 );
+define( 'ES_PORTFOLIO_ABOUT_DEFAULTS_VERSION', 2 );
 
 /**
  * Mapa "clave del option => función de tema que devuelve su default".
@@ -145,6 +159,7 @@ function es_portfolio_about_default_seeds() {
 		'about_certifications_other' => 'es_about_certifications_other_defaults',
 		'about_languages'            => 'es_about_languages_defaults',
 		'about_hobbies_items'        => 'es_home_about_hobbies_defaults',
+		'about_tools'                => 'es_about_tools_defaults',
 	);
 }
 
@@ -351,6 +366,40 @@ function es_portfolio_home_content_save() {
 			);
 		}
 		$data['about_languages'] = $es_languages;
+	}
+
+	// Tools (About page, ahora renderizado por el bloque estavillo/tools —
+	// Design System ticket) — N grupos, cada uno título + ícono (misma
+	// librería que Hobbies/How I Work) + <textarea> de items, uno por
+	// línea. Mismo parseo uno-por-línea que 'contributions' arriba.
+	// 'categoryDescription' no tiene campo propio todavía (atributo
+	// preparado para el bloque, sin UI — ver block.json de estavillo/tools):
+	// se guarda vacío, nunca se pisa un valor que no vino de este form.
+	if ( isset( $_POST['es_about_tools_title'] ) && is_array( $_POST['es_about_tools_title'] ) ) {
+		$es_tools_titles = wp_unslash( $_POST['es_about_tools_title'] );
+		$es_tools_icons  = isset( $_POST['es_about_tools_icon'] ) && is_array( $_POST['es_about_tools_icon'] ) ? wp_unslash( $_POST['es_about_tools_icon'] ) : array();
+		$es_tools_items  = isset( $_POST['es_about_tools_items'] ) && is_array( $_POST['es_about_tools_items'] ) ? wp_unslash( $_POST['es_about_tools_items'] ) : array();
+		$es_valid_icons  = function_exists( 'es_process_icon_choices' ) ? array_keys( es_process_icon_choices() ) : array();
+		$es_tools_groups = array();
+		foreach ( $es_tools_titles as $i => $es_tools_title ) {
+			$es_items = array();
+			if ( isset( $es_tools_items[ $i ] ) && '' !== trim( $es_tools_items[ $i ] ) ) {
+				foreach ( preg_split( '/\r\n|\r|\n/', $es_tools_items[ $i ] ) as $es_item ) {
+					$es_item = sanitize_text_field( $es_item );
+					if ( '' !== $es_item ) {
+						$es_items[] = $es_item;
+					}
+				}
+			}
+			$es_icon_choice   = isset( $es_tools_icons[ $i ] ) ? sanitize_key( $es_tools_icons[ $i ] ) : '';
+			$es_tools_groups[ $i ] = array(
+				'title'               => sanitize_text_field( $es_tools_title ),
+				'icon'                => in_array( $es_icon_choice, $es_valid_icons, true ) ? $es_icon_choice : '',
+				'items'               => $es_items,
+				'categoryDescription' => '',
+			);
+		}
+		$data['about_tools'] = $es_tools_groups;
 	}
 
 	// ---- How I Work ----
@@ -637,6 +686,7 @@ function es_portfolio_home_content_page() {
 							<input type="text" name="es_exp_sel_period[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['period'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Period, e.g. 2025–Present', 'estavillo-portfolio-core' ); ?>"><br>
 							<textarea name="es_exp_sel_summary[<?php echo esc_attr( $i ); ?>]" rows="2" class="large-text" placeholder="<?php esc_attr_e( 'Visible summary', 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( $es_row['summary'] ?? '' ); ?></textarea>
 							<textarea name="es_exp_sel_contributions[<?php echo esc_attr( $i ); ?>]" rows="4" class="large-text" placeholder="<?php esc_attr_e( 'Key contributions — one bullet per line', 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( isset( $es_row['contributions'] ) && is_array( $es_row['contributions'] ) ? implode( "\n", $es_row['contributions'] ) : '' ); ?></textarea><br>
+							<input type="text" name="es_exp_sel_tools[<?php echo esc_attr( $i ); ?>]" class="large-text" value="<?php echo esc_attr( isset( $es_row['tools'] ) && is_array( $es_row['tools'] ) ? implode( ', ', $es_row['tools'] ) : '' ); ?>" placeholder="<?php esc_attr_e( 'Tools used, comma-separated, e.g. "Figma, Claude, VS Code" (optional — leave blank if unconfirmed)', 'estavillo-portfolio-core' ); ?>"><br>
 							<input type="text" name="es_exp_sel_link_label[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['link_label'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Link label, e.g. "View case study" (optional)', 'estavillo-portfolio-core' ); ?>">
 							<input type="url" name="es_exp_sel_link_url[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['link_url'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Link URL (optional)', 'estavillo-portfolio-core' ); ?>">
 						</td>
@@ -661,6 +711,7 @@ function es_portfolio_home_content_page() {
 							<input type="text" name="es_exp_prev_period[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['period'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Period (optional)', 'estavillo-portfolio-core' ); ?>"><br>
 							<textarea name="es_exp_prev_summary[<?php echo esc_attr( $i ); ?>]" rows="2" class="large-text" placeholder="<?php esc_attr_e( 'Visible summary', 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( $es_row['summary'] ?? '' ); ?></textarea>
 							<textarea name="es_exp_prev_contributions[<?php echo esc_attr( $i ); ?>]" rows="4" class="large-text" placeholder="<?php esc_attr_e( 'Key contributions — one bullet per line', 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( isset( $es_row['contributions'] ) && is_array( $es_row['contributions'] ) ? implode( "\n", $es_row['contributions'] ) : '' ); ?></textarea><br>
+							<input type="text" name="es_exp_prev_tools[<?php echo esc_attr( $i ); ?>]" class="large-text" value="<?php echo esc_attr( isset( $es_row['tools'] ) && is_array( $es_row['tools'] ) ? implode( ', ', $es_row['tools'] ) : '' ); ?>" placeholder="<?php esc_attr_e( 'Tools used, comma-separated (optional — leave blank if unconfirmed)', 'estavillo-portfolio-core' ); ?>"><br>
 							<input type="text" name="es_exp_prev_link_label[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['link_label'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Link label (optional)', 'estavillo-portfolio-core' ); ?>">
 							<input type="url" name="es_exp_prev_link_url[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['link_url'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Link URL (optional)', 'estavillo-portfolio-core' ); ?>">
 						</td>
@@ -725,6 +776,34 @@ function es_portfolio_home_content_page() {
 						<td>
 							<input type="text" name="es_lang_name[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['name'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Language', 'estavillo-portfolio-core' ); ?>">
 							<input type="text" name="es_lang_level[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['level'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Level, e.g. Native / Advanced (C1) / Basic', 'estavillo-portfolio-core' ); ?>">
+						</td>
+					</tr>
+				<?php endfor; ?>
+			</table>
+
+			<h3><?php esc_html_e( 'Tools (About page)', 'estavillo-portfolio-core' ); ?></h3>
+			<p class="description"><?php esc_html_e( 'Renders via the reusable "Tools" block (estavillo/tools) — the same component available on Home/Case Studies. Leave a row\'s title blank to keep it out of the list. Items: one tool per line.', 'estavillo-portfolio-core' ); ?></p>
+			<table class="form-table" role="presentation">
+				<?php
+				$es_tools_groups = $data['about_tools'] ?? array();
+				$es_tools_icon_choices = function_exists( 'es_process_icon_choices' ) ? es_process_icon_choices() : array();
+				for ( $i = 0; $i < 6; $i++ ) :
+					$es_row = $es_tools_groups[ $i ] ?? array();
+					?>
+					<tr>
+						<th scope="row"><?php echo esc_html( sprintf( __( 'Group %d', 'estavillo-portfolio-core' ), $i + 1 ) ); ?></th>
+						<td>
+							<input type="text" name="es_about_tools_title[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['title'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Group title, e.g. "Design"', 'estavillo-portfolio-core' ); ?>">
+							<?php if ( ! empty( $es_tools_icon_choices ) ) : ?>
+								<select name="es_about_tools_icon[<?php echo esc_attr( $i ); ?>]">
+									<option value=""><?php esc_html_e( '— No icon —', 'estavillo-portfolio-core' ); ?></option>
+									<?php foreach ( $es_tools_icon_choices as $es_icon_key => $es_icon_label ) : ?>
+										<option value="<?php echo esc_attr( $es_icon_key ); ?>" <?php selected( $es_row['icon'] ?? '', $es_icon_key ); ?>><?php echo esc_html( $es_icon_label ); ?></option>
+									<?php endforeach; ?>
+								</select>
+							<?php endif; ?>
+							<br>
+							<textarea name="es_about_tools_items[<?php echo esc_attr( $i ); ?>]" rows="4" class="large-text" placeholder="<?php esc_attr_e( 'Tools — one per line', 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( isset( $es_row['items'] ) && is_array( $es_row['items'] ) ? implode( "\n", $es_row['items'] ) : '' ); ?></textarea>
 						</td>
 					</tr>
 				<?php endfor; ?>
@@ -1126,6 +1205,12 @@ function es_portfolio_filter_about_languages( $default ) {
 	return es_portfolio_merge_keyed_rows( $default, $data['about_languages'] ?? array(), 'name' );
 }
 add_filter( 'es_about_languages', 'es_portfolio_filter_about_languages' );
+
+function es_portfolio_filter_about_tools( $default ) {
+	$data = es_portfolio_get_home_content();
+	return es_portfolio_merge_keyed_rows( $default, $data['about_tools'] ?? array(), 'title' );
+}
+add_filter( 'es_about_tools', 'es_portfolio_filter_about_tools' );
 
 /**
  * Puente para How I Work. A diferencia de About (campos sueltos), acá se

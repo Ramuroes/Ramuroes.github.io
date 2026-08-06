@@ -515,6 +515,26 @@
 	margin-top: 8px;
 }
 
+/* Final-polish ticket §2: one small line at the end of "Key contributions",
+   the tools used during that specific experience. Deliberately minimal —
+   no chips, no cards, no logos: a label + a plain "·"-separated list, the
+   same separator/tone already used by .es-exp-item__meta and .es-cred__meta
+   two components up, so it reads as one more quiet meta line, not a new
+   kind of UI. No border/background of its own — a divider here would
+   reintroduce the "two lines" noise the ticket asked to remove above. */
+.es-about-tools {
+	margin: 14px 0 0;
+	font-family: var(--es-mono);
+	font-size: 11.5px;
+	letter-spacing: 0.02em;
+	color: var(--es-ink-3);
+}
+
+.es-about-tools__label {
+	color: var(--es-ink-4);
+	margin-right: 8px;
+}
+
 /* ---------- About: educación / certificados ---------- */
 
 .es-cred {
@@ -780,6 +800,13 @@
 	padding-left: 12px;
 	text-align: right;
 }
+
+/* About: Tools — el bloque de sistema estavillo/tools reemplazó la grilla
+   propia que vivía acá (final-polish ticket §4). Estilos ahora en
+   assets/css/tools.css (.es-tools/.es-tools__*), compartidos por
+   Home/About/Case Studies — ver Design System ticket. Nada que estilar en
+   este archivo: about-content.php sólo aporta el encabezado "06 Tools" de
+   sección, el grid en sí es 100% del bloque. */
 
 /* =========================================================================
    Connect — revision ticket (visual/structural correction)
@@ -1430,18 +1457,21 @@
    ones ("Show N earlier roles" / "Show N certifications") are untouched,
    they don't have a competing sibling border-top right after them. The
    next .es-exp-item's border-top remains the ONE separator per item, as
-   required. When open, the opened content gets a subtle left rule
-   instead (same visual language as .es-process-detail__note elsewhere on
-   this page) so the summary and its opened content read as one element
-   belonging to the entry, not as two things split by a rule. */
+   required.
+
+   Final-polish ticket: the opened content's own left rule (added by the
+   round-3 fix above, to visually "attach" the body to its summary) turned
+   into a SECOND vertical line competing with the one true timeline rail
+   (.es-exp-list::before, the continuous line + dot down the left edge of
+   the whole Experience list — see "About: Experience / Earlier Experience"
+   above). Dropped; a small top margin alone keeps the body read as
+   belonging to its summary without adding a second rail. */
 
 .es-exp-item .es-case-details.is-style-light summary {
 	border-bottom: none;
 }
 
 .es-exp-item .es-case-details.is-style-light[open] > .es-case-details__body {
-	border-left: 2px solid var(--es-line);
-	padding-left: 14px;
 	margin-top: 2px;
 }
 
