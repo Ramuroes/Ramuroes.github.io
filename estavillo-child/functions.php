@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.53' );
+define( 'ES_CHILD_VERSION', '0.2.54' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -420,50 +420,50 @@ function es_home_process_steps_defaults() {
 	return array(
 		array(
 			'title'    => 'Understand the system',
-			'text'     => 'Before I open any design tool, I map how the system actually operates — not how it\'s supposed to.',
+			'text'     => 'Before I open any design tool, I map how the system actually operates: the people, the information, the constraints and the product goals involved.',
 			'icon_key' => 'compass',
 			'why'      => 'A screen is the visible 1% of a system. Redesigning it without understanding the other 99% just makes the same problem look better.',
-			'example'  => 'On the Workshop Quoting System, that meant sitting on the shop floor to see how a quote actually got built — paper, memory, a spreadsheet nobody trusted — long before assuming the fix was a better form.',
+			'example'  => 'On the Workshop Quoting System, that meant sitting on the shop floor to see how a quote actually got built, with paper, memory and a spreadsheet nobody trusted, long before assuming the fix was a better form.',
 			'tools'    => 'Contextual inquiry, stakeholder mapping, process observation',
 		),
 		array(
-			'title'    => 'Find the real bottleneck',
+			'title'    => 'Find the real problem',
 			'text'     => 'Every system has one point where things actually break. I look for that specific point, not a list of general issues.',
 			'icon_key' => 'target',
 			'why'      => 'Teams often ask for a redesign when the real problem sits one step earlier or later. Naming the actual bottleneck precisely is what keeps the rest of the work from becoming decoration.',
-			'example'  => 'In Trazur, the interface had real usability issues, but the deeper bottleneck was trust — people didn\'t believe the platform understood their situation, so they disengaged before the screen ever became the problem.',
+			'example'  => 'In Trazur, the interface had real usability issues, but the deeper problem was trust: people didn\'t believe the platform understood their situation, so they disengaged before the screen ever became the problem.',
 			'tools'    => 'Root-cause analysis, journey mapping, structured evaluation',
 		),
 		array(
 			'title'    => 'Gather evidence',
-			'text'     => 'I build a case before I build a solution — evidence a team can react to, not an opinion they have to accept.',
+			'text'     => 'I build a case before I build a solution: user research a team can react to, not an opinion they have to accept.',
 			'icon_key' => 'document',
 			'why'      => 'A strong opinion in the room isn\'t evidence, no matter how senior it comes from. Evidence turns a debate about taste into a decision about the system.',
-			'example'  => 'For Trazur, that meant pairing traditional research with AI-assisted analysis to process a heavier volume of evidence faster — every synthesized finding still reviewed by a person before it counted as one.',
+			'example'  => 'For Trazur, that meant pairing traditional research with AI-assisted analysis to process a heavier volume of evidence faster, with every synthesized finding still reviewed by a person before it counted as one.',
 			'tools'    => 'Interviews, field observation, AI-assisted synthesis',
 		),
 		array(
-			'title'    => 'Challenge assumptions',
-			'text'     => 'Before anything gets built, I try to break the plan myself — find where it depends on something nobody\'s actually confirmed.',
+			'title'    => 'Explore and define',
+			'text'     => 'I turn what I learn into structure: information architecture, user flows and alternatives I can compare before committing to one.',
 			'icon_key' => 'check',
 			'why'      => 'Every proposal quietly assumes something. Finding that assumption and testing the one that would be expensive to get wrong is cheaper than discovering it after launch.',
 			'example'  => 'On the Workshop Quoting System, that meant checking with the person who actually prices jobs that a proposed shortcut wasn\'t quietly removing a judgment call they relied on.',
-			'tools'    => 'Assumption mapping, walkthroughs with real users, comparative testing',
+			'tools'    => 'Assumption mapping, information architecture, user flows, comparative testing',
 		),
 		array(
-			'title'    => 'Design practical solutions',
-			'text'     => 'Not every problem needs a new interface — sometimes the strongest move is fixing what\'s underneath it. When an interface is the right call, I design it for the conditions that actually exist: limited connectivity, time pressure, mixed skill levels, not an idealized user in an ideal setting.',
+			'title'    => 'Design and prototype',
+			'text'     => 'Not every problem needs a new interface; sometimes the strongest move is fixing what sits underneath it. When it is the right call, I move from structure to interaction and UI: wireframes, prototypes and reusable components when the project justifies them.',
 			'icon_key' => 'layers',
 			'why'      => 'A solution that only works under perfect conditions doesn\'t survive a busy shop floor or a rural connection that drops mid-session. Practical means it still works on a bad day.',
 			'example'  => 'Trazur\'s proposed solution was built around low-connectivity, low-fidelity conditions from the start, instead of assuming a fast connection and a confident, tech-comfortable user.',
-			'tools'    => 'Service blueprints, wireframing, systems-level design decisions',
+			'tools'    => 'Service blueprints, wireframes, prototypes, design systems',
 		),
 		array(
-			'title'    => 'Iterate with purpose',
-			'text'     => 'I treat a first version as a hypothesis, not a finish line — and decide in advance what would prove it wrong.',
+			'title'    => 'Test, learn and iterate',
+			'text'     => 'I treat a first version as a hypothesis, test it with users, and decide in advance what would prove it wrong.',
 			'icon_key' => 'rocket',
 			'why'      => 'Iteration without a target just produces motion. Knowing what "wrong" looks like before you ship is what makes the next version actually better, not just different.',
-			'example'  => 'Across projects — from an operational tool built for Guzmán Villalba to institutional work at Ceibal — the versions that held up were the ones designed to be revisited on purpose, not the ones treated as finished at delivery.',
+			'example'  => 'Across projects, from an operational tool built for Guzmán Villalba to institutional work at Ceibal, the versions that held up were the ones designed to be revisited on purpose, not the ones treated as finished at delivery.',
 			'tools'    => 'Usage review, structured feedback loops, versioned documentation',
 		),
 	);
@@ -497,15 +497,15 @@ function es_home_process_teaser_defaults() {
 		'groups'   => array(
 			array(
 				'title' => 'Understand',
-				'text'  => 'See how people, information and goals actually connect.',
+				'text'  => 'See how people, information and product goals actually connect.',
 			),
 			array(
 				'title' => 'Explore',
-				'text'  => 'Test ideas and challenge assumptions before committing to one.',
+				'text'  => 'Shape the structure, weigh alternatives and challenge assumptions before committing to one.',
 			),
 			array(
-				'title' => 'Improve',
-				'text'  => 'Build something that works — and keeps working.',
+				'title' => 'Iterate',
+				'text'  => 'Prototype, validate with users and refine until the solution works and holds up in real use.',
 			),
 		),
 	);
