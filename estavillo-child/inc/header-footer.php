@@ -73,6 +73,78 @@ add_filter( 'body_class', 'es_hf_body_classes' );
  * ---------------------------------------------------------------------- */
 
 /**
+ * URL de la página fija que usa un template del theme, en el IDIOMA de esta
+ * request. Es la pieza que permite que el menú apunte a páginas reales
+ * (Cómo trabajo / Sobre mí / Contacto) en vez de a anchors de la Home, sin
+ * hardcodear un slug ni una ruta por idioma.
+ *
+ * Por qué por TEMPLATE y no por slug/ID: el template
+ * ('templates/page-how-i-work.php') es el contrato estable del theme. El
+ * slug lo puede cambiar el editor, el ID es distinto en cada instalación y
+ * en cada idioma, y una ruta hardcodeada ('/es/como-trabajo/') se rompe en
+ * silencio si Polylang cambia el prefijo o si se renombra la página. El
+ * template, en cambio, es lo que el propio theme define.
+ *
+ * Polylang: NO hay que hacer nada especial más que dejar que filtre la
+ * query. Cada traducción es su propio post con su propio template, así que
+ * pedir "la página con este template" dentro del idioma activo devuelve
+ * naturalmente la versión correcta. De ahí el suppress_filters => false:
+ * get_posts() lo pone en true por defecto, y con true Polylang NO puede
+ * filtrar por idioma — devolvería la primera página que encuentre, en
+ * cualquier idioma. Es el detalle que rompería ES sin dar ningún error.
+ *
+ * Cacheado por (template + idioma) durante la request: el menú, el menú
+ * mobile, el footer y el breadcrumb piden lo mismo varias veces.
+ *
+ * @param string $template Ruta del template relativa al theme.
+ * @return string URL absoluta, o '' si no existe una página con ese template.
+ */
+function es_page_url_by_template( $template ) {
+	static $es_cache = array();
+
+	$es_lang = function_exists( 'pll_current_language' ) ? (string) pll_current_language() : '';
+	$es_key  = (string) $template . '|' . $es_lang;
+	if ( isset( $es_cache[ $es_key ] ) ) {
+		return $es_cache[ $es_key ];
+	}
+
+	$es_ids = get_posts(
+		array(
+			'post_type'              => 'page',
+			'post_status'            => 'publish',
+			'numberposts'            => 1,
+			'fields'                 => 'ids',
+			'meta_key'               => '_wp_page_template', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- una sola vez por template/idioma y cacheado en memoria.
+			'meta_value'             => (string) $template,  // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- idem.
+			'orderby'                => 'ID',
+			'order'                  => 'ASC',
+			'suppress_filters'       => false, // imprescindible: habilita el filtro de idioma de Polylang.
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+		)
+	);
+
+	$es_cache[ $es_key ] = ! empty( $es_ids ) ? (string) get_permalink( $es_ids[0] ) : '';
+	return $es_cache[ $es_key ];
+}
+
+/**
+ * La URL de una página fija si existe; si no, el anchor de la Home de
+ * siempre. Degradación limpia: mientras la página no esté creada (o esté
+ * en borrador, o falte la traducción), el ítem sigue navegando a la
+ * sección equivalente de la Home exactamente como hasta ahora.
+ *
+ * @param string $template Template de la página destino.
+ * @param string $anchor   Anchor de fallback (p. ej. '#process').
+ * @return string
+ */
+function es_nav_page_or_anchor( $template, $anchor ) {
+	$es_url = es_page_url_by_template( $template );
+	return '' !== $es_url ? $es_url : $anchor;
+}
+
+/**
  * Resolve one nav URL for the CURRENT request. The single, centralized rule
  * (no conditional URL logic scattered through templates):
  *

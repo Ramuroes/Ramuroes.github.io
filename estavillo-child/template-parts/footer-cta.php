@@ -23,7 +23,7 @@ $es_cta_lead  = apply_filters(
 );
 $es_email       = es_contact_email();
 $es_whatsapp    = es_contact_whatsapp();
-$es_connect_url = apply_filters( 'es_home_connect_url', '#connect' );
+$es_connect_url = apply_filters( 'es_home_connect_url', es_nav_page_or_anchor( 'templates/page-contact.php', '#connect' ) );
 ?>
 
 <section class="es-section es-footer-cta" id="connect">

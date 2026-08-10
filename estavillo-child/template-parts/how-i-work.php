@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $es_num = isset( $args['num'] ) ? $args['num'] : '01';
 
 $es_teaser       = es_home_process_teaser();
-$es_process_url  = apply_filters( 'es_home_process_url', '#process' );
+$es_process_url  = apply_filters( 'es_home_process_url', es_nav_page_or_anchor( 'templates/page-how-i-work.php', '#process' ) );
 $es_teaser_steps = array( 1, 4, 6 );
 ?>
 

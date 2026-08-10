@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.54' );
+define( 'ES_CHILD_VERSION', '0.2.55' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -210,9 +210,21 @@ function es_home_sections() {
 }
 
 /**
- * Enlaces de navegación (header y footer). Editable por filtro.
- * Por defecto anclan a las secciones de la home de una sola página; se
- * pueden apuntar a páginas reales (Work/About/…) vía el filtro cuando existan.
+ * Enlaces de navegación (header, menú mobile, footer y breadcrumb).
+ *
+ * Criterio de navegación (iteración de cierre): Cómo trabajo, Sobre mí y
+ * Contacto son PÁGINAS reales, no secciones de la Home, así que el menú
+ * apunta a la página en el idioma de la request — resuelto por template vía
+ * es_nav_page_or_anchor() (inc/header-footer.php), nunca por una ruta
+ * hardcodeada. Si la página todavía no existe en ese idioma, el ítem cae al
+ * anchor de la Home de siempre y nada se rompe.
+ *
+ * Work es la excepción DELIBERADA: todavía no hay una página índice de
+ * proyectos, así que sigue siendo la sección de la Home ('#work', que
+ * es_nav_resolve_url() convierte en "Home del idioma + #work" fuera de la
+ * Home). Cuando exista el índice, esta entrada pasa a
+ * es_nav_page_or_anchor( 'templates/page-work.php', '#work' ) y no hay que
+ * tocar nada más.
  *
  * @return array<int,array{label:string,url:string}>
  */
@@ -226,15 +238,15 @@ function es_nav_links() {
 			),
 			array(
 				'label' => es__( 'nav_how' ),
-				'url'   => '#process',
+				'url'   => es_nav_page_or_anchor( 'templates/page-how-i-work.php', '#process' ),
 			),
 			array(
 				'label' => es__( 'nav_about' ),
-				'url'   => '#about',
+				'url'   => es_nav_page_or_anchor( 'templates/page-about.php', '#about' ),
 			),
 			array(
 				'label' => es__( 'nav_connect' ),
-				'url'   => '#connect',
+				'url'   => es_nav_page_or_anchor( 'templates/page-contact.php', '#connect' ),
 			),
 		)
 	);
@@ -272,7 +284,18 @@ function es_breadcrumb_trail( $nav_label_key = '', $current_label = '' ) {
 	if ( $nav_label_key ) {
 		foreach ( es_nav_links() as $es_bc_link ) {
 			if ( es__( $nav_label_key ) === $es_bc_link['label'] ) {
-				$trail[] = $es_bc_link;
+				/*
+				 * La URL se RESUELVE, igual que en el header. Antes se copiaba
+				 * el ítem crudo de es_nav_links(), así que el crumb "Work"
+				 * heredaba el '#work' literal: dentro de un Case Study eso es
+				 * un anchor a una sección que no existe en esa página, y el
+				 * click no hacía nada. es_nav_resolve_url() es la MISMA regla
+				 * que ya usa es_nav_links_display() para el menú (por eso el
+				 * menú funcionaba y el breadcrumb no), y devuelve
+				 * "Home del idioma + #work" fuera de la Home.
+				 */
+				$es_bc_link['url'] = es_nav_resolve_url( isset( $es_bc_link['url'] ) ? $es_bc_link['url'] : '' );
+				$trail[]           = $es_bc_link;
 				break;
 			}
 		}

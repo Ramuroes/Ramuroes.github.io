@@ -28,7 +28,7 @@ if ( function_exists( 'es_about_intro_default' ) ) {
 	$es_about_text    = ! empty( $es_about_paras[0] ) ? trim( $es_about_paras[0] ) : trim( $es_about_default );
 }
 
-$es_about_url      = apply_filters( 'es_home_about_url', '#about' );
+$es_about_url      = apply_filters( 'es_home_about_url', es_nav_page_or_anchor( 'templates/page-about.php', '#about' ) );
 $es_about_portrait = '';
 ?>
 

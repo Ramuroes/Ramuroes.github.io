@@ -31,8 +31,11 @@ $es_hero_lead  = apply_filters(
 	'AI-assisted tools and workflows for real operations. From estimating to execution.'
 );
 
-$es_hero_primary_url   = apply_filters( 'es_home_hero_primary_url', '#work' );
-$es_hero_secondary_url = apply_filters( 'es_home_hero_secondary_url', '#process' );
+// El CTA primario es "Ver caso destacado": tiene que llevar a #featured,
+// no a #work. Apuntaba a la sección SIGUIENTE, así que se salteaba justo
+// el caso destacado que el botón promete.
+$es_hero_primary_url   = apply_filters( 'es_home_hero_primary_url', '#featured' );
+$es_hero_secondary_url = apply_filters( 'es_home_hero_secondary_url', es_nav_page_or_anchor( 'templates/page-how-i-work.php', '#process' ) );
 
 $es_hero_cta_primary_label   = apply_filters( 'es_home_hero_cta_primary_label', es__( 'hero_cta_primary' ) );
 $es_hero_cta_secondary_label = apply_filters( 'es_home_hero_cta_secondary_label', es__( 'hero_cta_secondary' ) );
