@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.56' );
+define( 'ES_CHILD_VERSION', '0.2.57' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -25,6 +25,7 @@ require ES_CHILD_DIR . '/inc/block-styles.php';
 require ES_CHILD_DIR . '/inc/how-i-work-illustrations.php';
 require ES_CHILD_DIR . '/inc/header-footer.php';
 require ES_CHILD_DIR . '/inc/theme-dark-mode.php';
+require ES_CHILD_DIR . '/inc/page-hero-meta.php';
 
 /**
  * Textdomain del child theme.
@@ -303,6 +304,25 @@ function es_breadcrumb_trail( $nav_label_key = '', $current_label = '' ) {
 
 	if ( $current_label ) {
 		$trail[] = array( 'label' => $current_label );
+	}
+
+	/*
+	 * Override opcional del último crumb desde la caja "Page header" de la
+	 * propia página (_es_page_breadcrumb_label). Útil cuando el título es
+	 * largo y el crumb queda mejor corto. Sólo aplica en una página real y
+	 * sólo si el campo tiene contenido: si está vacío, el crumb sigue
+	 * saliendo del nav/título de siempre.
+	 */
+	if ( is_page() ) {
+		// Se lee el meta CRUDO a propósito, no es_page_breadcrumb_label():
+		// esa función cae al título de la página cuando el campo está vacío,
+		// y acá un campo vacío tiene que dejar el crumb como estaba.
+		$es_bc_id       = get_queried_object_id();
+		$es_bc_override = $es_bc_id ? trim( (string) get_post_meta( $es_bc_id, '_es_page_breadcrumb_label', true ) ) : '';
+		$es_bc_last     = count( $trail ) - 1;
+		if ( '' !== $es_bc_override && $es_bc_last >= 0 ) {
+			$trail[ $es_bc_last ]['label'] = $es_bc_override;
+		}
 	}
 
 	return $trail;

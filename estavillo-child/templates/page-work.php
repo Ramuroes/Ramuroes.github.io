@@ -45,10 +45,12 @@ if ( function_exists( 'wp_body_open' ) ) {
 		get_template_part(
 			'template-parts/page-head',
 			null,
-			array(
-				'eyebrow' => es__( 'work_label' ),
-				'title'   => es__( 'work_title' ),
-				'lead'    => es__( 'work_lead' ),
+			es_page_hero_args(
+				array(
+					'eyebrow' => es__( 'work_label' ),
+					'title'   => es__( 'work_title' ),
+					'lead'    => es__( 'work_lead' ),
+				)
 			)
 		);
 

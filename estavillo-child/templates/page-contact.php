@@ -54,10 +54,12 @@ if ( function_exists( 'wp_body_open' ) ) {
 		get_template_part(
 			'template-parts/page-head',
 			null,
-			array(
-				'eyebrow' => apply_filters( 'es_connect_eyebrow', es__( 'connect_eyebrow' ) ),
-				'title'   => apply_filters( 'es_connect_title', es__( 'connect_title' ) ),
-				'lead'    => apply_filters( 'es_connect_intro', es__( 'connect_lead' ) ),
+			es_page_hero_args(
+				array(
+					'eyebrow' => apply_filters( 'es_connect_eyebrow', es__( 'connect_eyebrow' ) ),
+					'title'   => apply_filters( 'es_connect_title', es__( 'connect_title' ) ),
+					'lead'    => apply_filters( 'es_connect_intro', es__( 'connect_lead' ) ),
+				)
 			)
 		);
 

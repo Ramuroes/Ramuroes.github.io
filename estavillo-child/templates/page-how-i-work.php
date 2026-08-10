@@ -47,10 +47,15 @@ if ( function_exists( 'wp_body_open' ) ) {
 		get_template_part(
 			'template-parts/page-head',
 			null,
-			array(
-				'eyebrow' => es__( 'process_label' ),
-				'title'   => es__( 'how_title' ),
-				'lead'    => es__( 'how_lead' ),
+			// Los campos de la caja "Page header" ganan; estos son el
+			// respaldo aprobado de siempre, así que una instalación sin
+			// nada cargado se ve exactamente igual que antes.
+			es_page_hero_args(
+				array(
+					'eyebrow' => es__( 'process_label' ),
+					'title'   => es__( 'how_title' ),
+					'lead'    => es__( 'how_lead' ),
+				)
 			)
 		);
 
