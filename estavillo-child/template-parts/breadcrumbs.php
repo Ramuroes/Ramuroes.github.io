@@ -2,10 +2,10 @@
 /**
  * Breadcrumbs — tira simple y accesible (Home / Work / título del caso).
  *
- * Usado por single-es_case_study.php. Genérico por diseño (recibe un
- * 'trail' de {label, url} vía $args) para poder reusarse en otras páginas
- * fijas más adelante sin cambiar este archivo — pero por ahora solo se
- * engancha en el Case Study, que es lo único que pidió este ticket.
+ * Genérico por diseño (recibe un 'trail' de {label, url} vía $args): hoy lo
+ * usan single-es_case_study.php y las 4 páginas fijas (Work/About/How I
+ * Work/Contact), todas armando su trail con es_breadcrumb_trail() —
+ * ninguna reimplementa el markup.
  *
  * El link "Work" reusa es_nav_links() (el mismo array que ya alimenta el
  * header, el menú mobile y el footer) en vez de un campo nuevo: si el

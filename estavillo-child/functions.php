@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.61' );
+define( 'ES_CHILD_VERSION', '0.2.62' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -66,6 +66,12 @@ function es_child_ui_strings() {
 		'work_label'          => 'Selected work',
 		'work_view_all'       => 'All work',
 		'work_view_case'      => 'View case study',
+		// "01 — Featured Work" en la página Work (ticket "Refine Work
+		// archive hierarchy"). Clave propia, no reusa 'featured_label'
+		// ("Featured case"/"Caso destacado"): son la misma data (mismo
+		// flag "Feature this case on Home") pero dos pantallas distintas
+		// con su propio copy — tocar una nunca debe tocar la otra.
+		'work_featured_label' => 'Featured work',
 		'about_label'         => 'About',
 		'about_intro_label'   => 'My approach',
 		'about_cta'           => 'More about me',
@@ -125,9 +131,20 @@ function es_child_ui_strings() {
 		'about_title'         => 'About me.',
 		'how_title'           => 'How I work.',
 		'how_lead'            => "I don't start with interfaces. I start by understanding the system.",
+		// Eyebrow del page-head de Work. Clave propia (no reusa 'work_label',
+		// que ahora es SOLO el header de la sección "02 — Selected Work" más
+		// abajo en la página) — antes una misma cadena hacía de doble función
+		// (eyebrow arriba Y header de sección más abajo), acoplando dos roles
+		// de UI que necesitaban poder cambiar por separado.
+		'work_eyebrow'        => 'Work',
 		'work_title'          => 'Work.',
-		'work_lead'           => 'A selection of product and systems design work, from live decision tools to earlier academic and legacy projects.',
-		'work_archive_label'  => 'Archive / older work',
+		'work_lead'           => 'A selection of Product Design and systems work, alongside selected earlier work across digital, industrial and visual design.',
+		// "03 — More Work / Archive": encabezado + bajada opcional que
+		// envuelven TANTO los Case Studies marcados archivo (CPT) COMO el
+		// contenido viejo pegado en la página (SAMIC, French Bakery, webs
+		// anteriores, industrial/3D/visual/motion) — ver work-cases.php.
+		'work_archive_label'  => 'More work',
+		'work_archive_lead'   => 'Selected earlier work across digital, industrial, 3D and visual design.',
 		'connect_eyebrow'     => 'Get in touch',
 		'connect_title'       => 'Start a conversation.',
 		'connect_lead'        => "I'm open to Product Design, Design Systems and UX Research roles — anywhere the goal is making a real system work better, not just look better.",

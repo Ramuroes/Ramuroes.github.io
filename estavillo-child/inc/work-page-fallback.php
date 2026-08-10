@@ -24,14 +24,46 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Grupos placeholder de Work (mismos 3 casos de siempre como "selected",
- * sin archivo todavía) usados cuando no hay ningún Case Study publicado, o
- * cuando el plugin "Estavillo Portfolio Core" está inactivo.
+ * Placeholder de Featured Work (ticket "Refine Work archive hierarchy") —
+ * usado cuando no hay ningún Case Study marcado featured, o el plugin está
+ * inactivo. Adapta el MISMO placeholder de siempre de Home
+ * (es_home_featured_fallback_case(), inc/featured-case-fallback.php) al
+ * shape de card ancha (label/kicker/title/excerpt/tags/url/image) que usa
+ * esta página — no es copy nuevo, es el mismo texto aprobado, re-formado.
  *
- * @return array{selected:array<int,array>,archive:array<int,array>}
+ * El título de Home trae <em> para el énfasis tipográfico de esa sección
+ * (.es-featured__title); acá se imprime con esc_html() como cualquier otro
+ * card de esta página, así que hace falta texto plano — de ahí el
+ * wp_strip_all_tags().
+ *
+ * @return array
+ */
+function es_work_featured_fallback_case() {
+	$es_case = es_home_featured_fallback_case();
+	return array(
+		'label'             => $es_case['status'],
+		'kicker'            => $es_case['kicker'],
+		'title'             => wp_strip_all_tags( $es_case['title'] ),
+		'excerpt'           => $es_case['body'],
+		'tags'              => array(),
+		'category'          => '',
+		'url'               => $es_case['url'],
+		'image'             => $es_case['image'],
+		'placeholder_label' => '',
+	);
+}
+
+/**
+ * Grupos placeholder de Work (featured + los mismos 3 casos de siempre
+ * como "selected", sin archivo todavía) usados cuando no hay ningún Case
+ * Study publicado, o cuando el plugin "Estavillo Portfolio Core" está
+ * inactivo.
+ *
+ * @return array{featured:array,selected:array<int,array>,archive:array<int,array>}
  */
 function es_work_page_fallback_cases() {
 	return array(
+		'featured' => es_work_featured_fallback_case(),
 		'selected' => es_home_selected_work_fallback_cases(),
 		'archive'  => array(),
 	);
@@ -39,17 +71,18 @@ function es_work_page_fallback_cases() {
 
 /**
  * Fuente de datos para template-parts/work-cases.php: Case Studies reales
- * del plugin (separados selected/archive) si existen y el plugin está
+ * del plugin (featured/selected/archive) si existen y el plugin está
  * activo, si no los placeholders de siempre.
  *
- * @return array{selected:array<int,array>,archive:array<int,array>}
+ * @return array{featured:array,selected:array<int,array>,archive:array<int,array>}
  */
 function es_work_page_source() {
 	$data = apply_filters( 'es_portfolio_case_studies_for_work', array() );
-	if ( empty( $data['selected'] ) && empty( $data['archive'] ) ) {
+	if ( empty( $data['featured'] ) && empty( $data['selected'] ) && empty( $data['archive'] ) ) {
 		return es_work_page_fallback_cases();
 	}
 	return array(
+		'featured' => $data['featured'] ?? array(),
 		'selected' => $data['selected'] ?? array(),
 		'archive'  => $data['archive'] ?? array(),
 	);

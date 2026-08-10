@@ -1158,6 +1158,64 @@
 	border-bottom-color: var(--es-block-line);
 }
 
+/* Bajada opcional de "03 — More Work" (work_archive_lead). Se acerca al
+   encabezado (contrarresta parte del margin-bottom grande de
+   .es-section-head, pensado para separar SECCIONES, no un header de su
+   propia bajada) y deja aire antes de la grilla/el contenido de abajo. */
+.es-work-archive__lead {
+	margin-top: calc(-1 * clamp(20px, 2.4vw, 32px));
+	margin-bottom: clamp(28px, 3vw, 40px);
+	max-width: 56ch;
+}
+
+/* ---------- Work: contenido viejo del portfolio dentro de "03 — More Work"
+   (ticket "Refine Work archive hierarchy") -----------------------------
+   Ver templates/page-work.php + template-parts/work-cases.php: es el mismo
+   the_content() de siempre, capturado y reubicado — este bloque NO define
+   markup nuevo, sólo constriñe escala y tipografía para que un logo/imagen
+   vieja no compita al mismo nivel visual que Trazur o Presupuestador. Nada
+   de esto reescribe ni oculta contenido: sólo lo hace leer como lo que es,
+   trabajo anterior, no el frente de la página.
+
+   Tokens de tinta más apagados (--es-ink-2/--es-ink-3, ya usados y con
+   contraste verificado en el resto del sitio — ver el commit de
+   accesibilidad) en vez de opacity: bajar opacity además reduce el
+   contraste texto/fondo, que es exactamente lo que NO se quiere en
+   contenido que sigue queriendo ser legible, sólo secundario. */
+.es-work-archive__legacy {
+	font-size: 0.92em;
+}
+
+.es-work-archive__legacy--after-grid {
+	margin-top: clamp(40px, 4.5vw, 64px);
+	padding-top: clamp(32px, 3.5vw, 48px);
+	border-top: 1px solid var(--es-block-line);
+}
+
+.es-work-archive__legacy :where(h1, h2, h3, h4) {
+	font-size: clamp(17px, 1.8vw, 21px);
+	color: var(--es-ink-2);
+}
+
+.es-work-archive__legacy :where(p, li) {
+	color: var(--es-ink-3);
+}
+
+.es-work-archive__legacy img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 4px;
+}
+
+/* Galerías/columnas viejas con imágenes grandes sin recortar: un tope de
+   alto evita que UNA imagen legacy ocupe la pantalla completa al lado de
+   cards de 250-300px del resto del sitio. object-fit para no deformarla. */
+.es-work-archive__legacy :where(figure, .wp-block-image) img {
+	max-height: 340px;
+	width: 100%;
+	object-fit: cover;
+}
+
 /* =========================================================================
    About page — Gutenberg migration (architecture ticket)
    -------------------------------------------------------------------------

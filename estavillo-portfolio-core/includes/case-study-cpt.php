@@ -82,6 +82,37 @@ function es_case_status_tone_choices() {
 }
 
 /**
+ * Categorías del archivo (ticket "Refine Work archive hierarchy"). Primera
+ * versión SIMPLE a propósito: un select de meta, no una taxonomía nueva.
+ *
+ * Por qué no una taxonomía: son 5 valores fijos y cerrados, sin jerarquía,
+ * sin necesidad de pantalla de gestión de términos propia ni de asociarse a
+ * otros post types — un `get_post_meta()` de un solo valor cubre exactamente
+ * eso, con el mismo patrón ya usado acá mismo para
+ * es_case_status_tone_choices()/es_case_hero_layout_choices(). Registrar una
+ * taxonomía para 5 opciones fijas habría sido más máquina de la que el
+ * problema pide.
+ *
+ * Campo OPCIONAL: a diferencia de status_tone/hero_layout (que siempre
+ * tienen un default), acá "sin categoría" es un estado válido — no todos los
+ * casos necesitan una (Featured/Selected ya comunican categoría/tipo con el
+ * campo "Eyebrow / category" existente; esto es sobre todo para el archivo,
+ * donde SAMIC/French Bakery/etc. eventualmente se van a migrar de contenido
+ * pegado a Case Studies reales — ver docs/handoff/WORK-PAGE-STRUCTURE.md).
+ *
+ * @return array<string,string> valor => label legible.
+ */
+function es_case_category_choices() {
+	return array(
+		'product-design'       => __( 'Product Design', 'estavillo-portfolio-core' ),
+		'web-digital'          => __( 'Web & Digital', 'estavillo-portfolio-core' ),
+		'industrial-3d'        => __( 'Industrial & 3D', 'estavillo-portfolio-core' ),
+		'visual-motion'        => __( 'Visual & Motion', 'estavillo-portfolio-core' ),
+		'academic-experiments' => __( 'Academic / Experiments', 'estavillo-portfolio-core' ),
+	);
+}
+
+/**
  * Registra el CPT "Case Study" y su taxonomía de tags.
  */
 function es_register_case_study_cpt() {
@@ -185,6 +216,7 @@ function es_case_study_render_meta_box( $post ) {
 	$show_on_home_raw  = get_post_meta( $post->ID, '_es_case_show_on_home', true );
 	$show_on_home      = ( '' === $show_on_home_raw ) ? true : ( '1' === $show_on_home_raw );
 	$featured          = '1' === get_post_meta( $post->ID, '_es_case_featured', true );
+	$category          = get_post_meta( $post->ID, '_es_case_category', true );
 	?>
 	<p>
 		<label for="es_case_kicker"><strong><?php esc_html_e( 'Eyebrow / category', 'estavillo-portfolio-core' ); ?></strong></label><br>
@@ -251,6 +283,16 @@ function es_case_study_render_meta_box( $post ) {
 		<span class="description"><?php esc_html_e( 'Independent from Hero layout above — this only controls how wide the eyebrow/title/summary/tags block reads, not where the image sits. "Wide" is the recommended choice together with the "Stacked — full-width image" hero layout.', 'estavillo-portfolio-core' ); ?></span>
 	</p>
 	<p>
+		<label for="es_case_category"><strong><?php esc_html_e( 'Archive category (optional)', 'estavillo-portfolio-core' ); ?></strong></label><br>
+		<select id="es_case_category" name="es_case_category">
+			<option value="" <?php selected( $category, '' ); ?>><?php esc_html_e( '— No category —', 'estavillo-portfolio-core' ); ?></option>
+			<?php foreach ( es_case_category_choices() as $es_cat_key => $es_cat_label ) : ?>
+				<option value="<?php echo esc_attr( $es_cat_key ); ?>" <?php selected( $category, $es_cat_key ); ?>><?php echo esc_html( $es_cat_label ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<span class="description"><?php esc_html_e( 'Only shown on the Work page\'s "More Work" archive grid, as a small tag. Leave unset for Product Design cases — this is for sorting older/secondary work by discipline once it exists as real Case Studies.', 'estavillo-portfolio-core' ); ?></span>
+	</p>
+	<p>
 		<label>
 			<input type="checkbox" name="es_case_show_on_home" value="1" <?php checked( $show_on_home ); ?>>
 			<?php esc_html_e( 'Show this case in Home → Selected Work', 'estavillo-portfolio-core' ); ?>
@@ -264,6 +306,9 @@ function es_case_study_render_meta_box( $post ) {
 	</p>
 	<p class="description">
 		<?php esc_html_e( 'Title, Excerpt, Featured Image, Tags and Order use the standard WordPress fields above / in the sidebar. If this case is featured, its Excerpt becomes the Featured Case body paragraph and Label/status becomes its status pill — write the Excerpt to work for both sections if you also show this case in Selected Work. Role, Tools and Period are only used on this case\'s own single page — the body content below (or in the block editor) is that page\'s main content.', 'estavillo-portfolio-core' ); ?>
+	</p>
+	<p class="description">
+		<?php esc_html_e( 'Note on the Work page specifically (different from Home): a featured case appears ONCE, in its own "Featured Work" section, and is excluded from Selected Work and Archive there — no double listing. On Home, Featured Case and Selected Work stay independent as before.', 'estavillo-portfolio-core' ); ?>
 	</p>
 	<?php
 }
@@ -334,6 +379,19 @@ function es_save_case_study_meta( $post_id ) {
 			$es_status_tone_choice = 'neutral';
 		}
 		update_post_meta( $post_id, '_es_case_status_tone', $es_status_tone_choice );
+	}
+
+	// Whitelist-o-vacío, no whitelist-o-default: a diferencia de hero_layout/
+	// hero_text_width/status_tone (que siempre tienen un valor por defecto
+	// con sentido propio), "sin categoría" es un estado válido acá — un
+	// valor fuera de la whitelist cae a '' (sin categoría), nunca a una
+	// categoría inventada.
+	if ( isset( $_POST['es_case_category'] ) ) {
+		$es_category_choice = sanitize_key( wp_unslash( $_POST['es_case_category'] ) );
+		if ( ! array_key_exists( $es_category_choice, es_case_category_choices() ) ) {
+			$es_category_choice = '';
+		}
+		update_post_meta( $post_id, '_es_case_category', $es_category_choice );
 	}
 
 	update_post_meta( $post_id, '_es_case_show_on_home', isset( $_POST['es_case_show_on_home'] ) ? '1' : '0' );
@@ -460,16 +518,29 @@ function es_portfolio_filter_featured_case_for_home( $default_case ) {
 }
 
 /**
- * Todos los Case Studies publicados, separados en dos grupos para la página
- * Work: 'selected' (los mismos que aparecen en Home → Selected Work, mismo
- * flag _es_case_show_on_home que ya existía) y 'archive' (marcados
- * explícitamente "no mostrar en Home" — se interpretan como trabajo
- * más antiguo/secundario). No es un campo nuevo: reusa la misma casilla
- * "Show this case in Home → Selected Work" del meta box, así que un caso
- * no necesita configuración extra para aparecer correctamente clasificado
- * acá.
+ * Todos los Case Studies publicados, separados en TRES grupos para la
+ * página Work (ticket "Refine Work archive hierarchy"):
  *
- * @return array{selected:array<int,array>,archive:array<int,array>}
+ *  - 'featured': el caso marcado "Feature this case on Home" — MISMO flag
+ *    que usa Home, ningún sistema paralelo. A diferencia de Home (donde
+ *    Featured Case y Selected Work son independientes y un caso puede
+ *    aparecer en los dos a propósito), acá el featured se EXCLUYE de
+ *    selected/archive: en Work aparece una sola vez. Si por error hay más
+ *    de un caso marcado featured, gana el primero por 'Order' — MISMO
+ *    criterio de desempate que es_portfolio_get_featured_case_for_home(),
+ *    así que Home y Work nunca muestran un featured distinto — y el resto
+ *    de los casos marcados featured por error no se pierden: caen al split
+ *    normal selected/archive de abajo, ni duplicados ni descartados.
+ *  - 'selected': el resto, marcados "Show this case in Home → Selected
+ *    Work" (o el flag no existe todavía — mismo default que Home).
+ *  - 'archive': el resto, marcados explícitamente "no mostrar en Home".
+ *
+ * Una sola query: no hace falta una segunda pasada para encontrar el
+ * featured porque el orderby ya es el mismo que usa la query dedicada de
+ * Home, así que "el primero que cumple la condición, recorriendo en este
+ * orden" da exactamente el mismo resultado sin duplicar el WP_Query.
+ *
+ * @return array{featured:array,selected:array<int,array>,archive:array<int,array>}
  */
 function es_portfolio_get_case_studies_for_work_page() {
 	$query = new WP_Query(
@@ -484,27 +555,38 @@ function es_portfolio_get_case_studies_for_work_page() {
 
 	if ( empty( $query->posts ) ) {
 		return array(
+			'featured' => array(),
 			'selected' => array(),
 			'archive'  => array(),
 		);
 	}
 
+	$featured = array();
 	$selected = array();
 	$archive  = array();
 
 	foreach ( $query->posts as $es_post ) {
-		$es_url            = get_post_meta( $es_post->ID, '_es_case_url', true );
-		$es_show_on_home   = get_post_meta( $es_post->ID, '_es_case_show_on_home', true );
-		$es_case_data      = array(
+		$es_url          = get_post_meta( $es_post->ID, '_es_case_url', true );
+		$es_show_on_home = get_post_meta( $es_post->ID, '_es_case_show_on_home', true );
+		$es_is_featured  = '1' === get_post_meta( $es_post->ID, '_es_case_featured', true );
+		$es_category_key = get_post_meta( $es_post->ID, '_es_case_category', true );
+		$es_choices      = es_case_category_choices();
+		$es_case_data    = array(
 			'label'             => get_post_meta( $es_post->ID, '_es_case_label', true ),
 			'kicker'            => get_post_meta( $es_post->ID, '_es_case_kicker', true ),
 			'title'             => get_the_title( $es_post ),
 			'excerpt'           => get_the_excerpt( $es_post ),
 			'tags'              => wp_list_pluck( wp_get_post_terms( $es_post->ID, ES_CASE_TAG_TAX ), 'name' ),
+			'category'          => isset( $es_choices[ $es_category_key ] ) ? $es_choices[ $es_category_key ] : '',
 			'url'               => $es_url ? $es_url : get_permalink( $es_post ),
 			'image'             => get_the_post_thumbnail_url( $es_post, 'large' ),
 			'placeholder_label' => get_post_meta( $es_post->ID, '_es_case_placeholder_label', true ),
 		);
+
+		if ( $es_is_featured && empty( $featured ) ) {
+			$featured = $es_case_data;
+			continue;
+		}
 
 		// '0' explícito = "no mostrar en Home" = trabajo de archivo en Work.
 		// Vacío/'1' (o el flag no existe todavía) = selected, igual que Home.
@@ -516,6 +598,7 @@ function es_portfolio_get_case_studies_for_work_page() {
 	}
 
 	return array(
+		'featured' => $featured,
 		'selected' => $selected,
 		'archive'  => $archive,
 	);
@@ -523,15 +606,16 @@ function es_portfolio_get_case_studies_for_work_page() {
 
 /**
  * Callback del filtro 'es_portfolio_case_studies_for_work' que expone el
- * tema: si hay algún Case Study publicado devuelve los dos grupos reales,
- * si no deja pasar el default recibido (el fallback del tema) sin tocarlo.
+ * tema: si hay algún Case Study publicado en cualquiera de los tres grupos
+ * (featured/selected/archive) devuelve los datos reales, si no deja pasar
+ * el default recibido (el fallback del tema) sin tocarlo.
  *
  * @param array $default_data Lo que el tema pasó como default (su fallback).
  * @return array
  */
 function es_portfolio_filter_case_studies_for_work( $default_data ) {
 	$real_data = es_portfolio_get_case_studies_for_work_page();
-	if ( empty( $real_data['selected'] ) && empty( $real_data['archive'] ) ) {
+	if ( empty( $real_data['featured'] ) && empty( $real_data['selected'] ) && empty( $real_data['archive'] ) ) {
 		return $default_data;
 	}
 	return $real_data;

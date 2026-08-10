@@ -48,6 +48,7 @@ active with English + Spanish configured. Key = the array key in
 | `work_label` | Selected work | Proyectos seleccionados |
 | `work_view_all` | All work | Ver todos los proyectos |
 | `work_view_case` | View case study | Ver caso |
+| `work_featured_label` | Featured work | Trabajo destacado *(nuevo — ticket "Refine Work archive hierarchy"; header de la sección "01" en la página Work, NO reusa `featured_label` de Home)* |
 | `about_label` | About | Sobre mí |
 | `about_intro_label` | My approach | Mi enfoque |
 | `about_cta` | More about me | Más sobre mí |
@@ -80,9 +81,11 @@ active with English + Spanish configured. Key = the array key in
 | `about_title` | About me. | Sobre mí. |
 | `how_title` | How I work. | Cómo trabajo. |
 | `how_lead` | I don't start with interfaces. I start by understanding the system. | No empiezo por las interfaces. Empiezo por entender el sistema. |
+| `work_eyebrow` | Work | Proyectos *(nuevo — ticket "Refine Work archive hierarchy". Mismo valor EN que `nav_work` a propósito: Polylang traduce por texto, no por clave, así que comparte automáticamente la traducción ES de `nav_work` — no hace falta cargarla dos veces. Mismo patrón ya usado por `nav_about`/`about_label` y `nav_connect`/`cta_label`.)* |
 | `work_title` | Work. | Proyectos. |
-| `work_lead` | A selection of product and systems design work, from live decision tools to earlier academic and legacy projects. | Una selección de proyectos de Product Design y sistemas, más trabajo anterior en diseño digital, industrial y visual. *(actualizado — ticket "Work/Proyectos naming unification"; reemplaza la redacción anterior de esta fila)* |
-| `work_archive_label` | Archive / older work | Archivo / trabajo anterior |
+| `work_lead` | A selection of Product Design and systems work, alongside selected earlier work across digital, industrial and visual design. | Una selección de proyectos de Product Design y sistemas, junto con trabajos anteriores en diseño digital, industrial y visual. *(actualizado — ticket "Refine Work archive hierarchy"; reemplaza la redacción anterior de esta fila)* |
+| `work_archive_label` | More work | Más trabajos *(actualizado — antes "Archive / older work"/"Archivo / trabajo anterior"; ahora también es el header de la sección "03" combinada, no sólo del archivo CPT)* |
+| `work_archive_lead` | Selected earlier work across digital, industrial, 3D and visual design. | Una selección de trabajos anteriores en diseño digital, industrial, 3D y visual. *(nuevo — ticket "Refine Work archive hierarchy"; bajada opcional de la sección "03")* |
 | `connect_eyebrow` | Get in touch | Hablemos |
 | `connect_title` | Start a conversation. | Empecemos una conversación. |
 | `connect_lead` | I'm open to Product Design, Design Systems and UX Research roles — anywhere the goal is making a real system work better, not just look better. | Estoy abierto a roles de Product Design, Design Systems y UX Research — donde el objetivo sea lograr que un sistema real funcione mejor, no solo que se vea mejor. |
