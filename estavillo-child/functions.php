@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.58' );
+define( 'ES_CHILD_VERSION', '0.2.59' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -97,6 +97,8 @@ function es_child_ui_strings() {
 		'archive_eyebrow'     => 'Archive',
 		'archive_empty'       => 'Nothing published here yet.',
 		'pagination_aria'     => 'Results navigation',
+		// Skip link del header (WCAG 2.4.1). Ver template-parts/site-header.php.
+		'skip_to_content'     => 'Skip to content',
 		'nav_aria_main'       => 'Main',
 		'nav_aria_footer'     => 'Footer',
 		'nav_aria_mobile'     => 'Mobile',

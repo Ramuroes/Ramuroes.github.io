@@ -10,7 +10,8 @@
 	"textdomain": "estavillo-portfolio-core",
 	"attributes": {
 		"summary": { "type": "string", "default": "" },
-		"width": { "type": "string", "default": "reading", "enum": [ "reading", "content" ] }
+		"width": { "type": "string", "default": "reading", "enum": [ "reading", "content" ] },
+		"ariaLabel": { "type": "string", "default": "" }
 	},
 	"supports": {
 		"html": false,

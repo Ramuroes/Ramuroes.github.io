@@ -15,6 +15,69 @@
    este repo.
    ========================================================================= */
 
+/* ---------- saltar al contenido (WCAG 2.4.1) ----------
+   Fuera de pantalla en reposo, visible SÓLO con foco de teclado. No se usa
+   .es-visually-hidden porque ese patrón (clip + 1px) no se puede "des-ocultar"
+   con foco sin pelearse con sus propias reglas: acá alcanza con sacarlo del
+   viewport y traerlo de vuelta.
+
+   z-index por encima del header sticky (80) y del overlay del menú (70), si
+   no el link aparece pero tapado por el propio header al que le está
+   ganando de mano. */
+.es-skip-link {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 200;
+	transform: translateY(-100%);
+	/* Misma altura que .es-nav (66px) + su hairline: así el link TAPA el
+	   header completo en vez de dejar asomar media línea de la marca y del
+	   botón Menu por debajo, que se lee como un glitch y no como una barra. */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 67px;
+	padding: 8px 24px;
+	background: var(--es-paper);
+	border-bottom: 1px solid var(--es-accent);
+	font-family: var(--es-sans);
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--es-ink) !important;
+	text-align: center;
+	text-decoration: none;
+	transition: transform 0.18s var(--es-ease);
+}
+
+/* Con la admin bar de WP el header baja (regla de abajo); el skip link
+   acompaña, si no quedaría debajo de la barra gris de WordPress. */
+.admin-bar .es-skip-link {
+	top: 32px;
+}
+
+@media (max-width: 782px) {
+	.admin-bar .es-skip-link {
+		top: 46px;
+	}
+}
+
+/* Barra completa y no una píldora: el header es semitransparente con blur,
+   así que una píldora centrada dejaba asomar el link de nav que tapaba a
+   medias por debajo de su borde. Ocupando todo el ancho no hay nada detrás
+   con lo que competir, y además es el patrón que un usuario de teclado ya
+   conoce de otros sitios. */
+.es-skip-link:focus,
+.es-skip-link:focus-visible {
+	transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-skip-link {
+		transition: none;
+	}
+}
+
 /* ---------- header sticky ---------- */
 
 .es-site-header {

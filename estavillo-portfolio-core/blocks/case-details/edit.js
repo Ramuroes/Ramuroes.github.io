@@ -15,6 +15,7 @@
 	var InspectorControls = wp.blockEditor.InspectorControls;
 	var PanelBody = wp.components.PanelBody;
 	var SelectControl = wp.components.SelectControl;
+	var TextControl = wp.components.TextControl;
 
 	wp.blocks.registerBlockType('estavillo/case-details', {
 		edit: function (props) {
@@ -38,6 +39,17 @@
 						],
 						onChange: function (v) {
 							set({ width: v });
+						},
+					}),
+					el(TextControl, {
+						label: __('Accessible label', 'estavillo-portfolio-core'),
+						help: __(
+							'Sólo hace falta cuando varios acordeones de la misma página comparten el mismo texto visible (p. ej. seis "Más sobre este paso"): un lector de pantalla los lista como seis controles idénticos. Poné acá el nombre completo — "Más sobre: Entender el sistema" — y el texto visible queda como está. Vacío = el nombre sale del texto visible, como siempre.',
+							'estavillo-portfolio-core'
+						),
+						value: a.ariaLabel || '',
+						onChange: function (v) {
+							set({ ariaLabel: v });
 						},
 					})
 				)

@@ -36,7 +36,7 @@ estavillo-child/assets/css/tokens.css       ← :root is dark; [data-theme='ligh
 estavillo-child/assets/css/base.css         ← html/body surface (theme), .es-page (layout only)
 estavillo-child/assets/css/theme-dark.css   ← every selector prefixed body.es-theme-dark
 estavillo-child/inc/theme-dark-mode.php     ← mode resolution + body_class (+ inert preview plumbing)
-estavillo-child/inc/enqueue.php             ← theme-dark.css enqueued site-wide, unconditionally
+estavillo-child/inc/enqueue.php             ← theme-dark.css enqueued site-wide; es_uses_estavillo_chrome()
 ```
 
 Two layers do two different jobs, and it matters which is which:
@@ -51,10 +51,25 @@ Two layers do two different jobs, and it matters which is which:
 
 - **`.es-page`'s existing dark styling is untouched.** This phase adds
   coverage, it doesn't rebuild anything already working.
-- **`theme-dark.css` is 100% class-gated.** Every single rule starts with
-  `body.es-theme-dark` — with the class absent, the file has zero effect
-  (verified: identical computed styles whether the stylesheet is loaded or
-  not — see `dark-mode-validate.mjs`, "Estado A").
+- **`theme-dark.css` is 100% class-gated, and the gate is deliberately
+  narrow.** Every rule starts with `body.es-theme-dark`, and
+  `es_theme_dark_body_class()` emits that class **only on views this theme
+  does not render itself** (`! es_uses_estavillo_chrome()`).
+
+  This is not a detail. Those selectors were written for Kadence's markup
+  and carry Kadence-beating specificity (`body.es-theme-dark a` is 0-2-1),
+  so inside `.es-page` they win against design-system rules that are 0-1-0.
+  Emitting the class everywhere was measured against three views and
+  overrode 5 to 15 elements per view: the eyebrow lost its accent green and
+  came out flat ink, a muted excerpt jumped to full ink, `<strong>` ended up
+  *dimmer* than the paragraph containing it, and every keyboard-focused link
+  dropped to `opacity: .85`. None of that was a design decision. With the
+  narrow gate, the portfolio pages are governed by their own system and
+  `theme-dark.css` does exactly what its header says it does.
+
+  `body.es-theme--dark` (double dash) is the separate, always-emitted
+  *theme* class — it states which mode is active and is the stable hook for
+  a future light mode.
   It reuses the same tokens `.es-page` already uses (`--es-paper`,
   `--es-ink`, `--es-line`, `--es-accent`, etc.) and the same treatment
   patterns already approved inside `.es-page` (the border+radius image

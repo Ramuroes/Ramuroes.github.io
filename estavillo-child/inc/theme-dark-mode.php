@@ -93,17 +93,41 @@ function es_theme_dark_mode_active() {
  * @return string[]
  */
 function es_theme_dark_body_class( $classes ) {
-	if ( es_theme_dark_mode_active() ) {
-		$classes[] = 'es-theme-dark';
-		/*
-		 * Clase de TEMA, separada de la de implementación. 'es-theme-dark' es
-		 * el gate histórico de theme-dark.css (135 reglas ya aprobadas) y se
-		 * mantiene tal cual para no tocar ni una de ellas. 'es-theme--dark' es
-		 * el contrato nuevo y estable: cuando exista light mode, el theme
-		 * emite 'es-theme--light' y nada más cambia de nombre.
-		 */
-		$classes[] = 'es-theme--dark';
+	if ( ! es_theme_dark_mode_active() ) {
+		return $classes;
 	}
+
+	/*
+	 * Clase de TEMA. Va SIEMPRE: dice qué modo visual está activo, nada más.
+	 * Es el contrato estable — cuando exista un modo claro, el theme emite
+	 * 'es-theme--light' y ningún selector cambia de nombre.
+	 */
+	$classes[] = 'es-theme--dark';
+
+	/*
+	 * Clase de IMPLEMENTACIÓN, y sólo donde hace falta: es el gate de
+	 * assets/css/theme-dark.css, que existe para vestir el chrome NATIVO de
+	 * Kadence. Sus selectores nunca se escribieron para convivir con el
+	 * design system (son del tipo "body.es-theme-dark a", 0-2-1), así que
+	 * dentro de .es-page le ganan a reglas del sistema que son 0-1-0.
+	 *
+	 * Medido: emitiéndola en todas las vistas, dentro de .es-page el eyebrow
+	 * perdía su verde de acento y salía en tinta plana, el texto apagado de
+	 * un extracto subía a tinta llena, <strong> quedaba MÁS apagado que el
+	 * párrafo que lo contiene, y TODO link enfocado por teclado bajaba a
+	 * opacity .85 — 87 diferencias sobre tres vistas. Ninguna era una
+	 * decisión de diseño: era una hoja pensada para otro contexto pisando al
+	 * sistema.
+	 *
+	 * Con el gate limitado a las vistas que NO imprimen el chrome ESTAVILLO,
+	 * theme-dark.css vuelve a hacer exactamente lo que su propia cabecera
+	 * dice que hace, y las páginas del portfolio quedan gobernadas sólo por
+	 * su design system.
+	 */
+	if ( ! function_exists( 'es_uses_estavillo_chrome' ) || ! es_uses_estavillo_chrome() ) {
+		$classes[] = 'es-theme-dark';
+	}
+
 	return $classes;
 }
 add_filter( 'body_class', 'es_theme_dark_body_class' );

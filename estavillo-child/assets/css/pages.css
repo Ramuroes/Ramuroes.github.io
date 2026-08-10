@@ -1898,11 +1898,17 @@
 	color: var(--es-ink);
 }
 
-/* La página actual NO se estila acá a propósito: theme-dark.css ya define
-   "body.es-theme-dark .page-numbers.current" (fondo verde, texto papel) y
-   gana por especificidad. Es el mismo tratamiento aprobado para la
-   paginación nativa; duplicarlo con otro color sería inventar una segunda
-   versión del mismo componente. */
+/* Página actual: mismo tratamiento que ya tenía aprobado theme-dark.css para
+   la paginación nativa (fondo de acento, texto papel). Se declara acá porque
+   esa hoja sólo se activa en las vistas que NO imprimen el chrome ESTAVILLO
+   (ver inc/theme-dark-mode.php), y esta paginación vive justamente en las
+   que sí lo imprimen. No es un segundo diseño: es el mismo, en la hoja que
+   corresponde. */
+.es-pagination .page-numbers.current {
+	background: var(--es-accent);
+	border-color: var(--es-accent);
+	color: var(--es-paper);
+}
 
 .es-pagination .page-numbers.dots {
 	border-color: transparent;

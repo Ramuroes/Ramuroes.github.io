@@ -98,6 +98,28 @@ function es_is_generic_shell() {
 }
 
 /**
+ * ¿Esta request imprime el chrome ESTAVILLO (site-header + site-footer
+ * dentro de un wrapper .es-page)? Es decir: ¿la sirve un template de ESTE
+ * theme, y no uno de Kadence?
+ *
+ * Después de la iteración de cierre eso es casi todo el sitio: los siete
+ * templates con nombre propio más las seis vistas genéricas. Lo que queda
+ * afuera son las pantallas que sirve otro código y este theme no ve venir
+ * (una página de confirmación de un plugin, un embed, un template que
+ * Kadence resuelva por su cuenta) — exactamente el terreno de
+ * assets/css/theme-dark.css.
+ *
+ * @return bool
+ */
+function es_uses_estavillo_chrome() {
+	return es_is_home_template()
+		|| es_is_case_study_single()
+		|| es_is_estavillo_static_page()
+		|| is_404()
+		|| es_is_generic_shell();
+}
+
+/**
  * ¿Hay al menos un estavillo/case-figure con el zoom activado en el post
  * actual? A diferencia de Case Flow, acá `has_block()` no alcanza: dice si
  * el BLOQUE existe, no si ESTA instancia tiene `enableZoom` — y el visor
@@ -233,7 +255,7 @@ function es_child_enqueue_assets() {
 	// template-parts/generic-document.php) también imprimen el chrome
 	// ESTAVILLO, así que entran en la misma condición: sin esto mostrarían el
 	// header/footer sin estilos y con el menú sin comportamiento.
-	$es_needs_chrome = es_is_home_template() || es_is_case_study_single() || es_is_estavillo_static_page() || is_404() || es_is_generic_shell();
+	$es_needs_chrome = es_uses_estavillo_chrome();
 
 	if ( $es_needs_chrome ) {
 		wp_enqueue_style( 'es-site', ES_CHILD_URI . '/assets/css/site.css', array( 'es-components' ), es_asset_ver( 'assets/css/site.css' ) );
