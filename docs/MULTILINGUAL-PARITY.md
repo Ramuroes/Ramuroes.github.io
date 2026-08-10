@@ -21,7 +21,7 @@ any bilingual content or Polylang settings.
 | About | `/about/` | `/sobre-mi/` | `templates/page-about.php` | `docs/content/about-gutenberg-en.html` | `docs/content/about-gutenberg-es.html` | ES file created this phase |
 | How I Work | `/how-i-work/` | `/como-trabajo/` | `templates/page-how-i-work.php` | `docs/content/how-i-work-gutenberg-en.html` | `docs/content/how-i-work-gutenberg-es.html` | ES file created this phase |
 | Connect | `/contact/` | `/contacto/` | `templates/page-contact.php` | `docs/content/connect-gutenberg-en.html` | `docs/content/connect-gutenberg-es.html` | ES file created this phase |
-| Work | `/work/` | `/proyectos/` | `templates/page-work.php` | *(PHP fallback only — no Gutenberg content file exists yet for either language)* | — | Not started (pre-existing gap, not introduced by this phase) |
+| Work | `/my-work/` (canonical, pre-existing) | `/es/trabajos/` (canonical, pre-existing) | `templates/page-work.php` | *(PHP fallback only — no Gutenberg content file exists yet for either language)* | — | Naming/navigation unified (see "Work/Proyectos naming unification" ticket); page body still not migrated to Gutenberg |
 | Case Study — Trazur | `/work/trazur/` (recommended slug) | `/proyectos/trazur/` | `single-es_case_study.php` | `docs/content/trazur-gutenberg-en.html` | `docs/content/trazur-gutenberg-es.html` | **Already complete** (earlier phase) |
 | Case Study — Presupuestador / Workshop Quoting System | `/work/workshop-quoting-system/` (recommended slug) | `/proyectos/presupuestador/` | `single-es_case_study.php` | `docs/content/workshop-quoting-system-gutenberg-en.html` (current, supersedes the older `presupuestador-case-study-en.html`) | **missing — see §5** | Not published in either language yet (marked "content written, not yet published" in its own source file) |
 
@@ -81,7 +81,7 @@ active with English + Spanish configured. Key = the array key in
 | `how_title` | How I work. | Cómo trabajo. |
 | `how_lead` | I don't start with interfaces. I start by understanding the system. | No empiezo por las interfaces. Empiezo por entender el sistema. |
 | `work_title` | Work. | Proyectos. |
-| `work_lead` | A selection of product and systems design work, from live decision tools to earlier academic and legacy projects. | Una selección de trabajo de diseño de producto y sistemas, desde herramientas de decisión en producción hasta proyectos académicos y heredados anteriores. |
+| `work_lead` | A selection of product and systems design work, from live decision tools to earlier academic and legacy projects. | Una selección de proyectos de Product Design y sistemas, más trabajo anterior en diseño digital, industrial y visual. *(actualizado — ticket "Work/Proyectos naming unification"; reemplaza la redacción anterior de esta fila)* |
 | `work_archive_label` | Archive / older work | Archivo / trabajo anterior |
 | `connect_eyebrow` | Get in touch | Hablemos |
 | `connect_title` | Start a conversation. | Empecemos una conversación. |

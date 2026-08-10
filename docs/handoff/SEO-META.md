@@ -53,19 +53,19 @@ abajo.
 
 ## Work / Proyectos
 
-**EN** (`/work/`)
+**EN** (`/my-work/`)
 
 | Campo | Valor |
 |---|---|
 | SEO title | `Work · Ramiro Estavillo` |
 | Meta description | `A selection of product and systems design work, from live decision tools to earlier academic and legacy projects.` |
 
-**ES** (`/es/proyectos/`)
+**ES** (`/es/trabajos/`)
 
 | Campo | Valor |
 |---|---|
 | SEO title | `Proyectos · Ramiro Estavillo` |
-| Meta description | `Una selección de trabajo de diseño de producto y sistemas, desde herramientas de decisión en producción hasta proyectos académicos anteriores.` |
+| Meta description | `Una selección de proyectos de Product Design y sistemas, más trabajo anterior en diseño digital, industrial y visual.` |
 
 ## How I Work / Cómo trabajo
 

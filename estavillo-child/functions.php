@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.60' );
+define( 'ES_CHILD_VERSION', '0.2.61' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -238,12 +238,14 @@ function es_home_sections() {
  * hardcodeada. Si la página todavía no existe en ese idioma, el ítem cae al
  * anchor de la Home de siempre y nada se rompe.
  *
- * Work es la excepción DELIBERADA: todavía no hay una página índice de
- * proyectos, así que sigue siendo la sección de la Home ('#work', que
- * es_nav_resolve_url() convierte en "Home del idioma + #work" fuera de la
- * Home). Cuando exista el índice, esta entrada pasa a
- * es_nav_page_or_anchor( 'templates/page-work.php', '#work' ) y no hay que
- * tocar nada más.
+ * Work YA NO es la excepción (iteración "unificar Work/Proyectos"): las
+ * páginas índice canónicas existen — /my-work/ en inglés, /es/trabajos/ en
+ * español — así que el ítem se resuelve exactamente igual que los otros
+ * tres, por TEMPLATE, nunca por slug hardcodeado: es_page_url_by_template()
+ * busca la página publicada con "Estavillo — Work" asignado en el idioma de
+ * la request y devuelve su permalink real, sea cual sea su slug. El '#work'
+ * queda solo como fallback si algún día esa página no existiera en un
+ * idioma — mismo criterio que how/about/connect.
  *
  * @return array<int,array{label:string,url:string}>
  */
@@ -253,7 +255,7 @@ function es_nav_links() {
 		array(
 			array(
 				'label' => es__( 'nav_work' ),
-				'url'   => '#work',
+				'url'   => es_nav_page_or_anchor( 'templates/page-work.php', '#work' ),
 			),
 			array(
 				'label' => es__( 'nav_how' ),
