@@ -1806,3 +1806,132 @@
 	color: var(--es-ink);
 }
 
+
+/* ---------- vistas genéricas (search / archive / index / page sin template)
+   Ver template-parts/generic-document.php. Sin lenguaje visual nuevo: el
+   listado es una fila con hairline, las mismas voces tipográficas de siempre
+   (.es-h2, .es-body) y el mismo verde de acento en hover. No hay tarjeta:
+   estas vistas son utilitarias, no una galería. ---------- */
+
+/* El page-head ya deja aire abajo (clamp 40–64px) y cierra con hairline, así
+   que el padding-top completo de .es-section (hasta 112px) abría un hueco
+   vacío de más de una pantalla de alto entre el H1 y el primer resultado.
+   Estas vistas son utilitarias: el ritmo editorial de las páginas fijas acá
+   sobra. */
+.es-generic-body {
+	padding-top: clamp(36px, 4vw, 56px);
+}
+
+.es-postlist {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	border-top: 1px solid var(--es-line);
+}
+
+.es-postlist__item {
+	border-bottom: 1px solid var(--es-line);
+}
+
+.es-postlist__link {
+	display: block;
+	padding: 26px 0;
+	text-decoration: none;
+	color: inherit;
+	transition: padding-left var(--es-dur-fast) var(--es-ease);
+}
+
+.es-postlist__link:hover {
+	padding-left: 10px;
+}
+
+.es-postlist__link:hover .es-postlist__title {
+	color: var(--es-accent);
+}
+
+.es-postlist__title {
+	margin: 0 0 6px;
+	transition: color var(--es-dur-fast) ease;
+}
+
+.es-postlist__excerpt {
+	margin: 0;
+	max-width: 62ch;
+	color: var(--es-ink-3);
+}
+
+.es-generic-empty {
+	margin: 0;
+}
+
+/* Paginación de WP (the_posts_pagination). Se estilan las clases que emite
+   el core, sin markup propio. */
+.es-pagination {
+	margin-top: 40px;
+}
+
+.es-pagination .nav-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	align-items: center;
+}
+
+.es-pagination .page-numbers {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 40px;
+	height: 40px;
+	padding: 0 12px;
+	border: 1px solid var(--es-line);
+	border-radius: 40px;
+	font-family: var(--es-mono);
+	font-size: 13px;
+	color: var(--es-ink-2);
+	text-decoration: none;
+	transition: border-color var(--es-dur-fast) ease, color var(--es-dur-fast) ease;
+}
+
+.es-pagination a.page-numbers:hover {
+	border-color: var(--es-accent);
+	color: var(--es-ink);
+}
+
+/* La página actual NO se estila acá a propósito: theme-dark.css ya define
+   "body.es-theme-dark .page-numbers.current" (fondo verde, texto papel) y
+   gana por especificidad. Es el mismo tratamiento aprobado para la
+   paginación nativa; duplicarlo con otro color sería inventar una segunda
+   versión del mismo componente. */
+
+.es-pagination .page-numbers.dots {
+	border-color: transparent;
+}
+
+/* ---------- 404 ----------
+   Sin diseño nuevo: reusa .es-eyebrow / .es-h1 / .es-lead y el botón del
+   sistema (404.php). Lo único propio es el ritmo vertical, para que la
+   página no quede pegada al header en una vista tan corta. */
+
+.es-404 {
+	min-height: 52vh;
+	display: flex;
+	align-items: center;
+}
+
+.es-404__code {
+	margin-bottom: 18px;
+}
+
+.es-404__title {
+	margin-bottom: 18px;
+}
+
+.es-404__lead {
+	max-width: 46ch;
+	margin-bottom: 34px;
+}
+
+.es-404__actions {
+	margin: 0;
+}

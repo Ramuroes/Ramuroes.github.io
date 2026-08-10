@@ -548,13 +548,17 @@ function es_portfolio_home_content_save() {
 		$data['footer_location'] = sanitize_text_field( wp_unslash( $_POST['es_footer_location'] ) );
 	}
 
-	// ---- Appearance — Portfolio dark mode ----
-	// Same "hidden marker" gating as Header/Footer above: only trust the
-	// checkbox's absence as "explicitly turned off" when this section was
-	// actually on the submitted form.
-	if ( isset( $_POST['es_theme_appearance'] ) ) {
-		$data['theme_dark_mode'] = isset( $_POST['es_theme_dark_mode'] ) ? '1' : '0';
-	}
+	/*
+	 * ---- Appearance — Portfolio dark mode ----
+	 * Ya no se guarda nada acá. Dark dejó de ser una opción del sitio y pasó
+	 * a ser el único sistema visual del portfolio (ver
+	 * es_theme_dark_mode_enabled() en el theme), así que este bloque escribía
+	 * un valor que nadie lee.
+	 *
+	 * La clave 'theme_dark_mode' que haya quedado guardada de antes se deja
+	 * intacta a propósito: borrarla sería una migración destructiva sin
+	 * ninguna ganancia. Simplemente ya no se escribe ni se lee.
+	 */
 
 	update_option( 'es_portfolio_home_content', $data );
 	add_action( 'admin_notices', 'es_portfolio_home_content_saved_notice' );
@@ -1051,42 +1055,30 @@ function es_portfolio_home_content_page() {
 				</tr>
 			</table>
 
-			<h2><?php esc_html_e( 'Appearance — Portfolio dark mode', 'estavillo-portfolio-core' ); ?></h2>
-			<p class="description"><?php esc_html_e( 'The global switch for the portfolio-wide dark visual system. Disabled by default: the public site keeps its current behavior unchanged. When Enabled, every template — including generic pages, single posts, archives, search and 404 — renders dark, consistently, in both English and Spanish.', 'estavillo-portfolio-core' ); ?></p>
-			<input type="hidden" name="es_theme_appearance" value="1">
-			<table class="form-table" role="presentation">
-				<tr>
-					<th scope="row"><?php esc_html_e( 'Portfolio dark mode', 'estavillo-portfolio-core' ); ?></th>
-					<td>
-						<label><input type="checkbox" name="es_theme_dark_mode" value="1" <?php checked( '1' === ( $data['theme_dark_mode'] ?? '0' ) ); ?>> <?php esc_html_e( 'Enabled — apply dark mode site-wide for every visitor.', 'estavillo-portfolio-core' ); ?></label>
-						<p class="description"><?php esc_html_e( 'Leave unchecked (Disabled) until the content migration is finished and this is ready to go live for everyone. Use "Preview dark mode" below to review it safely first — previewing does not change this setting.', 'estavillo-portfolio-core' ); ?></p>
-					</td>
-				</tr>
-				<?php if ( function_exists( 'es_theme_dark_mode_enabled' ) && ! es_theme_dark_mode_enabled() ) : ?>
-					<tr>
-						<th scope="row"><?php esc_html_e( 'Preview (administrators only)', 'estavillo-portfolio-core' ); ?></th>
-						<td>
-							<?php if ( function_exists( 'es_theme_dark_preview_cookie_present' ) && es_theme_dark_preview_cookie_present() ) : ?>
-								<p>
-									<strong><?php esc_html_e( "You're currently previewing dark mode.", 'estavillo-portfolio-core' ); ?></strong>
-									<?php esc_html_e( 'Only your browser sees it — visitors still see the current site.', 'estavillo-portfolio-core' ); ?>
-								</p>
-								<?php if ( function_exists( 'es_theme_dark_preview_url' ) ) : ?>
-									<a class="button" href="<?php echo esc_url( es_theme_dark_preview_url( 'off', home_url( '/' ) ) ); ?>"><?php esc_html_e( 'Exit dark preview', 'estavillo-portfolio-core' ); ?></a>
-								<?php endif; ?>
-							<?php elseif ( function_exists( 'es_theme_dark_preview_url' ) ) : ?>
-								<a class="button button-secondary" href="<?php echo esc_url( es_theme_dark_preview_url( 'on', home_url( '/' ) ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Preview dark mode →', 'estavillo-portfolio-core' ); ?></a>
-								<p class="description"><?php esc_html_e( 'Opens the live site in a new tab, dark for you only (admin capability required). A matching "Exit dark preview" link is also always available in the admin toolbar on the front end.', 'estavillo-portfolio-core' ); ?></p>
-							<?php endif; ?>
-						</td>
-					</tr>
-				<?php else : ?>
-					<tr>
-						<th scope="row"><?php esc_html_e( 'Preview', 'estavillo-portfolio-core' ); ?></th>
-						<td><p class="description"><?php esc_html_e( 'Dark mode is already Enabled for every visitor — there is nothing left to preview.', 'estavillo-portfolio-core' ); ?></p></td>
-					</tr>
-				<?php endif; ?>
-			</table>
+			<h2><?php esc_html_e( 'Appearance', 'estavillo-portfolio-core' ); ?></h2>
+			<?php
+			/*
+			 * Esto era un checkbox ("Portfolio dark mode: Enabled / Disabled")
+			 * de la etapa en la que el sistema oscuro se estaba probando y
+			 * convivía con el look claro de Kadence. Ya no lo es.
+			 *
+			 * Por qué se retiró y no simplemente se dejó marcado: "Disabled"
+			 * nunca devolvió un sitio claro. Los tokens claros existen en
+			 * tokens.css bajo [data-theme='light'], pero nada emite ese
+			 * atributo y la capa que viste el chrome de Kadence (theme-dark.css)
+			 * no tiene contraparte clara. Ahora que el fondo oscuro se aplica
+			 * en html/body (assets/css/base.css), destildar la casilla dejaba
+			 * el sitio a medio camino: fondo oscuro con el chrome de Kadence
+			 * sin vestir. Un interruptor cuyo "off" es un bug no es una
+			 * opción, es una trampa.
+			 *
+			 * El punto de extensión sigue existiendo en código: el theme
+			 * resuelve el modo con apply_filters( 'es_theme_dark_mode', true ).
+			 * El día que exista un modo claro de verdad, ese filtro vuelve a
+			 * la pantalla como una elección entre dos sistemas completos.
+			 */
+			?>
+			<p class="description"><?php esc_html_e( 'The portfolio uses a single dark visual system across every template — home, case studies, the fixed pages, and the Kadence-native views (generic pages, posts, archives, search, 404) — in both English and Spanish. There is nothing to configure here: it is the theme, not a setting.', 'estavillo-portfolio-core' ); ?></p>
 
 			<?php submit_button( __( 'Save Portfolio Content', 'estavillo-portfolio-core' ), 'primary', 'es_portfolio_home_content_submit' ); ?>
 		</form>
@@ -1470,20 +1462,18 @@ function es_portfolio_filter_footer_visibility( $default ) {
 }
 add_filter( 'es_footer_visibility', 'es_portfolio_filter_footer_visibility' );
 
-/**
- * Portfolio dark mode — global switch bridge. Same "only override once the
- * section was saved at least once" guard as sticky_header above; until
- * then (and always, if never checked) the theme default wins, which is
- * Disabled (see es_theme_dark_mode_enabled() in the theme).
+/*
+ * Portfolio dark mode — el puente se retiró a propósito.
  *
- * @param bool $default Theme default (false — Disabled).
- * @return bool
+ * Este filtro leía la clave 'theme_dark_mode' de la opción y, con el guard
+ * array_key_exists(), cualquier guardado previo de la sección Appearance
+ * dejaba escrito un '0' que ganaba SIEMPRE contra el default del theme. Con
+ * el modo oscuro ya como sistema único (es_theme_dark_mode_enabled() devuelve
+ * true), ese '0' guardado en su momento habría apagado el theme entero en
+ * producción sin que nadie tocara nada.
+ *
+ * No se reemplaza por otro puente: no hay nada que elegir mientras exista un
+ * solo sistema visual. El theme sigue resolviendo el modo con
+ * apply_filters( 'es_theme_dark_mode', true ), así que el punto de extensión
+ * queda disponible para cuando exista un modo claro real.
  */
-function es_portfolio_filter_theme_dark_mode( $default ) {
-	$data = es_portfolio_get_home_content();
-	if ( ! array_key_exists( 'theme_dark_mode', $data ) ) {
-		return $default;
-	}
-	return '1' === $data['theme_dark_mode'];
-}
-add_filter( 'es_theme_dark_mode', 'es_portfolio_filter_theme_dark_mode' );

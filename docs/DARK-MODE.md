@@ -1,7 +1,14 @@
-# Portfolio dark mode — architecture, toggle, safe preview
+# Portfolio dark mode — architecture
 
-One child theme, one dark system, one global switch. No second theme, no
-duplicated stylesheets, no per-page colors.
+One child theme, one dark system, applied everywhere. No second theme, no
+duplicated stylesheets, no per-page colors, and — since the closing
+iteration — no switch either: dark is the portfolio, not a setting.
+
+> **Changed in the closing iteration.** This started as an opt-in global
+> toggle so the dark system could be reviewed before going live. It is now
+> the permanent baseline. Sections 3 and 4 below describe what replaced the
+> toggle and why; the mechanism they used still exists in code, inert, as
+> the plumbing for a future light mode.
 
 ## 1. Why this exists (audit findings)
 
@@ -25,12 +32,22 @@ symptom, not a bug in the existing dark system.
 ## 2. Architecture
 
 ```
+estavillo-child/assets/css/tokens.css       ← :root is dark; [data-theme='light'] exists but nothing emits it
+estavillo-child/assets/css/base.css         ← html/body surface (theme), .es-page (layout only)
 estavillo-child/assets/css/theme-dark.css   ← every selector prefixed body.es-theme-dark
-estavillo-child/inc/theme-dark-mode.php     ← global switch + admin-only preview + body_class
+estavillo-child/inc/theme-dark-mode.php     ← mode resolution + body_class (+ inert preview plumbing)
 estavillo-child/inc/enqueue.php             ← theme-dark.css enqueued site-wide, unconditionally
-estavillo-portfolio-core/includes/home-content-options.php
-                                             ← "Portfolio dark mode" admin field (Appearance section)
 ```
+
+Two layers do two different jobs, and it matters which is which:
+
+- **`html, body` in `base.css`** paints the surface (`--es-paper` /
+  `--es-ink`). This is what makes *any* view dark, including one this theme
+  has no template for. Before the closing iteration this lived on `.es-page`,
+  so a view without that wrapper fell back to Kadence's light.
+- **`theme-dark.css`** dresses the *Kadence-native chrome* — header, nav,
+  footer, entry content, forms, archives. It needs `body.es-theme-dark`, and
+  that class is now always emitted.
 
 - **`.es-page`'s existing dark styling is untouched.** This phase adds
   coverage, it doesn't rebuild anything already working.
@@ -48,54 +65,51 @@ estavillo-portfolio-core/includes/home-content-options.php
   request render dark," consumed by one `body_class` filter. It's purely
   additive — it never removes or reorders any existing class.
 
-## 3. The switch
+## 3. There is no switch (and why the old one was removed)
 
-**Location:** wp-admin → Case Studies → Portfolio Content →
-**"Appearance — Portfolio dark mode"** (last section on the page, right
-above Save). One checkbox: *"Enabled — apply dark mode site-wide for every
-visitor."*
+`es_theme_dark_mode_enabled()` returns `true`. It still routes through
+`apply_filters( 'es_theme_dark_mode', true )`, so the extension point
+survives — but nothing in the plugin bridges that filter anymore, and there
+is no field for it in wp-admin.
 
-- **Default: Disabled.** Stored in the same `es_portfolio_home_content`
-  option as everything else on that screen (key `theme_dark_mode`), bridged
-  through the `es_theme_dark_mode` filter with the same
-  "only override once this section was saved at least once" guard already
-  used for `sticky_header` — so an environment where this was never touched
-  behaves exactly as if it were explicitly Disabled.
-- **Disabled:** the public site is unchanged. `body.es-theme-dark` is never
-  added for a regular visitor; `theme-dark.css` stays inert.
-- **Enabled:** every template gets `body.es-theme-dark` for every visitor,
-  in both languages — global and language-independent by construction (the
-  filter reads no post content, no Polylang state).
+The **"Appearance — Portfolio dark mode"** checkbox on the Portfolio Content
+screen is gone, replaced by a one-line note saying dark is the theme. Three
+reasons, in order of how much they mattered:
 
-## 4. Admin-only preview (in and out)
+1. **Its "off" state was a bug, not an alternative.** Light tokens exist in
+   `tokens.css` under `[data-theme='light']`, but nothing emits that
+   attribute and `theme-dark.css` has no light counterpart for the
+   Kadence-native chrome. Now that `html, body` carries the dark surface
+   unconditionally, unchecking the box produced a half-migrated site: dark
+   background, undressed Kadence header and footer. A control whose off
+   position is broken is a trap, not a setting.
+2. **A stored `'0'` would have silently won.** The old bridge only deferred
+   to the theme default when the key was *absent* (`array_key_exists`), and
+   the save handler wrote `theme_dark_mode = '0'` on every submit of that
+   section. The screen's own help text told the admin to leave it unchecked
+   "until the content migration is finished" — so on a real install the
+   stored value is almost certainly `'0'`. Flipping only the theme default
+   would have shipped a no-op.
+3. **Nothing to decide.** One visual system means no choice to expose.
 
-Two ways in, both nonce-protected (`es_theme_preview_toggle` action) and
-capability-gated (`current_user_can( 'manage_options' )`, re-checked on
-every page load — not just when the preview was turned on):
+**Nothing was deleted from storage.** The `theme_dark_mode` key already
+saved in `es_portfolio_home_content` stays where it is, untouched and
+unread. If a real light mode ever arrives, the filter is the switch and this
+section becomes a two-way choice again.
 
-1. **Portfolio Content screen** → "Preview (administrators only)" row →
-   **"Preview dark mode →"** button, opens the live site in a new tab.
-2. **Admin toolbar**, on any front-end page → **"Preview dark mode"** node
-   (top right, next to the user menu) — reachable without going back to
-   wp-admin first.
+## 4. Admin-only preview — present, inert, kept on purpose
 
-Clicking either sets a short-lived (`24h`), `httponly`, `SameSite=Lax`
-cookie (`es_theme_preview=dark`) scoped to your browser only, then redirects
-to the clean URL (no query string ever gets bookmarked or cached). Every
-subsequent page load re-checks `manage_options` before honoring that
-cookie — an anonymous visitor can never trigger or inherit preview, even if
-they had the cookie value.
+The preview mechanism in `inc/theme-dark-mode.php` (nonce + `manage_options`
++ short-lived `httponly`/`SameSite=Lax` cookie + `DONOTCACHEPAGE`) still
+exists and is intentionally not removed, but **it cannot fire today**:
+`es_theme_dark_mode_active()` returns `true` at its first line, the admin-bar
+node returns early, and the Portfolio Content row that offered it is gone
+along with the rest of that section.
 
-**Exit preview** — two equally-visible ways, whichever is closer:
-- Admin toolbar → **"Exit dark preview"** (replaces the "Preview" node while
-  active).
-- Portfolio Content screen → **"Exit dark preview"** button (same section).
-
-**Cache safety:** while previewing (global switch still Disabled),
-`DONOTCACHEPAGE` + `nocache_headers()` fire so a page-cache plugin never
-stores the dark-preview HTML and serves it to an anonymous visitor later.
-This only fires on the preview branch — the real global "Enabled" state
-needs no special cache handling, every visitor is meant to see it.
+It is kept because it is exactly the mechanism a future light mode needs:
+review a whole visual system on the real public site, signed and
+capability-gated, without exposing it to visitors, and without a page cache
+leaking the preview HTML to anyone else.
 
 ## 5. Coverage
 
@@ -124,15 +138,27 @@ the harness (`imgFilter === 'none'`).
   or exact specificity. The validation harness in this phase simulates a
   representative generic-page skeleton with those class names — real
   visual QA once this is deployed to the live Kadence install is still
-  recommended before flipping the global switch on. If a specific Kadence
-  element resists these rules, raise that one selector's specificity in
-  `theme-dark.css` first; reach for `!important` only as a last resort.
-- **Portfolio Content is a single global option** (documented repeatedly
-  elsewhere in this repo, e.g. `docs/BACKLOG.md`) — the dark-mode switch is
-  necessarily the same for every visitor/language; there is no and will
-  never be a per-language dark-mode value, by design (the ticket asks for
-  exactly this).
-- Light mode as a public, user-facing feature is explicitly out of scope
-  for this phase (`[data-theme='light']` already exists in `tokens.css`
-  from earlier work, unrelated to and untouched by this phase's global
-  toggle).
+  recommended. This is now the *live* look, not a preview — so if a specific
+  Kadence element resists these rules it is visible to visitors. Raise that
+  one selector's specificity in `theme-dark.css` first; reach for
+  `!important` only as a last resort. **This is the main open risk of making
+  dark the default.** The views to check first are the ones this theme has
+  no template for: search results, category/tag archives, a single blog
+  post, and any Page saved without one of the six ESTAVILLO templates.
+- **The mode is global and language-independent by construction** — it reads
+  no post content and no Polylang state, so EN and ES can never diverge.
+  There is no and will never be a per-language value.
+- **Light mode is unfinished, not merely disabled.** `[data-theme='light']`
+  in `tokens.css` covers the token layer only; there is no light counterpart
+  for `theme-dark.css`'s Kadence-native rules, and nothing emits the
+  attribute. Treat those tokens as a starting point, not a working mode.
+- **Most Kadence-native views are no longer Kadence-native.** The closing
+  iteration added `404.php`, `search.php`, `archive.php`, `index.php`,
+  `page.php` and `single.php` to the child theme, all rendering through
+  `template-parts/generic-document.php` with the ESTAVILLO chrome. Those
+  views no longer depend on `theme-dark.css` at all — they are dark for the
+  same reason Home is. `theme-dark.css` remains the safety net for whatever
+  Kadence still serves (embedded widgets, plugin-owned templates such as a
+  Fluent Forms confirmation page, `wp-login`-adjacent screens), which is why
+  it is still enqueued site-wide and still worth QA'ing against the live
+  install.

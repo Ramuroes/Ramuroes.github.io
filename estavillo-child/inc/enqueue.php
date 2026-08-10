@@ -69,6 +69,35 @@ function es_is_estavillo_static_page() {
 }
 
 /**
+ * ¿Esta request la sirve el documento genérico
+ * (template-parts/generic-document.php)? Son las vistas que hasta la
+ * iteración de cierre caían al template del padre: búsqueda, archivos, el
+ * fallback index, y una Página guardada SIN ninguno de los templates del
+ * theme.
+ *
+ * La Home y las cuatro páginas fijas quedan fuera por sus propias
+ * condiciones: tienen template asignado, así que la jerarquía de WordPress
+ * las resuelve antes de llegar a page.php.
+ *
+ * @return bool
+ */
+function es_is_generic_shell() {
+	if ( is_search() || is_archive() || is_home() ) {
+		return true;
+	}
+	if ( is_page() && ! es_is_home_template() && ! es_is_estavillo_static_page() ) {
+		return true;
+	}
+	// single.php: entradas del blog y cualquier CPT sin template propio. El
+	// Case Study queda fuera porque tiene el suyo (single-es_case_study.php)
+	// y ya carga su capa de assets aparte.
+	if ( is_single() && ! es_is_case_study_single() ) {
+		return true;
+	}
+	return false;
+}
+
+/**
  * ¿Hay al menos un estavillo/case-figure con el zoom activado en el post
  * actual? A diferencia de Case Flow, acá `has_block()` no alcanza: dice si
  * el BLOQUE existe, no si ESTA instancia tiene `enableZoom` — y el visor
@@ -200,7 +229,11 @@ function es_child_enqueue_assets() {
 	// Home, el single de Case Study y las 4 páginas fijas nuevas (Work /
 	// About / How I Work / Contact) — todas usan template-parts/site-header
 	// y site-footer con el mismo markup/JS de menú.
-	$es_needs_chrome = es_is_home_template() || es_is_case_study_single() || es_is_estavillo_static_page();
+	// El 404 (404.php) y las vistas genéricas (search/archive/index/page, vía
+	// template-parts/generic-document.php) también imprimen el chrome
+	// ESTAVILLO, así que entran en la misma condición: sin esto mostrarían el
+	// header/footer sin estilos y con el menú sin comportamiento.
+	$es_needs_chrome = es_is_home_template() || es_is_case_study_single() || es_is_estavillo_static_page() || is_404() || es_is_generic_shell();
 
 	if ( $es_needs_chrome ) {
 		wp_enqueue_style( 'es-site', ES_CHILD_URI . '/assets/css/site.css', array( 'es-components' ), es_asset_ver( 'assets/css/site.css' ) );
@@ -232,14 +265,14 @@ function es_child_enqueue_assets() {
 	// Work/About/How I Work/Contact reusan esos mismos template-parts o su
 	// mismo lenguaje visual (cards, timeline, process grid, footer CTA) en
 	// vez de reinventar estilos nuevos — ver README, sección "Páginas fijas".
-	if ( es_is_home_template() || es_is_estavillo_static_page() ) {
+	if ( es_is_home_template() || es_is_estavillo_static_page() || is_404() || es_is_generic_shell() ) {
 		wp_enqueue_style( 'es-pages-home', ES_CHILD_URI . '/assets/css/pages-home.css', array( 'es-site' ), es_asset_ver( 'assets/css/pages-home.css' ) );
 	}
 
 	// Capa propia de las 4 páginas fijas nuevas (page-head, separación
 	// selected/archive de Work, timeline/educación/hobbies/CV de About,
 	// layout de Contact) — nunca se carga en Home ni en Case Study.
-	if ( es_is_estavillo_static_page() ) {
+	if ( es_is_estavillo_static_page() || is_404() || es_is_generic_shell() ) {
 		wp_enqueue_style( 'es-pages', ES_CHILD_URI . '/assets/css/pages.css', array( 'es-pages-home' ), es_asset_ver( 'assets/css/pages.css' ) );
 	}
 

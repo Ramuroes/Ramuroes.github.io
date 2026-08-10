@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.57' );
+define( 'ES_CHILD_VERSION', '0.2.58' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -81,6 +81,22 @@ function es_child_ui_strings() {
 		// never actually varied by language). Routed through Polylang
 		// string translation like every other shared label above.
 		'breadcrumb_home'     => 'Home',
+		// 404 (404.php) y las vistas genéricas que antes servía Kadence
+		// (search.php / archive.php / index.php / page.php, todas vía
+		// template-parts/generic-document.php). Registradas acá para que
+		// Polylang las traduzca como cualquier otra cadena de interfaz, en vez
+		// de depender de un .mo que este theme no tiene.
+		'error_404_title'     => 'Page not found.',
+		'error_404_lead'      => "That page doesn't exist, or it moved.",
+		'error_404_cta'       => 'Back home',
+		'search_eyebrow'      => 'Search',
+		// %s = el término buscado, ya escapado. Se deja el marcador para que
+		// la traducción pueda moverlo de lugar en la frase.
+		'search_title'        => 'Results for “%s”',
+		'search_empty'        => 'Nothing matched that search.',
+		'archive_eyebrow'     => 'Archive',
+		'archive_empty'       => 'Nothing published here yet.',
+		'pagination_aria'     => 'Results navigation',
 		'nav_aria_main'       => 'Main',
 		'nav_aria_footer'     => 'Footer',
 		'nav_aria_mobile'     => 'Mobile',

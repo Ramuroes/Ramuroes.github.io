@@ -1,20 +1,22 @@
 <?php
 /**
- * Portfolio dark mode — global toggle + admin-only safe preview.
+ * Portfolio dark mode — el modo del sitio y su clase de body.
  *
- * Three pieces, all in this one file:
- *  1. es_theme_dark_mode_enabled() — the GLOBAL switch (Portfolio Content →
- *     "Portfolio dark mode", bridged via the 'es_theme_dark_mode' filter,
- *     same theme-default/plugin-bridge pattern as es_sticky_header_enabled()
- *     in inc/header-footer.php). Default Disabled.
- *  2. Admin-only preview: a signed (nonce), capability-gated, cookie-based
- *     toggle so an administrator can see the dark system live on the real
- *     public site WITHOUT flipping it on for anyone else. Re-checks the
- *     capability on every read, not just when the cookie was set, so a
- *     stray/shared cookie can never activate it for a non-admin.
- *  3. es_theme_dark_body_class() — the single place that decides whether
- *     THIS request renders dark: adds body.es-theme-dark, the one class
- *     every rule in assets/css/theme-dark.css is gated behind.
+ * Tres piezas en este archivo:
+ *  1. es_theme_dark_mode_enabled() — resuelve el modo de ESTA request. Hoy
+ *     devuelve true siempre: el sistema oscuro dejó de ser una opción y pasó
+ *     a ser el único sistema visual del portfolio. Sigue pasando por
+ *     apply_filters( 'es_theme_dark_mode', … ) porque ese filtro es el punto
+ *     de extensión para un modo claro real, si algún día existe.
+ *  2. Preview admin-only: toggle con nonce, capability y cookie, para ver el
+ *     modo en el sitio público sin activarlo para nadie más. HOY ESTÁ
+ *     INERTE — es_theme_dark_mode_active() corta antes de llegar, la fila de
+ *     la pantalla de admin se auto-oculta y el nodo de la admin bar no se
+ *     registra. Se conserva a propósito: es exactamente el mecanismo que
+ *     hace falta para probar un futuro modo claro antes de publicarlo.
+ *  3. es_theme_dark_body_class() — el único lugar que decide qué clases de
+ *     tema lleva el body: 'es-theme-dark' (gate histórico de
+ *     assets/css/theme-dark.css) y 'es-theme--dark' (contrato nuevo).
  *
  * Language-independent by construction: reads no post/page content, no
  * Polylang state — one global decision, same in EN and ES.
@@ -30,13 +32,24 @@ define( 'ES_THEME_DARK_PREVIEW_COOKIE', 'es_theme_preview' );
 define( 'ES_THEME_DARK_PREVIEW_NONCE_ACTION', 'es_theme_preview_toggle' );
 
 /**
- * The GLOBAL "Portfolio dark mode" switch. Disabled until an administrator
- * explicitly turns it on in Portfolio Content — never on by default.
+ * El modo visual de ESTA request. Hoy, siempre oscuro.
  *
  * @return bool
  */
 function es_theme_dark_mode_enabled() {
-	return (bool) apply_filters( 'es_theme_dark_mode', false );
+	/*
+	 * Dark es el DEFAULT del child theme (iteración de cierre). Antes el
+	 * default era false y el look oscuro dependía de que la vista imprimiera
+	 * el wrapper .es-page, que sólo existe en los seis templates propios: el
+	 * 404, la búsqueda, los archivos y cualquier página sin template del
+	 * theme caían al claro de Kadence, con un header y un menú que ya no
+	 * existen en el resto del sitio.
+	 *
+	 * Sigue pasando por el filtro, así que la opción "Portfolio dark mode"
+	 * del plugin lo puede apagar; lo único que cambió es de qué lado arranca.
+	 * El día que exista light mode, este mismo filtro es el interruptor.
+	 */
+	return (bool) apply_filters( 'es_theme_dark_mode', true );
 }
 
 /**
@@ -82,6 +95,14 @@ function es_theme_dark_mode_active() {
 function es_theme_dark_body_class( $classes ) {
 	if ( es_theme_dark_mode_active() ) {
 		$classes[] = 'es-theme-dark';
+		/*
+		 * Clase de TEMA, separada de la de implementación. 'es-theme-dark' es
+		 * el gate histórico de theme-dark.css (135 reglas ya aprobadas) y se
+		 * mantiene tal cual para no tocar ni una de ellas. 'es-theme--dark' es
+		 * el contrato nuevo y estable: cuando exista light mode, el theme
+		 * emite 'es-theme--light' y nada más cambia de nombre.
+		 */
+		$classes[] = 'es-theme--dark';
 	}
 	return $classes;
 }

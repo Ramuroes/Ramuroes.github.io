@@ -5,6 +5,31 @@
    para no interferir con Kadence ni con el resto del sitio en vivo.
    ========================================================================= */
 
+/* Superficie base del tema. Va en html/body y NO sólo en .es-page: hasta la
+   iteración de cierre, el fondo oscuro salía únicamente del wrapper que
+   imprimen los seis templates propios, así que cualquier vista servida por
+   Kadence (404, búsqueda, archivos, una página sin template del theme) caía
+   al claro. .es-page pasa a ser SOLO layout; el tema lo define el body.
+
+   La clase de tema (body.es-theme--dark, ver inc/theme-dark-mode.php) no
+   hace falta acá porque hoy dark es el único modo y los tokens de :root ya
+   son oscuros. Cuando exista light, este bloque se duplica bajo
+   body.es-theme--light con los tokens claros y no hay que tocar nada más. */
+html,
+body {
+	background: var(--es-paper);
+	color: var(--es-ink);
+	/* Le dice al navegador que el documento ES oscuro, para que pinte en
+	   oscuro lo que no controla el CSS: barras de scroll, el desplegable de
+	   un <select>, los date pickers nativos, el fondo por defecto de un
+	   <input>. theme-dark.css tiene una regla equivalente pero apunta a
+	   html.es-theme-dark, y esa clase la agrega body_class() — o sea, va al
+	   <body>, nunca al <html>: ese selector no matchea nunca (verificado:
+	   color-scheme resolvía 'normal' en una vista nativa de Kadence). Acá no
+	   depende de ninguna clase. */
+	color-scheme: dark;
+}
+
 .es-page {
 	background: var(--es-paper);
 	color: var(--es-ink);
@@ -163,10 +188,67 @@
 .es-page a:focus-visible,
 .es-page button:focus-visible,
 .es-page [tabindex]:focus-visible,
-.es-page [role='button']:focus-visible {
+.es-page [role='button']:focus-visible,
+.es-page summary:focus-visible,
+.es-page input:focus-visible,
+.es-page textarea:focus-visible,
+.es-page select:focus-visible {
 	outline: 2px solid var(--es-accent) !important;
 	outline-offset: 3px !important;
 	border-radius: 2px !important;
+}
+
+/* Red de seguridad de foco FUERA de .es-page.
+   Kadence pone body.hide-focus-outline en todo el sitio, que suprime el
+   contorno de foco del navegador. Dentro de .es-page eso está resuelto arriba
+   (lo reemplaza el anillo verde), pero cualquier vista servida por Kadence
+   —búsqueda, archivos, una página sin template del theme— quedaba navegable
+   por teclado SIN ningún indicador visible, que es un bloqueante de
+   accesibilidad (WCAG 2.4.7).
+
+   Estas reglas no dependen de .es-page ni de la clase de Kadence: aplican al
+   documento entero y usan el mismo verde de acento, así que el foco se ve
+   igual en todo el sitio. Sólo :focus-visible, así que un click con mouse
+   sigue sin dibujar anillo.
+
+   !important, igual que las reglas de .es-page de arriba y por la misma
+   razón — pero acá está MEDIDO, no supuesto. La regla de Kadence es del tipo
+   "body.hide-focus-outline *:focus { outline: 0 }" (0,2,1) y le gana por
+   especificidad a "a:focus-visible" (0,1,1), tenga o no !important del otro
+   lado: un elemento con :focus-visible también matchea :focus. Sin este
+   !important el anillo se medía en 0px none — o sea, la red no existía. */
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible,
+[role='button']:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+	outline: 2px solid var(--es-accent) !important;
+	outline-offset: 3px !important;
+	border-radius: 2px;
+}
+
+/* Segundo escalón de la misma red, para el peor caso: si la regla de Kadence
+   además lleva !important, dos !important empatan y decide la especificidad —
+   "body.hide-focus-outline *:focus" (0,2,1) le sigue ganando a
+   "a:focus-visible" (0,1,1) y el anillo vuelve a medir 0px. Nombrar la clase
+   de Kadence sube a 0,2,2 y cierra el caso.
+   Es el único lugar del theme que menciona una clase de Kadence a propósito:
+   está acotado a foco, no cambia nada visual salvo hacer visible un estado
+   que sin esto no se ve, y si Kadence dejara de emitir esa clase el escalón
+   de arriba sigue funcionando solo. */
+body.hide-focus-outline a:focus-visible,
+body.hide-focus-outline button:focus-visible,
+body.hide-focus-outline [tabindex]:focus-visible,
+body.hide-focus-outline [role='button']:focus-visible,
+body.hide-focus-outline summary:focus-visible,
+body.hide-focus-outline input:focus-visible,
+body.hide-focus-outline textarea:focus-visible,
+body.hide-focus-outline select:focus-visible {
+	outline: 2px solid var(--es-accent) !important;
+	outline-offset: 3px !important;
 }
 
 /* red de seguridad anti-azul (baja especificidad vía :where → los componentes

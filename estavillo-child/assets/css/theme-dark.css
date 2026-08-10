@@ -2,10 +2,11 @@
    ESTAVILLO — Global dark mode (portfolio-wide toggle)
    -------------------------------------------------------------------------
    Every single selector in this file is prefixed with body.es-theme-dark.
-   With that class absent (the default — see inc/theme-dark-mode.php,
-   "Portfolio dark mode" = Disabled), this entire stylesheet is a no-op:
-   zero effect on the public site, exactly like tokens.css/base.css already
-   are outside .es-page (see inc/enqueue.php).
+   Esa clase HOY está siempre presente: el modo oscuro dejó de ser una opción
+   del sitio y es el único sistema visual del portfolio (ver
+   inc/theme-dark-mode.php). El gate se mantiene igual, sin tocar ninguna de
+   las reglas de abajo, para que un futuro modo claro sea simplemente "no
+   emitir la clase" en vez de una reescritura de este archivo.
 
    WHY THIS FILE EXISTS: .es-page (base.css) already renders dark — it has
    since Home v1 — but only inside the six "standalone" ESTAVILLO templates
