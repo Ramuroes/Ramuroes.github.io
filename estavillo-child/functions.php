@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.55' );
+define( 'ES_CHILD_VERSION', '0.2.56' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -446,7 +446,7 @@ function es_home_process_steps_defaults() {
 			'text'     => 'Before I open any design tool, I map how the system actually operates: the people, the information, the constraints and the product goals involved.',
 			'icon_key' => 'compass',
 			'why'      => 'A screen is the visible 1% of a system. Redesigning it without understanding the other 99% just makes the same problem look better.',
-			'example'  => 'On the Workshop Quoting System, that meant sitting on the shop floor to see how a quote actually got built, with paper, memory and a spreadsheet nobody trusted, long before assuming the fix was a better form.',
+			'example'  => 'On Presupuestador, the internal quoting system, that meant sitting on the shop floor to see how a quote actually got built, with paper, memory and a spreadsheet nobody trusted, long before assuming the fix was a better form.',
 			'tools'    => 'Contextual inquiry, stakeholder mapping, process observation',
 		),
 		array(
@@ -470,7 +470,7 @@ function es_home_process_steps_defaults() {
 			'text'     => 'I turn what I learn into structure: information architecture, user flows and alternatives I can compare before committing to one.',
 			'icon_key' => 'check',
 			'why'      => 'Every proposal quietly assumes something. Finding that assumption and testing the one that would be expensive to get wrong is cheaper than discovering it after launch.',
-			'example'  => 'On the Workshop Quoting System, that meant checking with the person who actually prices jobs that a proposed shortcut wasn\'t quietly removing a judgment call they relied on.',
+			'example'  => 'On Presupuestador, that meant checking with the person who actually prices jobs that a proposed shortcut wasn\'t quietly removing a judgment call they relied on.',
 			'tools'    => 'Assumption mapping, information architecture, user flows, comparative testing',
 		),
 		array(
@@ -486,7 +486,7 @@ function es_home_process_steps_defaults() {
 			'text'     => 'I treat a first version as a hypothesis, test it with users, and decide in advance what would prove it wrong.',
 			'icon_key' => 'rocket',
 			'why'      => 'Iteration without a target just produces motion. Knowing what "wrong" looks like before you ship is what makes the next version actually better, not just different.',
-			'example'  => 'Across projects, from an operational tool built for Guzmán Villalba to institutional work at Ceibal, the versions that held up were the ones designed to be revisited on purpose, not the ones treated as finished at delivery.',
+			'example'  => 'Across projects, from Presupuestador to institutional work at Ceibal, the versions that held up were the ones designed to be revisited on purpose, not the ones treated as finished at delivery.',
 			'tools'    => 'Usage review, structured feedback loops, versioned documentation',
 		),
 	);
