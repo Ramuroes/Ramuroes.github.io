@@ -48,7 +48,7 @@ active with English + Spanish configured. Key = the array key in
 | `work_label` | Selected work | Proyectos seleccionados |
 | `work_view_all` | All work | Ver todos los proyectos |
 | `work_view_case` | View case study | Ver caso |
-| `work_featured_label` | Featured work | Trabajo destacado *(nuevo — ticket "Refine Work archive hierarchy"; header de la sección "01" en la página Work, NO reusa `featured_label` de Home)* |
+| `work_featured_label` | Featured work | Proyecto destacado *(actualizado — ticket "Cierre general / bugfix"; era "Trabajo destacado", el usuario dio esta redacción como definitiva. Header de la sección "01" en la página Work, NO reusa `featured_label` de Home)* |
 | `about_label` | About | Sobre mí |
 | `about_intro_label` | My approach | Mi enfoque |
 | `about_cta` | More about me | Más sobre mí |

@@ -179,9 +179,26 @@ body {
    Study, mismo mecanismo). Ver también los overrides puntuales con su
    propio !important en case-study.css/case-figure-lightbox.css para los
    componentes que necesitan un color/offset distinto del default. */
+/* Bugfix (pasada de cierre): esta lista sólo cubría a/button/[tabindex] —
+   summary/[role=button]/input/textarea/select NO estaban, así que en
+   cualquier navegador donde su heurística de :focus-visible sea más laxa
+   que la de Chromium (WebKit ha tenido históricamente criterios más
+   permisivos para marcar :focus-visible en <summary> tras un click de
+   mouse — es exactamente el mecanismo detrás del reporte "el halo verde
+   queda pegado" en los desplegables de Cómo trabajo), NADA limpiaba el
+   anillo por defecto del navegador en el :focus plano — la regla de abajo
+   sólo pinta :focus-visible, nunca resetea el :focus normal para estos
+   elementos. La lista ahora es simétrica con la de :focus-visible que
+   sigue: los mismos elementos que reciben el anillo verde en foco-teclado
+   ahora también quedan sin anillo en click-con-mouse. */
 .es-page a:focus,
 .es-page button:focus,
-.es-page [tabindex]:focus {
+.es-page [tabindex]:focus,
+.es-page [role='button']:focus,
+.es-page summary:focus,
+.es-page input:focus,
+.es-page textarea:focus,
+.es-page select:focus {
 	outline: none !important;
 }
 

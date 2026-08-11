@@ -1201,19 +1201,26 @@
 	color: var(--es-ink-3);
 }
 
+/* Bugfix (post-implementación): la versión anterior de esta regla ponía
+   max-height: 340px + object-fit: cover en las imágenes dentro de
+   figure/.wp-block-image, pensado para que UNA imagen legacy no ocupara la
+   pantalla completa al lado de cards de 250-300px. Pero object-fit: cover
+   RECORTA lo que no entra en esa caja — cualquier imagen de la galería
+   vieja más alta que 340px perdía la parte de arriba/abajo. Es la
+   regresión reportada ("parte de la galería quedó cortada"): no era la
+   SECCIÓN la que dejaba de crecer, era CADA imagen alta la que se
+   recortaba. Confirmado con una imagen de prueba de 1200px: renderizaba a
+   340px con la mitad recortada.
+
+   Sin tope de alto ahora: max-width/height:auto ya evita que una imagen
+   se salga del layout (nunca más ancha que su columna), y deja que cada
+   imagen ocupe el alto que le corresponde según su propia proporción — la
+   sección vuelve a crecer verticalmente según su contenido, como pedía el
+   ticket, sin alturas arbitrarias ni overflow:hidden tapando nada. */
 .es-work-archive__legacy img {
 	max-width: 100%;
 	height: auto;
 	border-radius: 4px;
-}
-
-/* Galerías/columnas viejas con imágenes grandes sin recortar: un tope de
-   alto evita que UNA imagen legacy ocupe la pantalla completa al lado de
-   cards de 250-300px del resto del sitio. object-fit para no deformarla. */
-.es-work-archive__legacy :where(figure, .wp-block-image) img {
-	max-height: 340px;
-	width: 100%;
-	object-fit: cover;
 }
 
 /* =========================================================================

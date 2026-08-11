@@ -268,14 +268,28 @@
 	transition: color var(--es-dur-fast) ease;
 }
 
+/* Orden LVHA (Link → Visited → Hover → Active), a propósito y no por
+   casualidad. :visited y :hover/:focus-visible/:active tienen la MISMA
+   especificidad (0,2,0) y acá los dos llevan !important — en un empate de
+   especificidad gana la ÚLTIMA regla del archivo. Antes :visited estaba
+   DESPUÉS de :hover, así que en cualquier navegador donde el cascade real
+   resuelva el empate por orden de aparición (sin el tratamiento especial
+   de privacidad que Chromium le da a :visited), un link ya visitado — el
+   caso típico de "Inicio" en cualquier sesión real — se hubiera quedado
+   con el muted incluso en hover, exactamente el síntoma reportado. Medido
+   en Chromium con historial real + sampling de pixel (no
+   getComputedStyle(), que Chromium fuerza a mentir sobre :visited a
+   propósito) el hover seguía ganando ahí — pero el orden LVHA es la regla
+   estándar precisamente para no depender de esa implementación específica.
+   Sin costo: es sólo reordenar. */
+.es-breadcrumbs__link:visited {
+	color: var(--es-breadcrumbs-ink) !important;
+}
+
 .es-breadcrumbs__link:hover,
 .es-breadcrumbs__link:focus-visible,
 .es-breadcrumbs__link:active {
 	color: var(--es-accent) !important;
-}
-
-.es-breadcrumbs__link:visited {
-	color: var(--es-breadcrumbs-ink) !important;
 }
 
 .es-breadcrumbs__current {
