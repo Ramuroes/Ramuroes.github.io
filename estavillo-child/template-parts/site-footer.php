@@ -53,6 +53,7 @@ $es_show_phone    = es_footer_visible( 'phone' ) && ! empty( $es_phone );
 $es_show_whatsapp = es_footer_visible( 'whatsapp' ) && ! empty( $es_whatsapp );
 $es_show_location = es_footer_visible( 'location' ) && ! empty( $es_place );
 $es_show_note     = es_footer_visible( 'note' ) && ! empty( $es_note );
+$es_show_credit   = es_footer_visible( 'credit' ) && '' !== trim( (string) $es_name );
 
 $es_social_visible = array();
 foreach ( $es_social as $es_sname => $es_surl ) {
@@ -62,8 +63,8 @@ foreach ( $es_social as $es_sname => $es_surl ) {
 	}
 }
 
-$es_has_contact  = $es_show_email || $es_show_phone || $es_show_whatsapp;
-$es_has_elsewhere = ! empty( $es_social_visible );
+$es_has_contact = $es_show_email || $es_show_phone || $es_show_whatsapp;
+$es_has_social  = ! empty( $es_social_visible );
 ?>
 
 <footer class="es-site-footer es-site-footer--<?php echo esc_attr( $es_layout ); ?><?php echo 'wide' === $es_width ? ' es-site-footer--wide' : ''; ?>" data-screen-label="Footer">
@@ -75,6 +76,25 @@ $es_has_elsewhere = ! empty( $es_social_visible );
 				<?php if ( $es_show_note ) : ?>
 					<p class="es-site-footer__note"><?php echo esc_html( $es_note ); ?></p>
 				<?php endif; ?>
+				<?php if ( $es_show_credit ) : ?>
+					<p class="es-site-footer__credit">
+						<?php echo wp_kses( es__( 'footer_credit_lead' ), array( 'em' => array() ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- wp_kses'd, <em> only, same pattern as the Connect title field. ?>
+						<?php echo esc_html( $es_name ); ?>.
+					</p>
+				<?php endif; ?>
+				<?php if ( $es_has_social ) : ?>
+					<div class="es-footer-social">
+						<?php foreach ( $es_social_visible as $es_sname => $es_surl ) :
+							$es_social_aria = $es_name
+								? sprintf( es__( 'footer_social_named' ), $es_name, $es_sname )
+								: sprintf( es__( 'footer_social_generic' ), $es_sname );
+							?>
+							<a class="es-footer-social__link" href="<?php echo esc_url( $es_surl ); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr( $es_social_aria ); ?>">
+								<?php echo es_footer_icon( $es_social_key[ $es_sname ] ?? sanitize_key( $es_sname ), 'es-footer-social__icon' ); // phpcs:ignore WordPress.Security.EscapeOutput -- theme-authored SVG. ?>
+							</a>
+						<?php endforeach; ?>
+					</div>
+				<?php endif; ?>
 			</div>
 
 			<?php if ( $es_show_nav ) : ?>
@@ -85,34 +105,25 @@ $es_has_elsewhere = ! empty( $es_social_visible );
 				</nav>
 			<?php endif; ?>
 
-			<?php if ( $es_has_contact || $es_has_elsewhere ) : ?>
+			<?php if ( $es_has_contact ) : ?>
 				<div class="es-site-footer__col es-site-footer__col--contact">
-					<?php if ( $es_has_contact ) : ?>
-						<div class="es-footer-contact">
-							<?php if ( $es_show_email ) : ?>
-								<a class="es-footer-contact__item" href="mailto:<?php echo esc_attr( antispambot( $es_email ) ); ?>"><?php echo esc_html( antispambot( $es_email ) ); ?></a>
-							<?php endif; ?>
-							<?php if ( $es_show_phone ) : ?>
-								<a class="es-footer-contact__item" href="tel:+<?php echo esc_attr( es_phone_digits( $es_phone ) ); ?>" aria-label="<?php echo esc_attr( $es_name ? sprintf( es__( 'footer_call_named' ), $es_name ) : es__( 'footer_call_generic' ) ); ?>">
-									<?php echo es_footer_icon( 'phone' ); // phpcs:ignore WordPress.Security.EscapeOutput -- theme-authored SVG. ?>
-									<span><?php echo esc_html( $es_phone ); ?></span>
-								</a>
-							<?php endif; ?>
-							<?php if ( $es_show_whatsapp ) : ?>
-								<a class="es-footer-contact__item" href="https://wa.me/<?php echo esc_attr( es_phone_digits( $es_whatsapp ) ); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr( $es_name ? sprintf( es__( 'footer_wa_named' ), $es_name ) : es__( 'footer_wa_generic' ) ); ?>">
-									<?php echo es_footer_icon( 'whatsapp' ); // phpcs:ignore WordPress.Security.EscapeOutput -- theme-authored SVG. ?>
-									<span><?php echo esc_html( es__( 'whatsapp_label' ) ); ?></span>
-								</a>
-							<?php endif; ?>
-						</div>
-					<?php endif; ?>
-					<?php if ( $es_has_elsewhere ) : ?>
-						<div class="es-footer-elsewhere">
-							<?php foreach ( $es_social_visible as $es_sname => $es_surl ) : ?>
-								<a href="<?php echo esc_url( $es_surl ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $es_sname ); ?></a>
-							<?php endforeach; ?>
-						</div>
-					<?php endif; ?>
+					<div class="es-footer-contact">
+						<?php if ( $es_show_email ) : ?>
+							<a class="es-footer-contact__item" href="mailto:<?php echo esc_attr( antispambot( $es_email ) ); ?>"><?php echo esc_html( antispambot( $es_email ) ); ?></a>
+						<?php endif; ?>
+						<?php if ( $es_show_phone ) : ?>
+							<a class="es-footer-contact__item" href="tel:+<?php echo esc_attr( es_phone_digits( $es_phone ) ); ?>" aria-label="<?php echo esc_attr( $es_name ? sprintf( es__( 'footer_call_named' ), $es_name ) : es__( 'footer_call_generic' ) ); ?>">
+								<?php echo es_footer_icon( 'phone' ); // phpcs:ignore WordPress.Security.EscapeOutput -- theme-authored SVG. ?>
+								<span><?php echo esc_html( $es_phone ); ?></span>
+							</a>
+						<?php endif; ?>
+						<?php if ( $es_show_whatsapp ) : ?>
+							<a class="es-footer-contact__item" href="https://wa.me/<?php echo esc_attr( es_phone_digits( $es_whatsapp ) ); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr( $es_name ? sprintf( es__( 'footer_wa_named' ), $es_name ) : es__( 'footer_wa_generic' ) ); ?>">
+								<?php echo es_footer_icon( 'whatsapp' ); // phpcs:ignore WordPress.Security.EscapeOutput -- theme-authored SVG. ?>
+								<span><?php echo esc_html( es__( 'whatsapp_label' ) ); ?></span>
+							</a>
+						<?php endif; ?>
+					</div>
 				</div>
 			<?php endif; ?>
 

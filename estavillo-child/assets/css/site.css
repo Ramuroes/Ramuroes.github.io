@@ -711,6 +711,64 @@
 	color: var(--es-ink-3);
 }
 
+/* credit line — footer visual iteration: "Designed by <em>me</em>, {name}."
+   integrated under the tagline instead of repeated in the bottom bar (which
+   already carries © {year} {name} — repeating the sentence there read as
+   redundant). Deliberately quieter than the note above it via SIZE only
+   (12px vs 13px) — --es-ink-4 (used for the bottom-bar meta row) measures
+   ~3.45:1 against --es-paper, under the 4.5:1 WCAG AA text minimum at this
+   size; --es-ink-3 measures ~6.2:1, so this reuses the same muted tone the
+   note above it already uses rather than introducing a new, failing one. */
+.es-site-footer__credit {
+	margin: 0;
+	max-width: 34ch;
+	font-size: 12px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+}
+
+.es-site-footer__credit em {
+	font-style: normal;
+	color: var(--es-accent);
+}
+
+/* social icons — footer visual iteration: moved out of the contact column
+   (where they rendered as a stacked list of text links, ".es-footer-elsewhere")
+   and into the brand column as a small icon row, per the reference composition.
+   Icon-only; the platform name still reaches AT/screen readers via aria-label. */
+.es-footer-social {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	margin-top: 2px;
+}
+
+.es-footer-social__link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	margin: -5px;
+	color: var(--es-ink-4) !important;
+	text-decoration: none;
+	transition: color 0.15s ease;
+}
+
+.es-footer-social__link:hover,
+.es-footer-social__link:focus-visible,
+.es-footer-social__link:active {
+	color: var(--es-accent) !important;
+}
+
+.es-footer-social__link:visited {
+	color: var(--es-ink-4) !important;
+}
+
+.es-footer-social__icon {
+	flex: none;
+}
+
 /* navigation column — vertical list, reuses the same links as the header */
 .es-site-footer__nav {
 	gap: 10px;
@@ -725,10 +783,18 @@
 	transition: color 0.15s ease;
 }
 
+/* Bugfix (footer visual iteration): this hover/focus-visible/active rule
+   painted --es-ink (near-white — basically "brighten to full ink"), not
+   --es-accent — the one link state in the whole footer that didn't follow
+   the site-wide "hover/focus = accent green" language (contact items and
+   the social links right above already used --es-accent correctly). Not a
+   cascade/specificity override from elsewhere — this rule was always the
+   most specific match here (single class + pseudo-class + !important) and
+   always won; the color value itself was just wrong. */
 .es-site-footer__nav a:hover,
 .es-site-footer__nav a:focus-visible,
 .es-site-footer__nav a:active {
-	color: var(--es-ink) !important;
+	color: var(--es-accent) !important;
 }
 
 .es-site-footer__nav a[aria-current='page'] {
@@ -739,16 +805,11 @@
 	color: var(--es-ink-3) !important;
 }
 
-/* contact + elsewhere column */
-.es-footer-contact,
-.es-footer-elsewhere {
+/* contact column */
+.es-footer-contact {
 	display: flex;
 	flex-direction: column;
 	gap: 9px;
-}
-
-.es-footer-elsewhere {
-	margin-top: 14px;
 }
 
 .es-footer-contact__item {
@@ -783,24 +844,6 @@
 .es-footer-contact__item:focus-visible .es-footer-contact__icon {
 	color: var(--es-accent);
 	transform: translateX(2px);
-}
-
-.es-footer-elsewhere a {
-	width: fit-content;
-	font-size: 13.5px;
-	color: var(--es-ink-3) !important;
-	text-decoration: none;
-	transition: color 0.15s ease;
-}
-
-.es-footer-elsewhere a:hover,
-.es-footer-elsewhere a:focus-visible,
-.es-footer-elsewhere a:active {
-	color: var(--es-accent) !important;
-}
-
-.es-footer-elsewhere a:visited {
-	color: var(--es-ink-3) !important;
 }
 
 /* base row — location + auto-year copyright, mono meta */

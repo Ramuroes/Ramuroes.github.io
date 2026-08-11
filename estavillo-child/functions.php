@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.63' );
+define( 'ES_CHILD_VERSION', '0.2.64' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -119,6 +119,9 @@ function es_child_ui_strings() {
 		'footer_call_named'   => 'Call %s',
 		'footer_wa_generic'   => 'Contact on WhatsApp',
 		'footer_wa_named'     => 'Contact %s on WhatsApp',
+		'footer_credit_lead'    => 'Designed by <em>me</em>,',
+		'footer_social_named'   => "View %1\$s's %2\$s profile",
+		'footer_social_generic' => 'View %s profile',
 		'case_sections_aria'  => 'Case sections',
 		'case_nav_prev'       => 'Previous sections',
 		'case_nav_next'       => 'More sections',
