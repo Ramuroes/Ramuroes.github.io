@@ -14,11 +14,33 @@
    La clase de tema (body.es-theme--dark, ver inc/theme-dark-mode.php) no
    hace falta acá porque hoy dark es el único modo y los tokens de :root ya
    son oscuros. Cuando exista light, este bloque se duplica bajo
-   body.es-theme--light con los tokens claros y no hay que tocar nada más. */
-html,
-body {
+   body.es-theme--light con los tokens claros y no hay que tocar nada más.
+
+   :not(.wp-admin) — bugfix (pasada de cierre). base.css se puentea al
+   editor de bloques vía enqueue_block_assets (es_home_blocks_editor_theme_css()
+   en el plugin, para que el preview del bloque Home Hero use las mismas
+   clases tipográficas .es-h1/.es-eyebrow/etc. del frontend) — pero ese
+   hook NO está limitado al iframe del editor: en la pantalla de edición de
+   CUALQUIER post/página, WordPress lo dispara también sobre la página de
+   admin completa. Sin este guard, esta regla pintaba el <body> del propio
+   wp-admin de negro con tinta clara — exactamente el reporte "metaboxes
+   ilegibles, fondo... labels demasiado claros" (confirmado con un harness:
+   bodyBg pasaba del gris claro de wp-admin a #131211). body.wp-admin es una
+   clase que WordPress agrega SIEMPRE en cada pantalla de admin — nunca en
+   el front — así que es un ancla confiable sin tocar el mecanismo de carga
+   ni las clases tipográficas que el preview del editor sí necesita.
+
+   Sólo en body: <html> nunca lleva la clase wp-admin (WP sólo la agrega al
+   body), así que "html:not(.wp-admin)" matchearía siempre igual — no
+   guardaría nada — y da lo mismo en la práctica: body es opaco y cubre
+   TODO el viewport, así que su fondo correcto alcanza para tapar el de
+   html debajo, tanto en admin como en el front. */
+body:not(.wp-admin) {
 	background: var(--es-paper);
 	color: var(--es-ink);
+}
+
+html {
 	/* Le dice al navegador que el documento ES oscuro, para que pinte en
 	   oscuro lo que no controla el CSS: barras de scroll, el desplegable de
 	   un <select>, los date pickers nativos, el fondo por defecto de un
@@ -26,7 +48,13 @@ body {
 	   html.es-theme-dark, y esa clase la agrega body_class() — o sea, va al
 	   <body>, nunca al <html>: ese selector no matchea nunca (verificado:
 	   color-scheme resolvía 'normal' en una vista nativa de Kadence). Acá no
-	   depende de ninguna clase. */
+	   depende de ninguna clase.
+
+	   Sin guardar contra wp-admin a propósito: sólo afecta cómo el navegador
+	   pinta SU PROPIA UI nativa (scrollbar, selects, date pickers) — nunca
+	   texto ni fondos del documento — así que en el peor caso, en admin,
+	   sólo cambia el tono de la scrollbar nativa. Nada que ver con el bug
+	   real (texto ilegible), que era 100% el background/color de arriba. */
 	color-scheme: dark;
 }
 

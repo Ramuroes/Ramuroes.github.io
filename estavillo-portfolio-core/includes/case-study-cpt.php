@@ -415,14 +415,38 @@ function es_portfolio_get_case_studies_for_home() {
 			'orderby'        => 'menu_order title',
 			'order'          => 'ASC',
 			'meta_query'     => array(
-				'relation' => 'OR',
+				'relation' => 'AND',
 				array(
-					'key'     => '_es_case_show_on_home',
-					'compare' => 'NOT EXISTS',
+					'relation' => 'OR',
+					array(
+						'key'     => '_es_case_show_on_home',
+						'compare' => 'NOT EXISTS',
+					),
+					array(
+						'key'   => '_es_case_show_on_home',
+						'value' => '1',
+					),
 				),
+				// Auditoría "PASADA GENERAL DE CIERRE" (ítem 9): un caso
+				// marcado "Feature this case on Home" ya se muestra en la
+				// sección Featured (arriba) — sin este OR, si ese mismo caso
+				// también tiene "Show on Home" tildado (o simplemente no
+				// desmarcado, que es el default), aparecía DOS veces en
+				// Home: una vez como Featured y otra vez en la grilla de
+				// Selected Work. Se excluye acá, no cambia el editorial
+				// (los campos "Feature" y "Show on Home" siguen siendo
+				// independientes en el admin) — sólo evita el duplicado.
 				array(
-					'key'   => '_es_case_show_on_home',
-					'value' => '1',
+					'relation' => 'OR',
+					array(
+						'key'     => '_es_case_featured',
+						'compare' => 'NOT EXISTS',
+					),
+					array(
+						'key'     => '_es_case_featured',
+						'value'   => '1',
+						'compare' => '!=',
+					),
 				),
 			),
 		)

@@ -595,6 +595,32 @@ function es_portfolio_home_content_page() {
 			<?php wp_nonce_field( 'es_portfolio_home_content_save', 'es_portfolio_home_content_nonce' ); ?>
 
 			<h2><?php esc_html_e( 'About', 'estavillo-portfolio-core' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'The About page itself is now edited on its own Page (Gutenberg content) — this field only feeds the "read more" link on the Home About teaser.', 'estavillo-portfolio-core' ); ?></p>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><label for="es_about_url"><?php esc_html_e( 'About link (CTA URL)', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="url" id="es_about_url" name="es_about_url" class="regular-text" value="<?php echo esc_attr( $data['about_url'] ?? '' ); ?>" placeholder="#about"></td>
+				</tr>
+			</table>
+
+			<?php
+			/**
+			 * LEGACY — oculto (auditoría "PASADA GENERAL DE CIERRE", ítem 6).
+			 *
+			 * about_text / about_portrait / about_cv_url y las 6 subsecciones
+			 * de abajo (Hobbies, Experience, Earlier Experience, Education,
+			 * Other Certifications, Languages) sólo alimentan
+			 * template-parts/about-content.php — el fallback pre-Gutenberg de
+			 * la página About (templates/page-about.php). Esa página ya tiene
+			 * contenido real de Gutenberg, así que the_content() gana siempre
+			 * y ese fallback nunca se renderiza: estos campos ya no controlan
+			 * nada visible. Se ocultan del panel (no se borran del código ni
+			 * de la base de datos) para no seguir editando "en el vacío" —
+			 * el contenido real del About vive en su propia Página.
+			 * Reversible: cambiar `false` por `true` reactiva el panel.
+			 */
+			if ( false ) :
+				?>
 			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row"><label for="es_about_text"><?php esc_html_e( 'About text', 'estavillo-portfolio-core' ); ?></label></th>
@@ -602,10 +628,6 @@ function es_portfolio_home_content_page() {
 						<textarea id="es_about_text" name="es_about_text" rows="10" class="large-text"><?php echo esc_textarea( $data['about_text'] ?? '' ); ?></textarea>
 						<p class="description"><?php esc_html_e( 'Separate paragraphs with a blank line — each one renders as its own paragraph on the About page.', 'estavillo-portfolio-core' ); ?></p>
 					</td>
-				</tr>
-				<tr>
-					<th scope="row"><label for="es_about_url"><?php esc_html_e( 'About link (CTA URL)', 'estavillo-portfolio-core' ); ?></label></th>
-					<td><input type="url" id="es_about_url" name="es_about_url" class="regular-text" value="<?php echo esc_attr( $data['about_url'] ?? '' ); ?>" placeholder="#about"></td>
 				</tr>
 				<tr>
 					<th scope="row"><label for="es_about_portrait"><?php esc_html_e( 'Portrait image URL', 'estavillo-portfolio-core' ); ?></label></th>
@@ -784,6 +806,9 @@ function es_portfolio_home_content_page() {
 					</tr>
 				<?php endfor; ?>
 			</table>
+				<?php
+			endif; // LEGACY (about_text..about_languages) — ver comentario arriba.
+			?>
 
 			<h3><?php esc_html_e( 'Tools (About page)', 'estavillo-portfolio-core' ); ?></h3>
 			<p class="description"><?php esc_html_e( 'Renders via the reusable "Tools" block (estavillo/tools) — the same component available on Home/Case Studies. Leave a row\'s title blank to keep it out of the list. Items: one tool per line.', 'estavillo-portfolio-core' ); ?></p>
@@ -814,7 +839,29 @@ function es_portfolio_home_content_page() {
 			</table>
 
 			<h2><?php esc_html_e( 'How I Work', 'estavillo-portfolio-core' ); ?></h2>
-			<p class="description"><?php esc_html_e( 'Leave a step blank (both title and text) to keep its current placeholder — you can edit just one step without filling in all six. "Why it matters", "Example" and "Tools" are optional — the compact Home teaser never shows them (title + text + icon only); only the dedicated How I Work page does.', 'estavillo-portfolio-core' ); ?></p>
+			<p class="description"><?php esc_html_e( 'The How I Work page itself is now edited on its own Page (Gutenberg content) — this field only feeds the "read more" link on the Home How I Work teaser.', 'estavillo-portfolio-core' ); ?></p>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><label for="es_process_url"><?php esc_html_e( 'How I Work link (CTA URL)', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="url" id="es_process_url" name="es_process_url" class="regular-text" value="<?php echo esc_attr( $data['process_url'] ?? '' ); ?>" placeholder="#process"></td>
+				</tr>
+			</table>
+
+			<?php
+			/**
+			 * LEGACY — oculto (auditoría "PASADA GENERAL DE CIERRE", ítem 6).
+			 *
+			 * Los 6 "Step" (title/text/icon/why/example/tools) sólo
+			 * alimentan template-parts/how-i-work-detail.php — el fallback
+			 * pre-Gutenberg de la página How I Work (templates/page-how-i-work.php).
+			 * Esa página ya tiene contenido real de Gutenberg, así que
+			 * the_content() gana siempre y ese fallback nunca se renderiza.
+			 * El teaser de Home (template-parts/how-i-work.php) tampoco usa
+			 * estos steps — sólo el link de abajo. Reversible: cambiar
+			 * `false` por `true` reactiva el panel.
+			 */
+			if ( false ) :
+				?>
 			<table class="form-table" role="presentation">
 				<?php
 				$es_steps        = $data['process_steps'] ?? array();
@@ -850,11 +897,10 @@ function es_portfolio_home_content_page() {
 						</td>
 					</tr>
 				<?php endfor; ?>
-				<tr>
-					<th scope="row"><label for="es_process_url"><?php esc_html_e( 'How I Work link (CTA URL)', 'estavillo-portfolio-core' ); ?></label></th>
-					<td><input type="url" id="es_process_url" name="es_process_url" class="regular-text" value="<?php echo esc_attr( $data['process_url'] ?? '' ); ?>" placeholder="#process"></td>
-				</tr>
 			</table>
+				<?php
+			endif; // LEGACY (process steps) — ver comentario arriba.
+			?>
 
 			<h2><?php esc_html_e( 'Connect', 'estavillo-portfolio-core' ); ?></h2>
 			<p class="description"><?php esc_html_e( 'These fields feed Home\'s own CTA section only. For the dedicated Connect/Contact page (eyebrow, title, intro, phone, WhatsApp, country), see "Connect page (dedicated)" below.', 'estavillo-portfolio-core' ); ?></p>
@@ -878,6 +924,27 @@ function es_portfolio_home_content_page() {
 					<th scope="row"><label for="es_connect_url"><?php esc_html_e( 'Connect link (CTA URL)', 'estavillo-portfolio-core' ); ?></label></th>
 					<td><input type="url" id="es_connect_url" name="es_connect_url" class="regular-text" value="<?php echo esc_attr( $data['connect_url'] ?? '' ); ?>" placeholder="#connect"></td>
 				</tr>
+			</table>
+
+			<?php
+			/**
+			 * LEGACY — oculto (auditoría "PASADA GENERAL DE CIERRE", ítem 6).
+			 *
+			 * connect_note: cero call sites — el filtro 'es_connect_note' se
+			 * registra pero ningún template hace apply_filters() sobre él.
+			 * Nunca controló nada visible (verificado por grep en todo
+			 * estavillo-child/).
+			 *
+			 * connect_status: sólo alimenta template-parts/contact-content.php,
+			 * el fallback pre-Gutenberg de la página Connect — no se
+			 * renderiza mientras esa página tenga contenido real (ver nota
+			 * de "Connect page (dedicated)" más abajo).
+			 *
+			 * Reversible: cambiar `false` por `true` reactiva el panel.
+			 */
+			if ( false ) :
+				?>
+			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row"><label for="es_connect_note"><?php esc_html_e( 'Secondary note (optional)', 'estavillo-portfolio-core' ); ?></label></th>
 					<td>
@@ -892,10 +959,13 @@ function es_portfolio_home_content_page() {
 					</td>
 				</tr>
 			</table>
+				<?php
+			endif; // LEGACY (connect_note, connect_status) — ver comentario arriba.
+			?>
 
 			<h2><?php esc_html_e( 'Connect page (dedicated)', 'estavillo-portfolio-core' ); ?></h2>
-			<p class="description"><?php esc_html_e( 'The standalone Connect/Contact page only — Home is never affected by these. Contact email above and Availability above are shared with this page too.', 'estavillo-portfolio-core' ); ?></p>
-			<p class="description"><strong><?php esc_html_e( 'Source-of-truth note (revision ticket):', 'estavillo-portfolio-core' ); ?></strong> <?php esc_html_e( 'Eyebrow/Title/Introduction below always feed the page-head (they render whether or not the WP Page has real Gutenberg content). Phone/WhatsApp/Country and Availability above only feed the legacy fallback body — once the Connect Page has real Gutenberg content (the normal state), its own static text and links are the source of truth for the two-column contact section and editing these fields will NOT change what visitors see. This is intentional, not a bug — see docs/content/connect-gutenberg-en.html.', 'estavillo-portfolio-core' ); ?></p>
+			<p class="description"><?php esc_html_e( 'The standalone Connect/Contact page only — Home is never affected by these. Contact email above is shared with this page too.', 'estavillo-portfolio-core' ); ?></p>
+			<p class="description"><strong><?php esc_html_e( 'Source-of-truth note (revision ticket):', 'estavillo-portfolio-core' ); ?></strong> <?php esc_html_e( 'Eyebrow/Title/Introduction below always feed the page-head (they render whether or not the WP Page has real Gutenberg content). Phone and WhatsApp are also global — they feed the sitewide footer (template-parts/site-footer.php) in addition to the Connect page, so they stay live regardless of the page\'s Gutenberg state. Country only fed the legacy fallback body, hidden below (see the "PASADA GENERAL DE CIERRE" note) — once the Connect Page has real Gutenberg content (the normal state), its own static text is the source of truth there.', 'estavillo-portfolio-core' ); ?></p>
 			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row"><label for="es_connect_eyebrow"><?php esc_html_e( 'Eyebrow', 'estavillo-portfolio-core' ); ?></label></th>
@@ -910,10 +980,10 @@ function es_portfolio_home_content_page() {
 					<td><textarea id="es_connect_intro" name="es_connect_intro" rows="3" class="large-text"><?php echo esc_textarea( $data['connect_intro'] ?? '' ); ?></textarea></td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="es_contact_phone"><?php esc_html_e( 'Phone (not shown on Connect)', 'estavillo-portfolio-core' ); ?></label></th>
+					<th scope="row"><label for="es_contact_phone"><?php esc_html_e( 'Phone', 'estavillo-portfolio-core' ); ?></label></th>
 					<td>
 						<input type="text" id="es_contact_phone" name="es_contact_phone" class="regular-text" value="<?php echo esc_attr( $data['contact_phone'] ?? '' ); ?>" placeholder="+598 99 892 722">
-						<p class="description"><?php esc_html_e( 'Connect page now shows WhatsApp only (revision ticket — avoids showing the same number twice). Kept here for a future page that may need a separate phone row.', 'estavillo-portfolio-core' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Shown in the site footer. The Connect page itself shows WhatsApp only (revision ticket — avoids showing the same number twice).', 'estavillo-portfolio-core' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -923,11 +993,28 @@ function es_portfolio_home_content_page() {
 						<p class="description"><?php esc_html_e( 'Any format is fine — only the digits are used to build the wa.me link.', 'estavillo-portfolio-core' ); ?></p>
 					</td>
 				</tr>
+			</table>
+
+			<?php
+			/**
+			 * LEGACY — oculto (auditoría "PASADA GENERAL DE CIERRE", ítem 6).
+			 *
+			 * connect_country sólo alimenta template-parts/contact-content.php
+			 * (fallback pre-Gutenberg de la página Connect) — mismo caso que
+			 * connect_status más arriba. Reversible: cambiar `false` por
+			 * `true` reactiva el panel.
+			 */
+			if ( false ) :
+				?>
+			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row"><label for="es_connect_country"><?php esc_html_e( 'Country', 'estavillo-portfolio-core' ); ?></label></th>
 					<td><input type="text" id="es_connect_country" name="es_connect_country" class="regular-text" value="<?php echo esc_attr( $data['connect_country'] ?? '' ); ?>" placeholder="Uruguay"></td>
 				</tr>
 			</table>
+				<?php
+			endif; // LEGACY (connect_country) — ver comentario arriba.
+			?>
 
 			<h2><?php esc_html_e( 'Header — site identity', 'estavillo-portfolio-core' ); ?></h2>
 			<input type="hidden" name="es_hf_header" value="1">
