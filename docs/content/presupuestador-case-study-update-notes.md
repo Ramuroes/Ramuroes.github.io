@@ -8,6 +8,13 @@ Case Index, and the technical decision that changed the file format.
 No case content was deployed to WordPress as part of this update — this
 is a repo-only implementation for review, on `main`, per the request.
 
+**This file covers two editorial passes on the same date.** §1–§10 below
+describe the first pass (structure, the 4 Case Flow diagrams, the
+As-Is/V1/V2 split). §11 describes a second, narrative-only correction
+made right after — same structure, same anchors, same flows, only the
+*causal story* of how V1 and V2 came to exist was rewritten. Read §11 if
+you only care about what's different since the first pass.
+
 ## 1. What was kept
 
 Almost every sentence of the previous draft survives somewhere in the new
@@ -298,3 +305,139 @@ instead of the old "App Alpha dashboard" reference.
 - All `[DATO PENDIENTE DE VALIDACIÓN]` / `[DATA PENDING VALIDATION]`
   placeholders from the previous draft are preserved; two more were added
   where the new content makes a claim that would otherwise need one.
+
+## 11. Second pass (same date) — organic evolution, not a planned V1→V2 roadmap
+
+The first pass (§1–§10) got the shape right — As-Is, V1, V2, the 4 flows
+— but told the wrong *causal* story: it read as if V1 was decided first,
+shipped, and only then did learning from V1 trigger the decision to build
+something bigger. That's not what happened. This pass corrects the story
+without touching structure, anchors, flows, or images.
+
+**Corrected version of events**, per the brief: the first product
+response was already an attempt at the *whole* systemic problem — a
+materials-and-pricing database, catalog-style selection, prices that
+update themselves, avoiding repeated entry — and it began inside the same
+Google Sheets + Apps Script MVP. While that bigger direction was being
+explored, a *different, smaller* problem showed up in parallel: many
+requests didn't need a full formal quotation, just a fast range to decide
+whether to continue. Restimator (V1) was extracted from that parallel
+finding, not planned as "phase 1" of a two-phase roadmap. The bigger
+direction never stopped — it kept expanding (persistence, suppliers,
+clients, approvals, tasks, production, purchasing) into what's now V2.
+V1 and V2 are two different answers that emerged from decomposing one
+big problem, not two sequential, pre-planned stages.
+
+**What changed, section by section:**
+
+- **`#overview`** — the lead no longer says the project "evolved in
+  stages: a quick estimator first, a full system after." It now frames
+  the origin as one systemic problem that got decomposed into smaller,
+  verifiable solutions, with the estimator and the bigger materials/
+  pricing base named as parallel responses, not sequential ones.
+- **`#problem`** — softened, not rewritten: "armarlo depende de la
+  disponibilidad de una sola persona" replaces "depende de que una
+  persona puntual tenga tiempo libre," and the bullet about adding people
+  to the team no longer centers "esa persona" as the bottleneck. Also
+  folded in the brief's more specific detail — information scattered
+  across spreadsheets, **physical folders**, WhatsApp and email (physical
+  folders weren't mentioned before).
+- **`#as-is` (Flow 1 — "Antes de Restimator")** — node text enriched to
+  match the brief's actual described process, without touching the
+  10-node structure or its one loop: `revision-manual` is now "Duplicar
+  una planilla de referencia" (was generic "Revisión manual"), `busqueda`
+  now explicitly names copying materials/prices from websites and
+  supplier lists, `sheets` now names adapting formulas, calculating
+  surfaces/finishes by hand, and loading labor per Guzmán's criteria
+  (folding in three of the brief's bullets that had no home before), and
+  `carga` now says "se vuelve a cargar manualmente... en Zoho" per the
+  brief's exact phrasing. The closing caption no longer says the
+  following stages resolved these problems "una por una / one at a
+  time" (sequential) — it now says the different solutions that appeared
+  later addressed them "cada una desde un ángulo distinto."
+- **`#as-is` bottleneck tone (the main fix)** — the `validacion` node
+  was titled "Validación **con Guzmán**" and its friction text read "esta
+  validación es un **cuello de botella recurrente: nada avanza** sin que
+  una persona puntual tenga tiempo disponible" — close to the exact
+  phrases the brief asked to avoid. Retitled to "Revisión de criterio"
+  (no name in a friction-framed node) and the detail text replaced with
+  the brief's own suggested formulation almost verbatim: concentration of
+  criteria in one person → backlog of quotations waiting for review, low
+  visibility into case status, finished jobs sometimes held up before
+  being sent — concentration + visibility + accumulation, not "nothing
+  moves without him." Guzmán is still named once, neutrally, in the
+  `sheets` node ("...según los criterios que comunica Guzmán") — a
+  factual description of how labor rates get set, not a friction point.
+- **`#hypothesis`** — `case-stats` no longer has a "2 etapas de producto
+  planeadas desde el inicio" item (the block still nominally allowed a
+  countable claim, but the brief's whole point is there's no clean number
+  to put there anymore). It's now a single stat ("1 criterio de precios,
+  capturado como modelo explícito"), and the caption below it states the
+  brief's suggested replacement idea directly: a systemic problem
+  decomposed into smaller, verifiable solutions — the estimator was one
+  of them, not the first of two pre-planned phases.
+- **`#mvp`** — reframed as the *first* attempt at the big systemic
+  answer (materials database, catalog-style selection, self-updating
+  prices), not merely "the model validation tool that came before V1."
+  Added a sentence connecting the spreadsheet's own growth to what later
+  became V2's product-template library.
+- **`#v1-product`** — heading and lead rewritten so Restimator reads as a
+  small, specific answer extracted from a problem found *while* the
+  bigger direction was being explored *in parallel*, explicitly not "the
+  second stage of a two-phase plan." The closing paragraph now says V1
+  "started as formulas inside that same spreadsheet" rather than
+  "the model validated in Sheets got promoted to its own interface,"
+  removing the strict hand-off implication.
+- **`#learnings-v1`** — the paragraph that explicitly said "once the
+  estimator was in use, the learning that gave rise to V2 showed up" was
+  rewritten: V2's problem was "already being explored in parallel since
+  the MVP's own spreadsheet," not triggered by V1's usage.
+- **`#evolution-to-v2`** — lead rewritten from "the estimator proved the
+  model worked and that it was worth investing in a bigger system" to
+  "the materials/pricing base never stopped growing in parallel to
+  Restimator" — same gap being described (a workshop needs more than
+  estimates), different, non-causal framing of why V2 exists.
+- **`#evolution` (Flow 4 — "Una solución que fue creciendo con el
+  problema")** — this is the one place a literal "waited for the
+  previous stage to prove itself before starting the next" claim lived,
+  in both the section's lead and two node texts (`formal-v2`: "the quick
+  estimator stops being enough"; `modular`: "each module is added only
+  once the previous one has proven itself"). Per the brief's explicit
+  allowance ("si es necesario corregir el texto de algún nodo, hacelo,
+  pero mantené la misma estructura y geometría"), the **8 nodes, all
+  edges and the compact horizontal layout are unchanged** — only text.
+  The lead now states directly that this wasn't a tidy two-phase plan,
+  that the problem got decomposed into pieces explored partly in
+  parallel, and that the diagram's left-to-right order reflects when
+  each piece became concretely real, not the order anyone decided to
+  build them in. `sheets` and `v1`'s text now explicitly flag that V1
+  happened "in parallel" while the bigger base kept growing; `formal-v2`
+  no longer says the estimator "stopped being enough" (implies causal
+  failure) and instead says the base "expanded into" a full quotation;
+  `modular`'s text no longer implies strict gating.
+
+**Not touched:** `#v2-design`, `#system` (Flow 3 — the V2 operating-system
+diagram, including its accent/status-badge legend), `#production`,
+`#status`, `#next`. None of these made a "V1-before-V2, planned from the
+start" claim, so none needed correcting — confirmed by re-reading each
+one against the brief's banned phrases before leaving them alone, not by
+assumption.
+
+**Validation re-run after this pass** (same method as §9): real
+WordPress block parser round-trip
+(`@wordpress/block-serialization-default-parser`) on both files — **66
+real blocks each, 0 stray/invalid HTML**, identical block count to the
+first pass (structure genuinely unchanged). Regex/JSON checks: all 35
+JSON-bearing blocks per file still parse, `case-section` 15/15,
+`case-details` 4/4, `paragraph` 22/22, `list` 2/2, `list-item` 7/7,
+15 unique anchors unchanged, all 4 flows re-checked for dangling edges
+and duplicate node ids (node counts unchanged: 10/11/15/8) — none found
+in any of the 8 flow instances. Also grepped both files for the brief's
+specific banned phrases ("cuello de botella," "nada avanza," "dueño del
+criterio," "bottleneck," "nothing moves forward" …) — zero remaining
+matches; the only surviving hits for "planeadas/planned ... desde el
+inicio / from the start" are inside the new sentences that explicitly
+*negate* that framing, not restate it.
+
+Not deployed to WordPress — still repo-only, per the request. Next step
+per the brief is visual assembly in WordPress.
