@@ -192,6 +192,65 @@ function es_blocks_contain_flag( $blocks, $block_name, $attr ) {
 }
 
 /**
+ * ¿El post actual tiene alguna instancia de $block_name cuyo atributo
+ * $attr sea exactamente igual a $value? Versión de es_post_has_block_flag()
+ * para atributos de tipo string/enum (p. ej. mediaType === 'video') que no
+ * son simplemente verdadero/falso — es_post_has_block_flag() de arriba sólo
+ * sirve para booleanos.
+ *
+ * @param string $block_name Nombre completo del bloque (namespace incluido).
+ * @param string $attr       Atributo a comprobar.
+ * @param mixed  $value      Valor esperado (comparación estricta ===).
+ * @return bool
+ */
+function es_post_has_block_attr_value( $block_name, $attr, $value ) {
+	if ( ! is_singular() ) {
+		return false;
+	}
+	$post = get_post();
+	if ( ! $post || false === strpos( (string) $post->post_content, $block_name ) ) {
+		return false; // atajo: ni vale la pena parsear si el bloque ni aparece
+	}
+	return es_blocks_contain_attr_value( parse_blocks( $post->post_content ), $block_name, $attr, $value );
+}
+
+/**
+ * Recorre un árbol de bloques (parse_blocks()) buscando $block_name con
+ * $attr === $value (comparación estricta), en cualquier nivel de
+ * anidamiento (columnas, grupos…).
+ *
+ * @param array  $blocks     Árbol de bloques.
+ * @param string $block_name Nombre completo del bloque.
+ * @param string $attr       Atributo a comprobar.
+ * @param mixed  $value      Valor esperado.
+ * @return bool
+ */
+function es_blocks_contain_attr_value( $blocks, $block_name, $attr, $value ) {
+	foreach ( $blocks as $block ) {
+		if ( $block_name === ( $block['blockName'] ?? '' ) && isset( $block['attrs'][ $attr ] ) && $value === $block['attrs'][ $attr ] ) {
+			return true;
+		}
+		if ( ! empty( $block['innerBlocks'] ) && es_blocks_contain_attr_value( $block['innerBlocks'], $block_name, $attr, $value ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * ¿Hay al menos un estavillo/case-figure con mediaType === 'video' en el
+ * post actual? Mismo criterio opt-in por instancia que el zoom de arriba —
+ * el bloque puede existir en el post sin ninguna instancia de video, y el
+ * módulo de lazy-load + autoplay condicional (case-figure-media.js) no
+ * tiene nada que hacer ahí.
+ *
+ * @return bool
+ */
+function es_post_has_case_figure_video() {
+	return es_post_has_block_attr_value( 'estavillo/case-figure', 'mediaType', 'video' );
+}
+
+/**
  * Versión de cache-bust por archivo: usa filemtime() para que CADA cambio de
  * un asset genere un ?ver= nuevo y el navegador/CDN vuelva a bajarlo.
  *
@@ -423,6 +482,27 @@ function es_child_enqueue_assets() {
 			ES_CHILD_URI . '/assets/js/case-figure-lightbox.js',
 			array(),
 			es_asset_ver( 'assets/js/case-figure-lightbox.js' ),
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
+		);
+	}
+
+	/*
+	 * Case Figure media (video): lazy-load del archivo pesado con
+	 * IntersectionObserver + autoplay condicionado a prefers-reduced-motion
+	 * — ver el docblock de assets/js/case-figure-media.js. Sin ninguna
+	 * instancia de video, ni se pide: imagen/GIF no lo necesitan (ya son
+	 * <img> con loading="lazy" nativo). Sin CSS propio — el look de <video>
+	 * vive en case-study.css, que ya se encola en todo case study.
+	 */
+	if ( es_post_has_case_figure_video() ) {
+		wp_enqueue_script(
+			'es-case-figure-media',
+			ES_CHILD_URI . '/assets/js/case-figure-media.js',
+			array(),
+			es_asset_ver( 'assets/js/case-figure-media.js' ),
 			array(
 				'in_footer' => true,
 				'strategy'  => 'defer',

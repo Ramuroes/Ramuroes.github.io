@@ -5,8 +5,8 @@
 	"title": "Case Figure",
 	"category": "estavillo-case",
 	"icon": "format-image",
-	"description": "Figura de Case Study: imagen de la Biblioteca de medios (o placeholder {asset: …} mientras no exista), con caption numerada y tres variantes — standard (a medida de lectura), browser (marco tipo navegador) y wide (ancho completo). Zoom opcional: abre la imagen en un visor a pantalla completa con zoom y desplazamiento, pensado para Journey Maps, tablas y diagramas que en mobile quedan chicos.",
-	"keywords": [ "estavillo", "case", "figure", "imagen", "screenshot" ],
+	"description": "Figura de Case Study: imagen/GIF/video de la Biblioteca de medios (o placeholder {asset: …} mientras no exista), con caption numerada y cuatro tamaños — standard (a medida de lectura, default), wide/large (ancho completo del container), full (visual break — sangra al viewport), y la variante browser (marco tipo navegador). Zoom opcional en imagen/GIF: abre un visor a pantalla completa con zoom y desplazamiento, pensado para Journey Maps, tablas y diagramas que en mobile quedan chicos.",
+	"keywords": [ "estavillo", "case", "figure", "imagen", "screenshot", "video", "gif", "media" ],
 	"textdomain": "estavillo-portfolio-core",
 	"attributes": {
 		"mediaId": { "type": "number", "default": 0 },
@@ -14,7 +14,7 @@
 		"alt": { "type": "string", "default": "" },
 		"caption": { "type": "string", "default": "" },
 		"tag": { "type": "string", "default": "" },
-		"variant": { "type": "string", "default": "standard", "enum": [ "standard", "browser", "wide" ] },
+		"variant": { "type": "string", "default": "standard", "enum": [ "standard", "browser", "wide", "large", "full" ] },
 		"placeholderLabel": { "type": "string", "default": "" },
 		"browserLabel": { "type": "string", "default": "" },
 		"enableZoom": { "type": "boolean", "default": false },
@@ -22,7 +22,17 @@
 		"zoomCloseLabel": { "type": "string", "default": "Close image" },
 		"zoomInLabel": { "type": "string", "default": "Zoom in" },
 		"zoomOutLabel": { "type": "string", "default": "Zoom out" },
-		"zoomResetLabel": { "type": "string", "default": "Reset zoom" }
+		"zoomResetLabel": { "type": "string", "default": "Reset zoom" },
+		"mediaType": { "type": "string", "default": "image", "enum": [ "image", "gif", "video" ] },
+		"videoPosterId": { "type": "number", "default": 0 },
+		"videoPosterUrl": { "type": "string", "default": "" },
+		"videoAutoplay": { "type": "boolean", "default": true },
+		"videoLoop": { "type": "boolean", "default": true },
+		"videoMuted": { "type": "boolean", "default": true },
+		"videoControls": { "type": "boolean", "default": false },
+		"videoDecorative": { "type": "boolean", "default": true },
+		"mediaObjectFit": { "type": "string", "default": "cover", "enum": [ "cover", "contain" ] },
+		"mediaMaxHeight": { "type": "string", "default": "" }
 	},
 	"supports": {
 		"html": false,

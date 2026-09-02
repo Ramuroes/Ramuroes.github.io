@@ -1108,25 +1108,6 @@
 	max-width: none;
 }
 
-/* figuras Wide: sangran al borde del viewport en mobile (independiente del
-   ancho del capítulo que las contiene) */
-@media (max-width: 767px) {
-	.es-case__body .es-case-figure--wide {
-		margin-left: calc(-1 * var(--es-pad-x));
-		margin-right: calc(-1 * var(--es-pad-x));
-	}
-
-	.es-case__body .es-case-figure--wide .es-placeholder,
-	.es-case__body .es-case-figure--wide img {
-		border-radius: 0;
-	}
-
-	.es-case__body .es-case-figure--wide figcaption {
-		padding-left: var(--es-pad-x);
-		padding-right: var(--es-pad-x);
-	}
-}
-
 .es-case__body .es-case-label {
 	display: block;
 	font-family: var(--es-mono);
@@ -1193,11 +1174,123 @@
 	border-radius: var(--es-radius);
 }
 
+/* video (mediaType: "video"): mismo marco visual que la imagen — un video
+   dentro de un case-figure standard/wide se ve igual de "integrado" que un
+   screenshot, sin caja/reproductor genérico. height:auto explícito porque
+   <video>, a diferencia de <img>, no tiene ese comportamiento por defecto
+   en todos los navegadores al forzar width. object-fit/max-height puntual
+   (mediaObjectFit/mediaMaxHeight) llegan por style="" inline desde
+   render.php — acá sólo el look base. */
+.es-case__body .es-case-figure__video {
+	display: block;
+	width: 100%;
+	height: auto;
+	border: 1px solid var(--es-line);
+	border-radius: var(--es-radius);
+}
+
 /* placeholder de imagen todavía no subida, usado dentro de una figura del
    editor: sin este aspect-ratio el marco quedaría colapsado a la altura
    del tag "{asset: ...}" en vez de leerse como un espacio reservado. */
 .es-case__body .es-case-figure .es-placeholder {
 	aspect-ratio: 16 / 9;
+}
+
+/* Wide/large y full DESPUÉS de la regla base .es-case-figure { margin: … }
+   de arriba a propósito (bug real, encontrado con Playwright al testear
+   este ticket): esa regla base y estas dos comparten exactamente la misma
+   especificidad (.es-case__body + una clase = 0,2,0) — puestas ANTES en
+   el archivo (como estaban originalmente), la regla base "gana" por orden
+   de aparición y pisa margin-left/margin-right de vuelta a 0, así que el
+   sangrado nunca se veía (ni en mobile con --wide, que ya existía antes
+   de este ticket). Van DESPUÉS para ganar el empate de especificidad. Si
+   en el futuro se agrega OTRA regla con margin/margin-left/margin-right
+   sobre .es-case-figure (sin :not() ni mayor especificidad), va a pisar
+   esto de nuevo — mantené el orden. */
+
+/* figuras Wide/Large: sangran al borde del viewport en mobile
+   (independiente del ancho del capítulo que las contiene) */
+@media (max-width: 767px) {
+	.es-case__body .es-case-figure--wide {
+		margin-left: calc(-1 * var(--es-pad-x));
+		margin-right: calc(-1 * var(--es-pad-x));
+	}
+
+	.es-case__body .es-case-figure--wide .es-placeholder,
+	.es-case__body .es-case-figure--wide img,
+	.es-case__body .es-case-figure--wide .es-case-figure__video {
+		border-radius: 0;
+	}
+
+	.es-case__body .es-case-figure--wide figcaption {
+		padding-left: var(--es-pad-x);
+		padding-right: var(--es-pad-x);
+	}
+}
+
+/* Full width / hero (ticket "ampliar sistema multimedia de los Case
+   Studies"): sangrado real al viewport en TODOS los breakpoints, no sólo
+   mobile como --wide de arriba. calc(50% - 50vw) en vez del
+   -1*--es-pad-x que usa --wide: ese último sólo llega al borde cuando el
+   container mide exactamente 100vw - 2*--es-pad-x (cierto en mobile/
+   tablet, falso en desktop una vez que el container toca su tope
+   --es-max-w) — calc(50% - 50vw) se autoajusta sea cual sea el ancho real
+   del padre, así que funciona idéntico en los tres breakpoints sin media
+   queries propias.
+   overflow:hidden queda SCOPEADO ACÁ, nunca en .es-page ni en ningún
+   ancestro — ver la nota grande en base.css: overflow-x en .es-page
+   convierte a .es-page en su propio scroll container y rompe
+   position:sticky del header y del índice del caso. Mismo patrón que ya
+   usa .es-hero (hero.css) para su propio sangrado.
+   Asume que la figura vive en el flujo normal del body/sección del caso
+   — mismo supuesto que ya documenta .es-case-section para "ancho
+   completo" más abajo. Anidada dentro de una columna angosta de
+   Gutenberg (Columns 40/60, etc.) el breakout ya no tiene sentido
+   conceptual — un hero a pantalla completa dentro de una columna del 40%
+   no es el caso de uso que pide el ticket — y no está contemplado. */
+.es-case__body .es-case-figure--full {
+	width: 100vw;
+	max-width: 100vw;
+	margin-left: calc(50% - 50vw);
+	margin-right: calc(50% - 50vw);
+	overflow: hidden;
+}
+
+/* Edge-to-edge de verdad: sin el marco de 1px ni las esquinas redondeadas
+   que sí tiene la figura standard/wide — un borde pegado al filo del
+   viewport rompe el efecto "visual break" que pide el ticket. */
+.es-case__body .es-case-figure--full img,
+.es-case__body .es-case-figure--full .es-case-figure__video,
+.es-case__body .es-case-figure--full .es-placeholder {
+	display: block;
+	width: 100%;
+	border: 0;
+	border-radius: 0;
+}
+
+/* El caption NO sangra con el media: sigue alineado a la medida de
+   lectura del caso ("no necesariamente tiene que ocupar todo el
+   viewport", pedido explícito del ticket) — mismo padding lateral que ya
+   usa --wide en mobile, más un tope de --es-case-measure centrado para
+   que en desktop no se estire de borde a borde. */
+/* margin-left NO es auto-centering: un auto simple centra el caption
+   dentro del ANCHO COMPLETO DEL VIEWPORT (parent real del caption, porque
+   la figura es full-bleed) — en desktop ancho eso lo desalinea contra el
+   resto del texto del caso (que arranca en el borde del container
+   --es-max-w, NO en el centro del viewport). Este calc() reproduce esa
+   misma posición: (hueco entre viewport y el container ya centrado) / 2
+   + el padding del container — el mismo cálculo que ya resuelve
+   .es-container con max-width/margin:auto/padding, aplicado a mano porque
+   el caption ya no es descendiente de ese container (está fuera, dentro
+   de la figura que rompió el layout). min(): por debajo del breakpoint
+   donde el container toca su tope --es-max-w, container_width = 100vw,
+   así que esto colapsa exactamente al mismo padding-based inset que ya
+   funcionaba en mobile/tablet — margin-right simétrico evita que el
+   caption llegue al borde derecho ahí mismo. */
+.es-case__body .es-case-figure--full figcaption {
+	max-width: var(--es-case-measure);
+	margin-left: calc((100vw - min(var(--es-max-w), 100vw)) / 2 + var(--es-pad-x));
+	margin-right: var(--es-pad-x);
 }
 
 /* ---------- disparador de zoom (opcional, `enableZoom`) ----------
