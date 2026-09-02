@@ -1,340 +1,244 @@
 <!--
-  ESTAVILLO — Contenido de Case Study: "Presupuestador" (Guzmán Villalba) — ES
+  ESTAVILLO — Contenido de Case Study: "Restimator / Presupuestador"
+  (Guzmán Villalba) — ES, edición de bloques Gutenberg
   ============================================================================
-  CÓMO USAR ESTE ARCHIVO
+  CÓMO USAR ESTE ARCHIVO (CAMBIÓ — ver nota 7)
   ----------------------------------------------------------------------------
   1. En wp-admin, creá/abrí el post de Case Study en español (Case
      Studies → Add New, o su traducción vía Polylang si el post en
      inglés ya existe).
-  2. En el editor de bloques, agregá un bloque "Custom HTML" y pegá TODO
-     lo que está debajo del final de este comentario de instrucciones (no
-     pegues este bloque de comentario — son instrucciones, no contenido).
-  3. Los campos nativos van por separado — ver
+  2. Abrí el editor de bloques. Menú "⋮" (Opciones) → "Editor de código"
+     (o Ctrl+Shift+Alt+M / Cmd+Shift+Alt+M). Pegá TODO lo que está
+     debajo del final de este comentario de instrucciones.
+  3. Volvé a "Editor visual" desde el mismo menú de Opciones. WordPress
+     convierte el texto pegado en bloques reales y editables — Case
+     Section, Case Flow / Case Flow v2, Case Taxonomy, Case Timeline,
+     Case Decisions, Case Status, Case Details, Case Figure, más
+     Paragraph/List nativos. Si algún bloque muestra "Este bloque
+     contiene contenido inesperado o inválido", es un problema de
+     pegado (pegado parcial, o autocorrección del editor) — volvé a
+     pegar el bloque completo desde este archivo, no edites a mano el
+     HTML recuperado.
+  4. Los campos nativos van por separado — ver
      docs/content/presupuestador-case-study-fields.md para los valores
-     exactos recomendados en español (Title, Excerpt, Tags, Eyebrow,
-     Status, Role, Tools, Period, Hero layout, Case index).
-  4. Todo lo de abajo usa SOLO la librería de clases .es-case-*
-     existente (case-study.css) — sin markup nuevo, sin estilos inline,
-     sin JS.
-  5. Nota editorial importante: los números específicos que existían en
-     un borrador anterior de este caso (p. ej. "3–5 días de espera",
-     "2 personas no podían presupuestar") no estaban respaldados por
-     ninguna fuente verificable en este repositorio, así que ESTE
-     archivo los reemplaza por lenguaje cualitativo honesto o por
-     placeholders explícitos [DATO PENDIENTE DE VALIDACIÓN — ...]. Si
-     tenés el número real, reemplazá el placeholder correspondiente
-     antes de publicar — no lo dejes en blanco y no inventes un valor.
-  6. Mismo criterio para citas: este archivo NO incluye una cita
-     firmada — el cierre está escrito como reflexión en primera persona
-     sin atribución de comillas, para no presentar como "dicho
-     textual" algo que no fue verificado palabra por palabra.
+     recomendados en español (Title, Excerpt, Tags, Eyebrow, Status,
+     Role, Tools, Period, Hero layout, Case index). El Case Index de
+     ese archivo puede necesitar actualizarse — ver
+     docs/content/presupuestador-case-study-update-notes.md para el
+     mapa exacto de anchors nuevo.
+  5. Cada imagen es un bloque Case Figure real con una etiqueta
+     placeholder {asset: …} — seleccioná el bloque en el editor para
+     reemplazar el placeholder por una imagen real de la Biblioteca de
+     medios cuando exista. Ver
+     docs/content/presupuestador-case-study-update-notes.md para qué
+     imagen real de la curaduría (PORTFOLIO_FINAL_SELECTION) corresponde
+     a cada placeholder, y cuáles necesitan anonimización antes de
+     poder subirse.
+  6. Nota editorial: los números específicos que no tienen una fuente
+     verificable en este repositorio siguen marcados como
+     [DATO PENDIENTE DE VALIDACIÓN — …]. No reemplaces un placeholder
+     de estos sin el dato real — no inventes un valor. Tampoco hay cita
+     firmada: el cierre está escrito como reflexión en primera persona,
+     no como declaración textual atribuida.
+  7. CAMBIO DE FORMATO (esta actualización): las versiones anteriores de
+     este archivo eran un único bloque "Custom HTML" con las clases
+     .es-case-*. Esta versión es una secuencia real de bloques
+     Gutenberg — necesario para poder insertar los bloques Case
+     Flow/Case Flow v2 (interactivos, con datos propios), que NO
+     funcionan pegados dentro de un bloque Custom HTML. El resultado
+     visual de las secciones de texto es el mismo (misma librería de
+     clases .es-case-*, ahora emitida por los bloques en vez de HTML de
+     mano). Ver la nota de decisión técnica en
+     docs/content/presupuestador-case-study-update-notes.md.
   ============================================================================
 -->
 
-<div class="es-case-section" id="overview">
-	<div class="es-case-label">Fig. 00 — Resumen</div>
-	<h2 class="es-case-heading">Un presupuesto que dependía de una sola cabeza, convertido en un criterio que se puede escribir, discutir y mejorar.</h2>
-	<p class="es-case-lead">Presupuestador es un sistema de apoyo a la decisión para un taller de fabricación metálica en Montevideo. El objetivo no fue construir una app de presupuestos genérica, sino hacer explícito el criterio de precios que hasta ahora vivía en la cabeza de una sola persona — y ponerlo a disposición del resto del equipo sin perder el juicio experto que lo sostiene.</p>
+<!-- wp:estavillo/case-section {"anchor":"overview","label":"Fig. 00 — Resumen","heading":"Un presupuesto que dependía de una sola cabeza, convertido en un sistema que creció junto con el problema.","lead":"Restimator (nombre interno: Presupuestador) es un sistema de apoyo a la decisión para un taller de fabricación metálica en Montevideo. No nació como un producto — nació como una planilla para entender si el criterio de precios de una sola persona se podía volver explícito. De ahí evolucionó en etapas: un estimador rápido primero, un sistema de presupuestos y producción después. Este caso cuenta esa evolución completa, incluyendo lo que todavía está en desarrollo."} -->
+<!-- wp:estavillo/case-ladder {"steps":[{"label":"Diagnóstico y criterios documentados","state":"done"},{"label":"MVP en Google Sheets","state":"done"},{"label":"Restimator rápido V1","state":"done"},{"label":"Presupuesto y producción V2","state":"active"},{"label":"Cierre estimado vs. real","state":"future"}]} /-->
 
-	<ol class="es-case-ladder">
-		<li class="es-case-ladder__step">Diagnóstico operativo</li>
-		<li class="es-case-ladder__step">Criterios documentados</li>
-		<li class="es-case-ladder__step">MVP en Google Sheets</li>
-		<li class="es-case-ladder__step">Calibración contra el presupuestador</li>
-		<li class="es-case-ladder__step es-case-ladder__step--active">App Alpha</li>
-		<li class="es-case-ladder__step">Adopción en todo el equipo</li>
-	</ol>
-	<p class="es-case-caption">Dónde está hoy el proyecto: App Alpha está construida y responde presupuestos reales; el paso siguiente —que todo el equipo presupueste de forma independiente— es el objetivo, todavía no un resultado medido (más en Resultados y Limitaciones, más abajo).</p>
-</div>
+<!-- wp:paragraph {"className":"es-case-caption"} -->
+<p class="es-case-caption">Dónde está hoy el proyecto: el estimador rápido V1 está implementado y en uso; la V2 — presupuesto completo, aprobaciones y producción — tiene partes implementadas en desarrollo activo y partes todavía en diseño. Ningún tramo de este caso presenta un prototipo como si ya estuviera funcionando (más en Validación y estado actual, más abajo).</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
 
-<div class="es-case-section" id="context">
-	<div class="es-case-label">Fig. 01 — Contexto</div>
-	<h2 class="es-case-heading">Un taller que presupuesta bien — pero despacio, y desde la cabeza de una sola persona.</h2>
-	<p class="es-case-lead">Guzmán Villalba es un taller de fabricación metálica en Montevideo. Cada trabajo — desde una baranda a medida hasta una tanda completa de piezas — arranca con un presupuesto. Durante años, ese presupuesto salió del criterio de un solo presupuestador: material, mano de obra, tiempo de máquina y margen, calculados desde la memoria y la experiencia, no desde un sistema escrito.</p>
-	<p>Eso funcionó mientras el volumen fue manejable. Pero los pedidos empezaron a hacer cola detrás de una sola persona. Alguien nuevo en el equipo no podía presupuestar sin acompañar el proceso durante meses. Y como el criterio vivía solo en su cabeza, no se podía cuestionar, versionar ni mejorar — solo repetir.</p>
-</div>
+<!-- wp:estavillo/case-section {"anchor":"context","label":"Fig. 01 — Contexto","heading":"Un taller que presupuesta bien — pero despacio, y desde la cabeza de una sola persona.","lead":"Guzmán Villalba es un taller de fabricación metálica en Montevideo. Cada trabajo — desde una baranda a medida hasta una tanda completa de piezas — arranca con un presupuesto. Durante años, ese presupuesto salió del criterio de un solo presupuestador: material, mano de obra, tiempo de máquina y margen, calculados desde la memoria y la experiencia, no desde un sistema escrito."} -->
+<!-- wp:paragraph -->
+<p>Eso funcionó mientras el volumen fue manejable. Pero los pedidos empezaron a hacer cola detrás de una sola persona. Alguien nuevo en el equipo no podía presupuestar sin acompañar el proceso durante meses. Y como el criterio vivía solo en su cabeza, no se podía cuestionar, versionar ni mejorar — solo repetir.</p>
+<!-- /wp:paragraph -->
 
-<div class="es-case-section" id="problem">
-	<div class="es-case-label">Fig. 02 — El problema operativo</div>
-	<h2 class="es-case-heading">Un presupuesto lento puede perder el trabajo antes de cortar el primer caño.</h2>
-	<p class="es-case-lead">Un cliente que llama pidiendo un número aproximado necesita una respuesta rápida y defendible. Si la única vía es un presupuesto formal completo — y ese presupuesto depende de que una persona puntual tenga tiempo libre esa semana — la respuesta llega tarde, o no llega.</p>
-	<ul>
-		<li>El criterio de precios no estaba escrito en ningún lado: vivía en la experiencia de una persona.</li>
-		<li>No había una forma rápida de dar un rango orientativo sin armar el presupuesto completo.</li>
-		<li>Sumar gente al equipo de presupuestos significaba, en la práctica, que esa persona los acompañara caso por caso.</li>
-	</ul>
-	<p>[DATO PENDIENTE DE VALIDACIÓN — si existe un tiempo de respuesta promedio real (p. ej. días de espera típicos para un presupuesto formal), reemplazar este párrafo con ese dato concreto. No se incluye acá un número porque no hay una fuente verificable en este repositorio.]</p>
-</div>
+<!-- wp:estavillo/case-figure {"variant":"standard","tag":"01","caption":"[IMAGE: as-is-context] — diagnóstico inicial sobre presupuestos y facturación históricos del taller. Candidato real: HIST-0030 (curaduría 2026-09-02, sin restricción de anonimización, pendiente autorizar la publicación de métricas agregadas).","placeholderLabel":"as-is-context","alt":"Placeholder para el diagnóstico histórico del taller"} /-->
+<!-- /wp:estavillo/case-section -->
 
-<div class="es-case-section" id="discovery">
-	<div class="es-case-label">Fig. 03 — Entender el flujo real</div>
-	<h2 class="es-case-heading">Mirar cómo se arma un presupuesto, no solo preguntar cómo se arma.</h2>
-	<div class="es-case-cols">
-		<div>
-			<p>Las entrevistas solas no alcanzaron para entender cuánto criterio había en juego — el propio presupuestador tenía dificultad para poner en palabras sus propias reglas. Acompañar varios presupuestos reales de punta a punta mostró las variables reales en juego: tipo y espesor del material, complejidad del corte, terminaciones, disponibilidad de máquina esa semana, y un margen que se ajustaba según la relación con el cliente y la urgencia del pedido.</p>
-			<p>El hallazgo más claro: el criterio no era arbitrario, era <em>consistente pero no estaba documentado</em> — lo que significaba que se podía capturar como un modelo explícito, en vez de reemplazarlo por una fórmula genérica que hubiera ignorado las condiciones reales del taller.</p>
-		</div>
-		<figure class="es-case-figure">
-			<div class="es-placeholder" role="img" aria-label="Placeholder para foto o notas de investigación">
-				<span class="es-placeholder__tag">{asset: discovery-notes}</span>
-			</div>
-			<figcaption class="es-case-caption">
-				<span class="es-case-caption__tag">01</span>
-				<span>[CAPTURA PENDIENTE — foto del acompañamiento de presupuestos o de las notas de investigación sintetizadas.]</span>
-			</figcaption>
-		</figure>
-	</div>
-</div>
+<!-- wp:estavillo/case-section {"anchor":"problem","label":"Fig. 02 — El problema operativo","heading":"Un presupuesto lento puede perder el trabajo antes de cortar el primer caño.","lead":"Un cliente que llama pidiendo un número aproximado necesita una respuesta rápida y defendible. Si la única vía es un presupuesto formal completo — y ese presupuesto depende de que una persona puntual tenga tiempo libre esa semana — la respuesta llega tarde, o no llega."} -->
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>El criterio de precios no estaba escrito en ningún lado: vivía en la experiencia de una persona.</li>
+<!-- /wp:list-item -->
 
-<div class="es-case-section" id="system">
-	<div class="es-case-label">Fig. 04 — Hipótesis de diseño y arquitectura</div>
-	<h2 class="es-case-heading">Un solo modelo de precios, varias superficies.</h2>
-	<p class="es-case-lead">La hipótesis de partida: si el criterio del presupuestador se podía volver explícito, no hacía falta reemplazar su juicio — hacía falta darle una forma que otra persona pudiera usar, cuestionar y mejorar. En vez de construir una aplicación única desde el principio, el sistema separa la <em>lógica de precios</em> (versionada, inspeccionable, propiedad del taller) de las <em>superficies</em> que la consultan — así el presupuestador podía seguir trabajando desde el primer día, y la interfaz podía evolucionar sin tocar la lógica de fondo.</p>
+<!-- wp:list-item -->
+<li>No había una forma rápida de dar un rango orientativo sin armar el presupuesto completo.</li>
+<!-- /wp:list-item -->
 
-	<div class="es-case-cols">
-		<div class="es-case-browser">
-			<div class="es-case-browser__bar">
-				<span class="es-case-browser__dot"></span>
-				<span class="es-case-browser__dot"></span>
-				<span class="es-case-browser__dot"></span>
-				<span class="es-case-browser__label">diagrama-de-sistema</span>
-			</div>
-			<div class="es-placeholder" role="img" aria-label="Placeholder para diagrama de arquitectura del sistema">
-				<span class="es-placeholder__tag">{asset: architecture-diagram}</span>
-			</div>
-		</div>
-		<div>
-			<p>Los datos de entrada (material, dimensiones, terminación, urgencia) alimentan un único modelo de precios. Ese modelo devuelve tanto un rango orientativo rápido como, una vez confirmado, un presupuesto detallado. El mismo modelo se consulta desde el MVP en Sheets y, más adelante, desde la app Alpha — cambiar de superficie nunca implica rehacer la lógica.</p>
-			<p>[DIAGRAMA PENDIENTE — reemplazar el placeholder por el flujo real de entradas → modelo de precios → salidas una vez que exista como asset final.]</p>
-		</div>
-	</div>
+<!-- wp:list-item -->
+<li>Sumar gente al equipo de presupuestos significaba, en la práctica, que esa persona los acompañara caso por caso.</li>
+<!-- /wp:list-item -->
 
-	<div class="es-case-taxonomy">
-		<div class="es-case-taxonomy__root">Modelo de precios — las entradas que lee</div>
-		<div class="es-case-taxonomy__grid">
-			<div class="es-case-taxonomy__item">
-				<div class="es-case-taxonomy__item-title">Material y espesor</div>
-				<div class="es-case-taxonomy__item-meta">mueve el costo</div>
-			</div>
-			<div class="es-case-taxonomy__item">
-				<div class="es-case-taxonomy__item-title">Complejidad del corte</div>
-				<div class="es-case-taxonomy__item-meta">mueve la mano de obra</div>
-			</div>
-			<div class="es-case-taxonomy__item">
-				<div class="es-case-taxonomy__item-title">Terminaciones</div>
-				<div class="es-case-taxonomy__item-meta">mueve la mano de obra</div>
-			</div>
-			<div class="es-case-taxonomy__item">
-				<div class="es-case-taxonomy__item-title">Disponibilidad de máquina esa semana</div>
-				<div class="es-case-taxonomy__item-meta">capacidad, no precio</div>
-			</div>
-		</div>
-		<div class="es-case-taxonomy__mods">
-			<div class="es-case-taxonomy__mods-label">Se ajusta<br>según…</div>
-			<div class="es-case-taxonomy__mods-tags">
-				<span class="es-case-taxonomy__tag">Relación con el cliente</span>
-				<span class="es-case-taxonomy__tag">Urgencia</span>
-			</div>
-		</div>
-	</div>
-	<p class="es-case-caption">Las mismas variables que aparecieron en el descubrimiento — material y espesor, complejidad de corte, terminaciones y tiempo de máquina definen costo y mano de obra; la relación con el cliente y la urgencia ajustan desde ahí.</p>
+<!-- wp:list-item -->
+<li>La información de cada pedido quedaba repartida entre WhatsApp, mail, llamadas y planillas sueltas.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
 
-	<div class="es-case-stats">
-		<div class="es-case-stat">
-			<div class="es-case-stat__num">1</div>
-			<div class="es-case-stat__label">modelo de precios único, versionado</div>
-		</div>
-		<div class="es-case-stat">
-			<div class="es-case-stat__num">2</div>
-			<div class="es-case-stat__label">superficies que lo consultan (Sheets y App Alpha)</div>
-		</div>
-		<div class="es-case-stat">
-			<div class="es-case-stat__num">2</div>
-			<div class="es-case-stat__label">tipos de salida por consulta: rango rápido y presupuesto detallado</div>
-		</div>
-	</div>
-	<p class="es-case-caption">Estos tres números describen decisiones de diseño del sistema (cuántos modelos, cuántas superficies, cuántos tipos de salida) — no métricas de negocio del taller.</p>
-</div>
+<!-- wp:estavillo/case-figure {"variant":"standard","tag":"02","caption":"[IMAGE: manual-cost-sheet] — la planilla de costos manual que sostenía el criterio de precios. Candidato real: HIST-0041 (marcado ANON_REQUIRED en la curaduría — no publicable hasta anonimizar precios y tarifas).","placeholderLabel":"manual-cost-sheet","alt":"Placeholder para la planilla de costos manual"} /-->
 
-<div class="es-case-section" id="mvp">
-	<div class="es-case-label">Fig. 05 — MVP en Google Sheets + Apps Script</div>
-	<h2 class="es-case-heading">Publicar la lógica antes que la interfaz.</h2>
-	<p class="es-case-lead">La primera versión del modelo de precios vivió enteramente en Google Sheets con Apps Script — a propósito, para que el presupuestador pudiera corregir y extender el criterio él mismo, sin depender de un ciclo de desarrollo, y para poder validar el sistema contra presupuestos reales antes de construir cualquier interfaz.</p>
+<!-- wp:paragraph -->
+<p>[DATO PENDIENTE DE VALIDACIÓN — si existe un tiempo de respuesta promedio real (p. ej. días de espera típicos para un presupuesto formal), reemplazar este párrafo con ese dato concreto. No se incluye acá un número porque no hay una fuente verificable en este repositorio.]</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
 
-	<div class="es-case-browser">
-		<div class="es-case-browser__bar">
-			<span class="es-case-browser__dot"></span>
-			<span class="es-case-browser__dot"></span>
-			<span class="es-case-browser__dot"></span>
-			<span class="es-case-browser__label">presupuestador.xlsx — modelo de precios v1</span>
-		</div>
-		<div class="es-placeholder" role="img" aria-label="Placeholder para captura de la planilla del MVP">
-			<span class="es-placeholder__tag">{asset: mvp-sheets-screenshot}</span>
-		</div>
-	</div>
+<!-- wp:estavillo/case-section {"anchor":"as-is","label":"Fig. 03 — Cómo funcionaba antes","heading":"Antes de Restimator, cada presupuesto era un recorrido artesanal por varios sistemas desconectados.","lead":"Entender este flujo no salió de preguntarle al presupuestador cómo trabajaba — el propio presupuestador tenía dificultad para poner en palabras sus propias reglas. Acompañar varios presupuestos reales de punta a punta fue lo que mostró el recorrido completo, y confirmó algo importante: el criterio no era arbitrario, era <em>consistente pero no estaba documentado</em>. Eso significaba que se podía capturar como un modelo explícito, en vez de reemplazarlo por una fórmula genérica que hubiera ignorado las condiciones reales del taller."} -->
+<!-- wp:estavillo/case-flow {"sectionLabel":"Antes de Restimator","startLabel":"Solicitud entra","endLabel":"Presupuesto enviado","detailLabel":"Ver detalle","closeLabel":"Cerrar","stepLabel":"Paso","nodes":[{"id":"inicio","kind":"start","accent":"","title":"Inicio","text":"","edges":[{"to":"info-dispersa"}]},{"id":"info-dispersa","kind":"step","num":"01","title":"Información dispersa","text":"El pedido llega por WhatsApp, mail o teléfono, sin un formato común.","detail":[{"label":"Punto de fricción","text":"Cada canal guarda la información de una forma distinta — nada queda centralizado desde el primer contacto."}],"edges":[{"to":"revision-manual"}]},{"id":"revision-manual","kind":"step","num":"02","title":"Revisión manual","text":"Alguien tiene que leer, ordenar y entender el pedido antes de poder avanzar.","edges":[{"to":"busqueda"}]},{"id":"busqueda","kind":"step","num":"03","title":"Búsqueda de antecedentes, precios y proveedores","text":"Se revisan presupuestos parecidos, precios de materiales y disponibilidad de proveedores.","detail":[{"label":"Punto de fricción","text":"Buena parte de esta búsqueda depende de la memoria y el criterio de una sola persona, no de un registro consultable por cualquiera."}],"edges":[{"to":"sheets"}]},{"id":"sheets","kind":"step","num":"04","title":"Armado en Google Sheets","text":"El presupuesto se arma a mano, celda por celda, en una planilla de trabajo.","edges":[{"to":"validacion"}]},{"id":"validacion","kind":"milestone","num":"05","title":"Validación con Guzmán","text":"El presupuesto armado pasa por el dueño del criterio antes de continuar.","detail":[{"label":"Punto de fricción","text":"Esta validación es un cuello de botella recurrente: nada avanza sin que una persona puntual tenga tiempo disponible esa semana."}],"edges":[{"to":"correcciones"}]},{"id":"correcciones","kind":"step","num":"06","title":"Correcciones","text":"Se ajustan cálculos, materiales o condiciones según lo que indique la validación.","detail":[{"label":"Punto de fricción","text":"Las correcciones no quedan documentadas como reglas reutilizables — cada vez se resuelven de nuevo, caso por caso."}],"edges":[{"to":"carga"},{"to":"validacion","label":"Revalidar"}]},{"id":"carga","kind":"step","num":"07","title":"Carga en Zoho / PDF","text":"El presupuesto aprobado se pasa a un documento formal para el cliente.","edges":[{"to":"envio"}]},{"id":"envio","kind":"step","num":"08","title":"Envío al cliente","text":"","edges":[{"to":"fin"}]},{"id":"fin","kind":"end","accent":"","title":"Fin","text":"","edges":[]}]} /-->
 
-	<p>Cada presupuesto que pasaba por la planilla quedaba registrado. Esa base de presupuestos —no un número de negocio, sino el propio material de trabajo del sistema— es lo que después permitió comparar el modelo contra el criterio del presupuestador y ajustar la ponderación antes de pasar a una interfaz dedicada.</p>
-</div>
+<!-- wp:paragraph {"className":"es-case-caption"} -->
+<p class="es-case-caption">Ningún paso de este flujo estaba mal hecho — el taller presupuestaba bien. El problema era estructural: el conocimiento vivía en una sola cabeza, la información no quedaba centralizada, y cada corrección se resolvía de nuevo en vez de convertirse en una regla reutilizable. Esos tres problemas — dependencia de una persona, información dispersa y repetición de trabajo — son exactamente lo que las etapas siguientes fueron resolviendo, una por una.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
 
-<div class="es-case-section" id="testing">
-	<div class="es-case-label">Fig. 06 — Testing e iteración</div>
-	<h2 class="es-case-heading">El presupuestador como referencia, no como usuario de prueba.</h2>
-	<p class="es-case-lead">La validación no fue una tanda de usability testing con usuarios externos — fue comparar, presupuesto por presupuesto, lo que proponía el modelo contra lo que decía el propio presupuestador. Cuando coincidían, eso confirmaba una regla. Cuando no coincidían, esa diferencia era la señal para revisar el modelo, no para descartar el desacuerdo.</p>
+<!-- wp:estavillo/case-section {"anchor":"hypothesis","label":"Fig. 04 — Hipótesis y objetivo","heading":"Si el criterio se podía volver explícito, no hacía falta reemplazar el juicio del presupuestador — hacía falta darle una forma.","lead":"La hipótesis de partida: capturar el criterio de precios como un modelo explícito, versionado e inspeccionable, y separarlo de las superficies que lo consultan. Así el presupuestador podía seguir trabajando desde el primer día sin cambiar su forma de operar, mientras el modelo se iba validando — y la interfaz podía evolucionar después, sin tener que rehacer la lógica de precios cada vez."} -->
+<!-- wp:estavillo/case-stats {"items":[{"num":"1","label":"criterio de precios, capturado como modelo explícito"},{"num":"2","label":"etapas de producto planeadas desde el inicio: estimador rápido primero, sistema completo después"}]} /-->
 
-	<ol class="es-case-timeline">
-		<li class="es-case-timeline__item">
-			<div class="es-case-timeline__title">Correr un presupuesto real por el modelo</div>
-			<div class="es-case-timeline__text">Mismo caso, dos criterios: el del modelo y el del presupuestador, uno al lado del otro.</div>
-		</li>
-		<li class="es-case-timeline__item">
-			<div class="es-case-timeline__title">Marcar coincidencias y desvíos</div>
-			<div class="es-case-timeline__text">Los desvíos no se promediaban ni se ignoraban — cada uno se revisaba para entender qué variable faltaba o estaba mal ponderada.</div>
-		</li>
-		<li class="es-case-timeline__item">
-			<div class="es-case-timeline__title">Ajustar el modelo, no el criterio</div>
-			<div class="es-case-timeline__text">El objetivo era que el modelo aprendiera a explicar el criterio del presupuestador — no al revés.</div>
-		</li>
-	</ol>
+<!-- wp:paragraph {"className":"es-case-caption"} -->
+<p class="es-case-caption">Estos dos números describen decisiones de diseño del proyecto — cuántos modelos de precios, cuántas etapas planeadas — no métricas de negocio del taller.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
 
-	<p>[DATO PENDIENTE DE VALIDACIÓN — si existe una cifra real de cobertura o precisión del modelo frente al criterio del presupuestador (por ejemplo, en cuántos casos coincidieron dentro de un rango aceptable), incorporarla acá con su fuente. Mientras tanto, este proceso se describe de forma cualitativa porque no hay una cifra confirmada.]</p>
-</div>
+<!-- wp:estavillo/case-section {"anchor":"mvp","label":"Fig. 05 — Primer MVP: Google Sheets + Apps Script","heading":"Publicar la lógica antes que la interfaz.","lead":"La primera versión del modelo de precios vivió enteramente en Google Sheets con Apps Script — a propósito, para que el presupuestador pudiera corregir y extender el criterio él mismo, sin depender de un ciclo de desarrollo, y para poder validar el sistema contra presupuestos reales antes de construir cualquier interfaz."} -->
+<!-- wp:estavillo/case-figure {"variant":"browser","browserLabel":"presupuestador.xlsx — modelo de precios v1","caption":"[IMAGE: google-sheets-mvp] — el MVP construido dentro de la propia planilla del taller. Candidato real: V1-0001 (marcado ANON_REQUIRED en la curaduría — sustituir datos e importes por un caso ficticio antes de publicar).","placeholderLabel":"google-sheets-mvp","alt":"Placeholder para la captura de la planilla del MVP"} /-->
 
-<div class="es-case-section" id="app-alpha">
-	<div class="es-case-label">Fig. 07 — App Alpha</div>
-	<h2 class="es-case-heading">De una planilla que solo una persona sabía manejar, a una herramienta que puede usar el equipo.</h2>
+<!-- wp:paragraph -->
+<p>Cada presupuesto que pasaba por la planilla quedaba registrado. Esa base de presupuestos —no un número de negocio, sino el propio material de trabajo del sistema— es lo que después permitió comparar el modelo contra el criterio del presupuestador y ajustar la ponderación, corrida tras corrida: mismo caso, dos criterios uno al lado del otro; los desvíos no se promediaban ni se ignoraban, se revisaban para entender qué variable faltaba o estaba mal ponderada. El objetivo siempre fue que el modelo aprendiera a explicar el criterio del presupuestador, no al revés.</p>
+<!-- /wp:paragraph -->
 
-	<div class="es-case-browser">
-		<div class="es-case-browser__bar">
-			<span class="es-case-browser__dot"></span>
-			<span class="es-case-browser__dot"></span>
-			<span class="es-case-browser__dot"></span>
-			<span class="es-case-browser__label">app.presupuestador — alpha</span>
-		</div>
-		<div class="es-placeholder" role="img" aria-label="Placeholder para captura de App Alpha">
-			<span class="es-placeholder__tag">{asset: app-alpha-screenshot}</span>
-		</div>
-	</div>
+<!-- wp:paragraph -->
+<p>[DATO PENDIENTE DE VALIDACIÓN — si existe una cifra real de cobertura o precisión del modelo frente al criterio del presupuestador (por ejemplo, en cuántos casos coincidieron dentro de un rango aceptable), incorporarla acá con su fuente. Mientras tanto, este proceso se describe de forma cualitativa porque no hay una cifra confirmada.]</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
 
-	<ol class="es-case-timeline">
-		<li class="es-case-timeline__item">
-			<div class="es-case-timeline__title">Mismo modelo, puerta de entrada nueva</div>
-			<div class="es-case-timeline__text">La app Alpha consulta el mismo modelo de precios validado en Sheets — no se reescribió la lógica, solo se le dio una interfaz nueva.</div>
-		</li>
-		<li class="es-case-timeline__item">
-			<div class="es-case-timeline__title">Entrada guiada en vez de una planilla en blanco</div>
-			<div class="es-case-timeline__text">Un formulario corto y estructurado reemplaza las celdas libres, para que cualquiera del equipo —no solo el presupuestador original— pueda armar un presupuesto consistente.</div>
-		</li>
-		<li class="es-case-timeline__item">
-			<div class="es-case-timeline__title">Rango rápido primero, presupuesto preciso después</div>
-			<div class="es-case-timeline__text">La app responde un "más o menos cuánto" orientado al cliente en segundos, y después acompaña armar el presupuesto detallado.</div>
-		</li>
-	</ol>
-</div>
+<!-- wp:estavillo/case-section {"anchor":"v1-product","label":"Fig. 06 — Restimator rápido V1","heading":"Primera hipótesis de producto: estimar antes de presupuestar.","lead":"El modelo validado en Sheets pasó a tener su propia interfaz — pero no como el presupuestador completo que existe hoy, sino como una herramienta deliberadamente chica: clasificar el pedido, pedir lo mínimo indispensable y devolver un rango rápido. La pregunta que resuelve no es \"¿cuánto sale?\" en detalle, sino \"¿vale la pena seguir?\"."} -->
+<!-- wp:estavillo/case-flow {"sectionLabel":"Primera hipótesis: estimar antes de presupuestar","startLabel":"Solicitud","endLabel":"Presupuesto formal o filtrado","detailLabel":"Ver detalle","closeLabel":"Cerrar","stepLabel":"Paso","nodes":[{"id":"inicio","kind":"start","accent":"","title":"Inicio","text":"","edges":[{"to":"solicitud"}]},{"id":"solicitud","kind":"step","num":"01","title":"Solicitud","text":"El mismo pedido de siempre entra al sistema, ahora por una sola puerta.","edges":[{"to":"clasificacion"}]},{"id":"clasificacion","kind":"step","num":"02","title":"Clasificación rápida","text":"Se ubica el pedido dentro de las familias de trabajo que ya conoce el taller.","edges":[{"to":"familia"}]},{"id":"familia","kind":"step","num":"03","title":"Selección de familia / subcategoría","text":"Baranda, portón, estructura, pieza a medida — cada familia trae su propio criterio.","edges":[{"to":"medidas"}]},{"id":"medidas","kind":"step","num":"04","title":"Ingreso de medidas","text":"Datos mínimos — largo, cantidad, material — sin pedir todavía el detalle completo de un presupuesto formal.","edges":[{"to":"motor"}]},{"id":"motor","kind":"step","num":"05","accent":"signal","title":"Motor de estimación","text":"Calcula un rango a partir del historial de presupuestos, no de una fórmula genérica.","detail":[{"label":"Estado","text":"Implementado. Nació como fórmulas dentro de la misma planilla de Google Sheets del MVP y después pasó a una interfaz web dedicada."},{"label":"Evidencia","text":"Dashboard V1 y versión mobile ya funcionando, usados como herramienta de trabajo real por el equipo."}],"edges":[{"to":"rango"}]},{"id":"rango","kind":"step","num":"06","accent":"signal","title":"Rango recomendado","text":"Un número orientativo, rápido, para decidir si vale la pena seguir.","edges":[{"to":"decision"}]},{"id":"decision","kind":"decision","num":"07","accent":"decision","title":"¿Vale la pena presupuestar formalmente?","text":"El filtro que la planilla nunca tuvo: parar acá si el trabajo no lo justifica.","edges":[{"to":"formal","label":"Sí"},{"to":"filtro","label":"No"}]},{"id":"filtro","kind":"step","title":"Se comunica la estimación preliminar","text":"El cliente recibe una respuesta rápida y honesta, sin que nadie arme un presupuesto completo que después no se usa.","edges":[]},{"id":"formal","kind":"step","title":"Pasa a presupuesto formal","text":"Recién acá arranca el trabajo detallado de presupuestar.","edges":[{"to":"fin"}]},{"id":"fin","kind":"end","accent":"","title":"Fin","text":"","edges":[]}]} /-->
 
-<div class="es-case-section" id="ai">
-	<div class="es-case-label">Fig. 08 — El rol de la IA y del criterio humano</div>
-	<h2 class="es-case-heading">La IA asiste el presupuesto. Nunca fija el precio en silencio.</h2>
-	<p class="es-case-lead">La inteligencia artificial se usa en tres puntos acotados e inspeccionables del flujo — cada uno asistivo, y cada uno revisable por la persona que está armando el presupuesto.</p>
+<!-- wp:estavillo/case-figure {"variant":"standard","tag":"03","caption":"[IMAGE: v1-interface] — el dashboard de Restimator V1 implementado. Candidato real: V1-0003 (marcado ANON_REQUIRED — anonimizar proyectos, nombres e importes antes de publicar).","placeholderLabel":"v1-interface","alt":"Placeholder para el dashboard de Restimator V1"} /-->
 
-	<div class="es-case-decisions">
-		<div class="es-case-decision">
-			<div class="es-case-decision__num">01</div>
-			<h3 class="es-case-decision__title">Leer la entrada cruda</h3>
-			<dl class="es-case-decision__row">
-				<dt>Tarea</dt>
-				<dd>Extraer medidas o notas de material desde una foto o una descripción en texto libre del cliente.</dd>
-				<dt>Resguardo</dt>
-				<dd>Siempre se muestra de vuelta al presupuestador como campos editables antes de correr el modelo.</dd>
-			</dl>
-		</div>
-		<div class="es-case-decision">
-			<div class="es-case-decision__num">02</div>
-			<h3 class="es-case-decision__title">Sugerir un rango</h3>
-			<dl class="es-case-decision__row">
-				<dt>Tarea</dt>
-				<dd>Proponer un rango orientativo a partir de presupuestos anteriores con entradas similares.</dd>
-				<dt>Resguardo</dt>
-				<dd>Se etiqueta explícitamente como sugerencia — el número final lo define la lógica del modelo de precios, no la IA.</dd>
-			</dl>
-		</div>
-		<div class="es-case-decision">
-			<div class="es-case-decision__num">03</div>
-			<h3 class="es-case-decision__title">Marcar anomalías</h3>
-			<dl class="es-case-decision__row">
-				<dt>Tarea</dt>
-				<dd>Señalar un presupuesto que se aleja mucho del patrón histórico, para que alguien lo revise antes de enviarlo.</dd>
-				<dt>Resguardo</dt>
-				<dd>Es solo una alerta — nunca bloquea el envío de un presupuesto, solo pide una segunda mirada.</dd>
-			</dl>
-		</div>
-	</div>
+<!-- wp:estavillo/case-figure {"variant":"standard","tag":"04","caption":"[IMAGE: v1-mobile] — la misma herramienta llevada al celular, para acompañar el contexto operativo del taller. Candidato real: V1-0007 (marcado ANON_REQUIRED).","placeholderLabel":"v1-mobile","alt":"Placeholder para la versión mobile de Restimator V1"} /-->
 
-	<p>El sistema no reemplaza al presupuestador del taller: estructura y pone en operación su criterio. Los rangos sirven para responder rápido y hacer una primera evaluación de viabilidad — un caso fuera de lo común, con condiciones que el modelo todavía no cubre bien, sigue necesitando el juicio de una persona antes de confirmarse.</p>
-</div>
+<!-- wp:paragraph -->
+<p>Restimator V1 nació en la misma planilla del MVP y de ahí pasó a una interfaz web propia — se usó y se sigue usando como herramienta real, no como un piloto descartado. Su objetivo explícito era reducir trabajo innecesario antes del presupuesto formal, no reemplazarlo.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
 
-<div class="es-case-section" id="results">
-	<div class="es-case-label">Fig. 09 — Estado actual</div>
-	<h2 class="es-case-heading">Dónde está el sistema hoy.</h2>
-	<p class="es-case-lead">Presupuestador es un sistema en uso real, no un producto terminado. Esto es lo que se puede afirmar hoy con confianza, y lo que todavía necesita más evidencia antes de poder afirmarse como resultado.</p>
+<!-- wp:estavillo/case-section {"anchor":"learnings-v1","label":"Fig. 07 — Aprendizajes de V1","heading":"Lo difícil nunca fue la pantalla."} -->
+<!-- wp:paragraph -->
+<p>El trabajo de diseño real fue volver explícito un criterio que una persona nunca había tenido que poner en palabras — hacerlo lo bastante claro como para escribirlo, discutirlo y corregirlo. La aplicación fue, en comparación, el paso más simple una vez que eso estaba resuelto.</p>
+<!-- /wp:paragraph -->
 
-	<div class="es-case-status">
-		<div class="es-case-status__col es-case-status__col--done">
-			<div class="es-case-status__head">Vigente hoy</div>
-			<ul class="es-case-status__list">
-				<li>El criterio de precios está escrito, versionado y ya no vive solo en la cabeza de una persona.</li>
-				<li>Existe un modelo único que responde tanto desde Sheets como desde la app Alpha.</li>
-				<li>Cada presupuesto que pasa por el sistema queda registrado, no se pierde en una conversación o un papel.</li>
-			</ul>
-		</div>
-		<div class="es-case-status__col es-case-status__col--attention">
-			<div class="es-case-status__head">Necesita más evidencia</div>
-			<ul class="es-case-status__list">
-				<li>[DATO PENDIENTE DE VALIDACIÓN — impacto real en el tiempo de respuesta al cliente, una vez que haya datos de uso suficientes para medirlo con confianza.]</li>
-				<li>[DATO PENDIENTE DE VALIDACIÓN — cuántas personas del equipo, además del presupuestador original, ya presupuestan de forma independiente usando el sistema.]</li>
-				<li>Los casos atípicos todavía dependen del criterio directo del presupuestador — el sistema no tiene suficiente historial para cubrirlos con confianza.</li>
-			</ul>
-		</div>
-	</div>
-</div>
+<!-- wp:paragraph -->
+<p>También aprendí a desconfiar de la tentación de reemplazar el criterio experto por una fórmula prolija: un modelo que ignora las condiciones reales del taller —la relación con el cliente, la urgencia, la disponibilidad de máquina esa semana— hubiera sido más simple de construir, y peor. El sistema tenía que aprender del presupuestador, no corregirlo desde afuera.</p>
+<!-- /wp:paragraph -->
 
-<div class="es-case-section" id="limitations">
-	<div class="es-case-label">Fig. 10 — Limitaciones</div>
-	<h2 class="es-case-heading">Lo que el sistema todavía no hace.</h2>
-	<ul>
-		<li>Los trabajos atípicos o a medida siguen resolviéndose con criterio manual — el modelo cubre bien el patrón común, no el caso excepcional.</li>
-		<li>Todavía no existe un flujo pensado primero para uso desde el celular en el piso del taller.</li>
-		<li>El rango sugerido por IA necesita más historial de presupuestos para mantenerse preciso a medida que cambian los costos de material.</li>
-		<li>El sistema depende de que el presupuestador siga revisando y corrigiendo el modelo — no es un criterio que se mantenga solo.</li>
-	</ul>
-</div>
+<!-- wp:paragraph -->
+<p>Y una vez que el estimador rápido estuvo en uso, apareció el aprendizaje que dio origen a la V2: un rango orientativo resuelve la pregunta "¿sigo o no?", pero no resuelve presupuestar, aprobar, producir ni hacer seguimiento de un trabajo real. El siguiente problema ya no era de estimación — era de operación.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
 
-<div class="es-case-section" id="learnings">
-	<div class="es-case-label">Fig. 11 — Qué aprendí</div>
-	<h2 class="es-case-heading">Lo difícil nunca fue la pantalla.</h2>
-	<p>El trabajo de diseño real fue volver explícito un criterio que una persona nunca había tenido que poner en palabras — hacerlo lo bastante claro como para escribirlo, discutirlo y corregirlo. La aplicación fue, en comparación, el paso más simple una vez que eso estaba resuelto.</p>
-	<p>También aprendí a desconfiar de la tentación de reemplazar el criterio experto por una fórmula prolija: un modelo que ignora las condiciones reales del taller —la relación con el cliente, la urgencia, la disponibilidad de máquina esa semana— hubiera sido más simple de construir, y peor. El sistema tenía que aprender del presupuestador, no corregirlo desde afuera.</p>
-</div>
+<!-- wp:estavillo/case-section {"anchor":"evolution-to-v2","label":"Fig. 08 — Evolución hacia V2","heading":"De responder \"más o menos cuánto\" a sostener todo el ciclo del trabajo.","lead":"El estimador rápido demostró que el modelo de precios funcionaba y que valía la pena invertir en una interfaz propia. Pero un taller no vive solo de estimaciones: un presupuesto aprobado tiene que convertirse en documentación de producción, en compras, en trabajo ejecutado — y alguien necesita poder comparar, después, lo que se calculó contra lo que costó en realidad. Esa brecha es lo que la V2 empezó a cubrir."} -->
+<!-- wp:paragraph -->
+<p>El motor de precios de V1 no se reescribió — se desacopló de su interfaz original para poder alimentar un presupuesto más completo (productos, materiales, jornales, terminaciones, servicios) sin perder la lógica ya validada. Es la misma decisión de arquitectura del MVP original — lógica separada de superficie — aplicada un nivel más arriba.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
 
-<div class="es-case-section" id="next">
-	<div class="es-case-label">Fig. 12 — Próximos pasos</div>
-	<h2 class="es-case-heading">Hacia dónde va esto.</h2>
+<!-- wp:estavillo/case-section {"anchor":"v2-design","label":"Fig. 09 — Diseño del producto V2","heading":"Distribuir la complejidad en vez de amontonarla en una sola pantalla.","lead":"La V1 resolvía bien el cálculo principal, pero concentraba demasiada información y decisiones en una sola superficie. El diseño de la V2 se apoyó en tres criterios explícitos: trazabilidad de cada decisión, captura del conocimiento del taller en configuraciones reutilizables, y menor carga cognitiva sin perder velocidad."} -->
+<!-- wp:estavillo/case-figure {"variant":"wide","tag":"05","caption":"[IMAGE: mid-fi] — el editor de presupuesto V2 diseñado: productos, costos, alertas, estados y acciones de aprobación distribuidos en la pantalla. Candidato real: V2CD-0001 (marcado ANON_REQUIRED — confirmar o reemplazar nombres, proyectos e importes de ejemplo).","placeholderLabel":"mid-fi","alt":"Placeholder para el editor de presupuesto V2 diseñado"} /-->
 
-	<details class="es-case-details">
-		<summary>Extender el modelo a trabajos atípicos o a medida</summary>
-		<div class="es-case-details__body">
-			<p>[DATO PENDIENTE DE VALIDACIÓN — describir el plan concreto para cubrir los trabajos no estándar que hoy siguen dependiendo del criterio manual.]</p>
-		</div>
-	</details>
-	<details class="es-case-details">
-		<summary>Construir un flujo pensado para el piso del taller</summary>
-		<div class="es-case-details__body">
-			<p>[DATO PENDIENTE DE VALIDACIÓN — describir el plan concreto para un flujo de presupuestado liviano, usable directamente desde el celular en el taller.]</p>
-		</div>
-	</details>
-	<details class="es-case-details">
-		<summary>Formalizar el rango asistido por IA con más historial</summary>
-		<div class="es-case-details__body">
-			<p>[DATO PENDIENTE DE VALIDACIÓN — describir cómo va a seguir creciendo la base histórica de presupuestos para mejorar la precisión del rango sugerido con el tiempo.]</p>
-		</div>
-	</details>
-</div>
+<!-- wp:paragraph -->
+<p>Dos decisiones de systems design sostienen el resto del producto: una biblioteca de productos tipo, que convierte el conocimiento recurrente del taller en configuraciones reutilizables y editables en vez de partir de cero cada vez; y un lector de planos conceptual, que explora acelerar la extracción de medidas sin sacarle a la persona la revisión y la trazabilidad final. Ambas piezas son <strong>prototipos</strong> — decisiones de diseño exploradas y documentadas, no funcionalidad entregada.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>El sistema de diseño que sostiene estas pantallas — tokens semánticos por estado, componentes de formulario reutilizables y una decisión de tema deliberada — sí está implementado y en uso; es lo que permite escalar pantallas densas sin rediseñar cada una desde cero.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:estavillo/case-figure {"variant":"wide","tag":"06","caption":"[IMAGE: design-system] — tokens semánticos, componentes de formulario y la decisión de tema documentada. Candidatos reales: HIST-0395, HIST-0400, HIST-0451 (sin restricción de anonimización).","placeholderLabel":"design-system","alt":"Placeholder para el design system de V2"} /-->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"system","label":"Fig. 10 — Sistema y arquitectura del producto","heading":"De estimador a sistema operativo.","lead":"La arquitectura conserva la misma idea del MVP — <em>un modelo de precios, varias superficies</em> — pero ahora el modelo alimenta un ciclo completo: presupuesto, revisión, aprobación, producción y cierre. Algunas partes de este ciclo ya están implementadas y en desarrollo activo; otras todavía son prototipos o quedan como trabajo futuro. El diagrama marca cada tramo con su estado real, no con la intención."} -->
+<!-- wp:paragraph -->
+<p><strong>Cómo leer los estados:</strong> verde = implementado (en desarrollo activo); sin color = en desarrollo; gris/atenuado = diseñado, prototipo o futuro. El estado exacto de cada paso — y su evidencia — está en "Ver detalle".</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:estavillo/case-flow-v2 {"sectionLabel":"De estimador a sistema operativo","startLabel":"Solicitud entra","endLabel":"Ciclo cerrado","detailLabel":"Ver detalle","closeLabel":"Cerrar","stepLabel":"Paso","columns":5,"nodes":[{"id":"inicio","kind":"start","accent":"","title":"Inicio","text":"","edges":[{"to":"solicitud"}]},{"id":"solicitud","kind":"step","num":"01","accent":"signal","title":"Solicitud / trabajo","text":"El pedido entra al sistema como un trabajo con cliente y proyecto asociados.","detail":[{"label":"Estado","text":"Implementado — en desarrollo activo."},{"label":"Evidencia","text":"Dashboard V2 en uso, con prioridades, presupuestos y seguimiento visibles en un mismo lugar."}],"edges":[{"to":"presupuesto"}]},{"id":"presupuesto","kind":"step","num":"02","accent":"signal","title":"Presupuesto","text":"Se arma con un producto tipo de la biblioteca o de forma manual: materiales, jornales, terminaciones y servicios.","detail":[{"label":"Estado","text":"Implementado — en desarrollo activo. La biblioteca de productos tipo reutilizables todavía es un prototipo, no la superficie de carga por defecto."},{"label":"Evidencia","text":"Editor de presupuesto con esta arquitectura ya funcionando en el entorno de pruebas."}],"edges":[{"to":"calculo"}]},{"id":"calculo","kind":"step","num":"03","accent":"signal","title":"Cálculo (motor)","text":"El mismo motor de precios de Restimator, ahora alimentado por la estructura completa del presupuesto.","edges":[{"to":"revision"}]},{"id":"revision","kind":"decision","num":"04","accent":"decision","title":"¿Requiere aprobación interna?","text":"No todos los presupuestos necesitan una segunda mirada antes de salir.","detail":[{"label":"Estado","text":"En desarrollo. El presupuesto ya maneja estados y acciones asociadas; el criterio de cuándo pedir aprobación todavía se está afinando."}],"edges":[{"to":"envio","label":"No"},{"to":"aprobacion","label":"Sí"}]},{"id":"aprobacion","kind":"step","num":"05","title":"Revisión y aprobación interna","text":"Alguien del equipo revisa el presupuesto antes de que salga del taller.","detail":[{"label":"Estado","text":"En desarrollo."}],"edges":[{"to":"envio"}]},{"id":"envio","kind":"step","num":"06","title":"Envío al cliente","text":"","detail":[{"label":"Estado","text":"En desarrollo."}],"edges":[{"to":"cliente"}]},{"id":"cliente","kind":"decision","num":"07","accent":"decision","title":"¿El cliente acepta?","text":"El punto donde el presupuesto se convierte en trabajo real, o no.","detail":[{"label":"Estado","text":"Diseñado / en desarrollo. Todavía no existe una captura de esta secuencia completa de punta a punta con datos de demostración."}],"edges":[{"to":"produccion","label":"Sí"},{"to":"seguimiento","label":"No"}]},{"id":"seguimiento","kind":"step","title":"Seguimiento / cierre sin aprobación","text":"Se registra la respuesta y, si tiene sentido, se vuelve a presupuestar en otras condiciones.","edges":[{"to":"presupuesto","label":"Reformular"}]},{"id":"produccion","kind":"step","num":"08","accent":"signal","title":"Producción","text":"El presupuesto aprobado se convierte en trabajo visible y priorizable para el taller.","detail":[{"label":"Estado","text":"Implementado — en desarrollo activo."},{"label":"Evidencia","text":"Vista de producción conectada a presupuestos y tareas, en uso como puente entre venta y taller."}],"edges":[{"to":"documentacion"}]},{"id":"documentacion","kind":"step","num":"09","title":"Documentación para taller","text":"Despiece y lista de corte a partir de lo aprobado.","detail":[{"label":"Estado","text":"Diseñado / prototipo — la orden de producción existe como propuesta de Product Design, todavía no como funcionalidad entregada."}],"edges":[{"to":"compras"}]},{"id":"compras","kind":"step","num":"10","title":"Compras / materiales","text":"Faltantes y abastecimiento a partir de la documentación de producción.","detail":[{"label":"Estado","text":"Diseñado / prototipo."}],"edges":[{"to":"ejecucion"}]},{"id":"ejecucion","kind":"step","num":"11","title":"Ejecución","text":"El trabajo se fabrica y se coloca según lo documentado.","detail":[{"label":"Estado","text":"En desarrollo — la ejecución en sí siempre fue manual y del taller; lo nuevo es que ahora queda conectada al presupuesto y a producción."}],"edges":[{"to":"cierre"}]},{"id":"cierre","kind":"step","num":"12","title":"Cierre / comparación estimado vs. real","text":"El punto que cierra el ciclo: cuánto se calculó contra cuánto costó en verdad.","detail":[{"label":"Estado","text":"Futuro. Todavía no existe una medición completa de estimado contra real — es la pieza de evidencia más importante que falta producir."}],"edges":[{"to":"fin"}]},{"id":"fin","kind":"end","accent":"","title":"Fin","text":"","edges":[]}]} /-->
+
+<!-- wp:paragraph {"className":"es-case-caption"} -->
+<p class="es-case-caption">Dos piezas de este ciclo están confirmadas como implementadas y en uso — el dashboard V2 (prioridades, presupuestos y seguimiento en un mismo lugar) y la vista de producción conectada a presupuestos y tareas. El resto del ciclo —aprobación interna, respuesta del cliente, documentación de taller, compras y el cierre estimado-contra-real— está en distintos grados de desarrollo, diseño o todavía sin construir. La secuencia completa de punta a punta, con datos de demostración, es la pieza de evidencia más importante que falta producir (ver Validación y estado actual).</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"evolution","label":"Fig. 11 — Evolución del producto","heading":"Una solución que fue creciendo con el problema.","lead":"Ningún tramo de este recorrido se planeó completo desde el primer día. Cada etapa se agregó recién cuando la anterior ya había demostrado que funcionaba — reducir riesgo primero, expandir alcance después."} -->
+<!-- wp:estavillo/case-flow {"sectionLabel":"Una solución que fue creciendo con el problema","detailLabel":"Ver detalle","closeLabel":"Cerrar","stepLabel":"Paso","density":"compact","nodes":[{"id":"sheets","kind":"milestone","num":"01","title":"Google Sheets","text":"El modelo de precios nace como planilla, para poder validarlo rápido.","edges":[{"to":"v1"}]},{"id":"v1","kind":"milestone","num":"02","accent":"signal","title":"Restimator rápido V1","text":"El mismo modelo, ahora con interfaz propia — implementado y en uso.","edges":[{"to":"motor-desacoplado"}]},{"id":"motor-desacoplado","kind":"milestone","num":"03","title":"Motor desacoplado","text":"La lógica de precios se separa de la interfaz que la consulta.","edges":[{"to":"formal-v2"}]},{"id":"formal-v2","kind":"milestone","num":"04","title":"Presupuesto formal V2","text":"El estimador rápido deja de alcanzar — hace falta un presupuesto completo y trazable.","edges":[{"to":"datos"}]},{"id":"datos","kind":"milestone","num":"05","title":"Datos / clientes / proveedores","text":"El sistema empieza a recordar con quién se trabajó y con qué.","edges":[{"to":"flujo"}]},{"id":"flujo","kind":"milestone","num":"06","title":"Flujo y aprobaciones","text":"Presupuestar deja de ser un evento único y pasa a tener estados.","edges":[{"to":"produccion"}]},{"id":"produccion","kind":"milestone","num":"07","accent":"signal","title":"Producción","text":"Lo aprobado se conecta con lo que pasa en el taller.","edges":[{"to":"modular"}]},{"id":"modular","kind":"milestone","num":"08","title":"Sistema modular","text":"Dirección de trabajo, no funcionalidad terminada — cada módulo se agrega solo cuando el anterior ya demostró que funciona.","edges":[]}]} /-->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"production","label":"Fig. 12 — Producción y operación del taller","heading":"El punto donde un presupuesto aprobado se convierte en trabajo real.","lead":"Presupuestar bien no alcanza si lo aprobado no se traduce en instrucciones claras para el taller. La V2 empezó a construir ese puente: una vista de producción que conecta presupuestos, prioridades y tareas ya está implementada y en uso; la documentación técnica (despiece, lista de corte) y el módulo de compras y abastecimiento existen como propuestas de diseño, todavía no como funcionalidad entregada."} -->
+<!-- wp:estavillo/case-figure {"variant":"wide","tag":"07","caption":"[IMAGE: production-flow] — la vista de producción V2 implementada, conectando presupuestos aprobados con seguimiento del taller. Candidato real: V2VI-0016 (marcado ANON_REQUIRED — anonimizar proyectos, responsables, fechas e importes).","placeholderLabel":"production-flow","alt":"Placeholder para la vista de producción V2"} /-->
+
+<!-- wp:paragraph -->
+<p>La orden de producción diseñada reorganiza costos y decisiones comerciales en instrucciones accionables para el taller, y la exploración de compras conecta las necesidades de producción con el abastecimiento — ambas están documentadas como decisiones de Product Design, no presentadas acá como módulos ya en uso.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"status","label":"Fig. 13 — Validación y estado actual","heading":"Dónde está el sistema hoy, con la misma honestidad con la que se diseñó.","lead":"Restimator/Presupuestador es un sistema en uso real y en evolución activa, no un producto terminado. Esto es lo que se puede afirmar hoy con confianza, y lo que todavía necesita más evidencia antes de poder afirmarse como resultado."} -->
+<!-- wp:estavillo/case-status {"columns":[{"heading":"Vigente hoy","style":"done","items":["El criterio de precios está escrito, versionado y ya no vive solo en la cabeza de una persona.","Restimator V1 (estimador rápido) está implementado, funciona en desktop y mobile, y se usa como herramienta real del equipo.","El dashboard V2 y la vista de producción V2 están implementados y en desarrollo activo, conectando presupuestos, tareas y seguimiento del taller.","El modelo de cálculo se sometió a una batería de regresión sobre casos históricos, con una revisión de UX y una revisión de accesibilidad estructuradas antes del handoff."]},{"heading":"Necesita más evidencia","style":"attention","items":["[DATO PENDIENTE DE VALIDACIÓN — impacto real en el tiempo de respuesta al cliente, una vez que haya datos de uso suficientes para medirlo con confianza.]","[DATO PENDIENTE DE VALIDACIÓN — cuántas personas del equipo, además del presupuestador original, ya presupuestan de forma independiente usando el sistema.]","El ciclo completo de V2 — aprobación interna, respuesta del cliente, documentación de taller, compras y cierre estimado-contra-real — todavía no tiene una corrida de punta a punta documentada con datos de demostración.","No existe todavía una medición de estimado contra real posterior a la implementación: la evidencia disponible demuestra investigación, validación del modelo y calidad del sistema, no impacto de negocio medido después del lanzamiento."]}]} /-->
+
+<!-- wp:estavillo/case-figure {"variant":"wide","tag":"08","caption":"[IMAGE: results-evidence] — regresión sobre casos históricos, revisión UX y revisión de accesibilidad. Candidatos reales: HIST-0323, HIST-0456, HIST-0459 (sin restricción de anonimización).","placeholderLabel":"results-evidence","alt":"Placeholder para la evidencia de QA, UX y accesibilidad"} /-->
+
+<!-- wp:paragraph -->
+<p><strong>Sobre el uso de IA en este proyecto:</strong> se usó como apoyo de desarrollo y documentación — para estructurar criterios documentados a partir del diagnóstico, para asistir el desarrollo del código de V1, y para organizar la documentación del proyecto. No hay funcionalidad de IA embebida en el producto (lectura de fotos, sugerencia de rango o marcado de anomalías) confirmada como implementada — una versión anterior de este caso describía esas tres capacidades como si ya existieran, y esa afirmación no estaba respaldada por evidencia verificable; se retira acá.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Los trabajos atípicos o a medida siguen resolviéndose con criterio manual — el sistema cubre bien el patrón común, no el caso excepcional.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>El motor de estimación necesita más historial de presupuestos para mantenerse preciso a medida que cambian los costos de material.</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>El sistema depende de que el presupuestador siga revisando y corrigiendo el modelo — no es un criterio que se mantenga solo.</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+<!-- /wp:estavillo/case-section -->
+
+<!-- wp:estavillo/case-section {"anchor":"next","label":"Fig. 14 — Próximos pasos","heading":"Hacia dónde va esto."} -->
+<!-- wp:estavillo/case-details {"summary":"Cerrar el ciclo de aprobación y envío al cliente de punta a punta"} -->
+<!-- wp:paragraph -->
+<p>[DATO PENDIENTE DE VALIDACIÓN — describir el plan concreto para llevar revisión interna → envío → respuesta del cliente a una secuencia implementada y documentada, con datos de demostración.]</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-details -->
+
+<!-- wp:estavillo/case-details {"summary":"Llevar la documentación de producción y compras de prototipo a funcionalidad"} -->
+<!-- wp:paragraph -->
+<p>[DATO PENDIENTE DE VALIDACIÓN — describir el plan concreto para construir la orden de producción y el módulo de compras/abastecimiento, hoy solo diseñados.]</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-details -->
+
+<!-- wp:estavillo/case-details {"summary":"Medir estimado contra real"} -->
+<!-- wp:paragraph -->
+<p>[DATO PENDIENTE DE VALIDACIÓN — describir cómo se va a capturar, una vez que el ciclo esté implementado, la comparación entre lo presupuestado y lo que un trabajo costó en la práctica.]</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-details -->
+
+<!-- wp:estavillo/case-details {"summary":"Extender el modelo a trabajos atípicos o a medida"} -->
+<!-- wp:paragraph -->
+<p>[DATO PENDIENTE DE VALIDACIÓN — describir el plan concreto para cubrir los trabajos no estándar que hoy siguen dependiendo del criterio manual.]</p>
+<!-- /wp:paragraph -->
+<!-- /wp:estavillo/case-details -->
+<!-- /wp:estavillo/case-section -->

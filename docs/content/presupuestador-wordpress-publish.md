@@ -42,13 +42,18 @@ exact values from `presupuestador-case-study-fields.md` → "Spanish post":
 Also set the native **Excerpt** (sidebar panel) and **Case Tags**
 (sidebar panel) to the values in the field sheet.
 
-## 3. Paste the Spanish HTML into a Custom HTML block
+## 3. Paste the Spanish content via the block editor's Code editor
 
-In the block editor body, add a **Custom HTML** block. Open
-`presupuestador-case-study-es.html`, and paste **everything below the
-closing `-->` of its instructional comment** — not the comment block
-itself. Do not split it across multiple Custom HTML blocks; one block
-keeps the source easy to diff/update later.
+**Updated 2026-09-02 — no longer a Custom HTML block.** The content file
+is now a real sequence of Gutenberg blocks (Case Section, Case Flow / Case
+Flow v2, Case Figure, etc.) so the 4 interactive flow diagrams can render
+— a Custom HTML block would just show them as an inert HTML comment. In
+the block editor, open the "⋮" (Options) menu → **Code editor** (or
+Ctrl+Shift+Alt+M / Cmd+Shift+Alt+M). Open `presupuestador-case-study-es.html`,
+and paste **everything below the closing `-->` of its instructional
+comment** — not the comment block itself — into the code editor, then
+switch back to **Visual editor** from the same Options menu. WordPress
+parses the pasted text into real, editable blocks.
 
 ## 4. Upload / set featured image
 
@@ -95,10 +100,10 @@ intentionally the **same** tag terms as the Spanish post (Case Tags are
 language-neutral in this theme — see `EDITABILITY-PLAN.md` → "Polylang")
 so don't create new English-only tag terms.
 
-## 9. Paste the English HTML
+## 9. Paste the English content
 
-Same as step 3, but with `presupuestador-case-study-en.html` into the
-English post's own Custom HTML block.
+Same as step 3 (via the Code editor, not a Custom HTML block), but with
+`presupuestador-case-study-en.html` into the English post.
 
 ## 10. Link both translations
 

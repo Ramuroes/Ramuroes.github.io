@@ -3,9 +3,15 @@
 Exact recommended values for every native/meta field on the Case Study
 post, for both language versions. Pair with:
 
-- `presupuestador-case-study-es.html` (paste into the Spanish post's Custom HTML block)
-- `presupuestador-case-study-en.html` (paste into the English post's Custom HTML block)
-- `presupuestador-wordpress-publish.md` (step-by-step publishing order)
+- `presupuestador-case-study-es.html` (paste into the Spanish post's block
+  editor **Code editor** — no longer a Custom HTML block, see that file's
+  own instructional header, note 7)
+- `presupuestador-case-study-en.html` (same, English post)
+- `presupuestador-wordpress-publish.md` (step-by-step publishing order —
+  its "paste into Custom HTML block" step is now superseded by the Code
+  editor method described in the two content files themselves)
+- `presupuestador-case-study-update-notes.md` (what changed in the
+  2026-09-02 update — new narrative, 4 Case Flow diagrams, new anchors)
 
 **Editorial note carried over from the case content itself:** the numbers
 that used to appear in an earlier draft of this case (a specific quote
@@ -23,10 +29,10 @@ explicitly rather than inventing one.
 |---|---|
 | **Post title** | Presupuestador |
 | **Slug** | `presupuestador` |
-| **Eyebrow / category** | Product + System Design · En curso |
-| **Excerpt** | Un sistema de apoyo a la decisión para presupuestar en un taller de fabricación metálica — vuelve explícito el criterio de precios de una sola persona y lo convierte en una herramienta consistente que puede usar todo el equipo. |
+| **Eyebrow / category** | Product + System Design · En desarrollo activo |
+| **Excerpt** | Un sistema de apoyo a la decisión para presupuestar en un taller de fabricación metálica — de una planilla artesanal a un estimador rápido implementado y un sistema de presupuesto y producción en desarrollo activo. |
 | **Tags (Case Tags)** | Product Design, Systems Design, Applied AI |
-| **Status / label** | En curso |
+| **Status / label** | V1 implementado · V2 en desarrollo |
 | **Role** | Product Designer |
 | **Tools** | Google Sheets, Apps Script, Figma, GPT-4 |
 | **Period** | 2025– |
@@ -40,19 +46,25 @@ explicitly rather than inventing one.
 
 ### Case index (Spanish) — paste into "Case index" field
 
+Reemplaza el índice anterior (13 anchors) por completo — la actualización
+2026-09-02 reordenó y renombró varias secciones; ver
+`presupuestador-case-study-update-notes.md` para el detalle exacto.
+
 ```
 Resumen|#overview
 Contexto|#context
 Problema|#problem
-Descubrimiento|#discovery
-Sistema|#system
+Cómo funcionaba antes|#as-is
+Hipótesis y objetivo|#hypothesis
 MVP|#mvp
-Testing|#testing
-App Alpha|#app-alpha
-IA|#ai
-Resultados|#results
-Limitaciones|#limitations
-Aprendizajes|#learnings
+Restimator rápido V1|#v1-product
+Aprendizajes de V1|#learnings-v1
+Evolución hacia V2|#evolution-to-v2
+Diseño del producto V2|#v2-design
+Sistema y arquitectura|#system
+Evolución del producto|#evolution
+Producción y operación|#production
+Validación y estado actual|#status
 Próximos pasos|#next
 ```
 
@@ -64,10 +76,10 @@ Próximos pasos|#next
 |---|---|
 | **Post title** | Presupuestador |
 | **Slug** | `presupuestador` (if the Spanish post already claimed this slug, WordPress/Polylang will suffix the English one automatically — e.g. `presupuestador-2` — that's expected and fine, the visible title stays "Presupuestador") |
-| **Eyebrow / category** | Product + System Design · In progress |
-| **Excerpt** | A decision-support system for quoting in a metal fabrication workshop — makes one person's pricing judgment explicit and turns it into a consistent tool the whole team can use. |
+| **Eyebrow / category** | Product + System Design · Active development |
+| **Excerpt** | A decision-support system for quoting in a metal fabrication workshop — from an artisanal spreadsheet to an implemented rapid estimator and a quotation-and-production system in active development. |
 | **Tags (Case Tags)** | Product Design, Systems Design, Applied AI (same tags as the Spanish post — Case Tags are language-neutral by design in this theme, see `EDITABILITY-PLAN.md` → "Polylang") |
-| **Status / label** | In progress |
+| **Status / label** | V1 implemented · V2 in development |
 | **Role** | Product Designer |
 | **Tools** | Google Sheets, Apps Script, Figma, GPT-4 |
 | **Period** | 2025– |
@@ -81,19 +93,25 @@ Próximos pasos|#next
 
 ### Case index (English) — paste into "Case index" field
 
+Replaces the earlier index (13 anchors) entirely — the 2026-09-02 update
+reordered and renamed several sections; see
+`presupuestador-case-study-update-notes.md` for the exact detail.
+
 ```
 Overview|#overview
 Context|#context
 Problem|#problem
-Discovery|#discovery
-System|#system
+How it worked before|#as-is
+Hypothesis and objective|#hypothesis
 MVP|#mvp
-Testing|#testing
-App Alpha|#app-alpha
-AI|#ai
-Results|#results
-Limitations|#limitations
-Learnings|#learnings
+Restimator rapid V1|#v1-product
+Learnings from V1|#learnings-v1
+Evolution toward V2|#evolution-to-v2
+V2 product design|#v2-design
+System and architecture|#system
+Product evolution|#evolution
+Production and operations|#production
+Validation and current status|#status
 Next steps|#next
 ```
 
@@ -101,17 +119,17 @@ Next steps|#next
 
 ## Featured image and hero layout recommendation
 
-- **Which image to use as featured image:** none exists yet (see
-  `presupuestador-assets-plan.md` for the full asset inventory). Once
-  available, the best candidate is either **the App Alpha dashboard
-  screenshot** (shows the product, reads well as a portrait/tall crop) or
-  **the system architecture diagram** redrawn as a clean final asset — not
-  a workshop photo, since the case is about the decision system, not the
-  physical workshop.
+- **Which image to use as featured image:** none exists yet as a
+  publishable asset (see `presupuestador-assets-plan.md` for the general
+  asset inventory, and `presupuestador-case-study-update-notes.md` for
+  the full mapping against the 2026-09-02 image curation). Once
+  anonymized, the best candidate is **the Restimator V1 dashboard**
+  (curation id `V1-0003` — shows the implemented product, reads well as a
+  portrait/tall crop) — not the App Alpha concept referenced by earlier
+  drafts of this sheet, which this update's content no longer uses.
 - **Recommended hero layout:** **`split-right`** (the default —
   "Split — image right"). It's the safest choice for a portrait-oriented
-  product screenshot (the App Alpha dashboard) and needs no extra
-  configuration.
+  product screenshot (the V1 dashboard) and needs no extra configuration.
 - **Alternative if the featured image changes:** if the eventual featured
   image is a **wide screenshot** (e.g. the Sheets MVP, which reads better
   landscape than portrait) instead of a portrait dashboard shot, switch
