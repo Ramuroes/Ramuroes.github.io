@@ -533,27 +533,57 @@
 	position: relative;
 }
 
-/* Scrim + overlay: mismo lenguaje visual que .es-featured__grid--full en
-   pages-home.css (Home) — los tokens --es-ink* son theme-aware y no
-   sirven acá, el contraste tiene que ganarle a la imagen de fondo, no al
-   theme del sitio. */
+/* Sin sangrado a 100vw acá — a diferencia de Home, .es-card__media ya
+   llega borde a borde de la card sin ningún padding lateral propio (la
+   card no tiene padding, sólo .es-card__body lo tiene), así que "sin
+   márgenes internos laterales" ya se cumple sin ningún truco extra. Sí se
+   quita el borde inferior heredado de la variante wide: con el texto
+   superpuesto (no debajo) esa línea quedaría como un artefacto pegado al
+   borde de la card. */
+.es-card--featured-full .es-card__media {
+	border-bottom: none;
+}
+
+/* Scrim direccional — mismo lenguaje visual que .es-featured__grid--full
+   en pages-home.css (Home): más oscuro donde vive el texto (izquierda),
+   transparente hacia donde el visual queda a la vista. Los tokens
+   --es-ink* son theme-aware y no sirven acá: el contraste tiene que
+   ganarle a la imagen de fondo, no al theme del sitio. */
 .es-card--featured-full::before {
 	content: '';
 	position: absolute;
 	inset: 0;
 	z-index: 1;
-	background: linear-gradient(0deg, rgba(6, 8, 7, 0.88) 0%, rgba(6, 8, 7, 0.45) 45%, rgba(6, 8, 7, 0.05) 75%);
+	background: linear-gradient(90deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.6) 35%, rgba(0, 0, 0, 0.2) 70%, rgba(0, 0, 0, 0.08) 100%);
 	pointer-events: none;
 }
 
+/* Panel de texto: capa de legibilidad propia (fondo translúcido + blur)
+   detrás del bloque nomás, no de toda la card — mismo criterio que
+   .es-featured__text en pages-home.css, incluido el alto INTRÍNSECO
+   (top:50%+transform, nunca top:0;bottom:0 con altura forzada — mismo bug
+   real de recorte silencioso encontrado con Playwright, ver el comentario
+   largo en pages-home.css). Acá pesa más todavía: .es-card tiene
+   overflow:hidden propio, así que contenido que no entra no sólo se sale
+   del panel — desaparece del todo. line-clamp del excerpt más abajo
+   ayuda a que la card real casi nunca necesite más alto del que ya tiene.
+   left:0 + max-width, sin width: shrink-to-fit estándar de un absolutely
+   positioned con left pero sin right — nunca más ancho que max-width,
+   nunca una "tarjeta" de ancho completo. */
 .es-card--featured-full .es-card__body {
 	position: absolute;
-	inset: 0;
+	top: 50%;
+	left: 0;
+	transform: translateY(-50%);
 	z-index: 2;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-end;
-	padding: clamp(22px, 2.8vw, 36px);
+	max-width: clamp(240px, 48%, 420px);
+	margin: clamp(14px, 2vw, 22px);
+	padding: clamp(18px, 2.4vw, 28px);
+	background: rgba(0, 0, 0, 0.55);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: var(--es-radius);
 }
 
 .es-card--featured-full .es-card__meta,
@@ -565,31 +595,57 @@
 	color: #fff;
 }
 
+/* Título/meta más compactos DENTRO del panel — el tamaño/margen de
+   .es-card--wide .es-card__title (hasta 32px) está calibrado para esa
+   variante, con toda la card disponible para el texto. En el panel
+   angosto de full (y con menos alto total que Home: 250px/190px acá vs.
+   322px/250px allá) ese tamaño empujaba el panel más allá del alto de la
+   card. Nunca se toca .es-card--wide .es-card__title en sí — sólo el
+   contexto --featured-full. */
+.es-card--featured-full .es-card__meta {
+	margin-bottom: 6px;
+}
+
+.es-card--featured-full .es-card__title {
+	font-size: clamp(18px, 2.2vw, 24px);
+	margin-bottom: 6px;
+}
+
+.es-card--featured-full .es-card__excerpt {
+	margin-bottom: 0;
+}
+
+/* Máximo 2 líneas acá — el excerpt real de un Case Study puede ser
+   varias oraciones (pensado para el layout standard, con toda la
+   columna de texto disponible); dentro del panel angosto de full podría
+   no entrar nunca, aunque el resto del contenido sí. Recorte con "…"
+   nativo del navegador, nunca contenido invisible sin aviso. */
+.es-card--featured-full .es-card__excerpt {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+}
+
 @media (max-width: 767px) {
-	/* Igual que Home en mobile: sin overlay — media arriba, texto abajo en
-	   flujo normal, sin apostar el contraste a una imagen impredecible en
-	   una franja angosta. */
-	.es-card--featured-full {
-		display: grid;
+	/* Sigue siendo hero en mobile (media + texto superpuesto) — no vuelve
+	   a apilado. El panel se relaja a casi todo el ancho disponible
+	   (right:0 además del left:0 de la regla base) y el scrim se refuerza
+	   un poco más para evitar texto ilegible sobre partes brillantes de
+	   la imagen. */
+	.es-card--featured-full .es-card__body {
+		right: 0;
+		max-width: none;
+		margin: clamp(10px, 3vw, 14px);
+		padding: 12px 14px 14px;
+	}
+
+	.es-card--featured-full .es-card__excerpt {
+		-webkit-line-clamp: 1;
 	}
 
 	.es-card--featured-full::before {
-		display: none;
-	}
-
-	.es-card--featured-full .es-card__body {
-		position: static;
-		inset: auto;
-		padding: 20px 22px 24px;
-	}
-
-	.es-card--featured-full .es-card__meta,
-	.es-card--featured-full .es-card__kicker,
-	.es-card--featured-full .es-card__label,
-	.es-card--featured-full .es-card__title,
-	.es-card--featured-full .es-card__excerpt,
-	.es-card--featured-full .es-card__cta {
-		color: inherit;
+		background: linear-gradient(90deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.7) 45%, rgba(0, 0, 0, 0.35) 100%);
 	}
 }
 

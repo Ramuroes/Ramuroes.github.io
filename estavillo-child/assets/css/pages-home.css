@@ -30,43 +30,116 @@
 	grid-template-columns: 0.75fr 1.25fr;
 }
 
-/* Full: cancela la grilla de dos columnas — el media pasa a ocupar TODO
-   el ancho del componente (mismo --es-featured-media-h, nunca más alto) y
-   el texto se superpone encima, ancorado abajo, con un scrim para
-   contraste garantizado sin importar qué tan clara/oscura sea la imagen
-   de fondo — pedido explícito del ticket ("si el texto debe superponerse,
-   resolverlo... con buen contraste"). Los tokens --es-ink* son
-   theme-aware (claros en dark, oscuros en light) y evidentemente NO
-   sirven acá: el contraste tiene que ganarle a la imagen, no al theme del
-   sitio, así que el texto se fuerza a blanco fijo dentro de este
-   modificador únicamente. */
+/* Full — "verdadero hero background" (ajuste posterior al ticket
+   original: la v1 dejaba el media contenido dentro del padding lateral de
+   .es-container, dando un efecto "rectángulo enmarcado" en vez de hero).
+   Cancela la grilla de dos columnas: el media rompe el padding del
+   container y sangra a los 100vw reales — mismo calc(50% - 50vw) ya
+   verificado en Case Figure --full, se autoajusta sea cual sea el ancho
+   real del container en cada breakpoint — mientras que .es-featured__grid
+   en sí NO sangra, así que el texto (posicionado relativo a ESE box, ver
+   .es-featured__text más abajo) se queda alineado con el resto de la
+   página, no pegado al borde físico del viewport. Mismo
+   --es-featured-media-h que standard/wide: el ancho cambia, el alto no. */
 .es-featured__grid--full {
 	position: relative;
 	display: block;
 }
 
 .es-featured__grid--full .es-featured__media {
-	width: 100%;
+	width: 100vw;
+	margin-left: calc(50% - 50vw);
+	margin-right: calc(50% - 50vw);
 }
 
-.es-featured__grid--full::before {
+/* Scrim direccional SOBRE EL MEDIA (no sobre la grilla): así sangra junto
+   con él a los 100vw en vez de quedar recortado al ancho angosto del
+   container que dejaría un "corte" visible a mitad de imagen. Más oscuro
+   a la izquierda (donde vive el texto) y transparente hacia la
+   derecha — deja ver el visual (mockup/pantalla/producto) sin taparlo
+   por completo, pedido explícito del ajuste. */
+.es-featured__grid--full .es-featured__media::after {
 	content: '';
 	position: absolute;
 	inset: 0;
 	z-index: 1;
-	background: linear-gradient(0deg, rgba(6, 8, 7, 0.88) 0%, rgba(6, 8, 7, 0.45) 45%, rgba(6, 8, 7, 0.05) 75%);
+	background: linear-gradient(90deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.6) 35%, rgba(0, 0, 0, 0.2) 70%, rgba(0, 0, 0, 0.08) 100%);
 	pointer-events: none;
 }
 
+/* Panel de texto: capa de legibilidad propia (fondo translúcido + blur)
+   detrás del BLOQUE DE TEXTO nomás, no de todo el hero — así el blur sólo
+   afecta la porción de imagen que el texto realmente tapa, el resto del
+   visual queda nítido. Alto INTRÍNSECO a propósito (nunca top:0;bottom:0
+   con altura forzada) — bug real, encontrado con Playwright: con el
+   panel forzado a ocupar el hero entero y el contenido centrado con
+   flexbox, un kicker+título+body+CTA con longitud real (no el texto de
+   prueba corto de la primera pasada) no entraba y quedaba recortado en
+   silencio (scrollHeight > clientHeight, sin overflow visible que lo
+   delate). top:50%+transform centra verticalmente sin techo de alto: el
+   panel mide exactamente lo que su contenido necesita. left:0 +
+   max-width en vez de width: shrink-to-fit estándar de un absolutely
+   positioned con left pero sin right/width — nunca más ancho que
+   max-width, nunca "tarjeta pesada" de ancho completo. Los tokens
+   --es-ink* son theme-aware (claros en dark, oscuros en light) y no
+   sirven acá: el contraste tiene que ganarle a la imagen de fondo, no al
+   theme del sitio — texto blanco fijo. */
 .es-featured__grid--full .es-featured__text {
 	position: absolute;
-	inset: 0;
+	top: 50%;
+	left: 0;
+	transform: translateY(-50%);
 	z-index: 2;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-end;
-	padding: clamp(20px, 3vw, 40px);
+	max-width: clamp(320px, 42vw, 620px);
+	margin: clamp(16px, 2.4vw, 32px);
+	padding: clamp(18px, 2.2vw, 28px);
+	background: rgba(0, 0, 0, 0.55);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: var(--es-radius);
 	color: #fff;
+}
+
+/* Tipografía/espaciado más compactos DENTRO del panel — el tamaño/margen
+   por defecto de .es-featured__title (hasta 52px + 20px de margen) está
+   calibrado para el layout standard/wide, con toda la columna de texto
+   del componente disponible. Dentro del panel angosto de full (copy real
+   de production, no un texto de prueba corto) ese mismo tamaño hacía que
+   el panel completo se pasara bastante del alto del propio hero —
+   encontrado con Playwright. Nunca se toca .es-featured__title en sí
+   (standard/wide quedan exactamente igual): esto es sólo el contexto
+   --full. */
+.es-featured__grid--full .es-featured__kicker {
+	margin-bottom: 10px;
+}
+
+.es-featured__grid--full .es-featured__title {
+	font-size: clamp(22px, 2.2vw, 32px);
+	margin: 0 0 12px;
+}
+
+.es-featured__grid--full .es-featured__body {
+	margin: 0 0 12px;
+	max-width: none;
+	/* Máximo 3 líneas — mismo motivo que el título: un párrafo pensado
+	   para la columna completa de standard/wide no entraba en el panel
+	   angosto sin empujar el alto muy por encima del hero. max-width:none
+	   porque el tope de ancho ya lo pone el panel contenedor, no hace
+	   falta el 56ch que sí tiene sentido con la columna completa.
+	   Recorte con "…" nativo, nunca contenido invisible sin aviso. */
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 3;
+	overflow: hidden;
+}
+
+.es-featured__grid--full .es-featured__source {
+	margin: 0 0 14px;
+}
+
+.es-featured__grid--full .es-featured__status {
+	margin-bottom: 14px;
 }
 
 .es-featured__grid--full .es-featured__kicker,
@@ -152,33 +225,46 @@
 		grid-template-columns: 1fr;
 	}
 
-	/* Full en mobile: la grilla de standard/wide ya colapsa a una columna
-	   (texto arriba, media abajo) arriba — full ya ES una sola columna
-	   siempre (display:block), así que acá sólo hace falta un alto más
-	   chico para no ocupar toda la pantalla en un formato angosto, y
-	   volver el texto al flujo normal (ya no hace falta overlay: con
-	   media abajo del todo no hay superposición que resolver). */
-	.es-featured__grid--full {
-		display: block;
-	}
-
-	.es-featured__grid--full::before {
-		display: none;
-	}
-
+	/* Full en mobile: SIGUE siendo hero (media de borde a borde + texto
+	   superpuesto) — pedido explícito del ajuste ("mantener el hero
+	   compacto", nunca "volver a apilado"). Sólo el panel de texto se
+	   relaja a casi todo el ancho disponible (right:0 además del left:0
+	   de la regla base — ya no hay una segunda columna con la que
+	   compartir espacio) y el scrim se refuerza un poco más, para
+	   "evitar texto ilegible sobre partes brillantes de la imagen". */
 	.es-featured__grid--full .es-featured__text {
-		position: static;
-		inset: auto;
-		padding: 0;
-		color: inherit;
-		margin-bottom: clamp(20px, 5vw, 32px);
+		right: 0;
+		max-width: none;
+		margin: clamp(12px, 3.5vw, 18px);
+		padding: clamp(14px, 3.5vw, 20px);
 	}
 
-	.es-featured__grid--full .es-featured__kicker,
-	.es-featured__grid--full .es-featured__title,
-	.es-featured__grid--full .es-featured__body,
+	/* Un poco más compacto todavía que el desktop: menos alto disponible
+	   (--es-featured-media-h no baja de 250px, pero es mucho menos margen
+	   que en desktop) para el mismo copy real. */
+	.es-featured__grid--full .es-featured__kicker {
+		margin-bottom: 6px;
+	}
+
+	.es-featured__grid--full .es-featured__title {
+		margin-bottom: 8px;
+	}
+
+	.es-featured__grid--full .es-featured__body {
+		margin-bottom: 8px;
+		-webkit-line-clamp: 2;
+	}
+
 	.es-featured__grid--full .es-featured__source {
-		color: inherit;
+		margin-bottom: 8px;
+	}
+
+	.es-featured__grid--full .es-featured__status {
+		margin-bottom: 8px;
+	}
+
+	.es-featured__grid--full .es-featured__media::after {
+		background: linear-gradient(90deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.7) 45%, rgba(0, 0, 0, 0.35) 100%);
 	}
 }
 
