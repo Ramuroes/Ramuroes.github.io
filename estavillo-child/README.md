@@ -161,6 +161,7 @@ estavillo-child/
 │   ├── site-footer.php            → footer ESTAVILLO
 │   ├── breadcrumbs.php            → Home / Work / título — genérico, hoy solo en Case Study
 │   ├── page-head.php              → cabecera compartida (eyebrow + h1 + lead) de las 4 páginas fijas
+│   ├── generic-document.php       → documento completo para las vistas sin template propio (search/archive/index/page/single)
 │   ├── work-cases.php             → listado completo de Work: selected + archive
 │   ├── about-content.php          → intro + timeline + educación + hobbies + CV de la página About
 │   └── contact-content.php        → email + ubicación + redes de la página Contact
@@ -171,13 +172,41 @@ estavillo-child/
 │   ├── page-how-i-work.php        → Template Name: "Estavillo — How I Work" (standalone)
 │   └── page-contact.php           → Template Name: "Estavillo — Contact" (standalone)
 ├── single-es_case_study.php       → single de Case Study (standalone, reusa el chrome ESTAVILLO)
+├── 404.php                        → página no encontrada (chrome ESTAVILLO, copy vía es__())
+├── search.php                     → resultados de búsqueda      ┐
+├── archive.php                    → categoría/etiqueta/fecha    │ los cinco usan
+├── index.php                      → fallback final de WordPress │ generic-document.php
+├── page.php                       → Página sin template propio  │
+├── single.php                     → entrada de blog / CPT sin template ┘
 └── inc/
-    ├── enqueue.php                  → carga condicional de assets (Home + Case Study + páginas fijas) + config localizada
+    ├── enqueue.php                  → carga condicional de assets (Home + Case Study + páginas fijas + vistas genéricas) + config localizada
     ├── theme-options.php            → Customizer: acento + variantes de hero + font preset
+    ├── theme-dark-mode.php          → modo del sitio (hoy siempre oscuro) + clases de tema en el body
+    ├── page-hero-meta.php           → caja "Page header": eyebrow/título/bajada/breadcrumb por página
     ├── selected-work-fallback.php   → Selected Work: placeholders + puente por filtro hacia el plugin + es_work_media()
     ├── featured-case-fallback.php   → Featured Case: placeholder + puente por filtro hacia el plugin
     └── work-page-fallback.php       → Work: placeholders (selected/archive) + puente por filtro hacia el plugin
 ```
+
+### Ninguna vista queda fuera del sistema (iteración de cierre)
+
+Hasta esta iteración el theme sólo tenía template propio para siete
+pantallas (Home, Work, About, How I Work, Connect y el single de Case Study).
+Todo lo demás lo servía Kadence: fondo claro, el menú viejo *Home / About /
+My Work / Contact*, y el copy en inglés incluso llegando desde una URL `/es/`.
+El 404 era el caso más visible, pero pasaba igual en búsqueda, en un archivo
+de etiqueta y en cualquier Página nueva.
+
+Ahora esas vistas entran por `template-parts/generic-document.php`, que
+imprime el mismo `<head>`/`<body>` standalone, el mismo `site-header` /
+`site-footer`, el mismo `page-head` y las mismas voces tipográficas. Lo único
+propio del listado es `.es-postlist` en `pages.css`: una fila con hairline,
+sin tarjeta ni tratamiento nuevo.
+
+Qué NO cambia de template: los **Case Studies** (tienen
+`single-es_case_study.php`, que la jerarquía de WordPress elige antes que
+`single.php`) y las **cinco páginas del portfolio** (tienen su template
+asignado, que gana sobre `page.php`).
 
 > El **Case Study CPT** (registro, meta box, queries) vive en el plugin
 > companion **Estavillo Portfolio Core** (`estavillo-portfolio-core/` en la
@@ -437,7 +466,7 @@ dentro de lo que imprime `the_content()`):
 | `es-case-cols` | Grilla de 2 columnas (texto/imagen, texto/texto). Se apila a 1 columna en mobile automáticamente. |
 | `es-case-figure` (en un `<figure>`) + `es-case-caption` / `es-case-caption__tag` (en el `<figcaption>`) | Imagen con marco y caption mono con un "tag" de acento (p. ej. "FIG. 1.1"). Por defecto usa el ancho completo del container; agregale `es-case-figure--standard` para limitarla a la medida de lectura (figura que acompaña al texto). |
 | `es-case-browser` / `es-case-browser__bar` / `es-case-browser__dot` / `es-case-browser__label` | Marco tipo ventana de navegador (barra falsa con 3 puntos + label) para encuadrar screenshots de producto. |
-| `es-case-stats` (contenedor) + `es-case-stat` / `es-case-stat__num` / `es-case-stat__label` (cada celda) | Grilla de estadísticas — `auto-fit`: cualquier cantidad de stats llena la fila completa en desktop (antes un `repeat(4)` fijo dejaba un panel vacío con 3 stats), 2 columnas en mobile. |
+| `es-case-stats` (contenedor) + `es-case-stat` / `es-case-stat__icon` / `es-case-stat__num` / `es-case-stat__label` (cada celda) | Grilla de estadísticas. **Desktop/tablet:** `flex-wrap` con `flex-basis` — cualquier cantidad de stats llena la fila completa (la última fila incompleta crece hasta el borde, así que nunca queda un panel vacío), hairline por celda vía `box-shadow`. **Mobile (≤767px):** una stat por fila, sin superficie ni caja — filas separadas por un filete de 1px, para que la lista se lea como enumeración editorial y no como un dashboard apretado. `es-case-stat__icon` es opcional: un ícono lineal de 16px de `es_process_icon_library()` en `--es-accent`, arriba del número. |
 | `es-case-timeline` (`<ul>`) + `es-case-timeline__item` / `__title` / `__text` | Timeline vertical con puntos de acento, para procesos/evolución en fases. |
 | `es-case-decisions` (contenedor) + `es-case-decision` / `__num` / `__title` / `__row` (`<dl>` con `dt`/`dd`) | Cards de decisiones numeradas (evidencia → resultado) — `auto-fit`: 2, 3 o 4 cards llenan la fila; 1 columna en mobile. |
 | `es-case-quote` (en un `<blockquote>`) + `<cite>` adentro | Pullquote grande con borde de acento. |

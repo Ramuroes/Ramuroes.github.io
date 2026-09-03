@@ -176,6 +176,134 @@
 	gap: var(--es-flow-gap);
 }
 
+/* La grilla/lista conserva el orden semántico; esta envolvente aporta un
+   sistema de coordenadas independiente para el SVG decorativo. */
+.es-flow__diagram {
+	position: relative;
+}
+
+.es-flow__connections,
+.es-flow__connector-labels {
+	display: none;
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+}
+
+.es-flow__connections {
+	z-index: 0;
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+}
+
+.es-flow__connector-labels {
+	z-index: 2;
+}
+
+.es-flow.has-svg-connectors .es-flow__connections,
+.es-flow.has-svg-connectors .es-flow__connector-labels {
+	display: block;
+}
+
+.es-flow.has-svg-connectors .es-flow__track {
+	position: relative;
+	z-index: 1;
+}
+
+/* La capa de rótulos es hermana del track. Mientras hay un detalle abierto,
+   el track completo sube por encima de ella: así el z-index interno del
+   popover no queda atrapado debajo de YES/NO. El item abierto también gana
+   el orden de pintura frente a sus hermanos, incluso si la animación de
+   desktop todavía está terminando. */
+.es-flow.has-svg-connectors.has-open-panel .es-flow__track {
+	z-index: 3;
+}
+
+.es-flow.has-open-panel .es-flow__item.is-open {
+	position: relative;
+	z-index: 4;
+}
+
+.es-flow__connection-line,
+.es-flow__connection-head {
+	fill: none;
+	stroke: var(--es-line-strong);
+	stroke-width: 1.25;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.es-flow__connection-line {
+	stroke-dasharray: 1;
+	stroke-dashoffset: 0;
+}
+
+.es-flow__connection-label {
+	position: absolute;
+	display: inline-block;
+	width: max-content;
+	max-width: min(22ch, 180px);
+	padding: 1px 6px;
+	border-radius: 999px;
+	background: var(--es-paper);
+	font-family: var(--es-mono);
+	font-size: 9px;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	line-height: 1.6;
+	text-transform: uppercase;
+	color: var(--es-decision);
+	transform: translate(-50%, -50%);
+}
+
+.es-flow__connection-label[data-label-side='left'] {
+	transform: translate(-100%, -50%);
+}
+
+.es-flow__connection-label[data-label-side='right'] {
+	transform: translate(0, -50%);
+}
+
+.es-flow__connection-label.is-loop-label {
+	font-size: 8.5px;
+	letter-spacing: 0.06em;
+	text-transform: none;
+	color: var(--es-ink-3);
+}
+
+/* Los rieles CSS quedan como fallback legible sin JavaScript. Apenas el SVG
+   se pudo medir y dibujar, se retira su geometría visual. Los rótulos
+   originales siguen en el árbol de accesibilidad; sus copias del overlay
+   son decorativas y viven dentro de una capa aria-hidden. */
+.es-flow.has-svg-connectors .es-flow__rail,
+.es-flow.has-svg-connectors .es-flow__pass {
+	display: none !important;
+}
+
+.es-flow.has-svg-connectors .es-flow__branch-link,
+.es-flow.has-svg-connectors .es-flow__shape-band > .es-flow__edge-label {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	margin: -1px !important;
+	padding: 0 !important;
+	overflow: hidden !important;
+	clip: rect(0 0 0 0) !important;
+	clip-path: inset(50%) !important;
+	white-space: nowrap !important;
+	border: 0 !important;
+}
+
+.es-flow.has-svg-connectors .es-flow__item--branch {
+	border-left-color: transparent;
+}
+
+.es-flow.has-svg-connectors .es-flow__item--branch::before,
+.es-flow.has-svg-connectors .es-flow__item--branch::after {
+	display: none;
+}
+
 /* Una caja por paso, a lo ancho. El conector corre ENTRE las cajas, no en
    una columna lateral: ahora la forma ES la caja (como en el diagrama de
    referencia), así que ya no hay un punto en un gutter que conectar. */
@@ -227,6 +355,15 @@
 	position: relative;
 	padding-left: 18px;
 	border-left: 1px dashed var(--es-decision-dim);
+}
+
+/* Una rama que el JS confirmó sobre el mismo eje no necesita indentación:
+   quitarla centra exactamente su forma con los dos vértices que conecta.
+   Esto permite que el SVG use un único segmento vertical también en la
+   narrativa mobile, sin el desfase de 9px que obligaba a dibujar una L. */
+.es-flow__item--branch.is-axis-aligned-branch {
+	padding-left: 0;
+	border-left-color: transparent;
 }
 
 .es-flow__item--branch::before {
@@ -408,6 +545,14 @@
 	opacity: 0;
 }
 
+.es-flow.is-enhanced:not(.is-revealed) .es-flow__connection-line {
+	stroke-dashoffset: 1;
+}
+
+.es-flow.is-enhanced:not(.is-revealed) .es-flow__connection-head {
+	opacity: 0;
+}
+
 /* fill-mode "backwards" (NO "forwards"): sostiene el keyframe 0% durante
    el animation-delay (si no, cada nodo/línea aparecería de golpe apenas
    se agrega .is-revealed, y recién después "animaría" desde ahí — el
@@ -430,6 +575,16 @@
 }
 
 .es-flow.is-revealed .es-flow__head {
+	animation: es-flow-fade var(--es-dur) var(--es-ease) backwards;
+	animation-delay: calc(var(--es-flow-stagger) * var(--i, 0) + var(--es-dur-fast));
+}
+
+.es-flow.is-revealed .es-flow__connection-line {
+	animation: es-flow-draw var(--es-dur-slow) var(--es-ease) backwards;
+	animation-delay: calc(var(--es-flow-stagger) * var(--i, 0));
+}
+
+.es-flow.is-revealed .es-flow__connection-head {
 	animation: es-flow-fade var(--es-dur) var(--es-ease) backwards;
 	animation-delay: calc(var(--es-flow-stagger) * var(--i, 0) + var(--es-dur-fast));
 }
@@ -665,6 +820,15 @@
 .es-flow__body {
 	display: block;
 	padding: 8px 2px 0;
+}
+
+/* Cuando una rama baja por el eje central, el texto de apoyo cede ese eje
+   en vez de obligar al conector a desviarse. La geometría queda recta y el
+   contenido conserva altura natural, foco y área táctil completos. */
+.es-flow__item.has-axis-branch-below .es-flow__body {
+	width: calc(50% - 14px);
+	margin-right: auto;
+	text-align: left;
 }
 
 .es-flow__num {
@@ -996,12 +1160,18 @@
    pseudo) aunque esta última venga después en el archivo — el empate en
    la categoría de clases se rompe por la categoría de elementos, y ahí
    pierde. Con el prefijo pasa a 2 clases + 1 pseudo, que gana sin
-   depender del orden. */
+   depender del orden.
+
+   !important agregado acá: la regla genérica de base.css sumó su propio
+   !important (refuerzo anti-azul de Kadence, ver ese archivo) — entre
+   reglas !important la especificidad sigue siendo el desempate, así que
+   esto sigue ganando exactamente igual, pero sin el !important el de
+   base.css pasaría a ganar SIEMPRE sin importar especificidad. */
 /* SIN gate de .is-enhanced a propósito: el foco de teclado tiene que
    verse igual con o sin JS (mismo contrato de progressive enhancement
    que el resto del bloque — ver el docblock de render.php). */
 .es-flow .es-flow__trigger:focus-visible {
-	outline: none;
+	outline: none !important;
 }
 
 .es-flow__item:not(.es-flow__item--decision) .es-flow__trigger:focus-visible .es-flow__shape {
@@ -1016,7 +1186,7 @@
    rombo real. (El outline:none general de arriba ya cubre la decisión
    también — esta regla queda para dejar la intención explícita.) */
 .es-flow__item--decision .es-flow__trigger:focus-visible {
-	outline: none;
+	outline: none !important;
 }
 
 .es-flow__item--decision .es-flow__trigger:focus-visible .es-flow__shape::before {
@@ -1040,6 +1210,57 @@
 
 	.es-flow__title {
 		font-size: 16px;
+	}
+}
+
+/* =========================================================================
+   MOBILE / TABLET (<1280px) — render inmediato, sin motion
+   -------------------------------------------------------------------------
+   La narrativa vertical debe estar completa desde el primer pintado. Esto
+   neutraliza pre-hide, stagger, dibujo de paths, fades, translates, delays y
+   transiciones del componente. Desktop conserva su animación más abajo.
+   ========================================================================= */
+@media (max-width: 1279px) {
+	.es-flow__track > .es-flow__item {
+		order: var(--es-flow-mobile-order, 0);
+	}
+
+	.es-flow,
+	.es-flow *,
+	.es-flow *::before,
+	.es-flow *::after {
+		animation: none !important;
+		transition: none !important;
+	}
+
+	.es-flow.is-enhanced:not(.is-revealed) .es-flow__item,
+	.es-flow.is-revealed .es-flow__item {
+		opacity: 1;
+		transform: none;
+	}
+
+	.es-flow__line,
+	.es-flow.is-enhanced:not(.is-revealed) .es-flow__line,
+	.es-flow.is-revealed .es-flow__line,
+	.es-flow__connection-line,
+	.es-flow.is-enhanced:not(.is-revealed) .es-flow__connection-line,
+	.es-flow.is-revealed .es-flow__connection-line {
+		stroke-dasharray: none;
+		stroke-dashoffset: 0;
+	}
+
+	.es-flow__head,
+	.es-flow.is-enhanced:not(.is-revealed) .es-flow__head,
+	.es-flow.is-revealed .es-flow__head,
+	.es-flow__connection-head,
+	.es-flow.is-enhanced:not(.is-revealed) .es-flow__connection-head,
+	.es-flow.is-revealed .es-flow__connection-head {
+		opacity: 1;
+	}
+
+	.es-flow.is-enhanced .es-flow__trigger:hover,
+	.es-flow.is-enhanced .es-flow__trigger:focus-visible {
+		transform: none;
 	}
 }
 
@@ -1148,6 +1369,23 @@
 		grid-column: var(--c);
 	}
 
+	/* Si la decisión y el punto de reingreso ya comparten columna, la
+	   pantalla intermedia usa ese mismo eje. El carril lateral queda como
+	   fallback para grafos cuya rama realmente necesite desplazarse. */
+	.es-flow__item--branch.is-axis-aligned-branch {
+		grid-column: var(--es-flow-branch-column, var(--c));
+	}
+
+	/* El retorno vertical atraviesa el centro de estas dos celdas. El texto
+	   de apoyo usa sólo la mitad izquierda y corta en dos líneas, dejando un
+	   corredor limpio antes del eje. La clase la asigna el grafo únicamente
+	   al nodo de retorno y a su destino; no depende de IDs ni de textos de
+	   Trazur, y mobile conserva su ancho normal. */
+	.es-flow__item.has-axis-loop-text-clearance .es-flow__text {
+		width: calc(50% - 3px);
+		margin-right: auto;
+	}
+
 	/* Banda que se lee al revés (derecha → izquierda): el conector entra por
 	   el otro lado y el trazo se espeja. .is-rtl lo pone el PHP según la
 	   paridad de la banda — nunca un nth-child. */
@@ -1212,20 +1450,11 @@
 		width: calc(var(--es-flow-col) + var(--es-flow-decision-slack));
 	}
 
-	/* Salto de banda: caída vertical recta. El nodo de llegada queda en la
+	/* Fallback sin JS del salto de banda: caída vertical recta. El nodo de llegada queda en la
 	   MISMA columna que el de salida (lo garantiza la serpentina), así que
 	   no hace falta ningún desvío horizontal — sólo el trazo vertical del
-	   propio svg, del alto exacto del salto de fila. Deliberadamente NO
-	   estirado hasta el borde de la forma anterior: el cuerpo (descripción
-	   + "Ver detalle") vive en esa franja, en el mismo eje central que este
-	   riel — estirar el riel hasta ahí lo haría cruzar ese texto. La franja
-	   de despeje del cuerpo (--es-flow-body-clear, ver más abajo) ahora
-	   mide SIEMPRE lo mismo para cualquier nodo, así que este gap —aunque
-	   no toque la forma— es idéntico y predecible en todo el diagrama: se
-	   lee como una pausa deliberada después de la descripción, no como un
-	   corte arbitrario a mitad de fila (que es lo que pasaba antes, cuando
-	   el alto de cada fila lo definía el vecino con la descripción más
-	   larga). */
+	   propio svg, del alto del gap de fila. El overlay mejorado no usa este
+	   borde de grilla: sale de la forma real y rodea el contenido de soporte. */
 	.es-flow__rail--v {
 		left: 50%;
 		right: auto;
@@ -1556,44 +1785,10 @@
 		text-align: left;
 	}
 
-	/* =====================================================================
-	   FRANJA DE DESPEJE DEL CUERPO — por qué un conector vertical podía
-	   "empezar en un punto distinto según el vecino de fila"
-	   ---------------------------------------------------------------------
-	   Cada fila del grid mide, en alto, lo que mida su ítem MÁS ALTO — y
-	   ese alto incluye la descripción de cada nodo, que variaba de uno a
-	   otro. Un conector vertical (el riel entre bandas, la prolongación a
-	   través de un carril de ramas, la "L" que entra o sale de una
-	   pantalla intermedia) arranca en el BORDE DE LA FILA — así que su
-	   punto de partida dependía de qué tan larga fuera la descripción del
-	   vecino más largo de esa fila, no de la del propio nodo: dos filas
-	   con el mismo tipo de salto podían dejar un gap visualmente distinto.
-
-	   La solución no es medir nada en JS: es hacer que TODOS los cuerpos
-	   midan lo MISMO, una franja fija (--es-flow-body-clear) que cabe
-	   holgada hasta 2 líneas de descripción + el afordance "Ver detalle".
-	   Con eso el alto de CUALQUIER fila es siempre (alto de forma + esta
-	   franja), sin excepción — así que el conector, aunque siga arrancando
-	   en el borde de la fila (deliberadamente: estirarlo más cruzaría la
-	   descripción del propio nodo, que vive en el mismo eje), arranca
-	   siempre a la MISMA distancia relativa de cualquier forma, en
-	   cualquier fila. Un gap fijo y uniforme, no una distancia que cambia
-	   según el contenido del vecino. */
-	.es-flow {
-		--es-flow-body-clear: 74px;
-	}
-
-	.es-flow__body {
-		height: var(--es-flow-body-clear);
-		overflow: hidden;
-	}
-
-	.es-flow__text {
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 2;
-		overflow: hidden;
-	}
+	/* El cuerpo conserva su altura natural. Los conectores medidos salen por
+	   el lateral de la forma y recorren corredores libres entre items, por lo
+	   que una descripción larga ya no obliga a recortar texto ni a falsear la
+	   altura de todas las filas. */
 
 	/* Marcadores de contexto anclados a SU PROPIA pastilla.
 	   Antes vivían sueltos arriba y abajo del diagrama y se los acercaba con
@@ -1706,7 +1901,10 @@
 @media (prefers-reduced-motion: reduce) {
 	.es-flow__line,
 	.es-flow.is-enhanced:not(.is-revealed) .es-flow__line,
-	.es-flow.is-revealed .es-flow__line {
+	.es-flow.is-revealed .es-flow__line,
+	.es-flow__connection-line,
+	.es-flow.is-enhanced:not(.is-revealed) .es-flow__connection-line,
+	.es-flow.is-revealed .es-flow__connection-line {
 		stroke-dasharray: none;
 		stroke-dashoffset: 0;
 		animation: none;
@@ -1714,7 +1912,10 @@
 
 	.es-flow__head,
 	.es-flow.is-enhanced:not(.is-revealed) .es-flow__head,
-	.es-flow.is-revealed .es-flow__head {
+	.es-flow.is-revealed .es-flow__head,
+	.es-flow__connection-head,
+	.es-flow.is-enhanced:not(.is-revealed) .es-flow__connection-head,
+	.es-flow.is-revealed .es-flow__connection-head {
 		opacity: 1;
 		animation: none;
 	}

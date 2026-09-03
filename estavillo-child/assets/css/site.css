@@ -15,6 +15,69 @@
    este repo.
    ========================================================================= */
 
+/* ---------- saltar al contenido (WCAG 2.4.1) ----------
+   Fuera de pantalla en reposo, visible SÓLO con foco de teclado. No se usa
+   .es-visually-hidden porque ese patrón (clip + 1px) no se puede "des-ocultar"
+   con foco sin pelearse con sus propias reglas: acá alcanza con sacarlo del
+   viewport y traerlo de vuelta.
+
+   z-index por encima del header sticky (80) y del overlay del menú (70), si
+   no el link aparece pero tapado por el propio header al que le está
+   ganando de mano. */
+.es-skip-link {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 200;
+	transform: translateY(-100%);
+	/* Misma altura que .es-nav (66px) + su hairline: así el link TAPA el
+	   header completo en vez de dejar asomar media línea de la marca y del
+	   botón Menu por debajo, que se lee como un glitch y no como una barra. */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 67px;
+	padding: 8px 24px;
+	background: var(--es-paper);
+	border-bottom: 1px solid var(--es-accent);
+	font-family: var(--es-sans);
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--es-ink) !important;
+	text-align: center;
+	text-decoration: none;
+	transition: transform 0.18s var(--es-ease);
+}
+
+/* Con la admin bar de WP el header baja (regla de abajo); el skip link
+   acompaña, si no quedaría debajo de la barra gris de WordPress. */
+.admin-bar .es-skip-link {
+	top: 32px;
+}
+
+@media (max-width: 782px) {
+	.admin-bar .es-skip-link {
+		top: 46px;
+	}
+}
+
+/* Barra completa y no una píldora: el header es semitransparente con blur,
+   así que una píldora centrada dejaba asomar el link de nav que tapaba a
+   medias por debajo de su borde. Ocupando todo el ancho no hay nada detrás
+   con lo que competir, y además es el patrón que un usuario de teclado ya
+   conoce de otros sitios. */
+.es-skip-link:focus,
+.es-skip-link:focus-visible {
+	transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-skip-link {
+		transition: none;
+	}
+}
+
 /* ---------- header sticky ---------- */
 
 .es-site-header {
@@ -78,6 +141,20 @@
 	border-radius: 50%;
 	background: var(--es-accent);
 	pointer-events: none;
+	/* mismo tiempo que el background-size del subrayado de .es-nav__link, para
+	   que el punto se apague exactamente mientras la línea entra */
+	transition: opacity 0.2s ease;
+}
+
+/* Nunca dos indicadores verdes a la vez: sobre el item activo, el hover/foco
+   REEMPLAZA al punto por la línea (no los suma). Se cruzan con la misma
+   duración, así se lee como un indicador que se transforma, no como dos.
+   opacity y no display/visibility: es lo único animable, y el punto ya está
+   absolutamente posicionado, así que en ningún caso mueve layout. */
+.es-nav__link.is-active:hover .es-nav__dot,
+.es-nav__link.is-active:focus-visible .es-nav__dot,
+.es-nav__link.is-active:active .es-nav__dot {
+	opacity: 0;
 }
 
 /* optional wordmark logo image (text wordmark stays the default) */
@@ -115,39 +192,98 @@
    encola en el single de Case Study — ahora viven en el chrome
    compartido, así que cargan en cualquier página que los use. */
 
+/* Metadata editorial, no una segunda barra de navegación. En el Case
+   Study vive DEBAJO del índice sticky (header → índice → breadcrumb →
+   hero), y todo acá está calibrado para que se lea claramente por debajo
+   de ese índice: 10px contra 11px, peso liviano, interlínea corta,
+   padding mínimo y sin ningún cromo (ni fondo, ni borde, ni cápsula, ni
+   sombra) — el índice de arriba ya aporta la única línea divisoria que
+   necesita esta zona.
+
+   CONTRASTE — corrección respecto de la iteración anterior: acá se venía
+   usando un gris de ~3.15:1 justificado con el umbral de 3:1 de WCAG
+   1.4.11, pero ese criterio es para componentes de interfaz NO textuales
+   (bordes, íconos). Esto es texto de enlace, así que el criterio que
+   corresponde es 1.4.3, que pide 4.5:1 por debajo de 18pt. --es-ink-4
+   puro (3.45:1) tampoco alcanza. La mezcla de acá es el gris más apagado
+   que todavía cumple 4.5:1 (≈4.53:1 medido sobre --es-paper): la bajada
+   de protagonismo la hacen el tamaño, el peso y el espaciado, no un
+   contraste ilegible.
+
+   Los separadores "/" sí pueden ir más tenues (≈3:1): son puntuación
+   decorativa — la jerarquía real la comunica el marcado <ol>/<li>, no el
+   glifo. */
 .es-breadcrumbs {
-	padding: 14px 0;
-	border-bottom: 1px solid var(--es-line);
+	--es-breadcrumbs-ink: color-mix(in srgb, var(--es-ink-3) 45%, var(--es-ink-4));
+	--es-breadcrumbs-sep: color-mix(in srgb, var(--es-ink-4) 90%, var(--es-paper));
+	padding: 13px 0 0;
+	border-bottom: 0;
 }
 
 .es-breadcrumbs__list {
 	display: flex;
-	flex-wrap: wrap;
+	/* nowrap SIEMPRE, no sólo en mobile: nunca se quiere una segunda línea,
+	   en ningún viewport — ver .es-breadcrumbs__item--current más abajo,
+	   que es el único ítem que puede encogerse y truncar. */
+	flex-wrap: nowrap;
 	align-items: center;
 	gap: 0;
 	margin: 0;
 	padding: 0;
 	list-style: none;
 	font-family: var(--es-mono);
-	font-size: 11px;
-	letter-spacing: 0.04em;
+	font-size: 10px;
+	font-weight: 400;
+	font-style: italic;
+	line-height: 1.2;
+	letter-spacing: 0.03em;
 }
 
 .es-breadcrumbs__item {
 	display: flex;
 	align-items: center;
+	/* Todos los niveles quedan a su ancho natural — nunca se comprimen ni
+	   se ocultan. El único que puede achicarse es --current (ver abajo),
+	   así que un título largo nunca empuja "Home"/"Work" fuera de la fila
+	   ni los corta a la mitad. */
+	flex: none;
+}
+
+/* El crumb actual (último, sin link): el único que se banca perder ancho
+   — ahí es donde tiene que caer el ellipsis si no entra todo. */
+.es-breadcrumbs__item--current {
+	flex: 1 1 auto;
+	min-width: 0;
 }
 
 .es-breadcrumbs__item:not(:first-child)::before {
 	content: '/';
-	margin: 0 9px;
-	color: var(--es-ink-4);
+	margin: 0 7px;
+	color: var(--es-breadcrumbs-sep);
 }
 
 .es-breadcrumbs__link {
-	color: var(--es-ink-3) !important;
+	color: var(--es-breadcrumbs-ink) !important;
 	text-decoration: none;
 	transition: color var(--es-dur-fast) ease;
+}
+
+/* Orden LVHA (Link → Visited → Hover → Active), a propósito y no por
+   casualidad. :visited y :hover/:focus-visible/:active tienen la MISMA
+   especificidad (0,2,0) y acá los dos llevan !important — en un empate de
+   especificidad gana la ÚLTIMA regla del archivo. Antes :visited estaba
+   DESPUÉS de :hover, así que en cualquier navegador donde el cascade real
+   resuelva el empate por orden de aparición (sin el tratamiento especial
+   de privacidad que Chromium le da a :visited), un link ya visitado — el
+   caso típico de "Inicio" en cualquier sesión real — se hubiera quedado
+   con el muted incluso en hover, exactamente el síntoma reportado. Medido
+   en Chromium con historial real + sampling de pixel (no
+   getComputedStyle(), que Chromium fuerza a mentir sobre :visited a
+   propósito) el hover seguía ganando ahí — pero el orden LVHA es la regla
+   estándar precisamente para no depender de esa implementación específica.
+   Sin costo: es sólo reordenar. */
+.es-breadcrumbs__link:visited {
+	color: var(--es-breadcrumbs-ink) !important;
 }
 
 .es-breadcrumbs__link:hover,
@@ -156,13 +292,10 @@
 	color: var(--es-accent) !important;
 }
 
-.es-breadcrumbs__link:visited {
-	color: var(--es-ink-3) !important;
-}
-
 .es-breadcrumbs__current {
-	color: var(--es-ink-4);
-	max-width: 40ch;
+	display: block;
+	color: var(--es-breadcrumbs-ink);
+	max-width: 60ch;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -578,6 +711,64 @@
 	color: var(--es-ink-3);
 }
 
+/* credit line — footer visual iteration: "Designed by <em>me</em>, {name}."
+   integrated under the tagline instead of repeated in the bottom bar (which
+   already carries © {year} {name} — repeating the sentence there read as
+   redundant). Deliberately quieter than the note above it via SIZE only
+   (12px vs 13px) — --es-ink-4 (used for the bottom-bar meta row) measures
+   ~3.45:1 against --es-paper, under the 4.5:1 WCAG AA text minimum at this
+   size; --es-ink-3 measures ~6.2:1, so this reuses the same muted tone the
+   note above it already uses rather than introducing a new, failing one. */
+.es-site-footer__credit {
+	margin: 0;
+	max-width: 34ch;
+	font-size: 12px;
+	line-height: 1.6;
+	color: var(--es-ink-3);
+}
+
+.es-site-footer__credit em {
+	font-style: normal;
+	color: var(--es-accent);
+}
+
+/* social icons — footer visual iteration: moved out of the contact column
+   (where they rendered as a stacked list of text links, ".es-footer-elsewhere")
+   and into the brand column as a small icon row, per the reference composition.
+   Icon-only; the platform name still reaches AT/screen readers via aria-label. */
+.es-footer-social {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	margin-top: 2px;
+}
+
+.es-footer-social__link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	margin: -5px;
+	color: var(--es-ink-4) !important;
+	text-decoration: none;
+	transition: color 0.15s ease;
+}
+
+.es-footer-social__link:hover,
+.es-footer-social__link:focus-visible,
+.es-footer-social__link:active {
+	color: var(--es-accent) !important;
+}
+
+.es-footer-social__link:visited {
+	color: var(--es-ink-4) !important;
+}
+
+.es-footer-social__icon {
+	flex: none;
+}
+
 /* navigation column — vertical list, reuses the same links as the header */
 .es-site-footer__nav {
 	gap: 10px;
@@ -592,10 +783,18 @@
 	transition: color 0.15s ease;
 }
 
+/* Bugfix (footer visual iteration): this hover/focus-visible/active rule
+   painted --es-ink (near-white — basically "brighten to full ink"), not
+   --es-accent — the one link state in the whole footer that didn't follow
+   the site-wide "hover/focus = accent green" language (contact items and
+   the social links right above already used --es-accent correctly). Not a
+   cascade/specificity override from elsewhere — this rule was always the
+   most specific match here (single class + pseudo-class + !important) and
+   always won; the color value itself was just wrong. */
 .es-site-footer__nav a:hover,
 .es-site-footer__nav a:focus-visible,
 .es-site-footer__nav a:active {
-	color: var(--es-ink) !important;
+	color: var(--es-accent) !important;
 }
 
 .es-site-footer__nav a[aria-current='page'] {
@@ -606,16 +805,11 @@
 	color: var(--es-ink-3) !important;
 }
 
-/* contact + elsewhere column */
-.es-footer-contact,
-.es-footer-elsewhere {
+/* contact column */
+.es-footer-contact {
 	display: flex;
 	flex-direction: column;
 	gap: 9px;
-}
-
-.es-footer-elsewhere {
-	margin-top: 14px;
 }
 
 .es-footer-contact__item {
@@ -650,24 +844,6 @@
 .es-footer-contact__item:focus-visible .es-footer-contact__icon {
 	color: var(--es-accent);
 	transform: translateX(2px);
-}
-
-.es-footer-elsewhere a {
-	width: fit-content;
-	font-size: 13.5px;
-	color: var(--es-ink-3) !important;
-	text-decoration: none;
-	transition: color 0.15s ease;
-}
-
-.es-footer-elsewhere a:hover,
-.es-footer-elsewhere a:focus-visible,
-.es-footer-elsewhere a:active {
-	color: var(--es-accent) !important;
-}
-
-.es-footer-elsewhere a:visited {
-	color: var(--es-ink-3) !important;
 }
 
 /* base row — location + auto-year copyright, mono meta */

@@ -5,10 +5,216 @@
 /* ---------- featured case (Main case) ---------- */
 
 .es-featured__grid {
+	/* Featured Media (ticket "Featured media del Case Study"): un solo alto
+	   compartido por standard/wide/full — layout es horizontal-only por
+	   diseño, ver --wide/--full más abajo. Antes de este ticket el <img>
+	   no tenía ningún tope de alto propio (el componente crecía según el
+	   aspect ratio real de la imagen subida); ahora sí, para poder
+	   garantizar "el alto no crece" en wide/full sin inventar un número
+	   distinto por variante. Calibrado contra el aspect-ratio 16/10 que ya
+	   usaba el placeholder, al ancho real que tiene hoy la columna de
+	   media en standard (~510px en desktop ancho) — visualmente
+	   equivalente a como se veía antes con una imagen ya recortada 16:10
+	   (el caso típico), object-fit:cover se encarga del resto. */
+	--es-featured-media-h: clamp(250px, 27vw, 322px);
 	display: grid;
 	grid-template-columns: 0.95fr 1.05fr;
 	gap: clamp(32px, 5vw, 72px);
 	align-items: center;
+}
+
+/* Wide: el media pasa de ~52% a ~62% del ancho útil (rango 55-65% pedido
+   por el ticket) — mismo --es-featured-media-h, la diferencia es
+   horizontal nomás. */
+.es-featured__grid--wide {
+	grid-template-columns: 0.75fr 1.25fr;
+}
+
+/* Full — "verdadero hero background" (ajuste de ARQUITECTURA v2: la v1
+   sólo hacía sangrar .es-featured__media a los 100vw DENTRO de su propia
+   fila de grilla — el media nunca podía cubrir el "02 / Featured Case"
+   de arriba porque ese encabezado es un HERMANO de estavillo/featured-case,
+   no un hijo. Ver el comentario grande en #featured:has(...) más abajo
+   para el porqué completo).
+
+   .es-featured__grid--full YA NO es position:relative: si lo fuera,
+   sería EL containing block del media (ancestro posicionado más
+   cercano) y el media quedaría atado a la fila del bloque otra vez —
+   exactamente el bug que esto corrige. Se deja position:static
+   (default) a propósito, así .es-featured__media "ve a través" de este
+   nivel y resuelve su position:absolute contra #featured (ver abajo).
+
+   display:flex + min-height (no display:block): con el media ahora
+   position:absolute (fuera del flujo), .es-featured__grid--full sólo
+   tiene un hijo en flujo normal — .es-featured__text — así que
+   min-height reserva el mismo --es-featured-media-h de siempre (el
+   section sigue con la altura de siempre, no la gobierna el media) y
+   align-items:center centra el panel verticalmente sin position:absolute
+   ni transform (ver .es-featured__text más abajo). Un solo flex item en
+   flex-direction:row (default) no se estira horizontalmente por
+   align-items — el ancho lo sigue poniendo max-width en .es-featured__text,
+   alineado a la izquierda por el justify-content:flex-start (default). */
+.es-featured__grid--full {
+	display: flex;
+	align-items: center;
+	min-height: var(--es-featured-media-h);
+}
+
+/* El ancestro real que tiene que volverse containing block del media es
+   #featured — el <section> entero, no la fila del bloque — para que el
+   media pueda cubrir TODO el section, "02 / Featured Case" incluido,
+   sea cual sea la estructura exacta de Gutenberg alrededor (Group con
+   Paragraph "02" + Heading como hermano directo del bloque dinámico, o
+   el .es-container clásico del template-part — :has() no necesita saber
+   cuál de las dos es). :has(.es-featured__grid--full) lo activa SÓLO
+   cuando hay un Featured Case en modo full adentro — standard/wide no
+   tocan esta regla, #featured se queda exactamente como estaba.
+   overflow:hidden scopeado ACÁ (nunca en un ancestro más arriba, como
+   .es-page/.es-main) — mismo criterio ya documentado en base.css junto a
+   .es-page: overflow-x en un ancestro de elementos sticky (el header)
+   les rompe el position:sticky. #featured no es ancestro del header, así
+   que es seguro acá.
+
+   isolation:isolate — bug real, encontrado con Playwright: position:
+   relative SOLO (sin z-index propio) es containing block para el
+   position:absolute del media, pero NO establece un stacking context
+   nuevo — con z-index:auto (el default), .es-featured__media con
+   z-index:-1 no queda "adentro" de #featured para efectos de apilado,
+   sino que compite en el stacking context de más arriba (el de la
+   página), donde el propio fondo opaco de #featured (.es-section--block,
+   var(--es-block)) se pintaba ENCIMA del media — el hero se veía negro
+   sólido, la imagen cargaba bien pero quedaba tapada por su propio
+   section. isolation:isolate fuerza el stacking context nuevo sin
+   depender de elegir un z-index arbitrario — con eso, el orden de
+   pintado correcto (fondo de #featured primero, z-index negativo
+   después) pasa a resolverse DENTRO de #featured como corresponde. */
+#featured:has(.es-featured__grid--full) {
+	position: relative;
+	overflow: hidden;
+	isolation: isolate;
+}
+
+/* inset:0 contra #featured (ya position:relative arriba) — no contra
+   .es-featured__grid--full, que se dejó position:static a propósito.
+   .es-section (regla base, layout.css) sólo tiene padding VERTICAL, cero
+   padding horizontal, así que #featured ya mide el 100% del ancho
+   disponible por sí solo — inset:0 alcanza para cubrir el section
+   completo de lado a lado, sin necesitar ningún cálculo de viewport.
+   inset:0 en un absolutely positioned también llega hasta el borde de
+   padding del containing block — cubre el padding-top/bottom propio de
+   #featured (pedido explícito del ajuste: "incluyendo... padding
+   superior, padding inferior"), no sólo su content-box.
+   z-index:-1 (no position:relative + z-index:1 en el resto del section):
+   con un containing block ya establecido en #featured, un z-index
+   negativo alcanza para pintar el media DETRÁS de todo el contenido en
+   flujo normal de #featured (el "02 / Featured Case" incluido) sin
+   necesitar tocar la posición de ESE contenido — cero riesgo de romper
+   sus propios wrappers, sea cual sea su estructura real. */
+.es-featured__grid--full .es-featured__media {
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	width: auto;
+	height: auto;
+	margin: 0;
+}
+
+/* Scrim direccional SOBRE EL MEDIA (no sobre #featured ni sobre la
+   grilla): así cubre exactamente la misma área que el media —
+   inset:0 relativo a .es-featured__media, que ya es position:absolute —
+   sin depender de dónde termine el media. Más oscuro a la izquierda
+   (donde vive el texto) y transparente hacia la derecha — deja ver el
+   visual (mockup/pantalla/producto) sin taparlo por completo. */
+.es-featured__grid--full .es-featured__media::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	background: linear-gradient(90deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.6) 35%, rgba(0, 0, 0, 0.2) 70%, rgba(0, 0, 0, 0.08) 100%);
+	pointer-events: none;
+}
+
+/* Panel de texto: capa de legibilidad propia (fondo translúcido + blur)
+   detrás del BLOQUE DE TEXTO nomás, no de todo el hero — así el blur sólo
+   afecta la porción de imagen que el texto realmente tapa, el resto del
+   visual queda nítido. Mismo panel visual que antes de este ajuste de
+   arquitectura (fondo/blur/borde/radius sin cambios) — lo único que
+   cambia es CÓMO se posiciona: ya NO position:absolute — con el media
+   ahora fuera de flujo (ver arriba), .es-featured__text es el ÚNICO hijo
+   en flujo normal de .es-featured__grid--full (flex), así que
+   align-items:center en el padre ya lo centra verticalmente sin
+   necesitar top/transform acá, y al no estirarse por default en un flex
+   row, max-width alcanza para que nunca sea más ancho que eso ni una
+   "tarjeta pesada" de ancho completo — mismo resultado visual que el
+   shrink-to-fit anterior, con la ventaja de heredar automáticamente el
+   ancho/alineación de lo que sea que .es-featured__grid--full termine
+   midiendo (container clásico o layout constreñido de Gutenberg), sin
+   ningún cálculo de posición a mano. Los tokens --es-ink* son
+   theme-aware (claros en dark, oscuros en light) y no sirven acá: el
+   contraste tiene que ganarle a la imagen de fondo, no al theme del
+   sitio — texto blanco fijo. */
+.es-featured__grid--full .es-featured__text {
+	max-width: clamp(320px, 42vw, 620px);
+	margin: clamp(16px, 2.4vw, 32px);
+	padding: clamp(18px, 2.2vw, 28px);
+	background: rgba(0, 0, 0, 0.55);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: var(--es-radius);
+	color: #fff;
+}
+
+/* Tipografía/espaciado más compactos DENTRO del panel — el tamaño/margen
+   por defecto de .es-featured__title (hasta 52px + 20px de margen) está
+   calibrado para el layout standard/wide, con toda la columna de texto
+   del componente disponible. Dentro del panel angosto de full (copy real
+   de production, no un texto de prueba corto) ese mismo tamaño hacía que
+   el panel completo se pasara bastante del alto del propio hero —
+   encontrado con Playwright. Nunca se toca .es-featured__title en sí
+   (standard/wide quedan exactamente igual): esto es sólo el contexto
+   --full. */
+.es-featured__grid--full .es-featured__kicker {
+	margin-bottom: 10px;
+}
+
+.es-featured__grid--full .es-featured__title {
+	font-size: clamp(22px, 2.2vw, 32px);
+	margin: 0 0 12px;
+}
+
+.es-featured__grid--full .es-featured__body {
+	margin: 0 0 12px;
+	max-width: none;
+	/* Máximo 3 líneas — mismo motivo que el título: un párrafo pensado
+	   para la columna completa de standard/wide no entraba en el panel
+	   angosto sin empujar el alto muy por encima del hero. max-width:none
+	   porque el tope de ancho ya lo pone el panel contenedor, no hace
+	   falta el 56ch que sí tiene sentido con la columna completa.
+	   Recorte con "…" nativo, nunca contenido invisible sin aviso. */
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 3;
+	overflow: hidden;
+}
+
+.es-featured__grid--full .es-featured__source {
+	margin: 0 0 14px;
+}
+
+.es-featured__grid--full .es-featured__status {
+	margin-bottom: 14px;
+}
+
+.es-featured__grid--full .es-featured__kicker,
+.es-featured__grid--full .es-featured__title,
+.es-featured__grid--full .es-featured__body,
+.es-featured__grid--full .es-featured__source {
+	color: #fff;
+}
+
+.es-featured__grid--full .es-featured__source {
+	color: rgba(255, 255, 255, 0.72);
 }
 
 .es-featured__kicker {
@@ -52,16 +258,78 @@
 
 .es-featured__media {
 	position: relative;
+	height: var(--es-featured-media-h);
+	/* Scopeado ACÁ, nunca en un ancestro — mismo criterio documentado en
+	   base.css junto a .es-page: overflow-x en un ancestro de elementos
+	   sticky (el header, en este caso más arriba en el DOM) les rompe el
+	   position:sticky. */
+	overflow: hidden;
+}
+
+.es-featured__media img,
+.es-featured__media video {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
 }
 
 .es-featured__placeholder {
-	aspect-ratio: 16 / 10;
+	width: 100%;
+	height: 100%;
 	background: var(--es-block-2);
 }
 
 @media (max-width: 900px) {
 	.es-featured__grid {
 		grid-template-columns: 1fr;
+	}
+
+	.es-featured__grid--wide {
+		grid-template-columns: 1fr;
+	}
+
+	/* Full en mobile: SIGUE siendo hero (media de borde a borde + texto
+	   superpuesto) — pedido explícito del ajuste ("mantener el hero
+	   compacto", nunca "volver a apilado"). Sólo el panel de texto se
+	   relaja a casi todo el ancho disponible (width:100% — un flex item
+	   en flex-direction:row no se estira solo, a diferencia del
+	   left:0/right:0 de la v1 con position:absolute) y el scrim se
+	   refuerza un poco más, para "evitar texto ilegible sobre partes
+	   brillantes de la imagen". */
+	.es-featured__grid--full .es-featured__text {
+		width: 100%;
+		max-width: none;
+		margin: clamp(12px, 3.5vw, 18px);
+		padding: clamp(14px, 3.5vw, 20px);
+	}
+
+	/* Un poco más compacto todavía que el desktop: menos alto disponible
+	   (--es-featured-media-h no baja de 250px, pero es mucho menos margen
+	   que en desktop) para el mismo copy real. */
+	.es-featured__grid--full .es-featured__kicker {
+		margin-bottom: 6px;
+	}
+
+	.es-featured__grid--full .es-featured__title {
+		margin-bottom: 8px;
+	}
+
+	.es-featured__grid--full .es-featured__body {
+		margin-bottom: 8px;
+		-webkit-line-clamp: 2;
+	}
+
+	.es-featured__grid--full .es-featured__source {
+		margin-bottom: 8px;
+	}
+
+	.es-featured__grid--full .es-featured__status {
+		margin-bottom: 8px;
+	}
+
+	.es-featured__grid--full .es-featured__media::after {
+		background: linear-gradient(90deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.7) 45%, rgba(0, 0, 0, 0.35) 100%);
 	}
 }
 
@@ -340,6 +608,19 @@
 	display: flex;
 	align-items: baseline;
 	gap: 14px;
+}
+
+/* ---------- home tools (cierre de referencia, sin numeración) ----------
+   Encabezado deliberadamente más liviano que .es-section-head: sin el
+   <span class="es-section-head__num"> en acento que le daba peso de
+   "capítulo" a la sección — acá sólo queda el label mono/ink-4, ya de por
+   sí discreto. Margen inferior más chico que el default (clamp 36-52px):
+   Tools ya no abre un capítulo nuevo de la narrativa, cierra uno como
+   referencia rápida antes de About. Scopeado a .es-home-tools: no toca
+   .es-section-head en ningún otro lugar (About sigue con su propio
+   encabezado numerado, sin cambios). */
+.es-home-tools__head {
+	margin-bottom: clamp(22px, 2.6vw, 32px);
 }
 
 /* ---------- about ---------- */

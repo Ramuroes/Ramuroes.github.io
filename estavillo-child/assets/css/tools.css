@@ -1,0 +1,163 @@
+/* =========================================================================
+   Tools (.es-tools) — bloque reutilizable del Design System
+   -------------------------------------------------------------------------
+   estavillo/tools (plugin). No es una sección de About: se encola en
+   cualquier plantilla singular donde el bloque aparezca (ver
+   has_block('estavillo/tools') en inc/enqueue.php del theme) — mismo
+   mecanismo que ya usa Case Flow para vivir fuera del Case Study.
+
+   Lenguaje visual: sin cards, sin badges, sin chips, sin sombras. Sólo
+   hairlines de token, aire generoso, tipografía editorial (mono para el
+   label de categoría, sans para las herramientas — nunca mono para las
+   herramientas: leído en bloque se sentía a listado técnico/terminal) y el
+   acento verde reservado al ícono de categoría.
+
+   Dos variantes:
+   - Editorial (default): herramientas en columna, una por línea. Sin
+     separador — el salto de línea ya lo es.
+   - Inline: una sola línea corrida por categoría, unida con el separador
+     editorial del sitio ("·", el mismo que .es-exp-item__meta/.es-cred__meta
+     — nunca bullets).
+   ========================================================================= */
+
+/*
+ * Grilla compartida por las dos variantes: 3 columnas de ancho igual en
+ * desktop, 2 en tablet, 1 en mobile — MISMO mecanismo para editorial e
+ * inline (antes inline era flex-wrap con flex-basis:240px, que reparte
+ * filas según cuánto entra a lo ancho del contenedor, no una cantidad de
+ * columnas fija: con contenidos reales podía leerse 3+2, 2+2+1 o cualquier
+ * combinación según el ancho real de Home en cada breakpoint — nunca
+ * garantizaba "3 columnas" como tal). Con seis categorías (ver
+ * es_about_tools_defaults(), 6/3 = 2 filas exactas) grid resuelve solo el
+ * "sin espacios vacíos": nunca hay una fila incompleta que dejar en
+ * blanco ni una categoría para estirar.
+ */
+.es-tools__grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+	.es-tools__grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 560px) {
+	.es-tools__grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* Cada variante conserva su propio ritmo de aire — no hay motivo para que
+   Home (más compacto, más abajo en la página) y About (más espacioso,
+   layout vertical) compartan el mismo gap. */
+.es-tools--editorial .es-tools__grid {
+	gap: clamp(34px, 4vw, 52px) clamp(32px, 4.5vw, 64px);
+}
+
+@media (max-width: 560px) {
+	.es-tools--editorial .es-tools__grid {
+		gap: 30px;
+	}
+}
+
+.es-tools--inline .es-tools__grid {
+	gap: clamp(26px, 3vw, 40px) clamp(36px, 4.5vw, 60px);
+}
+
+@media (max-width: 560px) {
+	.es-tools--inline .es-tools__grid {
+		gap: 26px;
+	}
+}
+
+.es-tools__group {
+	min-width: 0;
+}
+
+/* cabecera de categoría: ícono lineal + label mono en caja alta, sobre una
+   hairline propia — la línea "separa" la categoría de su lista, no separa
+   una categoría de la siguiente (eso ya lo hace el aire del grid). */
+.es-tools__head {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	padding-bottom: 11px;
+	margin-bottom: 15px;
+	border-bottom: 1px solid var(--es-line);
+}
+
+.es-tools__icon {
+	display: inline-flex;
+	flex: none;
+	color: var(--es-accent);
+}
+
+.es-tools__icon svg {
+	display: block;
+}
+
+.es-tools__title {
+	margin: 0;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--es-ink-4);
+}
+
+/* atributo preparado para una evolución futura (ver block.json) — sin
+   contenido hoy en ningún grupo real, pero ya con su propio tratamiento
+   tipográfico listo si algún día se completa. */
+.es-tools__description {
+	margin: -7px 0 13px;
+	font-size: 12.5px;
+	line-height: 1.55;
+	color: var(--es-ink-4);
+	max-width: 34ch;
+}
+
+.es-tools__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+/* Editorial: columna, una herramienta por línea — el salto de línea es el
+   separador, sin glifo extra. */
+.es-tools--editorial .es-tools__list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.es-tools--editorial .es-tools__list li {
+	font-size: 14.5px;
+	line-height: 1.5;
+	color: var(--es-ink-2);
+}
+
+/* Inline: una línea corrida, herramientas unidas por "·" — el separador va
+   en el ítem ANTERIOR (::after), no en el siguiente (::before): así viaja
+   con su propia caja y, si el texto corta de línea, el "·" queda al final
+   del renglón — nunca huérfano al principio del siguiente. */
+.es-tools--inline .es-tools__list {
+	display: flex;
+	flex-wrap: wrap;
+	column-gap: 9px;
+	row-gap: 4px;
+}
+
+.es-tools--inline .es-tools__list li {
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--es-ink-2);
+}
+
+.es-tools--inline .es-tools__list li:not(:last-child)::after {
+	content: '·';
+	margin-left: 9px;
+	color: var(--es-ink-4);
+}

@@ -1,5 +1,55 @@
 # Connect page — Fluent Forms setup
 
+> ## Estado actual del sitio en vivo, y qué hay que corregir a mano
+>
+> La auditoría encontró el formulario **ya instalado pero con los valores
+> de fábrica de Fluent Forms**, que es un estado peor que no tenerlo: le
+> dice al visitante que la página está a medio hacer. Tres síntomas
+> concretos, los tres se arreglan en wp-admin (nada de esto se puede
+> corregir desde el theme: los labels viven en la configuración del
+> formulario, no en el HTML del sitio).
+>
+> **1. Aparece la palabra "Textarea" como etiqueta.** Es el nombre interno
+> del tipo de campo, no un label. En **Fluent Forms → tu formulario →**
+> click en el campo de mensaje **→ Input Customization → Element Label**,
+> poner `Mensaje` (ES) / `Message` (EN).
+>
+> **2. Aparece "Enter Your First Name" como placeholder.** Es el
+> placeholder por defecto del campo Name. En el mismo panel del campo de
+> nombre **→ Placeholder**, vaciarlo o poner algo neutro. El label sí debe
+> decir `Nombre` (ES) / `Name` (EN).
+>
+> **3. Sigue visible el bloque "Marcador de formulario" / "Form
+> placeholder".** Es el marcador dibujado a propósito con borde punteado
+> que puso este repo para reservar el lugar (paso 5 de abajo). Si el
+> formulario real ya está insertado, el marcador quedó de más: hay que
+> borrar ese Group. Si no está insertado, el marcador está bien y lo que
+> falta es el paso 5.
+>
+> ### Los cuatro campos, por idioma
+>
+> Con Polylang cada idioma necesita **su propio formulario** (Fluent Forms
+> guarda los labels en el formulario, no como cadenas traducibles), y la
+> página Connect de cada idioma apunta al suyo.
+>
+> | Campo    | Español   | English   |
+> |----------|-----------|-----------|
+> | Nombre   | `Nombre`  | `Name`    |
+> | Email    | `Email`   | `Email`   |
+> | Mensaje  | `Mensaje` | `Message` |
+> | Botón    | `Enviar`  | `Send`    |
+>
+> Sin placeholders inventados en ningún campo: el label alcanza, y un
+> placeholder que repite el label es ruido para lectores de pantalla.
+>
+> ### Cómo verificar que quedó bien
+>
+> Abrir `/es/contacto/` y `/contact/` en el front (no la preview del
+> editor) y confirmar, en cada uno: los cuatro textos de la tabla, cero
+> apariciones de "Textarea", "Enter Your First Name" o "Marcador de
+> formulario", y un envío de prueba real que llegue a la casilla.
+
+
 The Connect page's "Send a message." column is prepared for **Fluent
 Forms Free** (target chosen in the Connect revision ticket). The plugin is
 **not installed from the repository** — no plugin is ever installed

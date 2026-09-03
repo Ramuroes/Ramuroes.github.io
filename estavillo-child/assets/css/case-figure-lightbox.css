@@ -1,0 +1,338 @@
+/* =========================================================================
+   ESTAVILLO — Case Figure lightbox (.es-lightbox)
+   -------------------------------------------------------------------------
+   Visor COMPARTIDO por página: un solo <dialog>, inyectado una vez por
+   case-figure-lightbox.js la primera vez que se abre, sin importar cuántos
+   Case Figure con zoom haya en la página. Este archivo sólo se encola
+   cuando existe al menos un estavillo/case-figure con `enableZoom` activo
+   (ver inc/enqueue.php) — nunca en páginas sin zoom.
+
+   Mismos tokens que el resto del sitio (--es-*), mismo acento verde de
+   hover/foco, sin azul, sin librería de íconos. El <dialog> nativo entra
+   al "top layer" del navegador con .showModal() — por eso queda arriba de
+   header/nav/popups/admin bar sin necesitar pelear con z-index ajenos.
+   ========================================================================= */
+
+.es-lightbox {
+	position: fixed;
+	inset: 0;
+	z-index: 999;
+	width: 100%;
+	height: 100dvh;
+	height: 100vh;
+	max-width: none;
+	max-height: none;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: var(--es-block);
+	color: var(--es-ink);
+	overflow: hidden;
+}
+
+.es-lightbox:not([open]) {
+	display: none;
+}
+
+.es-lightbox::backdrop {
+	background: rgba(6, 5, 4, 0.92);
+}
+
+/* prefers-reduced-motion apaga la transición de apertura/cierre nativa del
+   <dialog> (Chrome/Safari recientes animan open/close vía @starting-style
+   si el CSS lo define; acá no se define ninguna, así que ya es instantáneo
+   por default — esta regla es un cinturón de seguridad explícito). */
+.es-lightbox,
+.es-lightbox::backdrop {
+	transition: none;
+}
+
+/* ---------- viewport desplazable ----------
+   touch-action: none desactiva el scroll/zoom nativo del navegador acá
+   adentro: el pan y el pinch los maneja el JS a mano, si no compiten con
+   el gesto nativo y la imagen "tironea". */
+.es-lightbox__viewport {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	touch-action: none;
+	cursor: grab;
+}
+
+.es-lightbox__viewport.is-zoomed {
+	cursor: grab;
+}
+
+.es-lightbox__viewport.is-dragging {
+	cursor: grabbing;
+}
+
+.es-lightbox__img {
+	position: absolute;
+	top: 0;
+	left: 0;
+	max-width: none;
+	max-height: none;
+	width: auto;
+	height: auto;
+	transform-origin: 0 0;
+	will-change: transform;
+	user-select: none;
+	-webkit-user-drag: none;
+	/* Se apaga apenas el JS toma el control real (translate/scale por
+	   frame); sin esto, cada ajuste de zoom con rueda o botón se vería con
+	   un lag de transición encima del que ya pone el propio gesto. */
+	transition: none;
+}
+
+.es-lightbox__viewport.is-animating .es-lightbox__img {
+	transition: transform var(--es-dur-fast) var(--es-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-lightbox__viewport.is-animating .es-lightbox__img {
+		transition: none;
+	}
+}
+
+/* ---------- cierre: fijo, siempre visible, respeta el safe area ----------
+   !important en border/background/box-shadow acá y en los controles de
+   abajo: Kadence pinta sus <button> con color/relleno propio en
+   :hover/:focus (confirmado en vivo con un círculo azul en las flechas
+   del índice — mismo mecanismo, cualquier <button> del sitio corre el
+   mismo riesgo). Sin el refuerzo, la superficie oscura de este botón
+   podía virar a azul en vez de quedarse en --es-surface/--es-surface-2. */
+.es-lightbox__close {
+	position: fixed;
+	top: calc(env(safe-area-inset-top, 0px) + 14px);
+	right: calc(env(safe-area-inset-right, 0px) + 14px);
+	z-index: 3;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border: 1px solid var(--es-line-strong) !important;
+	border-radius: 999px;
+	background: var(--es-surface) !important;
+	box-shadow: none !important;
+	color: var(--es-ink);
+	cursor: pointer;
+	transition: border-color var(--es-dur-fast) var(--es-ease), background-color var(--es-dur-fast) var(--es-ease);
+}
+
+.es-lightbox__close svg {
+	width: 18px;
+	height: 18px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.6;
+	stroke-linecap: round;
+}
+
+.es-lightbox__close:hover,
+.es-lightbox__close:focus-visible {
+	border-color: var(--es-signal) !important;
+	background: var(--es-surface-2) !important;
+	box-shadow: none !important;
+}
+
+.es-lightbox__close:focus-visible {
+	outline: 2px solid var(--es-accent) !important;
+	outline-offset: 2px !important;
+}
+
+/* :focus PLANO (mouse click sin :focus-visible — ver el comentario grande
+   junto a .es-case-index__arrow en case-study.css): sin esto, la regla
+   base (menos específica que un button:focus de Kadence) perdía y el
+   círculo quedaba azul con sólo clickear, sin necesidad de teclado. */
+.es-lightbox__close:focus {
+	border-color: var(--es-line-strong) !important;
+	background: var(--es-surface) !important;
+	box-shadow: none !important;
+}
+
+/* ---------- controles de zoom: fijos abajo, alcance de pulgar ---------- */
+.es-lightbox__controls {
+	position: fixed;
+	left: 50%;
+	bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+	z-index: 3;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px;
+	border: 1px solid var(--es-line-strong);
+	border-radius: 999px;
+	background: var(--es-surface);
+	transform: translateX(-50%);
+}
+
+.es-lightbox__controls button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 44px;
+	height: 44px;
+	padding: 0 14px;
+	border: 0 !important;
+	border-radius: 999px;
+	background: none !important;
+	box-shadow: none !important;
+	font-family: var(--es-mono);
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--es-ink-2);
+	cursor: pointer;
+	transition: color var(--es-dur-fast) var(--es-ease), background-color var(--es-dur-fast) var(--es-ease);
+}
+
+.es-lightbox__controls button svg {
+	width: 16px;
+	height: 16px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.8;
+	stroke-linecap: round;
+}
+
+.es-lightbox__controls button:hover,
+.es-lightbox__controls button:focus-visible {
+	color: var(--es-signal);
+	border: 0 !important;
+	background: var(--es-surface-2) !important;
+	box-shadow: none !important;
+}
+
+.es-lightbox__controls button:focus-visible {
+	outline: 2px solid var(--es-accent) !important;
+	outline-offset: -2px !important;
+}
+
+/* :focus PLANO — mismo motivo que .es-lightbox__close:focus arriba: la
+   regla base (0,1,1 de especificidad) empataba con un button:focus de
+   Kadence también (0,1,1) y el desempate por orden de carga podía
+   perderse. Acá sube a (0,2,1), gana siempre. */
+.es-lightbox__controls button:focus {
+	border: 0 !important;
+	background: none !important;
+	box-shadow: none !important;
+}
+
+.es-lightbox__controls button:disabled {
+	opacity: 0.35;
+	cursor: default;
+}
+
+.es-lightbox__controls button:disabled:hover {
+	color: var(--es-ink-2);
+	border: 0 !important;
+	background: none !important;
+	box-shadow: none !important;
+}
+
+/* ---------- caption: franja discreta, ocultable ---------- */
+.es-lightbox__caption {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: calc(env(safe-area-inset-bottom, 0px) + 68px);
+	z-index: 2;
+	display: flex;
+	align-items: baseline;
+	justify-content: center;
+	gap: 12px;
+	max-width: min(640px, calc(100% - 96px));
+	margin: 0 auto;
+	padding: 9px 16px;
+	border: 1px solid var(--es-line);
+	border-radius: 999px;
+	background: rgba(19, 18, 17, 0.86);
+	font-family: var(--es-mono);
+	font-size: 11px;
+	line-height: 1.5;
+	color: var(--es-ink-3);
+	text-align: center;
+}
+
+.es-lightbox__caption:empty,
+.es-lightbox__caption.is-hidden {
+	display: none;
+}
+
+.es-lightbox__caption .es-case-caption__tag {
+	flex: none;
+	color: var(--es-accent);
+}
+
+.es-lightbox__caption-toggle {
+	position: fixed;
+	right: calc(env(safe-area-inset-right, 0px) + 14px);
+	bottom: calc(env(safe-area-inset-bottom, 0px) + 68px);
+	z-index: 3;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	border: 1px solid var(--es-line) !important;
+	border-radius: 999px;
+	background: var(--es-surface) !important;
+	box-shadow: none !important;
+	color: var(--es-ink-3);
+	cursor: pointer;
+}
+
+.es-lightbox__caption-toggle svg {
+	width: 13px;
+	height: 13px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.6;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.es-lightbox__caption-toggle:hover,
+.es-lightbox__caption-toggle:focus-visible {
+	color: var(--es-signal);
+	border-color: var(--es-signal) !important;
+	background: var(--es-surface) !important;
+	box-shadow: none !important;
+}
+
+.es-lightbox__caption-toggle:focus-visible {
+	outline: 2px solid var(--es-accent) !important;
+	outline-offset: 2px !important;
+}
+
+/* :focus PLANO — mismo motivo que los dos controles de arriba: la regla
+   base (0,1,0) ni siquiera empata con un button:focus de Kadence
+   (0,1,1), pierde directo. */
+.es-lightbox__caption-toggle:focus {
+	border-color: var(--es-line) !important;
+	background: var(--es-surface) !important;
+	box-shadow: none !important;
+}
+
+/* Sin caption: no reservar el lugar ni mostrar el toggle. */
+.es-lightbox:not(.has-caption) .es-lightbox__caption,
+.es-lightbox:not(.has-caption) .es-lightbox__caption-toggle {
+	display: none;
+}
+
+/* Mobile angosto: la franja de caption y el toggle compiten por poco
+   ancho — el caption ya usa max-width acotado arriba, acá sólo se ajusta
+   el tamaño de fuente para que quepan 2-3 palabras por línea sin
+   desbordar. */
+@media (max-width: 420px) {
+	.es-lightbox__caption {
+		max-width: calc(100% - 64px);
+		font-size: 10.5px;
+	}
+}
+

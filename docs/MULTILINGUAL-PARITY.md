@@ -21,7 +21,7 @@ any bilingual content or Polylang settings.
 | About | `/about/` | `/sobre-mi/` | `templates/page-about.php` | `docs/content/about-gutenberg-en.html` | `docs/content/about-gutenberg-es.html` | ES file created this phase |
 | How I Work | `/how-i-work/` | `/como-trabajo/` | `templates/page-how-i-work.php` | `docs/content/how-i-work-gutenberg-en.html` | `docs/content/how-i-work-gutenberg-es.html` | ES file created this phase |
 | Connect | `/contact/` | `/contacto/` | `templates/page-contact.php` | `docs/content/connect-gutenberg-en.html` | `docs/content/connect-gutenberg-es.html` | ES file created this phase |
-| Work | `/work/` | `/proyectos/` | `templates/page-work.php` | *(PHP fallback only — no Gutenberg content file exists yet for either language)* | — | Not started (pre-existing gap, not introduced by this phase) |
+| Work | `/my-work/` (canonical, pre-existing) | `/es/trabajos/` (canonical, pre-existing) | `templates/page-work.php` | *(PHP fallback only — no Gutenberg content file exists yet for either language)* | — | Naming/navigation unified (see "Work/Proyectos naming unification" ticket); page body still not migrated to Gutenberg |
 | Case Study — Trazur | `/work/trazur/` (recommended slug) | `/proyectos/trazur/` | `single-es_case_study.php` | `docs/content/trazur-gutenberg-en.html` | `docs/content/trazur-gutenberg-es.html` | **Already complete** (earlier phase) |
 | Case Study — Presupuestador / Workshop Quoting System | `/work/workshop-quoting-system/` (recommended slug) | `/proyectos/presupuestador/` | `single-es_case_study.php` | `docs/content/workshop-quoting-system-gutenberg-en.html` (current, supersedes the older `presupuestador-case-study-en.html`) | **missing — see §5** | Not published in either language yet (marked "content written, not yet published" in its own source file) |
 
@@ -48,6 +48,7 @@ active with English + Spanish configured. Key = the array key in
 | `work_label` | Selected work | Proyectos seleccionados |
 | `work_view_all` | All work | Ver todos los proyectos |
 | `work_view_case` | View case study | Ver caso |
+| `work_featured_label` | Featured work | Proyecto destacado *(actualizado — ticket "Cierre general / bugfix"; era "Trabajo destacado", el usuario dio esta redacción como definitiva. Header de la sección "01" en la página Work, NO reusa `featured_label` de Home)* |
 | `about_label` | About | Sobre mí |
 | `about_intro_label` | My approach | Mi enfoque |
 | `about_cta` | More about me | Más sobre mí |
@@ -80,9 +81,11 @@ active with English + Spanish configured. Key = the array key in
 | `about_title` | About me. | Sobre mí. |
 | `how_title` | How I work. | Cómo trabajo. |
 | `how_lead` | I don't start with interfaces. I start by understanding the system. | No empiezo por las interfaces. Empiezo por entender el sistema. |
+| `work_eyebrow` | Work | Proyectos *(nuevo — ticket "Refine Work archive hierarchy". Mismo valor EN que `nav_work` a propósito: Polylang traduce por texto, no por clave, así que comparte automáticamente la traducción ES de `nav_work` — no hace falta cargarla dos veces. Mismo patrón ya usado por `nav_about`/`about_label` y `nav_connect`/`cta_label`.)* |
 | `work_title` | Work. | Proyectos. |
-| `work_lead` | A selection of product and systems design work, from live decision tools to earlier academic and legacy projects. | Una selección de trabajo de diseño de producto y sistemas, desde herramientas de decisión en producción hasta proyectos académicos y heredados anteriores. |
-| `work_archive_label` | Archive / older work | Archivo / trabajo anterior |
+| `work_lead` | A selection of Product Design and systems work, alongside selected earlier work across digital, industrial and visual design. | Una selección de proyectos de Product Design y sistemas, junto con trabajos anteriores en diseño digital, industrial y visual. *(actualizado — ticket "Refine Work archive hierarchy"; reemplaza la redacción anterior de esta fila)* |
+| `work_archive_label` | More work | Más trabajos *(actualizado — antes "Archive / older work"/"Archivo / trabajo anterior"; ahora también es el header de la sección "03" combinada, no sólo del archivo CPT)* |
+| `work_archive_lead` | Selected earlier work across digital, industrial, 3D and visual design. | Una selección de trabajos anteriores en diseño digital, industrial, 3D y visual. *(nuevo — ticket "Refine Work archive hierarchy"; bajada opcional de la sección "03")* |
 | `connect_eyebrow` | Get in touch | Hablemos |
 | `connect_title` | Start a conversation. | Empecemos una conversación. |
 | `connect_lead` | I'm open to Product Design, Design Systems and UX Research roles — anywhere the goal is making a real system work better, not just look better. | Estoy abierto a roles de Product Design, Design Systems y UX Research — donde el objetivo sea lograr que un sistema real funcione mejor, no solo que se vea mejor. |

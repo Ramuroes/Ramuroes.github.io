@@ -45,11 +45,14 @@ function es_portfolio_get_home_content() {
  * es_about_experience_previous_defaults() en el tema). 'contributions' es
  * un <textarea>, una bullet por línea — se separa por salto de línea acá,
  * líneas vacías descartadas, para guardar el mismo array<string> que
- * espera about-content.php.
+ * espera about-content.php. 'tools' (final-polish ticket §2) es un
+ * <input> de una línea, separado por comas — mismo criterio de "una
+ * herramienta por vez, nunca inventar" que el resto del About: una fila
+ * sin ninguna coma sigue guardando un array de un solo elemento.
  *
  * @param array  $post   $_POST completo.
  * @param string $prefix Prefijo de los campos (p.ej. 'es_exp_sel').
- * @return array<int,array{org:string,role:string,location:string,period:string,summary:string,contributions:string[],link_label:string,link_url:string}>
+ * @return array<int,array{org:string,role:string,location:string,period:string,summary:string,contributions:string[],tools:string[],link_label:string,link_url:string}>
  */
 function es_portfolio_sanitize_experience_rows( $post, $prefix ) {
 	$orgs           = isset( $post[ "{$prefix}_org" ] ) ? wp_unslash( $post[ "{$prefix}_org" ] ) : array();
@@ -58,6 +61,7 @@ function es_portfolio_sanitize_experience_rows( $post, $prefix ) {
 	$periods        = isset( $post[ "{$prefix}_period" ] ) ? wp_unslash( $post[ "{$prefix}_period" ] ) : array();
 	$summaries      = isset( $post[ "{$prefix}_summary" ] ) ? wp_unslash( $post[ "{$prefix}_summary" ] ) : array();
 	$contributions  = isset( $post[ "{$prefix}_contributions" ] ) ? wp_unslash( $post[ "{$prefix}_contributions" ] ) : array();
+	$tools_raw      = isset( $post[ "{$prefix}_tools" ] ) ? wp_unslash( $post[ "{$prefix}_tools" ] ) : array();
 	$link_labels    = isset( $post[ "{$prefix}_link_label" ] ) ? wp_unslash( $post[ "{$prefix}_link_label" ] ) : array();
 	$link_urls      = isset( $post[ "{$prefix}_link_url" ] ) ? wp_unslash( $post[ "{$prefix}_link_url" ] ) : array();
 	$rows           = array();
@@ -71,6 +75,15 @@ function es_portfolio_sanitize_experience_rows( $post, $prefix ) {
 				}
 			}
 		}
+		$es_tools = array();
+		if ( isset( $tools_raw[ $i ] ) && '' !== trim( $tools_raw[ $i ] ) ) {
+			foreach ( explode( ',', $tools_raw[ $i ] ) as $es_tool ) {
+				$es_tool = sanitize_text_field( trim( $es_tool ) );
+				if ( '' !== $es_tool ) {
+					$es_tools[] = $es_tool;
+				}
+			}
+		}
 		$rows[ $i ] = array(
 			'org'           => sanitize_text_field( $org ),
 			'role'          => sanitize_text_field( $roles[ $i ] ?? '' ),
@@ -78,6 +91,7 @@ function es_portfolio_sanitize_experience_rows( $post, $prefix ) {
 			'period'        => sanitize_text_field( $periods[ $i ] ?? '' ),
 			'summary'       => sanitize_textarea_field( $summaries[ $i ] ?? '' ),
 			'contributions' => $es_lines,
+			'tools'         => $es_tools,
 			'link_label'    => sanitize_text_field( $link_labels[ $i ] ?? '' ),
 			'link_url'      => isset( $link_urls[ $i ] ) ? esc_url_raw( $link_urls[ $i ] ) : '',
 		);
@@ -126,7 +140,7 @@ function es_portfolio_merge_keyed_rows( $default, $saved, $key_field ) {
  * solo para no pagar el costo de este chequeo en cada admin_init una vez
  * que TODOS los grupos conocidos ya están sembrados).
  */
-define( 'ES_PORTFOLIO_ABOUT_DEFAULTS_VERSION', 1 );
+define( 'ES_PORTFOLIO_ABOUT_DEFAULTS_VERSION', 2 );
 
 /**
  * Mapa "clave del option => función de tema que devuelve su default".
@@ -145,6 +159,7 @@ function es_portfolio_about_default_seeds() {
 		'about_certifications_other' => 'es_about_certifications_other_defaults',
 		'about_languages'            => 'es_about_languages_defaults',
 		'about_hobbies_items'        => 'es_home_about_hobbies_defaults',
+		'about_tools'                => 'es_about_tools_defaults',
 	);
 }
 
@@ -353,6 +368,40 @@ function es_portfolio_home_content_save() {
 		$data['about_languages'] = $es_languages;
 	}
 
+	// Tools (About page, ahora renderizado por el bloque estavillo/tools —
+	// Design System ticket) — N grupos, cada uno título + ícono (misma
+	// librería que Hobbies/How I Work) + <textarea> de items, uno por
+	// línea. Mismo parseo uno-por-línea que 'contributions' arriba.
+	// 'categoryDescription' no tiene campo propio todavía (atributo
+	// preparado para el bloque, sin UI — ver block.json de estavillo/tools):
+	// se guarda vacío, nunca se pisa un valor que no vino de este form.
+	if ( isset( $_POST['es_about_tools_title'] ) && is_array( $_POST['es_about_tools_title'] ) ) {
+		$es_tools_titles = wp_unslash( $_POST['es_about_tools_title'] );
+		$es_tools_icons  = isset( $_POST['es_about_tools_icon'] ) && is_array( $_POST['es_about_tools_icon'] ) ? wp_unslash( $_POST['es_about_tools_icon'] ) : array();
+		$es_tools_items  = isset( $_POST['es_about_tools_items'] ) && is_array( $_POST['es_about_tools_items'] ) ? wp_unslash( $_POST['es_about_tools_items'] ) : array();
+		$es_valid_icons  = function_exists( 'es_process_icon_choices' ) ? array_keys( es_process_icon_choices() ) : array();
+		$es_tools_groups = array();
+		foreach ( $es_tools_titles as $i => $es_tools_title ) {
+			$es_items = array();
+			if ( isset( $es_tools_items[ $i ] ) && '' !== trim( $es_tools_items[ $i ] ) ) {
+				foreach ( preg_split( '/\r\n|\r|\n/', $es_tools_items[ $i ] ) as $es_item ) {
+					$es_item = sanitize_text_field( $es_item );
+					if ( '' !== $es_item ) {
+						$es_items[] = $es_item;
+					}
+				}
+			}
+			$es_icon_choice   = isset( $es_tools_icons[ $i ] ) ? sanitize_key( $es_tools_icons[ $i ] ) : '';
+			$es_tools_groups[ $i ] = array(
+				'title'               => sanitize_text_field( $es_tools_title ),
+				'icon'                => in_array( $es_icon_choice, $es_valid_icons, true ) ? $es_icon_choice : '',
+				'items'               => $es_items,
+				'categoryDescription' => '',
+			);
+		}
+		$data['about_tools'] = $es_tools_groups;
+	}
+
 	// ---- How I Work ----
 	// 'why' / 'example' / 'tools' son opcionales y solo se muestran en la
 	// página dedicada How I Work (el teaser de Home se queda compacto,
@@ -499,13 +548,17 @@ function es_portfolio_home_content_save() {
 		$data['footer_location'] = sanitize_text_field( wp_unslash( $_POST['es_footer_location'] ) );
 	}
 
-	// ---- Appearance — Portfolio dark mode ----
-	// Same "hidden marker" gating as Header/Footer above: only trust the
-	// checkbox's absence as "explicitly turned off" when this section was
-	// actually on the submitted form.
-	if ( isset( $_POST['es_theme_appearance'] ) ) {
-		$data['theme_dark_mode'] = isset( $_POST['es_theme_dark_mode'] ) ? '1' : '0';
-	}
+	/*
+	 * ---- Appearance — Portfolio dark mode ----
+	 * Ya no se guarda nada acá. Dark dejó de ser una opción del sitio y pasó
+	 * a ser el único sistema visual del portfolio (ver
+	 * es_theme_dark_mode_enabled() en el theme), así que este bloque escribía
+	 * un valor que nadie lee.
+	 *
+	 * La clave 'theme_dark_mode' que haya quedado guardada de antes se deja
+	 * intacta a propósito: borrarla sería una migración destructiva sin
+	 * ninguna ganancia. Simplemente ya no se escribe ni se lee.
+	 */
 
 	update_option( 'es_portfolio_home_content', $data );
 	add_action( 'admin_notices', 'es_portfolio_home_content_saved_notice' );
@@ -542,6 +595,32 @@ function es_portfolio_home_content_page() {
 			<?php wp_nonce_field( 'es_portfolio_home_content_save', 'es_portfolio_home_content_nonce' ); ?>
 
 			<h2><?php esc_html_e( 'About', 'estavillo-portfolio-core' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'The About page itself is now edited on its own Page (Gutenberg content) — this field only feeds the "read more" link on the Home About teaser.', 'estavillo-portfolio-core' ); ?></p>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><label for="es_about_url"><?php esc_html_e( 'About link (CTA URL)', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="url" id="es_about_url" name="es_about_url" class="regular-text" value="<?php echo esc_attr( $data['about_url'] ?? '' ); ?>" placeholder="#about"></td>
+				</tr>
+			</table>
+
+			<?php
+			/**
+			 * LEGACY — oculto (auditoría "PASADA GENERAL DE CIERRE", ítem 6).
+			 *
+			 * about_text / about_portrait / about_cv_url y las 6 subsecciones
+			 * de abajo (Hobbies, Experience, Earlier Experience, Education,
+			 * Other Certifications, Languages) sólo alimentan
+			 * template-parts/about-content.php — el fallback pre-Gutenberg de
+			 * la página About (templates/page-about.php). Esa página ya tiene
+			 * contenido real de Gutenberg, así que the_content() gana siempre
+			 * y ese fallback nunca se renderiza: estos campos ya no controlan
+			 * nada visible. Se ocultan del panel (no se borran del código ni
+			 * de la base de datos) para no seguir editando "en el vacío" —
+			 * el contenido real del About vive en su propia Página.
+			 * Reversible: cambiar `false` por `true` reactiva el panel.
+			 */
+			if ( false ) :
+				?>
 			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row"><label for="es_about_text"><?php esc_html_e( 'About text', 'estavillo-portfolio-core' ); ?></label></th>
@@ -549,10 +628,6 @@ function es_portfolio_home_content_page() {
 						<textarea id="es_about_text" name="es_about_text" rows="10" class="large-text"><?php echo esc_textarea( $data['about_text'] ?? '' ); ?></textarea>
 						<p class="description"><?php esc_html_e( 'Separate paragraphs with a blank line — each one renders as its own paragraph on the About page.', 'estavillo-portfolio-core' ); ?></p>
 					</td>
-				</tr>
-				<tr>
-					<th scope="row"><label for="es_about_url"><?php esc_html_e( 'About link (CTA URL)', 'estavillo-portfolio-core' ); ?></label></th>
-					<td><input type="url" id="es_about_url" name="es_about_url" class="regular-text" value="<?php echo esc_attr( $data['about_url'] ?? '' ); ?>" placeholder="#about"></td>
 				</tr>
 				<tr>
 					<th scope="row"><label for="es_about_portrait"><?php esc_html_e( 'Portrait image URL', 'estavillo-portfolio-core' ); ?></label></th>
@@ -637,6 +712,7 @@ function es_portfolio_home_content_page() {
 							<input type="text" name="es_exp_sel_period[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['period'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Period, e.g. 2025–Present', 'estavillo-portfolio-core' ); ?>"><br>
 							<textarea name="es_exp_sel_summary[<?php echo esc_attr( $i ); ?>]" rows="2" class="large-text" placeholder="<?php esc_attr_e( 'Visible summary', 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( $es_row['summary'] ?? '' ); ?></textarea>
 							<textarea name="es_exp_sel_contributions[<?php echo esc_attr( $i ); ?>]" rows="4" class="large-text" placeholder="<?php esc_attr_e( 'Key contributions — one bullet per line', 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( isset( $es_row['contributions'] ) && is_array( $es_row['contributions'] ) ? implode( "\n", $es_row['contributions'] ) : '' ); ?></textarea><br>
+							<input type="text" name="es_exp_sel_tools[<?php echo esc_attr( $i ); ?>]" class="large-text" value="<?php echo esc_attr( isset( $es_row['tools'] ) && is_array( $es_row['tools'] ) ? implode( ', ', $es_row['tools'] ) : '' ); ?>" placeholder="<?php esc_attr_e( 'Tools used, comma-separated, e.g. "Figma, Claude, VS Code" (optional — leave blank if unconfirmed)', 'estavillo-portfolio-core' ); ?>"><br>
 							<input type="text" name="es_exp_sel_link_label[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['link_label'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Link label, e.g. "View case study" (optional)', 'estavillo-portfolio-core' ); ?>">
 							<input type="url" name="es_exp_sel_link_url[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['link_url'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Link URL (optional)', 'estavillo-portfolio-core' ); ?>">
 						</td>
@@ -661,6 +737,7 @@ function es_portfolio_home_content_page() {
 							<input type="text" name="es_exp_prev_period[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['period'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Period (optional)', 'estavillo-portfolio-core' ); ?>"><br>
 							<textarea name="es_exp_prev_summary[<?php echo esc_attr( $i ); ?>]" rows="2" class="large-text" placeholder="<?php esc_attr_e( 'Visible summary', 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( $es_row['summary'] ?? '' ); ?></textarea>
 							<textarea name="es_exp_prev_contributions[<?php echo esc_attr( $i ); ?>]" rows="4" class="large-text" placeholder="<?php esc_attr_e( 'Key contributions — one bullet per line', 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( isset( $es_row['contributions'] ) && is_array( $es_row['contributions'] ) ? implode( "\n", $es_row['contributions'] ) : '' ); ?></textarea><br>
+							<input type="text" name="es_exp_prev_tools[<?php echo esc_attr( $i ); ?>]" class="large-text" value="<?php echo esc_attr( isset( $es_row['tools'] ) && is_array( $es_row['tools'] ) ? implode( ', ', $es_row['tools'] ) : '' ); ?>" placeholder="<?php esc_attr_e( 'Tools used, comma-separated (optional — leave blank if unconfirmed)', 'estavillo-portfolio-core' ); ?>"><br>
 							<input type="text" name="es_exp_prev_link_label[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['link_label'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Link label (optional)', 'estavillo-portfolio-core' ); ?>">
 							<input type="url" name="es_exp_prev_link_url[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['link_url'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Link URL (optional)', 'estavillo-portfolio-core' ); ?>">
 						</td>
@@ -729,9 +806,62 @@ function es_portfolio_home_content_page() {
 					</tr>
 				<?php endfor; ?>
 			</table>
+				<?php
+			endif; // LEGACY (about_text..about_languages) — ver comentario arriba.
+			?>
+
+			<h3><?php esc_html_e( 'Tools (About page)', 'estavillo-portfolio-core' ); ?></h3>
+			<p class="description"><?php esc_html_e( 'Renders via the reusable "Tools" block (estavillo/tools) — the same component available on Home/Case Studies. Leave a row\'s title blank to keep it out of the list. Items: one tool per line.', 'estavillo-portfolio-core' ); ?></p>
+			<table class="form-table" role="presentation">
+				<?php
+				$es_tools_groups = $data['about_tools'] ?? array();
+				$es_tools_icon_choices = function_exists( 'es_process_icon_choices' ) ? es_process_icon_choices() : array();
+				for ( $i = 0; $i < 6; $i++ ) :
+					$es_row = $es_tools_groups[ $i ] ?? array();
+					?>
+					<tr>
+						<th scope="row"><?php echo esc_html( sprintf( __( 'Group %d', 'estavillo-portfolio-core' ), $i + 1 ) ); ?></th>
+						<td>
+							<input type="text" name="es_about_tools_title[<?php echo esc_attr( $i ); ?>]" class="regular-text" value="<?php echo esc_attr( $es_row['title'] ?? '' ); ?>" placeholder="<?php esc_attr_e( 'Group title, e.g. "Design"', 'estavillo-portfolio-core' ); ?>">
+							<?php if ( ! empty( $es_tools_icon_choices ) ) : ?>
+								<select name="es_about_tools_icon[<?php echo esc_attr( $i ); ?>]">
+									<option value=""><?php esc_html_e( '— No icon —', 'estavillo-portfolio-core' ); ?></option>
+									<?php foreach ( $es_tools_icon_choices as $es_icon_key => $es_icon_label ) : ?>
+										<option value="<?php echo esc_attr( $es_icon_key ); ?>" <?php selected( $es_row['icon'] ?? '', $es_icon_key ); ?>><?php echo esc_html( $es_icon_label ); ?></option>
+									<?php endforeach; ?>
+								</select>
+							<?php endif; ?>
+							<br>
+							<textarea name="es_about_tools_items[<?php echo esc_attr( $i ); ?>]" rows="4" class="large-text" placeholder="<?php esc_attr_e( 'Tools — one per line', 'estavillo-portfolio-core' ); ?>"><?php echo esc_textarea( isset( $es_row['items'] ) && is_array( $es_row['items'] ) ? implode( "\n", $es_row['items'] ) : '' ); ?></textarea>
+						</td>
+					</tr>
+				<?php endfor; ?>
+			</table>
 
 			<h2><?php esc_html_e( 'How I Work', 'estavillo-portfolio-core' ); ?></h2>
-			<p class="description"><?php esc_html_e( 'Leave a step blank (both title and text) to keep its current placeholder — you can edit just one step without filling in all six. "Why it matters", "Example" and "Tools" are optional — the compact Home teaser never shows them (title + text + icon only); only the dedicated How I Work page does.', 'estavillo-portfolio-core' ); ?></p>
+			<p class="description"><?php esc_html_e( 'The How I Work page itself is now edited on its own Page (Gutenberg content) — this field only feeds the "read more" link on the Home How I Work teaser.', 'estavillo-portfolio-core' ); ?></p>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><label for="es_process_url"><?php esc_html_e( 'How I Work link (CTA URL)', 'estavillo-portfolio-core' ); ?></label></th>
+					<td><input type="url" id="es_process_url" name="es_process_url" class="regular-text" value="<?php echo esc_attr( $data['process_url'] ?? '' ); ?>" placeholder="#process"></td>
+				</tr>
+			</table>
+
+			<?php
+			/**
+			 * LEGACY — oculto (auditoría "PASADA GENERAL DE CIERRE", ítem 6).
+			 *
+			 * Los 6 "Step" (title/text/icon/why/example/tools) sólo
+			 * alimentan template-parts/how-i-work-detail.php — el fallback
+			 * pre-Gutenberg de la página How I Work (templates/page-how-i-work.php).
+			 * Esa página ya tiene contenido real de Gutenberg, así que
+			 * the_content() gana siempre y ese fallback nunca se renderiza.
+			 * El teaser de Home (template-parts/how-i-work.php) tampoco usa
+			 * estos steps — sólo el link de abajo. Reversible: cambiar
+			 * `false` por `true` reactiva el panel.
+			 */
+			if ( false ) :
+				?>
 			<table class="form-table" role="presentation">
 				<?php
 				$es_steps        = $data['process_steps'] ?? array();
@@ -767,11 +897,10 @@ function es_portfolio_home_content_page() {
 						</td>
 					</tr>
 				<?php endfor; ?>
-				<tr>
-					<th scope="row"><label for="es_process_url"><?php esc_html_e( 'How I Work link (CTA URL)', 'estavillo-portfolio-core' ); ?></label></th>
-					<td><input type="url" id="es_process_url" name="es_process_url" class="regular-text" value="<?php echo esc_attr( $data['process_url'] ?? '' ); ?>" placeholder="#process"></td>
-				</tr>
 			</table>
+				<?php
+			endif; // LEGACY (process steps) — ver comentario arriba.
+			?>
 
 			<h2><?php esc_html_e( 'Connect', 'estavillo-portfolio-core' ); ?></h2>
 			<p class="description"><?php esc_html_e( 'These fields feed Home\'s own CTA section only. For the dedicated Connect/Contact page (eyebrow, title, intro, phone, WhatsApp, country), see "Connect page (dedicated)" below.', 'estavillo-portfolio-core' ); ?></p>
@@ -795,6 +924,27 @@ function es_portfolio_home_content_page() {
 					<th scope="row"><label for="es_connect_url"><?php esc_html_e( 'Connect link (CTA URL)', 'estavillo-portfolio-core' ); ?></label></th>
 					<td><input type="url" id="es_connect_url" name="es_connect_url" class="regular-text" value="<?php echo esc_attr( $data['connect_url'] ?? '' ); ?>" placeholder="#connect"></td>
 				</tr>
+			</table>
+
+			<?php
+			/**
+			 * LEGACY — oculto (auditoría "PASADA GENERAL DE CIERRE", ítem 6).
+			 *
+			 * connect_note: cero call sites — el filtro 'es_connect_note' se
+			 * registra pero ningún template hace apply_filters() sobre él.
+			 * Nunca controló nada visible (verificado por grep en todo
+			 * estavillo-child/).
+			 *
+			 * connect_status: sólo alimenta template-parts/contact-content.php,
+			 * el fallback pre-Gutenberg de la página Connect — no se
+			 * renderiza mientras esa página tenga contenido real (ver nota
+			 * de "Connect page (dedicated)" más abajo).
+			 *
+			 * Reversible: cambiar `false` por `true` reactiva el panel.
+			 */
+			if ( false ) :
+				?>
+			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row"><label for="es_connect_note"><?php esc_html_e( 'Secondary note (optional)', 'estavillo-portfolio-core' ); ?></label></th>
 					<td>
@@ -809,10 +959,13 @@ function es_portfolio_home_content_page() {
 					</td>
 				</tr>
 			</table>
+				<?php
+			endif; // LEGACY (connect_note, connect_status) — ver comentario arriba.
+			?>
 
 			<h2><?php esc_html_e( 'Connect page (dedicated)', 'estavillo-portfolio-core' ); ?></h2>
-			<p class="description"><?php esc_html_e( 'The standalone Connect/Contact page only — Home is never affected by these. Contact email above and Availability above are shared with this page too.', 'estavillo-portfolio-core' ); ?></p>
-			<p class="description"><strong><?php esc_html_e( 'Source-of-truth note (revision ticket):', 'estavillo-portfolio-core' ); ?></strong> <?php esc_html_e( 'Eyebrow/Title/Introduction below always feed the page-head (they render whether or not the WP Page has real Gutenberg content). Phone/WhatsApp/Country and Availability above only feed the legacy fallback body — once the Connect Page has real Gutenberg content (the normal state), its own static text and links are the source of truth for the two-column contact section and editing these fields will NOT change what visitors see. This is intentional, not a bug — see docs/content/connect-gutenberg-en.html.', 'estavillo-portfolio-core' ); ?></p>
+			<p class="description"><?php esc_html_e( 'The standalone Connect/Contact page only — Home is never affected by these. Contact email above is shared with this page too.', 'estavillo-portfolio-core' ); ?></p>
+			<p class="description"><strong><?php esc_html_e( 'Source-of-truth note (revision ticket):', 'estavillo-portfolio-core' ); ?></strong> <?php esc_html_e( 'Eyebrow/Title/Introduction below always feed the page-head (they render whether or not the WP Page has real Gutenberg content). Phone and WhatsApp are also global — they feed the sitewide footer (template-parts/site-footer.php) in addition to the Connect page, so they stay live regardless of the page\'s Gutenberg state. Country only fed the legacy fallback body, hidden below (see the "PASADA GENERAL DE CIERRE" note) — once the Connect Page has real Gutenberg content (the normal state), its own static text is the source of truth there.', 'estavillo-portfolio-core' ); ?></p>
 			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row"><label for="es_connect_eyebrow"><?php esc_html_e( 'Eyebrow', 'estavillo-portfolio-core' ); ?></label></th>
@@ -827,10 +980,10 @@ function es_portfolio_home_content_page() {
 					<td><textarea id="es_connect_intro" name="es_connect_intro" rows="3" class="large-text"><?php echo esc_textarea( $data['connect_intro'] ?? '' ); ?></textarea></td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="es_contact_phone"><?php esc_html_e( 'Phone (not shown on Connect)', 'estavillo-portfolio-core' ); ?></label></th>
+					<th scope="row"><label for="es_contact_phone"><?php esc_html_e( 'Phone', 'estavillo-portfolio-core' ); ?></label></th>
 					<td>
 						<input type="text" id="es_contact_phone" name="es_contact_phone" class="regular-text" value="<?php echo esc_attr( $data['contact_phone'] ?? '' ); ?>" placeholder="+598 99 892 722">
-						<p class="description"><?php esc_html_e( 'Connect page now shows WhatsApp only (revision ticket — avoids showing the same number twice). Kept here for a future page that may need a separate phone row.', 'estavillo-portfolio-core' ); ?></p>
+						<p class="description"><?php esc_html_e( 'Shown in the site footer. The Connect page itself shows WhatsApp only (revision ticket — avoids showing the same number twice).', 'estavillo-portfolio-core' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -840,11 +993,28 @@ function es_portfolio_home_content_page() {
 						<p class="description"><?php esc_html_e( 'Any format is fine — only the digits are used to build the wa.me link.', 'estavillo-portfolio-core' ); ?></p>
 					</td>
 				</tr>
+			</table>
+
+			<?php
+			/**
+			 * LEGACY — oculto (auditoría "PASADA GENERAL DE CIERRE", ítem 6).
+			 *
+			 * connect_country sólo alimenta template-parts/contact-content.php
+			 * (fallback pre-Gutenberg de la página Connect) — mismo caso que
+			 * connect_status más arriba. Reversible: cambiar `false` por
+			 * `true` reactiva el panel.
+			 */
+			if ( false ) :
+				?>
+			<table class="form-table" role="presentation">
 				<tr>
 					<th scope="row"><label for="es_connect_country"><?php esc_html_e( 'Country', 'estavillo-portfolio-core' ); ?></label></th>
 					<td><input type="text" id="es_connect_country" name="es_connect_country" class="regular-text" value="<?php echo esc_attr( $data['connect_country'] ?? '' ); ?>" placeholder="Uruguay"></td>
 				</tr>
 			</table>
+				<?php
+			endif; // LEGACY (connect_country) — ver comentario arriba.
+			?>
 
 			<h2><?php esc_html_e( 'Header — site identity', 'estavillo-portfolio-core' ); ?></h2>
 			<input type="hidden" name="es_hf_header" value="1">
@@ -972,42 +1142,30 @@ function es_portfolio_home_content_page() {
 				</tr>
 			</table>
 
-			<h2><?php esc_html_e( 'Appearance — Portfolio dark mode', 'estavillo-portfolio-core' ); ?></h2>
-			<p class="description"><?php esc_html_e( 'The global switch for the portfolio-wide dark visual system. Disabled by default: the public site keeps its current behavior unchanged. When Enabled, every template — including generic pages, single posts, archives, search and 404 — renders dark, consistently, in both English and Spanish.', 'estavillo-portfolio-core' ); ?></p>
-			<input type="hidden" name="es_theme_appearance" value="1">
-			<table class="form-table" role="presentation">
-				<tr>
-					<th scope="row"><?php esc_html_e( 'Portfolio dark mode', 'estavillo-portfolio-core' ); ?></th>
-					<td>
-						<label><input type="checkbox" name="es_theme_dark_mode" value="1" <?php checked( '1' === ( $data['theme_dark_mode'] ?? '0' ) ); ?>> <?php esc_html_e( 'Enabled — apply dark mode site-wide for every visitor.', 'estavillo-portfolio-core' ); ?></label>
-						<p class="description"><?php esc_html_e( 'Leave unchecked (Disabled) until the content migration is finished and this is ready to go live for everyone. Use "Preview dark mode" below to review it safely first — previewing does not change this setting.', 'estavillo-portfolio-core' ); ?></p>
-					</td>
-				</tr>
-				<?php if ( function_exists( 'es_theme_dark_mode_enabled' ) && ! es_theme_dark_mode_enabled() ) : ?>
-					<tr>
-						<th scope="row"><?php esc_html_e( 'Preview (administrators only)', 'estavillo-portfolio-core' ); ?></th>
-						<td>
-							<?php if ( function_exists( 'es_theme_dark_preview_cookie_present' ) && es_theme_dark_preview_cookie_present() ) : ?>
-								<p>
-									<strong><?php esc_html_e( "You're currently previewing dark mode.", 'estavillo-portfolio-core' ); ?></strong>
-									<?php esc_html_e( 'Only your browser sees it — visitors still see the current site.', 'estavillo-portfolio-core' ); ?>
-								</p>
-								<?php if ( function_exists( 'es_theme_dark_preview_url' ) ) : ?>
-									<a class="button" href="<?php echo esc_url( es_theme_dark_preview_url( 'off', home_url( '/' ) ) ); ?>"><?php esc_html_e( 'Exit dark preview', 'estavillo-portfolio-core' ); ?></a>
-								<?php endif; ?>
-							<?php elseif ( function_exists( 'es_theme_dark_preview_url' ) ) : ?>
-								<a class="button button-secondary" href="<?php echo esc_url( es_theme_dark_preview_url( 'on', home_url( '/' ) ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Preview dark mode →', 'estavillo-portfolio-core' ); ?></a>
-								<p class="description"><?php esc_html_e( 'Opens the live site in a new tab, dark for you only (admin capability required). A matching "Exit dark preview" link is also always available in the admin toolbar on the front end.', 'estavillo-portfolio-core' ); ?></p>
-							<?php endif; ?>
-						</td>
-					</tr>
-				<?php else : ?>
-					<tr>
-						<th scope="row"><?php esc_html_e( 'Preview', 'estavillo-portfolio-core' ); ?></th>
-						<td><p class="description"><?php esc_html_e( 'Dark mode is already Enabled for every visitor — there is nothing left to preview.', 'estavillo-portfolio-core' ); ?></p></td>
-					</tr>
-				<?php endif; ?>
-			</table>
+			<h2><?php esc_html_e( 'Appearance', 'estavillo-portfolio-core' ); ?></h2>
+			<?php
+			/*
+			 * Esto era un checkbox ("Portfolio dark mode: Enabled / Disabled")
+			 * de la etapa en la que el sistema oscuro se estaba probando y
+			 * convivía con el look claro de Kadence. Ya no lo es.
+			 *
+			 * Por qué se retiró y no simplemente se dejó marcado: "Disabled"
+			 * nunca devolvió un sitio claro. Los tokens claros existen en
+			 * tokens.css bajo [data-theme='light'], pero nada emite ese
+			 * atributo y la capa que viste el chrome de Kadence (theme-dark.css)
+			 * no tiene contraparte clara. Ahora que el fondo oscuro se aplica
+			 * en html/body (assets/css/base.css), destildar la casilla dejaba
+			 * el sitio a medio camino: fondo oscuro con el chrome de Kadence
+			 * sin vestir. Un interruptor cuyo "off" es un bug no es una
+			 * opción, es una trampa.
+			 *
+			 * El punto de extensión sigue existiendo en código: el theme
+			 * resuelve el modo con apply_filters( 'es_theme_dark_mode', true ).
+			 * El día que exista un modo claro de verdad, ese filtro vuelve a
+			 * la pantalla como una elección entre dos sistemas completos.
+			 */
+			?>
+			<p class="description"><?php esc_html_e( 'The portfolio uses a single dark visual system across every template — home, case studies, the fixed pages, and the Kadence-native views (generic pages, posts, archives, search, 404) — in both English and Spanish. There is nothing to configure here: it is the theme, not a setting.', 'estavillo-portfolio-core' ); ?></p>
 
 			<?php submit_button( __( 'Save Portfolio Content', 'estavillo-portfolio-core' ), 'primary', 'es_portfolio_home_content_submit' ); ?>
 		</form>
@@ -1126,6 +1284,12 @@ function es_portfolio_filter_about_languages( $default ) {
 	return es_portfolio_merge_keyed_rows( $default, $data['about_languages'] ?? array(), 'name' );
 }
 add_filter( 'es_about_languages', 'es_portfolio_filter_about_languages' );
+
+function es_portfolio_filter_about_tools( $default ) {
+	$data = es_portfolio_get_home_content();
+	return es_portfolio_merge_keyed_rows( $default, $data['about_tools'] ?? array(), 'title' );
+}
+add_filter( 'es_about_tools', 'es_portfolio_filter_about_tools' );
 
 /**
  * Puente para How I Work. A diferencia de About (campos sueltos), acá se
@@ -1385,20 +1549,18 @@ function es_portfolio_filter_footer_visibility( $default ) {
 }
 add_filter( 'es_footer_visibility', 'es_portfolio_filter_footer_visibility' );
 
-/**
- * Portfolio dark mode — global switch bridge. Same "only override once the
- * section was saved at least once" guard as sticky_header above; until
- * then (and always, if never checked) the theme default wins, which is
- * Disabled (see es_theme_dark_mode_enabled() in the theme).
+/*
+ * Portfolio dark mode — el puente se retiró a propósito.
  *
- * @param bool $default Theme default (false — Disabled).
- * @return bool
+ * Este filtro leía la clave 'theme_dark_mode' de la opción y, con el guard
+ * array_key_exists(), cualquier guardado previo de la sección Appearance
+ * dejaba escrito un '0' que ganaba SIEMPRE contra el default del theme. Con
+ * el modo oscuro ya como sistema único (es_theme_dark_mode_enabled() devuelve
+ * true), ese '0' guardado en su momento habría apagado el theme entero en
+ * producción sin que nadie tocara nada.
+ *
+ * No se reemplaza por otro puente: no hay nada que elegir mientras exista un
+ * solo sistema visual. El theme sigue resolviendo el modo con
+ * apply_filters( 'es_theme_dark_mode', true ), así que el punto de extensión
+ * queda disponible para cuando exista un modo claro real.
  */
-function es_portfolio_filter_theme_dark_mode( $default ) {
-	$data = es_portfolio_get_home_content();
-	if ( ! array_key_exists( 'theme_dark_mode', $data ) ) {
-		return $default;
-	}
-	return '1' === $data['theme_dark_mode'];
-}
-add_filter( 'es_theme_dark_mode', 'es_portfolio_filter_theme_dark_mode' );

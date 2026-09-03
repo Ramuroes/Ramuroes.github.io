@@ -73,6 +73,78 @@ add_filter( 'body_class', 'es_hf_body_classes' );
  * ---------------------------------------------------------------------- */
 
 /**
+ * URL de la página fija que usa un template del theme, en el IDIOMA de esta
+ * request. Es la pieza que permite que el menú apunte a páginas reales
+ * (Cómo trabajo / Sobre mí / Contacto) en vez de a anchors de la Home, sin
+ * hardcodear un slug ni una ruta por idioma.
+ *
+ * Por qué por TEMPLATE y no por slug/ID: el template
+ * ('templates/page-how-i-work.php') es el contrato estable del theme. El
+ * slug lo puede cambiar el editor, el ID es distinto en cada instalación y
+ * en cada idioma, y una ruta hardcodeada ('/es/como-trabajo/') se rompe en
+ * silencio si Polylang cambia el prefijo o si se renombra la página. El
+ * template, en cambio, es lo que el propio theme define.
+ *
+ * Polylang: NO hay que hacer nada especial más que dejar que filtre la
+ * query. Cada traducción es su propio post con su propio template, así que
+ * pedir "la página con este template" dentro del idioma activo devuelve
+ * naturalmente la versión correcta. De ahí el suppress_filters => false:
+ * get_posts() lo pone en true por defecto, y con true Polylang NO puede
+ * filtrar por idioma — devolvería la primera página que encuentre, en
+ * cualquier idioma. Es el detalle que rompería ES sin dar ningún error.
+ *
+ * Cacheado por (template + idioma) durante la request: el menú, el menú
+ * mobile, el footer y el breadcrumb piden lo mismo varias veces.
+ *
+ * @param string $template Ruta del template relativa al theme.
+ * @return string URL absoluta, o '' si no existe una página con ese template.
+ */
+function es_page_url_by_template( $template ) {
+	static $es_cache = array();
+
+	$es_lang = function_exists( 'pll_current_language' ) ? (string) pll_current_language() : '';
+	$es_key  = (string) $template . '|' . $es_lang;
+	if ( isset( $es_cache[ $es_key ] ) ) {
+		return $es_cache[ $es_key ];
+	}
+
+	$es_ids = get_posts(
+		array(
+			'post_type'              => 'page',
+			'post_status'            => 'publish',
+			'numberposts'            => 1,
+			'fields'                 => 'ids',
+			'meta_key'               => '_wp_page_template', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- una sola vez por template/idioma y cacheado en memoria.
+			'meta_value'             => (string) $template,  // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- idem.
+			'orderby'                => 'ID',
+			'order'                  => 'ASC',
+			'suppress_filters'       => false, // imprescindible: habilita el filtro de idioma de Polylang.
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+		)
+	);
+
+	$es_cache[ $es_key ] = ! empty( $es_ids ) ? (string) get_permalink( $es_ids[0] ) : '';
+	return $es_cache[ $es_key ];
+}
+
+/**
+ * La URL de una página fija si existe; si no, el anchor de la Home de
+ * siempre. Degradación limpia: mientras la página no esté creada (o esté
+ * en borrador, o falte la traducción), el ítem sigue navegando a la
+ * sección equivalente de la Home exactamente como hasta ahora.
+ *
+ * @param string $template Template de la página destino.
+ * @param string $anchor   Anchor de fallback (p. ej. '#process').
+ * @return string
+ */
+function es_nav_page_or_anchor( $template, $anchor ) {
+	$es_url = es_page_url_by_template( $template );
+	return '' !== $es_url ? $es_url : $anchor;
+}
+
+/**
  * Resolve one nav URL for the CURRENT request. The single, centralized rule
  * (no conditional URL logic scattered through templates):
  *
@@ -133,12 +205,17 @@ function es_nav_links_display() {
  * Server-side, page/context aware — no scroll tracking. Home stays neutral
  * (returns '') on purpose (§5).
  *
+ * Un Case Study TAMBIÉN queda neutro, a propósito: adentro de un caso el
+ * "dónde estoy" ya lo dicen el breadcrumb (Home / Work / Título, con el
+ * aria-current="page" en el crumb que de verdad ES la página actual) y el
+ * índice interno del caso, que es el que manda en esa pantalla. Marcar
+ * además "Work" en el menú era un tercer indicador redundante — y encima
+ * semánticamente incorrecto: Work es la sección padre, no la página en la
+ * que está el usuario, así que su aria-current="page" mentía.
+ *
  * @return string '' | 'work' | 'process' | 'about' | 'connect'
  */
 function es_nav_active_key() {
-	if ( defined( 'ES_CASE_STUDY_CPT' ) && is_singular( ES_CASE_STUDY_CPT ) ) {
-		return 'work'; // a single Case Study lives under Work
-	}
 	if ( is_page_template( 'templates/page-work.php' ) ) {
 		return 'work';
 	}
@@ -238,7 +315,7 @@ function es_footer_width() {
  * filter map. (Items with no data of their own — e.g. an empty social URL —
  * hide themselves regardless.)
  *
- * @param string $key nav|email|phone|whatsapp|linkedin|instagram|behance|location|note
+ * @param string $key nav|email|phone|whatsapp|linkedin|instagram|behance|location|note|credit
  * @return bool
  */
 function es_footer_visible( $key ) {
@@ -247,23 +324,40 @@ function es_footer_visible( $key ) {
 }
 
 /* -------------------------------------------------------------------------
- * Two restrained line icons (phone + WhatsApp) — §12
+ * Restrained line icons (phone, WhatsApp, LinkedIn, Behance, Instagram).
  * Local, currentColor, 16-grid, 1.3 stroke — same language as the How I Work
  * / theme-toggle icons. No emoji, no external icon library. Theme-authored
  * (trusted) so echoed directly.
+ *
+ * Footer iteration (visual polish ticket): added linkedin/behance/instagram
+ * so the "Elsewhere" links in the footer brand column can render as small
+ * icons instead of a row of text links — same restrained-not-literal-brand
+ * approach already used for whatsapp (a speech bubble, not the WhatsApp
+ * glyph): a rounded badge with a simplified letterform for LinkedIn/Behance,
+ * a camera badge for Instagram. The name is still always available via
+ * aria-label, so recognizability doesn't depend on the glyph alone.
  * ---------------------------------------------------------------------- */
 
 /**
- * @param string $name 'phone' | 'whatsapp'
+ * @param string $name  'phone' | 'whatsapp' | 'linkedin' | 'behance' | 'instagram'
+ * @param string $class Wrapper class for the <svg> — defaults to the
+ *                       contact-column icon class for backwards compat with
+ *                       existing phone/whatsapp call sites.
  * @return string SVG markup (empty string for an unknown name).
  */
-function es_footer_icon( $name ) {
-	$open  = '<svg class="es-footer-contact__icon" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">';
+function es_footer_icon( $name, $class = 'es-footer-contact__icon' ) {
+	$open  = '<svg class="' . esc_attr( $class ) . '" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">';
 	$icons = array(
 		// handset outline
-		'phone'    => '<path d="M5.4 2.6 3.1 3.3c-.5.1-.8.6-.7 1.1a11 11 0 0 0 9.2 9.2c.5.1 1-.2 1.1-.7l.7-2.3-2.7-1.3-1 1.1a8.2 8.2 0 0 1-3.4-3.4l1.1-1z"/>',
+		'phone'     => '<path d="M5.4 2.6 3.1 3.3c-.5.1-.8.6-.7 1.1a11 11 0 0 0 9.2 9.2c.5.1 1-.2 1.1-.7l.7-2.3-2.7-1.3-1 1.1a8.2 8.2 0 0 1-3.4-3.4l1.1-1z"/>',
 		// speech bubble outline (message → WhatsApp), restrained, not the brand glyph
-		'whatsapp' => '<path d="M13.2 8.4a5.2 5.2 0 0 1-7.4 4.7L2.8 13.5l.8-2.8A5.2 5.2 0 1 1 13.2 8.4Z"/><path d="M6.2 6.6c0 2.3 1.9 4.2 4.2 4.2"/>',
+		'whatsapp'  => '<path d="M13.2 8.4a5.2 5.2 0 0 1-7.4 4.7L2.8 13.5l.8-2.8A5.2 5.2 0 1 1 13.2 8.4Z"/><path d="M6.2 6.6c0 2.3 1.9 4.2 4.2 4.2"/>',
+		// rounded badge + simplified "in"
+		'linkedin'  => '<rect x="1.6" y="1.6" width="12.8" height="12.8" rx="2.6"/><path d="M5 5.35v.1"/><path d="M5 7.3v3.8"/><path d="M8 11.1V7.3"/><path d="M8 8.7c0-1 .8-1.4 1.6-1.4s1.6.4 1.6 1.4v2.4"/>',
+		// rounded badge + simplified "b"
+		'behance'   => '<rect x="1.6" y="1.6" width="12.8" height="12.8" rx="2.6"/><path d="M6 4.2v7.6"/><path d="M6 7.5h1.8a2.15 2.15 0 1 1 0 4.3H6"/>',
+		// camera badge (lens + shutter dot)
+		'instagram' => '<rect x="1.6" y="1.6" width="12.8" height="12.8" rx="4"/><circle cx="8" cy="8" r="2.6"/><path d="M10.9 4.9v.1"/>',
 	);
 	if ( ! isset( $icons[ $name ] ) ) {
 		return '';

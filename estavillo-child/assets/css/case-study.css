@@ -39,7 +39,33 @@
    Work/Contact), no solo acá, así que viven en el CSS de chrome
    compartido en vez de en este archivo Case-Study-only. Ver site.css. */
 
-/* ---------- índice sticky en-página (opcional, manual) ---------- */
+/* ---------- índice sticky en-página (opcional, manual) ----------
+   Jerarquía visual del encabezado de un Case Study, de más a menos peso:
+   Header (site-header) > Breadcrumb (site.css, casi metadata) > este menú
+   (navegación real, pero discreta) > ... > Hero (protagonista absoluto,
+   sin tocar acá). Este bloque tiene que leerse claramente por ENCIMA del
+   breadcrumb — es navegación funcional, no sólo ubicación — pero muy por
+   DEBAJO del Hero: de ahí el tamaño/peso contenido y los botones sin caja
+   de más abajo. */
+
+/* .es-case hereda el padding-top de .es-section (--es-section-y, token
+   COMPARTIDO por toda sección del sitio: Home, About, How I Work...) —
+   64-112px según viewport, pensado para separar secciones INDEPENDIENTES
+   entre sí. Acá arriba ya hay índice sticky + breadcrumb recortando el
+   recorrido visual hasta el Hero; ese mismo espacio grande vuelve a
+   sumarse antes de que el Hero empiece, atrasándolo.
+
+   Se pisa SÓLO el padding-top y SÓLO para .es-case: no se toca
+   --es-section-y ni ninguna otra plantilla (Home, About, How I Work
+   siguen con su ritmo de siempre), y el padding-bottom queda intacto
+   (ese es el aire antes del footer, otro problema).
+
+   El valor es el tramo breadcrumb → Hero. Sumado a los 13px de
+   padding-top del breadcrumb, el total desde la línea del índice hasta
+   el Hero queda en ~40px de escritorio, contra los ~90-110px de antes. */
+.es-case {
+	padding-top: clamp(18px, 2.2vw, 26px);
+}
 
 .es-case-index {
 	position: sticky;
@@ -61,15 +87,33 @@
 	}
 }
 
-.es-case-index__inner {
+/* El viewport centra el conjunto en el ancho del sistema y es el ancla
+   (position:relative) de los dos botones flotantes. El scroller de adentro
+   es el que realmente desborda. */
+.es-case-index__viewport {
+	position: relative;
 	max-width: var(--es-max-w);
 	margin: 0 auto;
 	padding: 0 var(--es-pad-x);
+}
+
+.es-case-index__inner {
+	position: relative;
 	display: flex;
 	gap: 2px;
 	overflow-x: auto;
 	scrollbar-width: none;
 	-ms-overflow-style: none;
+	/* pan-x deja pasar el gesto horizontal nativo (touch y trackpad) sin
+	   que el navegador secuestre el scroll vertical de la página. */
+	touch-action: pan-x;
+	scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.es-case-index__inner {
+		scroll-behavior: auto;
+	}
 }
 
 /* mobile: tira horizontal scrolleable, liviana — sin scrollbar visible */
@@ -79,6 +123,7 @@
 }
 
 .es-case-index__link {
+	position: relative;
 	flex: none;
 	font-family: var(--es-mono);
 	font-size: 11px;
@@ -86,9 +131,21 @@
 	white-space: nowrap;
 	color: var(--es-ink-3) !important;
 	text-decoration: none;
-	padding: 12px 11px;
-	border-bottom: 2px solid transparent;
-	transition: color var(--es-dur-fast) ease, border-color var(--es-dur-fast) ease;
+	/* Compacto pero real: menos protagonismo que antes, sin dejar de ser
+	   una barra de navegación (el breadcrumb, arriba, es el que va a peso
+	   de metadata). */
+	padding: 9px 9px 10px;
+	transition: color var(--es-dur-fast) ease;
+}
+
+/* El padding horizontal de cada link también funciona como el espacio
+   ENTRE ellos (gap:2px + este padding) — necesario para que no queden
+   pegados, pero hace que el PRIMER link arranque ~9px a la derecha del
+   borde del contenedor, desalineado del breadcrumb y del título del Hero
+   (que no tienen ese padding propio). Se cancela sólo acá, sin tocar el
+   resto: rompería el espaciado entre links si se sacara del todos. */
+.es-case-index__link:first-child {
+	padding-left: 0;
 }
 
 /* nunca azul — mismo refuerzo !important que el resto del chrome (site.css) */
@@ -96,11 +153,210 @@
 .es-case-index__link:focus-visible,
 .es-case-index__link:active {
 	color: var(--es-ink) !important;
-	border-bottom-color: var(--es-accent);
 }
 
 .es-case-index__link:visited {
 	color: var(--es-ink-3) !important;
+}
+
+/* Sección activa: NO depende sólo del segmento verde del riel — el texto
+   sube de contraste, y el link lleva aria-current="location" (lo pone
+   case-index.js), que es lo que realmente anuncia un lector de pantalla. */
+.es-case-index__link[aria-current='location'] {
+	color: var(--es-ink) !important;
+}
+
+/* ---------- riel: línea gris fina de ancho completo ----------
+   Vive DENTRO del scroller para compartir su sistema de coordenadas: el
+   segmento verde se posiciona con el offsetLeft/offsetWidth crudos del
+   link activo, sin tener que compensar el scroll. Por eso su ancho es el
+   scrollWidth completo (100% de un flex item que ya creció), no el ancho
+   visible. */
+.es-case-index__rail {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 1px;
+	background: var(--es-line);
+	pointer-events: none;
+}
+
+/* El desplazamiento del segmento es una transición CSS común, así que ya
+   la neutraliza la regla global de reduced-motion de base.css (0.01ms
+   !important sobre todo lo que vive dentro de .es-page) — no hace falta
+   repetir un override acá. Lo que SÍ hace falta es apagar el
+   scroll-behavior de arriba, porque no es una transición y esa regla
+   global no lo alcanza. */
+.es-case-index__rail-active {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 0;
+	height: 1px;
+	background: var(--es-signal);
+	transition: transform var(--es-dur) var(--es-ease), width var(--es-dur) var(--es-ease);
+}
+
+/* ---------- flechas de desplazamiento: sólo el ícono, nada más ----------
+   Arrancan [hidden] desde el markup: sin JS no aparecen nunca (el menú se
+   sigue scrolleando con gesto/trackpad/teclado — son un atajo, no el único
+   camino).
+
+   Sin degradado de fondo: la ronda anterior usaba un fundido con
+   --es-paper para separar el ícono del texto que pasa por debajo, pero
+   seguía leyéndose como "una superficie" — acá no queda ningún fondo, ni
+   siquiera el del propio papel del sitio. El único píxel con color es el
+   trazo del SVG (14px, sólo línea). El texto puede rozar el ícono al
+   scrollear; es el costo aceptado de "sólo la flecha, nada de caja".
+
+   appearance:none resetea el chrome nativo del <button> (Safari en
+   particular redondea/sombrea botones por default): sin esto el foco de
+   teclado dibuja un óvalo que se lee como "botón". border-radius sólo
+   importa para el HALO de foco (ver :focus-visible más abajo) — sin fondo
+   ni borde propios, no dibuja ninguna forma visible en reposo/hover. */
+/* !important en border/background/box-shadow: Kadence (tema padre) pinta
+   sus propios <button> con un círculo azul relleno en :hover/:focus —
+   confirmado en vivo, algo que este harness de pruebas (que nunca carga
+   el CSS real de Kadence) no podía detectar. Mismo refuerzo que ya usa
+   el resto del chrome del sitio contra este problema exacto (ver
+   .es-nav__menu-btn en site.css y la "red de seguridad anti-azul" de
+   base.css): sin !important acá, Kadence gana por orden de carga aunque
+   nuestra regla sea más específica. */
+.es-case-index__arrow {
+	position: absolute;
+	top: 0;
+	bottom: 1px;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	padding: 0;
+	border: 0 !important;
+	/* 50%: en un botón casi cuadrado esto da una elipse/círculo — un aro
+	   redondo alrededor del ícono, no una caja con esquinas. Sólo importa
+	   para la FORMA del outline de foco (ver :focus-visible más abajo);
+	   sin fondo ni borde propios, no se ve nada distinto en reposo/hover. */
+	border-radius: 50%;
+	background: none !important;
+	box-shadow: none !important;
+	color: var(--es-ink-3);
+	cursor: pointer;
+	appearance: none;
+	-webkit-appearance: none;
+	transition: color var(--es-dur) var(--es-ease);
+}
+
+.es-case-index__arrow[hidden] {
+	display: none;
+}
+
+/* Área táctil invisible de 44×44 (WCAG 2.5.5). La barra mide ~31px de
+   alto y la flecha 32px de ancho: agrandar el botón para llegar a 44
+   engordaría el índice entero, justo lo contrario de lo que se buscó.
+   Este pseudo-elemento extiende sólo la zona clickeable — el dibujo
+   sigue siendo la flecha sola.
+
+   Se ancla al borde EXTERNO de cada flecha (left:0 en la de "anterior",
+   right:0 en la de "siguiente") en vez de centrarse: centrado, los 6px
+   sobrantes de la flecha derecha caían fuera del viewport y generaban
+   desborde horizontal de página en mobile (medido: 396px sobre un
+   dispositivo de 390px). Anclado hacia adentro, los 12px extra crecen
+   sobre la zona de links — que el padding de .has-prev/.has-next de más
+   abajo ya deja libre. */
+.es-case-index__arrow::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	width: 44px;
+	height: 44px;
+	transform: translateY(-50%);
+}
+
+.es-case-index__arrow--prev::before {
+	left: 0;
+}
+
+.es-case-index__arrow--next::before {
+	right: 0;
+}
+
+/* Gris por defecto, verde en hover Y en active — nunca blanco, nunca azul.
+   Mismo verde que el segmento activo del riel, así la flecha se lee como
+   parte del mismo sistema de "esto está vivo/interactivo". Fondo/borde/
+   sombra repetidos con !important en el estado hover/active: es
+   exactamente donde Kadence pinta su círculo azul, así que no alcanza
+   con heredar el "none" de la regla base sin refuerzo. */
+.es-case-index__arrow:hover,
+.es-case-index__arrow:active {
+	color: var(--es-accent);
+	background: none !important;
+	border: 0 !important;
+	box-shadow: none !important;
+}
+
+/* :focus PLANO (no sólo :focus-visible): un click de mouse deja el botón
+   realmente enfocado sin que el navegador necesariamente decida mostrar
+   un indicador visible (heurística de :focus-visible) — Kadence pinta
+   button:focus sin condicionarlo a esa heurística, así que sin esta
+   regla el círculo azul podía aparecer con sólo clickear la flecha, ni
+   siquiera con teclado. No toca color: sin indicador visible, el ícono
+   se queda gris (igual que en reposo) — el verde es sólo para hover,
+   active y focus-visible, que si tienen indicador. */
+.es-case-index__arrow:focus {
+	background: none !important;
+	border: 0 !important;
+	box-shadow: none !important;
+}
+
+/* Foco: un halo MUY sutil, no el mismo verde sólido de hover/active — un
+   tono mezclado con transparencia, offset generoso para que se lea como
+   un aro alrededor del ícono y no como el borde de una caja pegada a él.
+   Selector calificado con .es-case-index (no sólo .es-case-index__arrow):
+   la regla global ".es-page button:focus-visible" de base.css tiene más
+   especificidad que un solo .arrow:focus-visible (button+clase vs. sólo
+   2 clases) y pisaba tanto el color como el border-radius — esa regla
+   global también fuerza border-radius:2px en CUALQUIER botón al
+   enfocarse (para que el outline le quede prolijo a botones cuadrados
+   normales), lo que acá convertía el aro redondo en un rectángulo con
+   esquinas apenas curvas. Se repite el 50% acá para que gane. */
+.es-case-index .es-case-index__arrow:focus-visible {
+	color: var(--es-accent);
+	/* !important en el propio outline, no sólo en background/box-shadow:
+	   si Kadence también refuerza el suyo con !important (frecuente en
+	   estilos de foco "accesibles" de un tema), gana por ser la última
+	   regla cargada — sin este !important el halo verde podía terminar
+	   siendo el azul de Kadence, no sólo el relleno. */
+	outline: 2px solid color-mix(in srgb, var(--es-accent) 55%, transparent) !important;
+	outline-offset: 3px !important;
+	border-radius: 50% !important;
+	background: none !important;
+	box-shadow: none !important;
+}
+
+.es-case-index__arrow--prev {
+	left: 0;
+}
+
+.es-case-index__arrow--next {
+	right: 0;
+}
+
+/* Con flechas visibles, el primer/último link no debe quedar tapado por
+   la zona clickeable de la flecha (que mide 44px aunque el dibujo sea de
+   32): el JS agrega estas clases junto con cada botón. 40px deja el área
+   táctil completa libre sin pisar ningún link.
+
+   Importante para la alineación: .has-prev sólo existe cuando el índice
+   YA fue desplazado. En reposo (scroll 0) el padding-left es 0, que es lo
+   que mantiene el primer link alineado con el breadcrumb y el Hero. */
+.es-case-index__viewport.has-prev .es-case-index__inner {
+	padding-left: 40px;
+}
+
+.es-case-index__viewport.has-next .es-case-index__inner {
+	padding-right: 40px;
 }
 
 /* ---------- hero del caso: grilla editorial 2 columnas en desktop ----------
@@ -170,8 +426,80 @@
 .es-case__tags {
 	display: flex;
 	flex-wrap: wrap;
+	align-items: center;
 	gap: 8px;
 	margin-bottom: 28px;
+}
+
+/* ---------- badge de estado del proyecto ----------
+   Comparte fila con los tags (es el primer ítem del flex de arriba), así
+   que su altura y su ritmo tipográfico siguen los de .es-pill — no es un
+   componente que compita con el eyebrow ni con el título.
+
+   El texto sale de "Label / status" (texto libre de siempre) y el color
+   del punto de un campo aparte y opcional. Sin ese campo → .--neutral, que
+   es literalmente el gris que ya se veía: por eso los casos publicados
+   antes de que esto existiera no cambian de aspecto. */
+.es-case__status {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	font-family: var(--es-mono);
+	font-size: 10.5px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--es-ink-2);
+	border: 1px solid var(--es-line);
+	border-radius: 30px;
+	padding: 6px 12px;
+}
+
+.es-case__status-dot {
+	flex: none;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--es-ink-4);
+}
+
+/* Los 4 tonos. Verde y ámbar son los tokens de acento que el portfolio ya
+   usa (--es-signal / --es-decision). Azul y violeta no existían: se
+   definen ACÁ, locales al badge, con la misma saturación baja y la misma
+   luminosidad que esos dos, y no se suman al sistema global de acentos —
+   ningún otro componente puede tomarlos por accidente. El color vive en un
+   punto de 6px y en un borde apenas teñido: nunca en el texto, que sigue
+   leyéndose con el contraste de siempre (el color no es el único
+   portador de significado — al lado está el texto del estado). */
+.es-case__status--green .es-case__status-dot {
+	background: var(--es-signal);
+}
+
+.es-case__status--green {
+	border-color: color-mix(in srgb, var(--es-signal) 40%, var(--es-line));
+}
+
+.es-case__status--amber .es-case__status-dot {
+	background: var(--es-decision);
+}
+
+.es-case__status--amber {
+	border-color: color-mix(in srgb, var(--es-decision) 40%, var(--es-line));
+}
+
+.es-case__status--blue .es-case__status-dot {
+	background: #5b93b8;
+}
+
+.es-case__status--blue {
+	border-color: color-mix(in srgb, #5b93b8 40%, var(--es-line));
+}
+
+.es-case__status--purple .es-case__status-dot {
+	background: #9179b5;
+}
+
+.es-case__status--purple {
+	border-color: color-mix(in srgb, #9179b5 40%, var(--es-line));
 }
 
 /* ---------- metadata del proyecto: bloque propio después de la imagen ----------
@@ -196,56 +524,98 @@
 	margin: clamp(28px, 4vw, 44px) auto clamp(40px, 5.5vw, 64px);
 }
 
+/* Desktop: UNA caja, no tres tarjetas. El borde y el radio son del
+   contenedor; adentro las tres columnas se separan sólo con una línea
+   vertical de 1px (los ::before), que es el separador más silencioso
+   posible. Tools va última y más ancha (1.4fr) porque es sistemáticamente
+   una lista — con 1fr se parte en dos líneas mientras Rol/Período dejan
+   aire de sobra al lado. */
 .es-case__meta {
 	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 22px 32px;
+	/* Anchos desparejos a propósito: Período siempre es corto ("2024–2025")
+	   y con 1fr le sobraba medio ancho mientras Rol partía en dos líneas al
+	   lado. Tools se queda con la columna más grande porque es una lista. */
+	grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr) minmax(0, 1.5fr);
+	gap: 0;
 	margin: 0;
-	border-top: 1px solid var(--es-line);
-	padding-top: 24px;
+	border: 1px solid var(--es-line);
+	border-radius: var(--es-radius);
+	background: var(--es-paper-2);
+	padding: 0;
+	overflow: hidden;
 }
 
-.es-case__meta-item--tools {
-	grid-column: 1 / -1;
+.es-case__meta-item {
+	position: relative;
+	padding: 20px 24px;
+	min-width: 0;
+}
+
+/* Separadores: sólo ENTRE columnas, nunca en el borde exterior (de ahí el
+   :not(:first-child)) — y con inset arriba/abajo para que la línea no
+   toque el borde de la caja y se lea como un divisor, no como una grilla
+   de tabla. */
+.es-case__meta-item:not(:first-child)::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 16px;
+	bottom: 16px;
+	width: 1px;
+	background: var(--es-line);
 }
 
 .es-case__meta-item dt {
+	display: flex;
+	align-items: center;
+	gap: 7px;
 	font-family: var(--es-mono);
 	font-size: 10px;
 	font-weight: 500;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
 	color: var(--es-ink-4);
-	margin-bottom: 4px;
+	margin-bottom: 8px;
+}
+
+.es-case__meta-item dt svg {
+	flex: none;
+	/* un punto por debajo del texto: el ícono acompaña, no encabeza */
+	color: var(--es-ink-4);
+	opacity: 0.75;
 }
 
 .es-case__meta-item dd {
 	margin: 0;
 	font-size: 14px;
-	color: var(--es-ink-2);
+	line-height: 1.5;
+	color: var(--es-ink);
 }
 
-/* mobile: una columna, cada entrada separada por un divisor sutil (no un
-   hueco enorme) — la primera no lleva borde/padding arriba, ya tiene el
-   de .es-case__meta justo encima. */
+/* mobile: una columna. La caja se mantiene (sigue siendo un solo objeto),
+   pero los separadores pasan a ser horizontales entre filas y el padding
+   se comprime — sin convertir cada dato en su propia tarjeta ni dejar
+   huecos grandes entre ellos. */
 @media (max-width: 999px) {
 	.es-case__meta {
 		grid-template-columns: 1fr;
-		gap: 16px;
-	}
-
-	.es-case__meta-item--tools {
-		grid-column: auto;
 	}
 
 	.es-case__meta-item {
-		padding-top: 14px;
-		border-top: 1px solid var(--es-line);
+		padding: 14px 18px;
 	}
 
-	.es-case__meta-item:first-child {
-		padding-top: 0;
-		border-top: 0;
+	.es-case__meta-item:not(:first-child)::before {
+		left: 18px;
+		right: 18px;
+		top: 0;
+		bottom: auto;
+		width: auto;
+		height: 1px;
+	}
+
+	.es-case__meta-item dt {
+		margin-bottom: 5px;
 	}
 }
 
@@ -738,25 +1108,6 @@
 	max-width: none;
 }
 
-/* figuras Wide: sangran al borde del viewport en mobile (independiente del
-   ancho del capítulo que las contiene) */
-@media (max-width: 767px) {
-	.es-case__body .es-case-figure--wide {
-		margin-left: calc(-1 * var(--es-pad-x));
-		margin-right: calc(-1 * var(--es-pad-x));
-	}
-
-	.es-case__body .es-case-figure--wide .es-placeholder,
-	.es-case__body .es-case-figure--wide img {
-		border-radius: 0;
-	}
-
-	.es-case__body .es-case-figure--wide figcaption {
-		padding-left: var(--es-pad-x);
-		padding-right: var(--es-pad-x);
-	}
-}
-
 .es-case__body .es-case-label {
 	display: block;
 	font-family: var(--es-mono);
@@ -823,11 +1174,242 @@
 	border-radius: var(--es-radius);
 }
 
+/* video (mediaType: "video"): mismo marco visual que la imagen — un video
+   dentro de un case-figure standard/wide se ve igual de "integrado" que un
+   screenshot, sin caja/reproductor genérico. height:auto explícito porque
+   <video>, a diferencia de <img>, no tiene ese comportamiento por defecto
+   en todos los navegadores al forzar width. object-fit/max-height puntual
+   (mediaObjectFit/mediaMaxHeight) llegan por style="" inline desde
+   render.php — acá sólo el look base. */
+.es-case__body .es-case-figure__video {
+	display: block;
+	width: 100%;
+	height: auto;
+	border: 1px solid var(--es-line);
+	border-radius: var(--es-radius);
+}
+
 /* placeholder de imagen todavía no subida, usado dentro de una figura del
    editor: sin este aspect-ratio el marco quedaría colapsado a la altura
    del tag "{asset: ...}" en vez de leerse como un espacio reservado. */
 .es-case__body .es-case-figure .es-placeholder {
 	aspect-ratio: 16 / 9;
+}
+
+/* Wide/large y full DESPUÉS de la regla base .es-case-figure { margin: … }
+   de arriba a propósito (bug real, encontrado con Playwright al testear
+   este ticket): esa regla base y estas dos comparten exactamente la misma
+   especificidad (.es-case__body + una clase = 0,2,0) — puestas ANTES en
+   el archivo (como estaban originalmente), la regla base "gana" por orden
+   de aparición y pisa margin-left/margin-right de vuelta a 0, así que el
+   sangrado nunca se veía (ni en mobile con --wide, que ya existía antes
+   de este ticket). Van DESPUÉS para ganar el empate de especificidad. Si
+   en el futuro se agrega OTRA regla con margin/margin-left/margin-right
+   sobre .es-case-figure (sin :not() ni mayor especificidad), va a pisar
+   esto de nuevo — mantené el orden. */
+
+/* figuras Wide/Large: sangran al borde del viewport en mobile
+   (independiente del ancho del capítulo que las contiene) */
+@media (max-width: 767px) {
+	.es-case__body .es-case-figure--wide {
+		margin-left: calc(-1 * var(--es-pad-x));
+		margin-right: calc(-1 * var(--es-pad-x));
+	}
+
+	.es-case__body .es-case-figure--wide .es-placeholder,
+	.es-case__body .es-case-figure--wide img,
+	.es-case__body .es-case-figure--wide .es-case-figure__video {
+		border-radius: 0;
+	}
+
+	.es-case__body .es-case-figure--wide figcaption {
+		padding-left: var(--es-pad-x);
+		padding-right: var(--es-pad-x);
+	}
+}
+
+/* Full width / hero (ticket "ampliar sistema multimedia de los Case
+   Studies"): sangrado real al viewport en TODOS los breakpoints, no sólo
+   mobile como --wide de arriba. calc(50% - 50vw) en vez del
+   -1*--es-pad-x que usa --wide: ese último sólo llega al borde cuando el
+   container mide exactamente 100vw - 2*--es-pad-x (cierto en mobile/
+   tablet, falso en desktop una vez que el container toca su tope
+   --es-max-w) — calc(50% - 50vw) se autoajusta sea cual sea el ancho real
+   del padre, así que funciona idéntico en los tres breakpoints sin media
+   queries propias.
+   overflow:hidden queda SCOPEADO ACÁ, nunca en .es-page ni en ningún
+   ancestro — ver la nota grande en base.css: overflow-x en .es-page
+   convierte a .es-page en su propio scroll container y rompe
+   position:sticky del header y del índice del caso. Mismo patrón que ya
+   usa .es-hero (hero.css) para su propio sangrado.
+   Asume que la figura vive en el flujo normal del body/sección del caso
+   — mismo supuesto que ya documenta .es-case-section para "ancho
+   completo" más abajo. Anidada dentro de una columna angosta de
+   Gutenberg (Columns 40/60, etc.) el breakout ya no tiene sentido
+   conceptual — un hero a pantalla completa dentro de una columna del 40%
+   no es el caso de uso que pide el ticket — y no está contemplado. */
+.es-case__body .es-case-figure--full {
+	width: 100vw;
+	max-width: 100vw;
+	margin-left: calc(50% - 50vw);
+	margin-right: calc(50% - 50vw);
+	overflow: hidden;
+}
+
+/* Edge-to-edge de verdad: sin el marco de 1px ni las esquinas redondeadas
+   que sí tiene la figura standard/wide — un borde pegado al filo del
+   viewport rompe el efecto "visual break" que pide el ticket. */
+.es-case__body .es-case-figure--full img,
+.es-case__body .es-case-figure--full .es-case-figure__video,
+.es-case__body .es-case-figure--full .es-placeholder {
+	display: block;
+	width: 100%;
+	border: 0;
+	border-radius: 0;
+}
+
+/* El caption NO sangra con el media: sigue alineado a la medida de
+   lectura del caso ("no necesariamente tiene que ocupar todo el
+   viewport", pedido explícito del ticket) — mismo padding lateral que ya
+   usa --wide en mobile, más un tope de --es-case-measure centrado para
+   que en desktop no se estire de borde a borde. */
+/* margin-left NO es auto-centering: un auto simple centra el caption
+   dentro del ANCHO COMPLETO DEL VIEWPORT (parent real del caption, porque
+   la figura es full-bleed) — en desktop ancho eso lo desalinea contra el
+   resto del texto del caso (que arranca en el borde del container
+   --es-max-w, NO en el centro del viewport). Este calc() reproduce esa
+   misma posición: (hueco entre viewport y el container ya centrado) / 2
+   + el padding del container — el mismo cálculo que ya resuelve
+   .es-container con max-width/margin:auto/padding, aplicado a mano porque
+   el caption ya no es descendiente de ese container (está fuera, dentro
+   de la figura que rompió el layout). min(): por debajo del breakpoint
+   donde el container toca su tope --es-max-w, container_width = 100vw,
+   así que esto colapsa exactamente al mismo padding-based inset que ya
+   funcionaba en mobile/tablet — margin-right simétrico evita que el
+   caption llegue al borde derecho ahí mismo. */
+.es-case__body .es-case-figure--full figcaption {
+	max-width: var(--es-case-measure);
+	margin-left: calc((100vw - min(var(--es-max-w), 100vw)) / 2 + var(--es-pad-x));
+	margin-right: var(--es-pad-x);
+}
+
+/* ---------- disparador de zoom (opcional, `enableZoom`) ----------
+   El botón envuelve la imagen (o el marco browser) entera: mismo tamaño,
+   mismo layout, cero cambio visual del caso normal — sólo agrega cursor,
+   el borde/glow de hover y la lupa. Reset de <button> completo porque acá
+   SÍ es un elemento interactivo real (a diferencia de .es-case-figure
+   normal, que es sólo una figura), y tiene que verse idéntico a como se
+   veía sin el wrapper. */
+/* !important en border/background: mismo problema que las flechas del
+   índice más arriba — Kadence pinta sus <button> con relleno/borde
+   propio en :hover/:focus y esta imagen es, técnicamente, un botón. */
+.es-case__body .es-case-figure__zoom-trigger {
+	position: relative;
+	display: block;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	border: 0 !important;
+	background: none !important;
+	box-shadow: none !important;
+	font: inherit;
+	color: inherit;
+	text-align: left;
+	cursor: zoom-in;
+	appearance: none;
+}
+
+.es-case__body .es-case-figure__zoom-trigger:hover,
+.es-case__body .es-case-figure__zoom-trigger:focus,
+.es-case__body .es-case-figure__zoom-trigger:active {
+	border: 0 !important;
+	background: none !important;
+	box-shadow: none !important;
+}
+
+.es-case__body .es-case-figure__zoom-trigger img,
+.es-case__body .es-case-figure__zoom-trigger .es-case-browser {
+	display: block;
+	width: 100%;
+}
+
+/* Indicador discreto: lupa + "+" en una esquina, nunca tapa el contenido
+   de la imagen (que suele tener información hasta los bordes en un
+   Journey Map). Visible siempre en mobile —no hay hover táctil—, y en
+   desktop aparece con el hover para no sumar ruido permanente. */
+.es-case__body .es-case-figure__zoom-badge {
+	position: absolute;
+	right: 10px;
+	bottom: 10px;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	border: 1px solid var(--es-line-strong);
+	border-radius: 999px;
+	background: var(--es-paper);
+	opacity: 0.88;
+	transition: border-color var(--es-dur-fast) var(--es-ease),
+		background-color var(--es-dur-fast) var(--es-ease),
+		opacity var(--es-dur-fast) var(--es-ease);
+}
+
+.es-case__body .es-case-figure__zoom-badge svg {
+	width: 15px;
+	height: 15px;
+	fill: none;
+	stroke: var(--es-ink-2);
+	stroke-width: 1.4;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+/* Hover/foco desktop: leve glow verde en el borde de la imagen — el mismo
+   acento semántico que usa el resto del sitio para "esto responde",
+   nunca azul. La imagen NO cambia de tamaño (requisito explícito). */
+.es-case__body .es-case-figure__zoom-trigger:hover img,
+.es-case__body .es-case-figure__zoom-trigger:focus-visible img,
+.es-case__body .es-case-figure__zoom-trigger:hover .es-case-browser,
+.es-case__body .es-case-figure__zoom-trigger:focus-visible .es-case-browser {
+	border-color: var(--es-signal);
+	box-shadow: 0 0 0 1px var(--es-signal), 0 0 24px -8px var(--es-signal-dim);
+}
+
+.es-case__body .es-case-figure__zoom-trigger:hover .es-case-figure__zoom-badge,
+.es-case__body .es-case-figure__zoom-trigger:focus-visible .es-case-figure__zoom-badge {
+	border-color: var(--es-signal);
+	background: var(--es-surface-2);
+	opacity: 1;
+}
+
+.es-case__body .es-case-figure__zoom-trigger:focus-visible {
+	outline: none !important;
+}
+
+/* !important en ambos: mismo refuerzo anti-azul de Kadence que el resto
+   de los controles custom del sitio (ver el comentario grande junto a
+   .es-case-index__arrow más arriba). */
+.es-case__body .es-case-figure__zoom-trigger:focus-visible img,
+.es-case__body .es-case-figure__zoom-trigger:focus-visible .es-case-browser {
+	outline: 2px solid var(--es-accent) !important;
+	outline-offset: 2px !important;
+}
+
+/* En touch no hay hover: la lupa queda siempre visible y un poco más
+   grande — es la única señal de que la imagen es interactiva. */
+@media (hover: none) {
+	.es-case__body .es-case-figure__zoom-badge {
+		width: 34px;
+		height: 34px;
+		opacity: 1;
+	}
+
+	.es-case__body .es-case-figure__zoom-badge svg {
+		width: 17px;
+		height: 17px;
+	}
 }
 
 .es-case__body .es-case-caption {
@@ -897,19 +1479,51 @@
 /* ---------- grilla de stats ---------- */
 
 .es-case__body .es-case-stats {
-	display: grid;
-	/* auto-fit: cualquier cantidad de stats llena la fila completa — con el
-	   viejo repeat(4, 1fr) fijo, 3 stats dejaban un panel vacío a la derecha */
-	grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+	/* flex-wrap y no grid: con grid, la última fila incompleta dejaba tracks
+	   sobrantes (una tarjeta sola y el resto de la fila vacío). Con flex, los
+	   ítems de la ÚLTIMA fila crecen solos hasta llenarla — para cualquier
+	   cantidad y en cualquier breakpoint, sin reglas :nth-child por cantidad
+	   de columnas. Impar en mobile: la última ocupa el ancho completo; si
+	   sobran dos, se reparten la fila. Nunca queda un hueco. */
+	display: flex;
+	flex-wrap: wrap;
 	gap: 1px;
-	background: var(--es-line);
-	border: 1px solid var(--es-line);
 	margin: clamp(28px, 3.5vw, 40px) 0;
 }
 
 .es-case__body .es-case-stat {
+	/* misma base que el minmax() del grid anterior: mismo umbral de corte */
+	flex: 1 1 170px;
+	min-width: 0;
 	background: var(--es-paper-2);
 	padding: 22px 20px;
+	/* La hairline la dibuja CADA tarjeta, no el fondo del contenedor.
+	   Antes el contenedor tenía background+border --es-line y las líneas eran
+	   ese fondo asomando por los gaps de 1px; el problema es que en una fila
+	   incompleta (cualquier cantidad que no llene la última fila) el hueco
+	   TAMBIÉN mostraba ese fondo, y se leía como una celda gris vacía —
+	   medido: 568px en tablet con 5 stats, 869px en desktop con 7.
+	   Con el halo por tarjeta, donde no hay tarjeta no hay nada que pintar,
+	   así que el cuadrado vacío no puede existir para ninguna combinación de
+	   cantidad y breakpoint. El resultado visual con la grilla completa es
+	   idéntico: gap de 1px + halo de 1px de cada vecina se superponen en la
+	   misma línea de siempre. box-shadow no ocupa layout ni genera scroll. */
+	box-shadow: 0 0 0 1px var(--es-line);
+}
+
+/* Ícono lineal de la librería curada del theme, arriba del número. Es el
+   único elemento en acento de la celda: el número se queda en --es-ink para
+   que el acento marque la categoría del dato, no compita con él. line-height
+   0 en el contenedor evita el espacio fantasma del inline box del <svg>. */
+.es-case__body .es-case-stat__icon {
+	display: block;
+	line-height: 0;
+	color: var(--es-accent);
+	margin-bottom: 12px;
+}
+
+.es-case__body .es-case-stat__icon svg {
+	display: block;
 }
 
 .es-case__body .es-case-stat__num {
@@ -919,6 +1533,11 @@
 	letter-spacing: -0.02em;
 	color: var(--es-ink);
 	line-height: 1;
+	/* Cifras de ancho fijo: con la animación de conteo activa el número
+	   cambia decenas de veces por segundo, y sin tabular-nums cada dígito
+	   tendría un ancho distinto — el número "temblaría" mientras cuenta.
+	   Inofensivo cuando la animación está apagada. */
+	font-variant-numeric: tabular-nums;
 }
 
 .es-case__body .es-case-stat__label {
@@ -929,8 +1548,62 @@
 }
 
 @media (max-width: 767px) {
+	/* Mobile: una stat por fila, en lista con filete — no la grilla de dos
+	   columnas de antes. En dos columnas el número quedaba chico, la etiqueta
+	   se partía en tres o cuatro líneas y la celda se leía como una tarjeta
+	   apretada; a ancho completo el dato respira y la lista se lee como una
+	   enumeración editorial, no como un dashboard.
+	   La superficie (--es-paper-2) y el halo se apagan a propósito: apiladas
+	   a ancho completo, seis cajas rellenas seguidas pesan mucho más que seis
+	   filas separadas por una línea de 1px. El filete queda del lado superior
+	   de cada fila, así que la lista abre y cierra con línea sin necesidad de
+	   ninguna regla :first-child/:last-child. */
 	.es-case__body .es-case-stats {
-		grid-template-columns: repeat(2, 1fr);
+		gap: 0;
+		border-bottom: 1px solid var(--es-line);
+	}
+
+	.es-case__body .es-case-stat {
+		/* Icono y número en la misma fila (antes el icono flotaba arriba
+		   como un bullet, desconectado del dato). flex-basis: 100% en el
+		   label de abajo lo fuerza a su propia línea sin importar cuánto
+		   midan icono+número: la fila nunca llega a ocupar el ancho
+		   completo del contenedor, así que el label siempre desborda y
+		   pasa a la fila siguiente — sin depender de un ancho fijo. */
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		column-gap: 12px;
+		flex-basis: 100%;
+		background: none;
+		box-shadow: none;
+		border-top: 1px solid var(--es-line);
+		/* un poco más de aire entre estadísticas: +4px por borde (antes 20px) */
+		padding: 24px 0;
+	}
+
+	.es-case__body .es-case-stat__icon {
+		/* ya no apila arriba: se apaga el margen vertical del layout de
+		   desktop, el gap horizontal lo pone flex en el contenedor */
+		margin-bottom: 0;
+	}
+
+	.es-case__body .es-case-stat__icon svg {
+		/* levemente más grande sólo en mobile — mismo viewBox/stroke-width
+		   del SVG, así que el trazo escala proporcional (no más grueso) */
+		width: 21px;
+		height: 21px;
+	}
+
+	.es-case__body .es-case-stat__num {
+		/* a ancho completo el número puede crecer sin riesgo de corte */
+		font-size: 30px;
+	}
+
+	.es-case__body .es-case-stat__label {
+		flex-basis: 100%;
+		font-size: 13px;
+		margin-top: 8px;
 	}
 }
 
@@ -1422,6 +2095,14 @@
 	background: var(--es-paper-2);
 	/* contenido de lectura: a medida, no a container completo */
 	max-width: var(--es-case-measure);
+}
+
+/* Width: Content — ancho completo del contenedor, mismo criterio y mismo
+   nombre que .es-case-section--content. Opt-in desde el inspector: sin el
+   atributo (todos los acordeones ya publicados) manda la regla de arriba y
+   nada cambia. Para tablas/diagramas que a medida de lectura quedan apretados. */
+.es-case__body .es-case-details--content {
+	max-width: none;
 }
 
 .es-case__body .es-case-details summary {

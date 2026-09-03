@@ -29,13 +29,24 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function es_home_featured_fallback_case() {
 	return array(
-		'kicker'   => 'Product + System Design · In progress',
-		'title'    => 'A decision system for <em>metal workshop budgeting.</em>',
-		'body'     => "A metal fabrication workshop that quotes well — but slowly, and from one person's head. Estimates queue up, and hours go into requests that end up not closing. I'm designing a system that turns that tacit knowledge into explicit, versioned criteria: consistent, transferable, and able to answer early with an orientative range before hours are committed.",
-		'source'   => 'Developed and implemented at Guzmán Villalba — metal fabrication workshop, Montevideo.',
-		'status'   => 'In progress',
-		'url'      => '#',
-		'image'    => null,
+		'kicker'       => 'Product + System Design · In progress',
+		'title'        => 'A decision system for <em>metal workshop budgeting.</em>',
+		'body'         => "A metal fabrication workshop that quotes well — but slowly, and from one person's head. Estimates queue up, and hours go into requests that end up not closing. I'm designing a system that turns that tacit knowledge into explicit, versioned criteria: consistent, transferable, and able to answer early with an orientative range before hours are committed.",
+		'source'       => 'Developed and implemented at Guzmán Villalba — metal fabrication workshop, Montevideo.',
+		'status'       => 'In progress',
+		'url'          => '#',
+		'image'        => null,
+		// Featured Media (ticket "Featured media del Case Study"): el
+		// placeholder siempre es imagen/standard — mismo shape que el caso
+		// real (es_case_get_featured_media() en el plugin) para que
+		// inc/featured-media.php no tenga que distinguir origen real vs.
+		// fallback.
+		'media_type'   => 'image',
+		'layout'       => 'standard',
+		'object_fit'   => 'cover',
+		'focal'        => 'center',
+		'video_url'    => '',
+		'video_poster' => '',
 	);
 }
 

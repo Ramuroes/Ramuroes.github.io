@@ -27,11 +27,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 function es_about_blocks_list() {
 	return array(
 		'hobby-list',
+		'tools',
 	);
 }
 
 /**
- * Registra la categoría "Estavillo — About" en el inserter.
+ * Registra la categoría en el inserter.
+ *
+ * Título "Estavillo — Content" (antes "Estavillo — About"): esta librería
+ * ya nacía pensada para crecer más allá de About — ver el docblock de este
+ * archivo ("Home/How I Work/Connect podrán sumar bloques acá a futuro sin
+ * tocar case-blocks.php"). El bloque Tools es el primer caso real de eso
+ * (Design System ticket: reutilizable en Home/About/Case Studies/landings),
+ * así que el título deja de nombrar una sola página. Mismo slug de siempre
+ * ('estavillo-about'): las categorías del inserter son sólo agrupación
+ * visual en el editor, no un dato guardado por bloque — renombrar el
+ * título no afecta ningún contenido ya publicado.
  *
  * @param array $categories Categorías existentes.
  * @return array
@@ -41,7 +52,7 @@ function es_about_blocks_category( $categories ) {
 		$categories,
 		array(
 			'slug'  => 'estavillo-about',
-			'title' => __( 'Estavillo — About', 'estavillo-portfolio-core' ),
+			'title' => __( 'Estavillo — Content', 'estavillo-portfolio-core' ),
 			'icon'  => null,
 		)
 	);
@@ -76,8 +87,10 @@ add_action( 'init', 'es_about_blocks_register' );
 /**
  * Puente de estilos del theme hacia el editor para esta librería: a
  * diferencia de case-blocks.php (que puentea case-study.css), estos
- * bloques usan clases de assets/css/pages.css — tokens.css ya lo puentea
- * es_case_blocks_editor_theme_css(), así que acá solo falta pages.css.
+ * bloques usan clases de assets/css/pages.css y, desde el bloque Tools,
+ * también assets/css/tools.css (Design System — vive suelto del resto de
+ * páginas, ver inc/enqueue.php del theme) — tokens.css ya lo puentea
+ * es_case_blocks_editor_theme_css(), así que acá sólo faltan esas dos.
  * Mismo guard is_admin(); si el child theme no está activo, no se encola
  * nada y el bloque cae al estilo estructural mínimo del navegador.
  */
@@ -86,14 +99,21 @@ function es_about_blocks_editor_theme_css() {
 		return;
 	}
 
-	$path = get_stylesheet_directory() . '/assets/css/pages.css';
-	if ( file_exists( $path ) ) {
-		wp_enqueue_style(
-			'es-editor-pages',
-			get_stylesheet_directory_uri() . '/assets/css/pages.css',
-			array(),
-			(string) filemtime( $path )
-		);
+	$es_sheets = array(
+		'es-editor-pages' => 'assets/css/pages.css',
+		'es-editor-tools' => 'assets/css/tools.css',
+	);
+
+	foreach ( $es_sheets as $es_handle => $es_rel ) {
+		$es_path = get_stylesheet_directory() . '/' . $es_rel;
+		if ( file_exists( $es_path ) ) {
+			wp_enqueue_style(
+				$es_handle,
+				get_stylesheet_directory_uri() . '/' . $es_rel,
+				array(),
+				(string) filemtime( $es_path )
+			);
+		}
 	}
 }
 add_action( 'enqueue_block_assets', 'es_about_blocks_editor_theme_css' );

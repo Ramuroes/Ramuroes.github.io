@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.41' );
+define( 'ES_CHILD_VERSION', '0.2.65' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -20,11 +20,13 @@ require ES_CHILD_DIR . '/inc/enqueue.php';
 require ES_CHILD_DIR . '/inc/theme-options.php';
 require ES_CHILD_DIR . '/inc/selected-work-fallback.php';
 require ES_CHILD_DIR . '/inc/featured-case-fallback.php';
+require ES_CHILD_DIR . '/inc/featured-media.php';
 require ES_CHILD_DIR . '/inc/work-page-fallback.php';
 require ES_CHILD_DIR . '/inc/block-styles.php';
 require ES_CHILD_DIR . '/inc/how-i-work-illustrations.php';
 require ES_CHILD_DIR . '/inc/header-footer.php';
 require ES_CHILD_DIR . '/inc/theme-dark-mode.php';
+require ES_CHILD_DIR . '/inc/page-hero-meta.php';
 
 /**
  * Textdomain del child theme.
@@ -65,6 +67,12 @@ function es_child_ui_strings() {
 		'work_label'          => 'Selected work',
 		'work_view_all'       => 'All work',
 		'work_view_case'      => 'View case study',
+		// "01 — Featured Work" en la página Work (ticket "Refine Work
+		// archive hierarchy"). Clave propia, no reusa 'featured_label'
+		// ("Featured case"/"Caso destacado"): son la misma data (mismo
+		// flag "Feature this case on Home") pero dos pantallas distintas
+		// con su propio copy — tocar una nunca debe tocar la otra.
+		'work_featured_label' => 'Featured work',
 		'about_label'         => 'About',
 		'about_intro_label'   => 'My approach',
 		'about_cta'           => 'More about me',
@@ -80,6 +88,24 @@ function es_child_ui_strings() {
 		// never actually varied by language). Routed through Polylang
 		// string translation like every other shared label above.
 		'breadcrumb_home'     => 'Home',
+		// 404 (404.php) y las vistas genéricas que antes servía Kadence
+		// (search.php / archive.php / index.php / page.php, todas vía
+		// template-parts/generic-document.php). Registradas acá para que
+		// Polylang las traduzca como cualquier otra cadena de interfaz, en vez
+		// de depender de un .mo que este theme no tiene.
+		'error_404_title'     => 'Page not found.',
+		'error_404_lead'      => "That page doesn't exist, or it moved.",
+		'error_404_cta'       => 'Back home',
+		'search_eyebrow'      => 'Search',
+		// %s = el término buscado, ya escapado. Se deja el marcador para que
+		// la traducción pueda moverlo de lugar en la frase.
+		'search_title'        => 'Results for “%s”',
+		'search_empty'        => 'Nothing matched that search.',
+		'archive_eyebrow'     => 'Archive',
+		'archive_empty'       => 'Nothing published here yet.',
+		'pagination_aria'     => 'Results navigation',
+		// Skip link del header (WCAG 2.4.1). Ver template-parts/site-header.php.
+		'skip_to_content'     => 'Skip to content',
 		'nav_aria_main'       => 'Main',
 		'nav_aria_footer'     => 'Footer',
 		'nav_aria_mobile'     => 'Mobile',
@@ -94,7 +120,12 @@ function es_child_ui_strings() {
 		'footer_call_named'   => 'Call %s',
 		'footer_wa_generic'   => 'Contact on WhatsApp',
 		'footer_wa_named'     => 'Contact %s on WhatsApp',
+		'footer_credit_lead'    => 'Designed by <em>me</em>,',
+		'footer_social_named'   => "View %1\$s's %2\$s profile",
+		'footer_social_generic' => 'View %s profile',
 		'case_sections_aria'  => 'Case sections',
+		'case_nav_prev'       => 'Previous sections',
+		'case_nav_next'       => 'More sections',
 		'case_media_ph_aria'  => 'Placeholder for the case visual',
 		'connect_cta_all'     => 'All ways to connect',
 		// Page-head eyebrow/H1/lead — deliberately outside the migrated
@@ -104,9 +135,20 @@ function es_child_ui_strings() {
 		'about_title'         => 'About me.',
 		'how_title'           => 'How I work.',
 		'how_lead'            => "I don't start with interfaces. I start by understanding the system.",
+		// Eyebrow del page-head de Work. Clave propia (no reusa 'work_label',
+		// que ahora es SOLO el header de la sección "02 — Selected Work" más
+		// abajo en la página) — antes una misma cadena hacía de doble función
+		// (eyebrow arriba Y header de sección más abajo), acoplando dos roles
+		// de UI que necesitaban poder cambiar por separado.
+		'work_eyebrow'        => 'Work',
 		'work_title'          => 'Work.',
-		'work_lead'           => 'A selection of product and systems design work, from live decision tools to earlier academic and legacy projects.',
-		'work_archive_label'  => 'Archive / older work',
+		'work_lead'           => 'A selection of Product Design and systems work, alongside selected earlier work across digital, industrial and visual design.',
+		// "03 — More Work / Archive": encabezado + bajada opcional que
+		// envuelven TANTO los Case Studies marcados archivo (CPT) COMO el
+		// contenido viejo pegado en la página (SAMIC, French Bakery, webs
+		// anteriores, industrial/3D/visual/motion) — ver work-cases.php.
+		'work_archive_label'  => 'More work',
+		'work_archive_lead'   => 'Selected earlier work across digital, industrial, 3D and visual design.',
 		'connect_eyebrow'     => 'Get in touch',
 		'connect_title'       => 'Start a conversation.',
 		'connect_lead'        => "I'm open to Product Design, Design Systems and UX Research roles — anywhere the goal is making a real system work better, not just look better.",
@@ -163,7 +205,18 @@ function es_phone_digits( $number ) {
  * Fuente única de la NARRATIVA de la home. Cada entrada mapea una clave de
  * sección → su template part. El orden del array es el orden de render:
  *
- *   Hero → How I Work → Featured Case → Selected Work → About → Connect
+ *   Hero → How I Work → Featured Case → Selected Work → Tools → About → Connect
+ *
+ * Tools va DESPUÉS de los casos, no antes: primero criterio y trabajo
+ * (cómo se trabaja, qué se hizo), recién después el inventario de con qué
+ * — nunca antes de haber mostrado evidencia. Entra sin numeración (ver
+ * template-parts/tools.php: la rama fallback la excluye del contador de
+ * $es_section_num en templates/page-home-estavillo.php, igual que 'hero')
+ * y con un encabezado deliberadamente más liviano que el resto de la
+ * narrativa — es un cierre de referencia, no un capítulo con el mismo
+ * peso que Featured/Selected Work/About. No es una sección nueva del
+ * tema: es el bloque reutilizable estavillo/tools invocado vía
+ * render_block(), el mismo que usa About.
  *
  * Reordenar / quitar / insertar secciones = filtrar 'es_home_sections' (p. ej.
  * desde Code Snippets), sin editar el template PHP:
@@ -189,6 +242,7 @@ function es_home_sections() {
 			'how-i-work'    => 'template-parts/how-i-work',
 			'featured'      => 'template-parts/featured-case',
 			'selected-work' => 'template-parts/selected-work',
+			'tools'         => 'template-parts/tools',
 			'about'         => 'template-parts/about-teaser',
 			'connect'       => 'template-parts/footer-cta',
 		)
@@ -196,9 +250,23 @@ function es_home_sections() {
 }
 
 /**
- * Enlaces de navegación (header y footer). Editable por filtro.
- * Por defecto anclan a las secciones de la home de una sola página; se
- * pueden apuntar a páginas reales (Work/About/…) vía el filtro cuando existan.
+ * Enlaces de navegación (header, menú mobile, footer y breadcrumb).
+ *
+ * Criterio de navegación (iteración de cierre): Cómo trabajo, Sobre mí y
+ * Contacto son PÁGINAS reales, no secciones de la Home, así que el menú
+ * apunta a la página en el idioma de la request — resuelto por template vía
+ * es_nav_page_or_anchor() (inc/header-footer.php), nunca por una ruta
+ * hardcodeada. Si la página todavía no existe en ese idioma, el ítem cae al
+ * anchor de la Home de siempre y nada se rompe.
+ *
+ * Work YA NO es la excepción (iteración "unificar Work/Proyectos"): las
+ * páginas índice canónicas existen — /my-work/ en inglés, /es/trabajos/ en
+ * español — así que el ítem se resuelve exactamente igual que los otros
+ * tres, por TEMPLATE, nunca por slug hardcodeado: es_page_url_by_template()
+ * busca la página publicada con "Estavillo — Work" asignado en el idioma de
+ * la request y devuelve su permalink real, sea cual sea su slug. El '#work'
+ * queda solo como fallback si algún día esa página no existiera en un
+ * idioma — mismo criterio que how/about/connect.
  *
  * @return array<int,array{label:string,url:string}>
  */
@@ -208,19 +276,19 @@ function es_nav_links() {
 		array(
 			array(
 				'label' => es__( 'nav_work' ),
-				'url'   => '#work',
+				'url'   => es_nav_page_or_anchor( 'templates/page-work.php', '#work' ),
 			),
 			array(
 				'label' => es__( 'nav_how' ),
-				'url'   => '#process',
+				'url'   => es_nav_page_or_anchor( 'templates/page-how-i-work.php', '#process' ),
 			),
 			array(
 				'label' => es__( 'nav_about' ),
-				'url'   => '#about',
+				'url'   => es_nav_page_or_anchor( 'templates/page-about.php', '#about' ),
 			),
 			array(
 				'label' => es__( 'nav_connect' ),
-				'url'   => '#connect',
+				'url'   => es_nav_page_or_anchor( 'templates/page-contact.php', '#connect' ),
 			),
 		)
 	);
@@ -258,7 +326,18 @@ function es_breadcrumb_trail( $nav_label_key = '', $current_label = '' ) {
 	if ( $nav_label_key ) {
 		foreach ( es_nav_links() as $es_bc_link ) {
 			if ( es__( $nav_label_key ) === $es_bc_link['label'] ) {
-				$trail[] = $es_bc_link;
+				/*
+				 * La URL se RESUELVE, igual que en el header. Antes se copiaba
+				 * el ítem crudo de es_nav_links(), así que el crumb "Work"
+				 * heredaba el '#work' literal: dentro de un Case Study eso es
+				 * un anchor a una sección que no existe en esa página, y el
+				 * click no hacía nada. es_nav_resolve_url() es la MISMA regla
+				 * que ya usa es_nav_links_display() para el menú (por eso el
+				 * menú funcionaba y el breadcrumb no), y devuelve
+				 * "Home del idioma + #work" fuera de la Home.
+				 */
+				$es_bc_link['url'] = es_nav_resolve_url( isset( $es_bc_link['url'] ) ? $es_bc_link['url'] : '' );
+				$trail[]           = $es_bc_link;
 				break;
 			}
 		}
@@ -266,6 +345,25 @@ function es_breadcrumb_trail( $nav_label_key = '', $current_label = '' ) {
 
 	if ( $current_label ) {
 		$trail[] = array( 'label' => $current_label );
+	}
+
+	/*
+	 * Override opcional del último crumb desde la caja "Page header" de la
+	 * propia página (_es_page_breadcrumb_label). Útil cuando el título es
+	 * largo y el crumb queda mejor corto. Sólo aplica en una página real y
+	 * sólo si el campo tiene contenido: si está vacío, el crumb sigue
+	 * saliendo del nav/título de siempre.
+	 */
+	if ( is_page() ) {
+		// Se lee el meta CRUDO a propósito, no es_page_breadcrumb_label():
+		// esa función cae al título de la página cuando el campo está vacío,
+		// y acá un campo vacío tiene que dejar el crumb como estaba.
+		$es_bc_id       = get_queried_object_id();
+		$es_bc_override = $es_bc_id ? trim( (string) get_post_meta( $es_bc_id, '_es_page_breadcrumb_label', true ) ) : '';
+		$es_bc_last     = count( $trail ) - 1;
+		if ( '' !== $es_bc_override && $es_bc_last >= 0 ) {
+			$trail[ $es_bc_last ]['label'] = $es_bc_override;
+		}
 	}
 
 	return $trail;
@@ -294,6 +392,32 @@ function es_process_icon_library() {
 		'document' => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><rect x="3.2" y="2" width="9.6" height="12" rx="1"/><path d="M5.6 5.8h4.8M5.6 8.4h4.8M5.6 11h3"/></svg>',
 		'bulb'     => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><path d="M8 2.2a4 4 0 0 1 2.2 7.3c-.4.3-.7.9-.7 1.4v.3H6.5v-.3c0-.5-.3-1.1-.7-1.4A4 4 0 0 1 8 2.2Z"/><path d="M6.6 13.4h2.8M7 14.8h2"/></svg>',
 		'rocket'   => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><path d="M8 2c1.8 1.4 2.8 3.6 2.8 6.2 0 1-.2 2-.6 2.9H5.8c-.4-.9-.6-1.9-.6-2.9C5.2 5.6 6.2 3.4 8 2Z"/><circle cx="8" cy="7" r="1"/><path d="M5.8 11.1 4.4 13M10.2 11.1l1.4 1.9M6.6 13.6v1.2M9.4 13.6v1.2"/></svg>',
+		// cubo isométrico (wireframe, 3 caras) — sumado para el bloque Tools
+		// (categoría "3D"): 'map' ya está tomado por How I Work ("plan") y no
+		// comunica 3D, así que en vez de reusarlo se agrega una figura nueva
+		// a la misma librería compartida, con el mismo trazo 1.3.
+		'cube'     => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><path d="M8 2 13.5 5.2v5.6L8 14 2.5 10.8V5.2Z"/><path d="M8 8V2M8 8 2.5 5.2M8 8 13.5 5.2"/></svg>',
+		/*
+		 * Bloque siguiente: figuras sumadas para el ícono por stat de
+		 * estavillo/case-stats (un stat suele nombrar una medición, una
+		 * persona, un tiempo o una tendencia — vocabulario que la librería
+		 * original de How I Work no cubría). Mismo trazo 1.3 / 16x16 /
+		 * currentColor: no es una librería nueva, es la misma extendida, y
+		 * quedan disponibles para cualquier otro bloque que las necesite.
+		 *
+		 * 'chart' cubre tanto "chart" como "analytics" a propósito: dos
+		 * figuras de barras casi idénticas sólo fragmentarían el <select>
+		 * sin agregar significado.
+		 */
+		// Eje en L + dos barras: probado contra una variante de tres barras
+		// sobre línea de base — a 16px, que es el tamaño real de uso, tres
+		// barras se apelmazan y el dibujo se lee como ruido; con el eje y dos
+		// barras la figura se identifica como gráfico de un vistazo.
+		'chart'    => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><path d="M3 2.8V13h10.2"/><path d="M6.4 13V9.4M10.6 13V5.8"/></svg>',
+		'trend'    => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><path d="M2.4 11.4 6.2 7.6l2.4 2.4 4.8-4.8"/><path d="M9.8 5.2h3.6v3.6"/></svg>',
+		'clock'    => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><circle cx="8" cy="8" r="6.2"/><path d="M8 4.6V8l2.4 1.6"/></svg>',
+		'user'     => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><circle cx="8" cy="5.4" r="2.6"/><path d="M3.2 13.4a4.8 4.8 0 0 1 9.6 0"/></svg>',
+		'search'   => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . '><circle cx="7.2" cy="7.2" r="4.4"/><path d="M10.5 10.5 13.6 13.6"/></svg>',
 	);
 }
 
@@ -317,8 +441,41 @@ function es_process_icon_choices() {
 		'document' => __( 'Document (archive)', 'estavillo-child' ),
 		'bulb'     => __( 'Bulb (idea)', 'estavillo-child' ),
 		'rocket'   => __( 'Rocket (scale)', 'estavillo-child' ),
+		'cube'     => __( 'Cube (3D)', 'estavillo-child' ),
+		'chart'    => __( 'Chart (analytics)', 'estavillo-child' ),
+		'trend'    => __( 'Trend (growth)', 'estavillo-child' ),
+		'clock'    => __( 'Clock (time)', 'estavillo-child' ),
+		'user'     => __( 'User (people)', 'estavillo-child' ),
+		'search'   => __( 'Search (find)', 'estavillo-child' ),
 	);
 	return $labels;
+}
+
+/**
+ * Íconos de la caja de metadata del Case Study (Rol / Período /
+ * Herramientas). Mismo trazo fino de 16x16 y currentColor que
+ * es_process_icon_library() — no es una librería nueva, es el mismo
+ * lenguaje con las 3 figuras que esta caja necesita. Siempre
+ * aria-hidden en el markup: el <dt> de al lado ya nombra el campo, así
+ * que el ícono no aporta nada a un lector de pantalla.
+ *
+ * Whitelist cerrada por clave interna del template ('role'/'period'/
+ * 'tools'), nunca contenido del admin — cero superficie de XSS.
+ *
+ * @param string $key Clave del campo de metadata.
+ * @return string Markup SVG, o '' si la clave no está en la whitelist.
+ */
+function es_case_meta_icon( $key ) {
+	$stroke = 'fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"';
+	$icons  = array(
+		// persona: rol en el proyecto
+		'role'   => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . ' aria-hidden="true" focusable="false"><circle cx="8" cy="5.4" r="2.6"/><path d="M3.2 13.4a4.8 4.8 0 0 1 9.6 0"/></svg>',
+		// calendario: período
+		'period' => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . ' aria-hidden="true" focusable="false"><rect x="2.4" y="3.4" width="11.2" height="10.2" rx="1.2"/><path d="M2.4 6.6h11.2M5.6 2.2v2.4M10.4 2.2v2.4"/></svg>',
+		// llave: herramientas (mismo dibujo que 'tool' de How I Work)
+		'tools'  => '<svg width="16" height="16" viewBox="0 0 16 16" ' . $stroke . ' aria-hidden="true" focusable="false"><path d="M9.7 3.3a2.6 2.6 0 0 0-3.4 3.4L2.9 10l1.6 1.6 3.3-3.4a2.6 2.6 0 0 0 3.4-3.4l-1.5 1.5-1.2-1.2Z"/></svg>',
+	);
+	return isset( $icons[ $key ] ) ? $icons[ $key ] : '';
 }
 
 /**
@@ -347,50 +504,50 @@ function es_home_process_steps_defaults() {
 	return array(
 		array(
 			'title'    => 'Understand the system',
-			'text'     => 'Before I open any design tool, I map how the system actually operates — not how it\'s supposed to.',
+			'text'     => 'Before I open any design tool, I map how the system actually operates: the people, the information, the constraints and the product goals involved.',
 			'icon_key' => 'compass',
 			'why'      => 'A screen is the visible 1% of a system. Redesigning it without understanding the other 99% just makes the same problem look better.',
-			'example'  => 'On the Workshop Quoting System, that meant sitting on the shop floor to see how a quote actually got built — paper, memory, a spreadsheet nobody trusted — long before assuming the fix was a better form.',
+			'example'  => 'On Presupuestador, the internal quoting system, that meant sitting on the shop floor to see how a quote actually got built, with paper, memory and a spreadsheet nobody trusted, long before assuming the fix was a better form.',
 			'tools'    => 'Contextual inquiry, stakeholder mapping, process observation',
 		),
 		array(
-			'title'    => 'Find the real bottleneck',
+			'title'    => 'Find the real problem',
 			'text'     => 'Every system has one point where things actually break. I look for that specific point, not a list of general issues.',
 			'icon_key' => 'target',
 			'why'      => 'Teams often ask for a redesign when the real problem sits one step earlier or later. Naming the actual bottleneck precisely is what keeps the rest of the work from becoming decoration.',
-			'example'  => 'In Trazur, the interface had real usability issues, but the deeper bottleneck was trust — people didn\'t believe the platform understood their situation, so they disengaged before the screen ever became the problem.',
+			'example'  => 'In Trazur, the interface had real usability issues, but the deeper problem was trust: people didn\'t believe the platform understood their situation, so they disengaged before the screen ever became the problem.',
 			'tools'    => 'Root-cause analysis, journey mapping, structured evaluation',
 		),
 		array(
 			'title'    => 'Gather evidence',
-			'text'     => 'I build a case before I build a solution — evidence a team can react to, not an opinion they have to accept.',
+			'text'     => 'I build a case before I build a solution: user research a team can react to, not an opinion they have to accept.',
 			'icon_key' => 'document',
 			'why'      => 'A strong opinion in the room isn\'t evidence, no matter how senior it comes from. Evidence turns a debate about taste into a decision about the system.',
-			'example'  => 'For Trazur, that meant pairing traditional research with AI-assisted analysis to process a heavier volume of evidence faster — every synthesized finding still reviewed by a person before it counted as one.',
+			'example'  => 'For Trazur, that meant pairing traditional research with AI-assisted analysis to process a heavier volume of evidence faster, with every synthesized finding still reviewed by a person before it counted as one.',
 			'tools'    => 'Interviews, field observation, AI-assisted synthesis',
 		),
 		array(
-			'title'    => 'Challenge assumptions',
-			'text'     => 'Before anything gets built, I try to break the plan myself — find where it depends on something nobody\'s actually confirmed.',
+			'title'    => 'Explore and define',
+			'text'     => 'I turn what I learn into structure: information architecture, user flows and alternatives I can compare before committing to one.',
 			'icon_key' => 'check',
 			'why'      => 'Every proposal quietly assumes something. Finding that assumption and testing the one that would be expensive to get wrong is cheaper than discovering it after launch.',
-			'example'  => 'On the Workshop Quoting System, that meant checking with the person who actually prices jobs that a proposed shortcut wasn\'t quietly removing a judgment call they relied on.',
-			'tools'    => 'Assumption mapping, walkthroughs with real users, comparative testing',
+			'example'  => 'On Presupuestador, that meant checking with the person who actually prices jobs that a proposed shortcut wasn\'t quietly removing a judgment call they relied on.',
+			'tools'    => 'Assumption mapping, information architecture, user flows, comparative testing',
 		),
 		array(
-			'title'    => 'Design practical solutions',
-			'text'     => 'Not every problem needs a new interface — sometimes the strongest move is fixing what\'s underneath it. When an interface is the right call, I design it for the conditions that actually exist: limited connectivity, time pressure, mixed skill levels, not an idealized user in an ideal setting.',
+			'title'    => 'Design and prototype',
+			'text'     => 'Not every problem needs a new interface; sometimes the strongest move is fixing what sits underneath it. When it is the right call, I move from structure to interaction and UI: wireframes, prototypes and reusable components when the project justifies them.',
 			'icon_key' => 'layers',
 			'why'      => 'A solution that only works under perfect conditions doesn\'t survive a busy shop floor or a rural connection that drops mid-session. Practical means it still works on a bad day.',
 			'example'  => 'Trazur\'s proposed solution was built around low-connectivity, low-fidelity conditions from the start, instead of assuming a fast connection and a confident, tech-comfortable user.',
-			'tools'    => 'Service blueprints, wireframing, systems-level design decisions',
+			'tools'    => 'Service blueprints, wireframes, prototypes, design systems',
 		),
 		array(
-			'title'    => 'Iterate with purpose',
-			'text'     => 'I treat a first version as a hypothesis, not a finish line — and decide in advance what would prove it wrong.',
+			'title'    => 'Test, learn and iterate',
+			'text'     => 'I treat a first version as a hypothesis, test it with users, and decide in advance what would prove it wrong.',
 			'icon_key' => 'rocket',
 			'why'      => 'Iteration without a target just produces motion. Knowing what "wrong" looks like before you ship is what makes the next version actually better, not just different.',
-			'example'  => 'Across projects — from an operational tool built for Guzmán Villalba to institutional work at Ceibal — the versions that held up were the ones designed to be revisited on purpose, not the ones treated as finished at delivery.',
+			'example'  => 'Across projects, from Presupuestador to institutional work at Ceibal, the versions that held up were the ones designed to be revisited on purpose, not the ones treated as finished at delivery.',
 			'tools'    => 'Usage review, structured feedback loops, versioned documentation',
 		),
 	);
@@ -424,15 +581,15 @@ function es_home_process_teaser_defaults() {
 		'groups'   => array(
 			array(
 				'title' => 'Understand',
-				'text'  => 'See how people, information and goals actually connect.',
+				'text'  => 'See how people, information and product goals actually connect.',
 			),
 			array(
 				'title' => 'Explore',
-				'text'  => 'Test ideas and challenge assumptions before committing to one.',
+				'text'  => 'Shape the structure, weigh alternatives and challenge assumptions before committing to one.',
 			),
 			array(
-				'title' => 'Improve',
-				'text'  => 'Build something that works — and keeps working.',
+				'title' => 'Iterate',
+				'text'  => 'Prototype, validate with users and refine until the solution works and holds up in real use.',
 			),
 		),
 	);
@@ -563,6 +720,12 @@ function es_about_render_experience_item( $es_exp, $compact = false ) {
 							<li><?php echo esc_html( $es_line ); ?></li>
 						<?php endforeach; ?>
 					</ul>
+					<?php if ( ! empty( $es_exp['tools'] ) && is_array( $es_exp['tools'] ) ) : ?>
+						<p class="es-about-tools">
+							<span class="es-about-tools__label"><?php echo esc_html( es__( 'case_meta_tools' ) ); ?></span>
+							<span class="es-about-tools__list"><?php echo esc_html( implode( ' · ', $es_exp['tools'] ) ); ?></span>
+						</p>
+					<?php endif; ?>
 				</div>
 			</details>
 		<?php endif; ?>
@@ -875,7 +1038,7 @@ function es_about_intro_paragraphs( $text ) {
  * a wp-admin en este entorno), así que no hay URL real que enlazar
  * todavía — no se inventa una.
  *
- * @return array<int,array{org:string,role:string,location:string,period:string,summary:string,contributions:string[],link_label:string,link_url:string}>
+ * @return array<int,array{org:string,role:string,location:string,period:string,summary:string,contributions:string[],tools:string[],link_label:string,link_url:string}>
  */
 function es_about_experience_selected_defaults() {
 	return array(
@@ -895,6 +1058,7 @@ function es_about_experience_selected_defaults() {
 				'Defined a progressive roadmap from a quick-estimate MVP toward a broader project and approval system.',
 				'Documented the work as an evolving Product Design case study.',
 			),
+			'tools'         => array( 'Figma', 'Claude', 'ChatGPT', 'Codex', 'VS Code' ),
 			'link_label'    => '',
 			'link_url'      => '',
 		),
@@ -918,6 +1082,7 @@ function es_about_experience_selected_defaults() {
 				'Explored how connectivity, trust and digital confidence affect adoption among rural users.',
 				'Contributed to the final degree project focused on the redesign of an e-learning platform for livestock traceability (not sole authorship — a collaborative thesis project).',
 			),
+			'tools'         => array( 'WordPress', 'Figma', 'ChatGPT' ),
 			'link_label'    => '',
 			'link_url'      => '',
 		),
@@ -938,6 +1103,7 @@ function es_about_experience_selected_defaults() {
 				'Communicated project progress with stakeholders.',
 				'Helped improve workflows and operational coordination.',
 			),
+			'tools'         => array( 'Redmine', 'Trello', 'Miro' ),
 			'link_label'    => '',
 			'link_url'      => '',
 		),
@@ -956,7 +1122,7 @@ function es_about_experience_selected_defaults() {
  * nuevo — mismo campo, mismo tratamiento visual, sin inventar UI nueva
  * para un caso único.
  *
- * @return array<int,array{org:string,role:string,location:string,period:string,summary:string,contributions:string[],link_label:string,link_url:string}>
+ * @return array<int,array{org:string,role:string,location:string,period:string,summary:string,contributions:string[],tools:string[],link_label:string,link_url:string}>
  */
 function es_about_experience_previous_defaults() {
 	return array(
@@ -980,6 +1146,11 @@ function es_about_experience_previous_defaults() {
 				'Implemented, taught and monitored the administrative software.',
 				'Identified and addressed logistics and warehouse problems.',
 			),
+			// Sin 'tools': el documento fuente no nombra ningún software
+			// específico para este rol ("a CRM", "administrative software" —
+			// ambos genéricos, sin marca) — no se inventa un nombre de
+			// producto que el documento no confirma.
+			'tools'         => array(),
 			'link_label'    => '',
 			'link_url'      => '',
 		),
@@ -1008,6 +1179,7 @@ function es_about_experience_previous_defaults() {
 				'Used Mailchimp for newsletter campaigns.',
 				'Contributed to a new digital sales channel, improved shopping experience and more organized operations.',
 			),
+			'tools'         => array( 'Photoshop', 'Illustrator', 'Figma', 'WordPress', 'Mailchimp' ),
 			'link_label'    => '',
 			'link_url'      => '',
 		),
@@ -1026,6 +1198,7 @@ function es_about_experience_previous_defaults() {
 				'Implemented and maintained the website.',
 				'Improved the user experience across digital touchpoints over time.',
 			),
+			'tools'         => array( 'WordPress', 'Mailchimp' ),
 			'link_label'    => '',
 			'link_url'      => '',
 		),
@@ -1162,6 +1335,82 @@ function es_about_languages_defaults() {
 		array(
 			'name'  => 'Portuguese',
 			'level' => 'Basic',
+		),
+	);
+}
+
+/**
+ * Defaults de "Tools" (About page) — sección de cierre que ahora renderiza
+ * el bloque reutilizable estavillo/tools (Design System ticket): esta
+ * función sólo sigue siendo la FUENTE DE DATOS (misma responsabilidad que
+ * es_about_languages_defaults() etc.), no dibuja nada — about-content.php
+ * pasa este array directo como 'groups' a render_block(), el mismo camino
+ * que usa el contenido Gutenberg real. Una sola implementación del bloque,
+ * dos orígenes de datos (este default PHP y los atributos guardados en
+ * Gutenberg), igual que el resto de las secciones editables del About.
+ *
+ * No es un inventario de todo lo que se usó alguna vez (eso ya lo cuenta
+ * cada 'tools' de Experience) — es lo que se maneja HOY. 'icon' es una
+ * clave de es_process_icon_library(); 'categoryDescription' queda vacía a
+ * propósito (atributo preparado para una evolución futura del bloque, no
+ * usado todavía — ver estavillo-portfolio-core/blocks/tools/block.json).
+ *
+ * @return array<int,array{title:string,icon:string,items:string[],categoryDescription:string}>
+ */
+function es_about_tools_defaults() {
+	return array(
+		array(
+			'title'               => 'Research',
+			'icon'                => 'compass',
+			'items'               => array( 'Google Analytics', 'Microsoft Clarity', 'Synthetic Users' ),
+			'categoryDescription' => '',
+		),
+		array(
+			'title'               => 'Design',
+			'icon'                => 'layers',
+			// Figma/FigJam/Relume = producto; Photoshop/Illustrator/InDesign/
+			// Premiere Pro suman el lado editorial/gráfico — mismo criterio
+			// "herramientas reales que uso", no exhaustividad de currículum.
+			'items'               => array( 'Figma', 'FigJam', 'Relume', 'Photoshop', 'Illustrator', 'InDesign', 'Premiere Pro' ),
+			'categoryDescription' => '',
+		),
+		array(
+			'title'               => 'AI',
+			'icon'                => 'bulb',
+			'items'               => array( 'Claude', 'Claude Code', 'Claude Cowork', 'ChatGPT', 'Codex' ),
+			'categoryDescription' => '',
+		),
+		/*
+		 * Sexta categoría (composición 3×2 ticket): definición de producto,
+		 * documentación, organización de procesos y seguimiento de trabajo —
+		 * deliberadamente NO "Skills"/soft skills, sigue siendo una lista de
+		 * herramientas reales, mismo criterio que el resto de las 5
+		 * categorías. Ninguno de estos 4 nombres se repite en otra
+		 * categoría (verificado contra las 5 anteriores antes de sumarlos).
+		 * Ícono 'flow' (dos nodos conectados): distinto de 'layers'/'tool'/
+		 * 'cube' ya usados acá, y ya comunica "proceso/sistema" en el resto
+		 * de la librería (case-flow).
+		 */
+		array(
+			'title'               => 'Product & Systems',
+			'icon'                => 'flow',
+			'items'               => array( 'Notion', 'Trello', 'Google Sheets', 'Apps Script' ),
+			'categoryDescription' => '',
+		),
+		array(
+			'title'               => 'Development',
+			'icon'                => 'tool',
+			'items'               => array( 'VS Code', 'WordPress', 'HTML', 'CSS', 'Git', 'GitHub' ),
+			'categoryDescription' => '',
+		),
+		array(
+			'title'               => '3D',
+			'icon'                => 'cube',
+			// Rhino/AutoCAD: ya estaban acá antes de este ticket. El pedido
+			// de sumar "AutoCAD, Rhinoceros" se resuelve NO duplicándolos —
+			// ya son estos dos ítems (Rhino = Rhinoceros).
+			'items'               => array( 'Rhino', 'AutoCAD' ),
+			'categoryDescription' => '',
 		),
 	);
 }

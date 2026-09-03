@@ -21,7 +21,23 @@ $es_num = isset( $args['num'] ) ? $args['num'] : '03';
 
 $es_cases = apply_filters( 'es_home_selected_work', es_home_selected_work_source() );
 
-$es_view_all_url = apply_filters( 'es_home_view_all_url', '#' );
+/*
+ * "All work" apuntaba a '#' — un href literal que no lleva a ningún lado.
+ * El filtro existía desde Home v1 pero nadie lo puenteaba nunca, ni el theme
+ * ni el plugin, así que el default crudo era lo que se servía: un link muerto
+ * en la sección más importante de la Home.
+ *
+ * Se resuelve igual que el menú (COMMIT 2): por TEMPLATE, no por ruta. La
+ * página Work de cada idioma es la que la jerarquía de WordPress devuelve
+ * para su propio idioma con Polylang, así que ES lleva a la página en español
+ * y EN a la inglesa sin ninguna ruta escrita a mano. El filtro sigue ahí para
+ * poder apuntarlo a otro lado.
+ *
+ * Si esa página todavía no existe en este idioma, el resolver devuelve
+ * cadena vacía y el link NO se imprime. Un "All work" que apunta a la misma
+ * sección que ya estás mirando es peor que no tenerlo.
+ */
+$es_view_all_url = apply_filters( 'es_home_view_all_url', es_page_url_by_template( 'templates/page-work.php' ) );
 
 $es_wide = array_shift( $es_cases );
 ?>
@@ -33,9 +49,11 @@ $es_wide = array_shift( $es_cases );
 				<span class="es-section-head__num"><?php echo esc_html( $es_num ); ?></span>
 				<h2 class="es-label"><?php echo esc_html( es__( 'work_label' ) ); ?></h2>
 			</div>
-			<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_view_all_url ); ?>">
-				<?php echo esc_html( es__( 'work_view_all' ) ); ?>
-			</a>
+			<?php if ( '' !== trim( (string) $es_view_all_url ) && '#' !== $es_view_all_url ) : ?>
+				<a class="es-link-arrow es-link-arrow--quiet" href="<?php echo esc_url( $es_view_all_url ); ?>">
+					<?php echo esc_html( es__( 'work_view_all' ) ); ?>
+				</a>
+			<?php endif; ?>
 		</div>
 
 		<div class="es-work__stack">

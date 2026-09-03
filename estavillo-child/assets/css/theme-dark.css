@@ -2,20 +2,33 @@
    ESTAVILLO — Global dark mode (portfolio-wide toggle)
    -------------------------------------------------------------------------
    Every single selector in this file is prefixed with body.es-theme-dark.
-   With that class absent (the default — see inc/theme-dark-mode.php,
-   "Portfolio dark mode" = Disabled), this entire stylesheet is a no-op:
-   zero effect on the public site, exactly like tokens.css/base.css already
-   are outside .es-page (see inc/enqueue.php).
+
+   DÓNDE SE EMITE ESA CLASE (importa): sólo en las vistas que este theme NO
+   renderiza — ver es_theme_dark_body_class() e es_uses_estavillo_chrome().
+   En cualquier pantalla con chrome ESTAVILLO la clase NO está, y este
+   archivo entero vuelve a ser un no-op.
+
+   Por qué: los selectores de acá se escribieron para ganarle al CSS de
+   Kadence, así que llevan especificidad alta por diseño (body.es-theme-dark a
+   es 0-2-1). Dentro de .es-page eso les gana a reglas del design system que
+   son 0-1-0 — medido: el eyebrow perdía su verde de acento, un extracto
+   apagado subía a tinta llena, <strong> quedaba más apagado que su párrafo,
+   y todo link enfocado por teclado bajaba a opacity .85. Este archivo cubre
+   el chrome de Kadence; no es una capa de tema para el portfolio.
 
    WHY THIS FILE EXISTS: .es-page (base.css) already renders dark — it has
-   since Home v1 — but only inside the six "standalone" ESTAVILLO templates
-   (Home, Work, About, How I Work, Connect, single Case Study), which print
+   since Home v1 — but only inside the ESTAVILLO templates, which print
    their own <head>/<body> and never call get_header()/get_footer(). Any
-   other context (a generic Gutenberg Page without one of those templates,
-   a single blog post, an archive, search results, 404) renders through
-   Kadence's own native templates and chrome, which this child theme never
-   overrides — so it never picked up the --es-* tokens at all. This file
-   is the missing coverage for exactly those native-Kadence contexts, using
+   other context renders through Kadence's own native templates and chrome,
+   which this child theme never overrides — so it never picked up the
+   --es-* tokens at all.
+
+   NOTA de la iteración de cierre: ese conjunto se achicó mucho. El 404, la
+   búsqueda, los archivos, el fallback index, una Página sin template y una
+   entrada de blog ahora TIENEN template propio en el child y no pasan por
+   acá. Lo que queda es lo que sirve otro código: la pantalla de
+   confirmación de un plugin, un embed, un template que Kadence resuelva por
+   su cuenta. Este archivo sigue siendo la red para eso, usando
    the SAME tokens and the SAME treatment patterns already approved inside
    .es-page (border+radius frames from case-study.css, the input pattern
    from pages.css's Connect form, etc.) — nothing new invented.

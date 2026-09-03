@@ -69,6 +69,211 @@ function es_is_estavillo_static_page() {
 }
 
 /**
+ * ¿Esta request la sirve el documento genérico
+ * (template-parts/generic-document.php)? Son las vistas que hasta la
+ * iteración de cierre caían al template del padre: búsqueda, archivos, el
+ * fallback index, y una Página guardada SIN ninguno de los templates del
+ * theme.
+ *
+ * La Home y las cuatro páginas fijas quedan fuera por sus propias
+ * condiciones: tienen template asignado, así que la jerarquía de WordPress
+ * las resuelve antes de llegar a page.php.
+ *
+ * @return bool
+ */
+function es_is_generic_shell() {
+	if ( is_search() || is_archive() || is_home() ) {
+		return true;
+	}
+	if ( is_page() && ! es_is_home_template() && ! es_is_estavillo_static_page() ) {
+		return true;
+	}
+	// single.php: entradas del blog y cualquier CPT sin template propio. El
+	// Case Study queda fuera porque tiene el suyo (single-es_case_study.php)
+	// y ya carga su capa de assets aparte.
+	if ( is_single() && ! es_is_case_study_single() ) {
+		return true;
+	}
+	return false;
+}
+
+/**
+ * ¿Esta request imprime el chrome ESTAVILLO (site-header + site-footer
+ * dentro de un wrapper .es-page)? Es decir: ¿la sirve un template de ESTE
+ * theme, y no uno de Kadence?
+ *
+ * Después de la iteración de cierre eso es casi todo el sitio: los siete
+ * templates con nombre propio más las seis vistas genéricas. Lo que queda
+ * afuera son las pantallas que sirve otro código y este theme no ve venir
+ * (una página de confirmación de un plugin, un embed, un template que
+ * Kadence resuelva por su cuenta) — exactamente el terreno de
+ * assets/css/theme-dark.css.
+ *
+ * @return bool
+ */
+function es_uses_estavillo_chrome() {
+	return es_is_home_template()
+		|| es_is_case_study_single()
+		|| es_is_estavillo_static_page()
+		|| is_404()
+		|| es_is_generic_shell();
+}
+
+/**
+ * ¿Hay al menos un estavillo/case-figure con el zoom activado en el post
+ * actual? A diferencia de Case Flow, acá `has_block()` no alcanza: dice si
+ * el BLOQUE existe, no si ESTA instancia tiene `enableZoom` — y el visor
+ * (dialog + JS de pan/zoom) es exactamente el tipo de peso que no debería
+ * pedirse en las páginas que no lo usan. parse_blocks() sobre el propio
+ * post_content ya trae los atributos serializados del bloque, así que no
+ * hace falta ningún acoplamiento con el plugin (ni una bandera global
+ * seteada desde render.php): el theme lee el mismo dato crudo que
+ * Gutenberg guardó.
+ *
+ * @return bool
+ */
+function es_post_has_case_figure_zoom() {
+	return es_post_has_block_flag( 'estavillo/case-figure', 'enableZoom' );
+}
+
+/**
+ * ¿Hay al menos un estavillo/case-stats con la animación de conteo activada?
+ * Mismo criterio opt-in por instancia que el zoom de case-figure: el bloque
+ * existe en casi todos los casos, pero el JS del contador sólo tiene sentido
+ * donde alguien prendió el toggle — y es mejora progresiva pura, así que no
+ * pedirlo no rompe nada (el número final ya está en el HTML).
+ *
+ * @return bool
+ */
+function es_post_has_case_stats_animation() {
+	return es_post_has_block_flag( 'estavillo/case-stats', 'animate' );
+}
+
+/**
+ * ¿El post actual tiene alguna instancia de $block_name con el atributo
+ * booleano $attr en true? A diferencia de has_block(), mira los ATRIBUTOS
+ * serializados, así que distingue "el bloque está" de "esta instancia pidió
+ * la función" — que es lo que decide si vale la pena mandar un asset extra.
+ *
+ * @param string $block_name Nombre completo del bloque (namespace incluido).
+ * @param string $attr       Atributo booleano a comprobar.
+ * @return bool
+ */
+function es_post_has_block_flag( $block_name, $attr ) {
+	if ( ! is_singular() ) {
+		return false;
+	}
+	$post = get_post();
+	if ( ! $post || false === strpos( (string) $post->post_content, $block_name ) ) {
+		return false; // atajo: ni vale la pena parsear si el bloque ni aparece
+	}
+	return es_blocks_contain_flag( parse_blocks( $post->post_content ), $block_name, $attr );
+}
+
+/**
+ * Recorre un árbol de bloques (parse_blocks()) buscando $block_name con
+ * $attr=true, en cualquier nivel de anidamiento (columnas, grupos…).
+ *
+ * @param array  $blocks     Árbol de bloques.
+ * @param string $block_name Nombre completo del bloque.
+ * @param string $attr       Atributo booleano a comprobar.
+ * @return bool
+ */
+function es_blocks_contain_flag( $blocks, $block_name, $attr ) {
+	foreach ( $blocks as $block ) {
+		if ( $block_name === ( $block['blockName'] ?? '' ) && ! empty( $block['attrs'][ $attr ] ) ) {
+			return true;
+		}
+		if ( ! empty( $block['innerBlocks'] ) && es_blocks_contain_flag( $block['innerBlocks'], $block_name, $attr ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * ¿El post actual tiene alguna instancia de $block_name cuyo atributo
+ * $attr sea exactamente igual a $value? Versión de es_post_has_block_flag()
+ * para atributos de tipo string/enum (p. ej. mediaType === 'video') que no
+ * son simplemente verdadero/falso — es_post_has_block_flag() de arriba sólo
+ * sirve para booleanos.
+ *
+ * @param string $block_name Nombre completo del bloque (namespace incluido).
+ * @param string $attr       Atributo a comprobar.
+ * @param mixed  $value      Valor esperado (comparación estricta ===).
+ * @return bool
+ */
+function es_post_has_block_attr_value( $block_name, $attr, $value ) {
+	if ( ! is_singular() ) {
+		return false;
+	}
+	$post = get_post();
+	if ( ! $post || false === strpos( (string) $post->post_content, $block_name ) ) {
+		return false; // atajo: ni vale la pena parsear si el bloque ni aparece
+	}
+	return es_blocks_contain_attr_value( parse_blocks( $post->post_content ), $block_name, $attr, $value );
+}
+
+/**
+ * Recorre un árbol de bloques (parse_blocks()) buscando $block_name con
+ * $attr === $value (comparación estricta), en cualquier nivel de
+ * anidamiento (columnas, grupos…).
+ *
+ * @param array  $blocks     Árbol de bloques.
+ * @param string $block_name Nombre completo del bloque.
+ * @param string $attr       Atributo a comprobar.
+ * @param mixed  $value      Valor esperado.
+ * @return bool
+ */
+function es_blocks_contain_attr_value( $blocks, $block_name, $attr, $value ) {
+	foreach ( $blocks as $block ) {
+		if ( $block_name === ( $block['blockName'] ?? '' ) && isset( $block['attrs'][ $attr ] ) && $value === $block['attrs'][ $attr ] ) {
+			return true;
+		}
+		if ( ! empty( $block['innerBlocks'] ) && es_blocks_contain_attr_value( $block['innerBlocks'], $block_name, $attr, $value ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * ¿Hay al menos un estavillo/case-figure con mediaType === 'video' en el
+ * post actual? Mismo criterio opt-in por instancia que el zoom de arriba —
+ * el bloque puede existir en el post sin ninguna instancia de video, y el
+ * módulo de lazy-load + autoplay condicional (case-figure-media.js) no
+ * tiene nada que hacer ahí.
+ *
+ * @return bool
+ */
+function es_post_has_case_figure_video() {
+	return es_post_has_block_attr_value( 'estavillo/case-figure', 'mediaType', 'video' );
+}
+
+/**
+ * ¿El Featured Media resuelto de Home o de Work/Trabajos es un video? A
+ * diferencia de es_post_has_case_figure_video() (que parsea post_content
+ * en busca de un BLOQUE), acá el dato vive en post meta del Case Study
+ * destacado — mismo criterio de "sólo pedir el asset donde realmente hace
+ * falta", pero leyendo la fuente ya resuelta (es_home_featured_source() /
+ * es_work_page_source(), ambas del propio tema — sin llamar nada del
+ * plugin acá, cero riesgo si estuviera inactivo) en vez de parsear bloques.
+ *
+ * @return bool
+ */
+function es_home_or_work_has_featured_video() {
+	if ( es_is_home_template() ) {
+		$es_case = es_home_featured_source();
+	} elseif ( is_page_template( 'templates/page-work.php' ) ) {
+		$es_data = es_work_page_source();
+		$es_case = isset( $es_data['featured'] ) ? $es_data['featured'] : array();
+	} else {
+		return false;
+	}
+	return isset( $es_case['media_type'] ) && 'video' === $es_case['media_type'];
+}
+
+/**
  * Versión de cache-bust por archivo: usa filemtime() para que CADA cambio de
  * un asset genere un ?ver= nuevo y el navegador/CDN vuelva a bajarlo.
  *
@@ -128,7 +333,11 @@ function es_child_enqueue_assets() {
 	// Home, el single de Case Study y las 4 páginas fijas nuevas (Work /
 	// About / How I Work / Contact) — todas usan template-parts/site-header
 	// y site-footer con el mismo markup/JS de menú.
-	$es_needs_chrome = es_is_home_template() || es_is_case_study_single() || es_is_estavillo_static_page();
+	// El 404 (404.php) y las vistas genéricas (search/archive/index/page, vía
+	// template-parts/generic-document.php) también imprimen el chrome
+	// ESTAVILLO, así que entran en la misma condición: sin esto mostrarían el
+	// header/footer sin estilos y con el menú sin comportamiento.
+	$es_needs_chrome = es_uses_estavillo_chrome();
 
 	if ( $es_needs_chrome ) {
 		wp_enqueue_style( 'es-site', ES_CHILD_URI . '/assets/css/site.css', array( 'es-components' ), es_asset_ver( 'assets/css/site.css' ) );
@@ -160,14 +369,14 @@ function es_child_enqueue_assets() {
 	// Work/About/How I Work/Contact reusan esos mismos template-parts o su
 	// mismo lenguaje visual (cards, timeline, process grid, footer CTA) en
 	// vez de reinventar estilos nuevos — ver README, sección "Páginas fijas".
-	if ( es_is_home_template() || es_is_estavillo_static_page() ) {
+	if ( es_is_home_template() || es_is_estavillo_static_page() || is_404() || es_is_generic_shell() ) {
 		wp_enqueue_style( 'es-pages-home', ES_CHILD_URI . '/assets/css/pages-home.css', array( 'es-site' ), es_asset_ver( 'assets/css/pages-home.css' ) );
 	}
 
 	// Capa propia de las 4 páginas fijas nuevas (page-head, separación
 	// selected/archive de Work, timeline/educación/hobbies/CV de About,
 	// layout de Contact) — nunca se carga en Home ni en Case Study.
-	if ( es_is_estavillo_static_page() ) {
+	if ( es_is_estavillo_static_page() || is_404() || es_is_generic_shell() ) {
 		wp_enqueue_style( 'es-pages', ES_CHILD_URI . '/assets/css/pages.css', array( 'es-pages-home' ), es_asset_ver( 'assets/css/pages.css' ) );
 	}
 
@@ -219,6 +428,26 @@ function es_child_enqueue_assets() {
 	// Capa específica del single de Case Study (prose body + meta row).
 	if ( es_is_case_study_single() ) {
 		wp_enqueue_style( 'es-case-study', ES_CHILD_URI . '/assets/css/case-study.css', array( 'es-site' ), es_asset_ver( 'assets/css/case-study.css' ) );
+
+		/*
+		 * Índice sticky: scrollspy + riel + botones de desplazamiento. Sólo
+		 * si el caso tiene el campo "Case index" cargado — sin ese campo el
+		 * <nav> ni siquiera se imprime, así que pedir el script sería peso
+		 * muerto. Es 100% mejora progresiva (ver el docblock de
+		 * case-index.js): sin él el menú se sigue scrolleando solo.
+		 */
+		if ( get_post_meta( get_the_ID(), '_es_case_index', true ) ) {
+			wp_enqueue_script(
+				'es-case-index',
+				ES_CHILD_URI . '/assets/js/case-index.js',
+				array(),
+				es_asset_ver( 'assets/js/case-index.js' ),
+				array(
+					'in_footer' => true,
+					'strategy'  => 'defer',
+				)
+			);
+		}
 	}
 
 	/*
@@ -256,6 +485,103 @@ function es_child_enqueue_assets() {
 	 */
 	if ( $es_has_flow_v2 ) {
 		wp_enqueue_style( 'es-case-flow-v2', ES_CHILD_URI . '/assets/css/case-flow-v2.css', array( 'es-case-flow' ), es_asset_ver( 'assets/css/case-flow-v2.css' ) );
+	}
+
+	/*
+	 * Case Figure lightbox: visor compartido por página (un solo <dialog>),
+	 * opt-in por instancia vía el toggle "Permitir ampliar imagen" del
+	 * bloque. Sin ninguna figura con zoom activo, ni el CSS ni el JS se
+	 * piden — ver es_post_has_case_figure_zoom() arriba.
+	 */
+	if ( es_post_has_case_figure_zoom() ) {
+		wp_enqueue_style(
+			'es-case-figure-lightbox',
+			ES_CHILD_URI . '/assets/css/case-figure-lightbox.css',
+			array( 'es-components' ),
+			es_asset_ver( 'assets/css/case-figure-lightbox.css' )
+		);
+		wp_enqueue_script(
+			'es-case-figure-lightbox',
+			ES_CHILD_URI . '/assets/js/case-figure-lightbox.js',
+			array(),
+			es_asset_ver( 'assets/js/case-figure-lightbox.js' ),
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
+		);
+	}
+
+	/*
+	 * Video lazy-load + autoplay condicional: lo comparten Case Figure
+	 * (dentro del contenido de un caso) y Featured Media (Home/Work) — ver
+	 * el docblock de assets/js/case-figure-media.js. Sin ninguna instancia
+	 * de video en ningún lado, ni se pide: imagen/GIF no lo necesitan (ya
+	 * son <img> con loading="lazy" nativo). Sin CSS propio — el look de
+	 * <video> vive en case-study.css/pages-home.css/components.css, que ya
+	 * se encolan donde corresponde.
+	 */
+	if ( es_post_has_case_figure_video() || es_home_or_work_has_featured_video() ) {
+		wp_enqueue_script(
+			'es-case-figure-media',
+			ES_CHILD_URI . '/assets/js/case-figure-media.js',
+			array(),
+			es_asset_ver( 'assets/js/case-figure-media.js' ),
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
+		);
+	}
+
+	/*
+	 * Tools (.es-tools): mismo criterio que Case Flow arriba — componente
+	 * del Design System, no exclusivo de ninguna página (Home/About/Case
+	 * Studies/landings futuras), así que se carga por has_block() y en
+	 * ningún otro lado. Único agregado sobre el patrón de Case Flow: el
+	 * template de About también dispara la carga aunque has_block() no
+	 * encuentre el bloque, porque About tiene una rama de fallback PHP
+	 * (template-parts/about-content.php) que renderiza el bloque vía
+	 * render_block() directo — sin pasar por post_content real, así que
+	 * has_block() nunca lo vería ahí. Los is_page_template() de abajo sólo
+	 * agregan ESOS casos puntuales; el bloque en sí sigue sin acoplarse a
+	 * ninguna plantilla.
+	 *
+	 * Home entra por el mismo motivo desde que su rama fallback incluye la
+	 * sección Tools (template-parts/tools.php, misma llamada a
+	 * render_block()). En la rama Gutenberg de cualquiera de las dos
+	 * páginas alcanza con has_block(), pero la condición cubre las dos
+	 * ramas sin tener que saber cuál está activa.
+	 */
+	$es_needs_tools = is_singular() && (
+		has_block( 'estavillo/tools' )
+		|| is_page_template( 'templates/page-about.php' )
+		|| es_is_home_template()
+	);
+
+	if ( $es_needs_tools ) {
+		wp_enqueue_style( 'es-tools', ES_CHILD_URI . '/assets/css/tools.css', array( 'es-components' ), es_asset_ver( 'assets/css/tools.css' ) );
+	}
+
+	/*
+	 * Contador de Case Stats: mismo criterio opt-in por instancia que el
+	 * lightbox de case-figure arriba — sin ningún bloque con "Animate
+	 * numbers" activo, el script no se pide. No hay CSS asociado: el estilo
+	 * del bloque (ícono incluido) ya vive en case-study.css, y el contador no
+	 * agrega ninguna regla propia. Mejora progresiva: sin este script el
+	 * número final ya está impreso en el HTML.
+	 */
+	if ( es_post_has_case_stats_animation() ) {
+		wp_enqueue_script(
+			'es-case-stats',
+			ES_CHILD_URI . '/assets/js/case-stats.js',
+			array(),
+			es_asset_ver( 'assets/js/case-stats.js' ),
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
+		);
 	}
 }
 add_action( 'wp_enqueue_scripts', 'es_child_enqueue_assets' );

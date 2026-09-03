@@ -15,20 +15,103 @@
 	   hero está en viewport (rAF). Base 0 para que sin JS / con reduced
 	   motion el hero quede totalmente visible y estático. */
 	--es-hero-progress: 0;
+	/* Sangrado inferior de la CAPA DE FONDO. 0 por defecto (mobile/tablet y
+	   cualquier contexto sin la media query de abajo): sin sangrado, el hero
+	   se comporta exactamente como antes. Ver §1B. */
+	--es-hero-bleed: 0px;
 }
 
 /* transición suave hacia la sección siguiente: la constelación se disuelve en
-   el papel (sin borde duro). No toca el motor ni el layout del hero. */
+   el papel (sin borde duro). No toca el motor ni el layout del hero.
+   Queda anclado al FINAL DEL CONTENIDO del hero, no al final de la caja: con
+   sangrado activo (§1B) la caja se extiende por debajo y este degradado tiene
+   que seguir marcando el borde editorial de siempre, no el nuevo. */
 .es-hero::after {
 	content: '';
 	position: absolute;
 	left: 0;
 	right: 0;
-	bottom: 0;
+	bottom: var(--es-hero-bleed);
 	height: clamp(90px, 14vh, 170px);
 	background: linear-gradient(to bottom, transparent, var(--es-paper));
 	pointer-events: none;
 	z-index: 0;
+}
+
+/* =========================================================================
+   §1B — Sangrado del fondo hacia abajo (sólo desktop)
+   -------------------------------------------------------------------------
+   Problema medido: la constelación termina exactamente donde termina el
+   hero (la capa es inset:0), y encima el degradado ::after se come sus
+   últimos ~126px. Resultado: el mapa muere al ~82% del hero y quedan ~238px
+   de vacío antes del contenido de "Cómo trabajo".
+
+   Solución sin mover NADA: `padding-bottom` agranda la caja del hero (y con
+   ella la capa de fondo, que es inset:0 contra la caja de padding), y un
+   `margin-bottom` negativo del mismo valor lo devuelve al flujo — la
+   sección siguiente arranca en el mismo píxel de siempre. El copy está en
+   flujo normal dentro de .es-hero__inner, así que tampoco se mueve.
+
+   La sección siguiente pasa a solaparse con la zona sangrada. Como
+   .es-section es transparente, la constelación se sigue viendo por detrás;
+   lo único que hace falta es garantizar que su TEXTO pinte por encima
+   (regla .es-hero + * más abajo).
+
+   El corte duro lo reemplaza un mask sobre la capa: la constelación se
+   atenúa de forma continua a lo largo de todo el tramo extendido y llega a
+   0 antes del titular de la sección siguiente. "Que siga viviendo un poco
+   más antes de desaparecer", sin arista.
+
+   overflow:hidden del hero sigue recortando en la caja de padding, así que
+   el sangrado no genera scroll horizontal ni vertical.
+   ========================================================================= */
+@media (min-width: 1024px) {
+	.es-hero {
+		/* ~30% del alto del hero (min(78svh, 760px)): medido 702px a 900 de
+		   alto → 211px; 760px a 1050 → 231px. El clamp lo mantiene en ese
+		   rango en pantallas fuera de escala. */
+		--es-hero-bleed: clamp(150px, 22svh, 240px);
+		padding-bottom: var(--es-hero-bleed);
+		margin-bottom: calc(-1 * var(--es-hero-bleed));
+	}
+
+	/* El texto de la sección siguiente por encima de la zona sangrada. Es
+	   inerte salvo por este solape: sólo crea contexto de apilado. */
+	.es-hero + * {
+		position: relative;
+		z-index: 1;
+	}
+
+	/* Disolución continua en lugar del corte. Los stops están en % de la
+	   caja YA extendida: con 702px de hero + 211px de sangrado, el 77% cae
+	   justo en el borde viejo — o sea que la constelación llega entera hasta
+	   donde llegaba antes y recién ahí empieza a irse, apagándose del todo
+	   ~40px antes del titular de "Cómo trabajo". */
+	.es-hero__bg {
+		-webkit-mask-image: linear-gradient(
+			to bottom,
+			#000 0%,
+			#000 62%,
+			rgba(0, 0, 0, 0.55) 79%,
+			rgba(0, 0, 0, 0.18) 90%,
+			transparent 99%
+		);
+		mask-image: linear-gradient(
+			to bottom,
+			#000 0%,
+			#000 62%,
+			rgba(0, 0, 0, 0.55) 79%,
+			rgba(0, 0, 0, 0.18) 90%,
+			transparent 99%
+		);
+	}
+
+	/* Con el mask haciendo la disolución, el degradado a papel sobraría:
+	   volvería a cortar la constelación en el borde viejo, que es
+	   exactamente lo que este bloque viene a resolver. */
+	.es-hero::after {
+		display: none;
+	}
 }
 
 /* ---------- capa visual (SVG inyectado por hero-system-map.js) ----------
@@ -230,7 +313,24 @@
 	}
 }
 
-/* respiración idle de la constelación (halo + nodos), muy sutil */
+/* ---------- respiración idle de la constelación ----------
+   Todo lo de acá es CSS puro: el rAF del motor se DUERME al asentarse
+   (ver hero-system-map.js, frame() sale cuando la energía cae), así que
+   la vida en reposo no cuesta un solo frame de JS. La curva la aporta el
+   motor (cubic-bezier sinusoidal, easeInOutSine) — acá sólo viven los
+   valores, para poder ajustarlos sin tocar el motor.
+
+   TODAS animan `opacity` y ninguna otra propiedad. No es casual: opacity
+   es de las poquísimas que el navegador puede correr en el compositor,
+   sin recálculo de estilo ni repintado por frame. Se probó una versión
+   con fill-opacity / stroke-opacity (que tienen la ventaja de
+   multiplicarse con el style.opacity que escribe el campo de proximidad
+   en hover, en vez de pisarlo) y el costo medido en 6s de reposo saltó de
+   6,6ms a 339ms de main thread — ninguna de las dos es componible. La
+   compatibilidad con el hover no vale ese precio: las 3-4 figuras que
+   respiran pierden el realce del cursor mientras la animación corre, que
+   es exactamente el comportamiento que ya tenían antes de este ticket. */
+
 @keyframes es-net-breathe {
 	0%,
 	100% {
@@ -251,8 +351,42 @@
 	}
 }
 
+/* nodo raíz: amplitud mínima — acompaña, no parpadea */
+@keyframes es-net-breathe-root {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.82;
+	}
+}
+
+/* aristas del foco: apenas un respiro en el trazo */
+@keyframes es-net-breathe-edge {
+	0%,
+	100% {
+		opacity: 0.75;
+	}
+	50% {
+		opacity: 0.54;
+	}
+}
+
+/* anillo del foco */
+@keyframes es-net-pulse-ring {
+	0%,
+	100% {
+		opacity: 0.85;
+	}
+	50% {
+		opacity: 0.55;
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
-	.es-net-svg circle {
+	.es-net-svg circle,
+	.es-net-svg line {
 		animation: none !important;
 	}
 }
@@ -387,10 +521,19 @@
 	}
 
 	/* El fondo permanece más que el texto: parallax leve hacia abajo y fade
-	   cuadrático (se va recién cerca del final del recorrido). */
+	   CÚBICO (antes cuadrático). El exponente es lo único que define cuánto
+	   "acompaña" el fondo antes de irse: con p² a mitad de recorrido ya
+	   había perdido el 18% de opacidad y a 3/4 el 39%; con p³ pierde 9% y
+	   30% en los mismos puntos, o sea se mantiene casi entero durante la
+	   primera mitad del scroll y recién cede al final. Es exactamente el
+	   "que acompañe algunos píxeles más" del ticket, sin ningún efecto
+	   nuevo: misma propiedad, misma curva continua, una potencia más.
+	   El parallax pasa de 34px a 52px por el mismo motivo. */
 	.es-hero:not(.es-hero--scroll-parallax) .es-hero__visual {
-		transform: translateY(calc(var(--es-hero-progress) * 34px));
-		opacity: calc(1 - var(--es-hero-progress) * var(--es-hero-progress) * 0.7);
+		transform: translateY(calc(var(--es-hero-progress) * 52px));
+		opacity: calc(
+			1 - var(--es-hero-progress) * var(--es-hero-progress) * var(--es-hero-progress) * 0.78
+		);
 		will-change: transform, opacity;
 	}
 }
@@ -425,7 +568,10 @@
      --es-hero-bg-out   : progreso al que el fondo llega a ~0. */
 .es-hero--scroll-parallax {
 	--es-hero-copy-out: 0.55;
-	--es-hero-bg-out: 0.86;
+	/* 0.86 → 0.97: el fondo llega a 0 casi al final del recorrido en vez de
+	   a 6/7. Mismo criterio que el fade cúbico del modo standard — que el
+	   fondo acompañe unos píxeles más antes de desaparecer. */
+	--es-hero-bg-out: 0.97;
 }
 
 /* Mobile / tablet: SIN anclaje ni sticky (evita saltos de viewport, §4). Fade
@@ -438,8 +584,10 @@
 	}
 
 	.es-hero--scroll-parallax .es-hero__visual {
-		transform: translateY(calc(var(--es-hero-progress) * 34px));
-		opacity: calc(1 - var(--es-hero-progress) * var(--es-hero-progress) * 0.7);
+		transform: translateY(calc(var(--es-hero-progress) * 52px));
+		opacity: calc(
+			1 - var(--es-hero-progress) * var(--es-hero-progress) * var(--es-hero-progress) * 0.78
+		);
 		will-change: transform, opacity;
 	}
 }
@@ -469,7 +617,11 @@
 .es-hero__scroll {
 	position: absolute;
 	left: 50%;
-	bottom: clamp(16px, 3vh, 30px);
+	/* + el sangrado (§1B): el indicador se posiciona contra la caja del hero,
+	   que con sangrado activo termina más abajo — sin compensar, el indicador
+	   bajaría con ella y se metería dentro de "Cómo trabajo". Con
+	   --es-hero-bleed en 0 (mobile/tablet) esto es el valor de siempre. */
+	bottom: calc(clamp(16px, 3vh, 30px) + var(--es-hero-bleed, 0px));
 	transform: translateX(-50%);
 	z-index: 2;
 	display: inline-flex;

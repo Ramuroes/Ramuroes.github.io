@@ -515,6 +515,26 @@
 	margin-top: 8px;
 }
 
+/* Final-polish ticket §2: one small line at the end of "Key contributions",
+   the tools used during that specific experience. Deliberately minimal —
+   no chips, no cards, no logos: a label + a plain "·"-separated list, the
+   same separator/tone already used by .es-exp-item__meta and .es-cred__meta
+   two components up, so it reads as one more quiet meta line, not a new
+   kind of UI. No border/background of its own — a divider here would
+   reintroduce the "two lines" noise the ticket asked to remove above. */
+.es-about-tools {
+	margin: 14px 0 0;
+	font-family: var(--es-mono);
+	font-size: 11.5px;
+	letter-spacing: 0.02em;
+	color: var(--es-ink-3);
+}
+
+.es-about-tools__label {
+	color: var(--es-ink-4);
+	margin-right: 8px;
+}
+
 /* ---------- About: educación / certificados ---------- */
 
 .es-cred {
@@ -780,6 +800,13 @@
 	padding-left: 12px;
 	text-align: right;
 }
+
+/* About: Tools — el bloque de sistema estavillo/tools reemplazó la grilla
+   propia que vivía acá (final-polish ticket §4). Estilos ahora en
+   assets/css/tools.css (.es-tools/.es-tools__*), compartidos por
+   Home/About/Case Studies — ver Design System ticket. Nada que estilar en
+   este archivo: about-content.php sólo aporta el encabezado "06 Tools" de
+   sección, el grid en sí es 100% del bloque. */
 
 /* =========================================================================
    Connect — revision ticket (visual/structural correction)
@@ -1131,6 +1158,71 @@
 	border-bottom-color: var(--es-block-line);
 }
 
+/* Bajada opcional de "03 — More Work" (work_archive_lead). Se acerca al
+   encabezado (contrarresta parte del margin-bottom grande de
+   .es-section-head, pensado para separar SECCIONES, no un header de su
+   propia bajada) y deja aire antes de la grilla/el contenido de abajo. */
+.es-work-archive__lead {
+	margin-top: calc(-1 * clamp(20px, 2.4vw, 32px));
+	margin-bottom: clamp(28px, 3vw, 40px);
+	max-width: 56ch;
+}
+
+/* ---------- Work: contenido viejo del portfolio dentro de "03 — More Work"
+   (ticket "Refine Work archive hierarchy") -----------------------------
+   Ver templates/page-work.php + template-parts/work-cases.php: es el mismo
+   the_content() de siempre, capturado y reubicado — este bloque NO define
+   markup nuevo, sólo constriñe escala y tipografía para que un logo/imagen
+   vieja no compita al mismo nivel visual que Trazur o Presupuestador. Nada
+   de esto reescribe ni oculta contenido: sólo lo hace leer como lo que es,
+   trabajo anterior, no el frente de la página.
+
+   Tokens de tinta más apagados (--es-ink-2/--es-ink-3, ya usados y con
+   contraste verificado en el resto del sitio — ver el commit de
+   accesibilidad) en vez de opacity: bajar opacity además reduce el
+   contraste texto/fondo, que es exactamente lo que NO se quiere en
+   contenido que sigue queriendo ser legible, sólo secundario. */
+.es-work-archive__legacy {
+	font-size: 0.92em;
+}
+
+.es-work-archive__legacy--after-grid {
+	margin-top: clamp(40px, 4.5vw, 64px);
+	padding-top: clamp(32px, 3.5vw, 48px);
+	border-top: 1px solid var(--es-block-line);
+}
+
+.es-work-archive__legacy :where(h1, h2, h3, h4) {
+	font-size: clamp(17px, 1.8vw, 21px);
+	color: var(--es-ink-2);
+}
+
+.es-work-archive__legacy :where(p, li) {
+	color: var(--es-ink-3);
+}
+
+/* Bugfix (post-implementación): la versión anterior de esta regla ponía
+   max-height: 340px + object-fit: cover en las imágenes dentro de
+   figure/.wp-block-image, pensado para que UNA imagen legacy no ocupara la
+   pantalla completa al lado de cards de 250-300px. Pero object-fit: cover
+   RECORTA lo que no entra en esa caja — cualquier imagen de la galería
+   vieja más alta que 340px perdía la parte de arriba/abajo. Es la
+   regresión reportada ("parte de la galería quedó cortada"): no era la
+   SECCIÓN la que dejaba de crecer, era CADA imagen alta la que se
+   recortaba. Confirmado con una imagen de prueba de 1200px: renderizaba a
+   340px con la mitad recortada.
+
+   Sin tope de alto ahora: max-width/height:auto ya evita que una imagen
+   se salga del layout (nunca más ancha que su columna), y deja que cada
+   imagen ocupe el alto que le corresponde según su propia proporción — la
+   sección vuelve a crecer verticalmente según su contenido, como pedía el
+   ticket, sin alturas arbitrarias ni overflow:hidden tapando nada. */
+.es-work-archive__legacy img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 4px;
+}
+
 /* =========================================================================
    About page — Gutenberg migration (architecture ticket)
    -------------------------------------------------------------------------
@@ -1430,18 +1522,21 @@
    ones ("Show N earlier roles" / "Show N certifications") are untouched,
    they don't have a competing sibling border-top right after them. The
    next .es-exp-item's border-top remains the ONE separator per item, as
-   required. When open, the opened content gets a subtle left rule
-   instead (same visual language as .es-process-detail__note elsewhere on
-   this page) so the summary and its opened content read as one element
-   belonging to the entry, not as two things split by a rule. */
+   required.
+
+   Final-polish ticket: the opened content's own left rule (added by the
+   round-3 fix above, to visually "attach" the body to its summary) turned
+   into a SECOND vertical line competing with the one true timeline rail
+   (.es-exp-list::before, the continuous line + dot down the left edge of
+   the whole Experience list — see "About: Experience / Earlier Experience"
+   above). Dropped; a small top margin alone keeps the body read as
+   belonging to its summary without adding a second rail. */
 
 .es-exp-item .es-case-details.is-style-light summary {
 	border-bottom: none;
 }
 
 .es-exp-item .es-case-details.is-style-light[open] > .es-case-details__body {
-	border-left: 2px solid var(--es-line);
-	padding-left: 14px;
 	margin-top: 2px;
 }
 
@@ -1776,3 +1871,138 @@
 	color: var(--es-ink);
 }
 
+
+/* ---------- vistas genéricas (search / archive / index / page sin template)
+   Ver template-parts/generic-document.php. Sin lenguaje visual nuevo: el
+   listado es una fila con hairline, las mismas voces tipográficas de siempre
+   (.es-h2, .es-body) y el mismo verde de acento en hover. No hay tarjeta:
+   estas vistas son utilitarias, no una galería. ---------- */
+
+/* El page-head ya deja aire abajo (clamp 40–64px) y cierra con hairline, así
+   que el padding-top completo de .es-section (hasta 112px) abría un hueco
+   vacío de más de una pantalla de alto entre el H1 y el primer resultado.
+   Estas vistas son utilitarias: el ritmo editorial de las páginas fijas acá
+   sobra. */
+.es-generic-body {
+	padding-top: clamp(36px, 4vw, 56px);
+}
+
+.es-postlist {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	border-top: 1px solid var(--es-line);
+}
+
+.es-postlist__item {
+	border-bottom: 1px solid var(--es-line);
+}
+
+.es-postlist__link {
+	display: block;
+	padding: 26px 0;
+	text-decoration: none;
+	color: inherit;
+	transition: padding-left var(--es-dur-fast) var(--es-ease);
+}
+
+.es-postlist__link:hover {
+	padding-left: 10px;
+}
+
+.es-postlist__link:hover .es-postlist__title {
+	color: var(--es-accent);
+}
+
+.es-postlist__title {
+	margin: 0 0 6px;
+	transition: color var(--es-dur-fast) ease;
+}
+
+.es-postlist__excerpt {
+	margin: 0;
+	max-width: 62ch;
+	color: var(--es-ink-3);
+}
+
+.es-generic-empty {
+	margin: 0;
+}
+
+/* Paginación de WP (the_posts_pagination). Se estilan las clases que emite
+   el core, sin markup propio. */
+.es-pagination {
+	margin-top: 40px;
+}
+
+.es-pagination .nav-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	align-items: center;
+}
+
+.es-pagination .page-numbers {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 40px;
+	height: 40px;
+	padding: 0 12px;
+	border: 1px solid var(--es-line);
+	border-radius: 40px;
+	font-family: var(--es-mono);
+	font-size: 13px;
+	color: var(--es-ink-2);
+	text-decoration: none;
+	transition: border-color var(--es-dur-fast) ease, color var(--es-dur-fast) ease;
+}
+
+.es-pagination a.page-numbers:hover {
+	border-color: var(--es-accent);
+	color: var(--es-ink);
+}
+
+/* Página actual: mismo tratamiento que ya tenía aprobado theme-dark.css para
+   la paginación nativa (fondo de acento, texto papel). Se declara acá porque
+   esa hoja sólo se activa en las vistas que NO imprimen el chrome ESTAVILLO
+   (ver inc/theme-dark-mode.php), y esta paginación vive justamente en las
+   que sí lo imprimen. No es un segundo diseño: es el mismo, en la hoja que
+   corresponde. */
+.es-pagination .page-numbers.current {
+	background: var(--es-accent);
+	border-color: var(--es-accent);
+	color: var(--es-paper);
+}
+
+.es-pagination .page-numbers.dots {
+	border-color: transparent;
+}
+
+/* ---------- 404 ----------
+   Sin diseño nuevo: reusa .es-eyebrow / .es-h1 / .es-lead y el botón del
+   sistema (404.php). Lo único propio es el ritmo vertical, para que la
+   página no quede pegada al header en una vista tan corta. */
+
+.es-404 {
+	min-height: 52vh;
+	display: flex;
+	align-items: center;
+}
+
+.es-404__code {
+	margin-bottom: 18px;
+}
+
+.es-404__title {
+	margin-bottom: 18px;
+}
+
+.es-404__lead {
+	max-width: 46ch;
+	margin-bottom: 34px;
+}
+
+.es-404__actions {
+	margin: 0;
+}

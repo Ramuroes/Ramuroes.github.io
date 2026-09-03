@@ -97,6 +97,26 @@ if ( ! function_exists( 'es_render_nav_link' ) ) {
 }
 ?>
 
+<?php
+/*
+ * Saltar al contenido (WCAG 2.4.1, Bypass Blocks — nivel A).
+ *
+ * Antes de esto, una persona navegando por teclado o con lector de pantalla
+ * tenía que atravesar los mismos siete controles del header (marca, cuatro
+ * links, switch de idioma, botón de menú) en CADA página antes de llegar al
+ * contenido. Este link es lo primero que recibe el foco y salta directo.
+ *
+ * Va acá, en el chrome compartido, así que aparece en las trece vistas que
+ * imprimen el header: las siete con template propio y las seis genéricas.
+ * Apunta a #top, que es el id que ya llevan todos los <main> del theme, así
+ * que no hay que agregar ningún ancla nueva.
+ *
+ * Sólo se ve con foco de teclado (.es-skip-link en site.css): con el mouse
+ * nunca aparece.
+ */
+?>
+<a class="es-skip-link" href="#top"><?php echo esc_html( es__( 'skip_to_content' ) ); ?></a>
+
 <header class="es-site-header<?php echo $es_sticky ? '' : ' es-site-header--static'; ?>" data-screen-label="Nav">
 	<nav class="es-container es-nav" aria-label="<?php echo esc_attr( es__( 'nav_aria_main' ) ); ?>">
 		<?php if ( ! empty( $es_wm['image'] ) ) : ?>

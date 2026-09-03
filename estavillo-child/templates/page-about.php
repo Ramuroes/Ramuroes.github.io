@@ -50,9 +50,11 @@ if ( function_exists( 'wp_body_open' ) ) {
 		get_template_part(
 			'template-parts/page-head',
 			null,
-			array(
-				'eyebrow' => es__( 'about_eyebrow' ),
-				'title'   => es__( 'about_title' ),
+			es_page_hero_args(
+				array(
+					'eyebrow' => es__( 'about_eyebrow' ),
+					'title'   => es__( 'about_title' ),
+				)
 			)
 		);
 
