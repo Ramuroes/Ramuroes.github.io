@@ -1,0 +1,90 @@
+/* ============================================================
+   Presupuestador RE — LIGHT THEME (second supported theme)
+   ------------------------------------------------------------
+   Opt-in. Dark remains the default (:root). Activate by setting
+   data-theme="light" on <html> (or any wrapper):
+
+       <html data-theme="light">  …  </html>
+
+   This is a COLOR-ONLY remap — surfaces, ink, borders, shadows.
+   Spacing, typography, radii, hierarchy, interaction and
+   accessibility are untouched. Only the tokens declared below
+   change; everything else inherits the :root (dark) values.
+
+   Design intent:
+   · White cards on a warm off-white canvas (paper, not cold SaaS).
+   · Amber stays the single brand accent (active rail, CTA, logo,
+     recommended figure). Hover/press DARKENS amber (vs. brightens
+     on dark).
+   · Semantic hues preserved; text variants darkened + soft fills
+     lightened for legibility on white.
+   · The charcoal "feature" blocks (recommended value, totals,
+     KPI accent tile) DELIBERATELY stay dark — a premium contrast
+     anchor that keeps the industrial tone and avoids flat,
+     colorful-dashboard SaaS. (the charcoal and on-dark tokens are
+     intentionally NOT overridden, so they inherit the dark values.)
+   ============================================================ */
+[data-theme="light"]{
+  /* ---- Warm-gray / white surfaces ---- */
+  --re-canvas:        #f3f1ec;  /* app background — warm off-white */
+  --re-surface:       #ffffff;  /* cards, panels, inputs */
+  --re-surface-2:     #efece5;  /* inset / hover fill, segmented track */
+  --re-surface-3:     #e6e1d8;  /* deeper inset, slider tracks */
+
+  /* ---- Graphite ink on light ---- */
+  --re-ink:           #1b1d22;  /* primary text — graphite near-black */
+  --re-ink-2:         #474b54;  /* secondary text */
+  --re-ink-3:         #6b7079;  /* tertiary / hints */
+  --re-ink-4:         #9a9ea7;  /* faint labels, placeholders */
+
+  /* ---- Warm borders ---- */
+  --re-line:          #e7e3da;  /* hairline dividers, card borders */
+  --re-line-2:        #d9d4ca;  /* input borders */
+  --re-line-strong:   #c2bcae;  /* emphasised borders, dashed */
+
+  /* ---- Amber (same brand accent; hover/press DARKENS on light) ---- */
+  --re-amber:         #e0911e;  /* unchanged brand amber */
+  --re-amber-strong:  #c67d12;  /* hover / press — darker on light */
+  /* --re-amber-bright kept (sits on the dark charcoal feature blocks) */
+  --re-amber-soft:    rgba(224,145,30,.14);  /* tint background on white */
+  --re-amber-line:    rgba(224,145,30,.40);  /* tint border */
+  --re-amber-ink:     #9a6510;               /* amber text on white / tint */
+
+  /* ---- Semantic — hues preserved, tuned for white ---- */
+  --re-ok:            #2f9e54;
+  --re-ok-soft:       rgba(47,158,84,.12);   --re-ok-line: rgba(47,158,84,.30);
+  /* --re-ok-bright kept (on dark KPI accent tile) */
+  --re-warn:          #b9831f;  --re-warn-soft: rgba(185,131,31,.13);
+  --re-warn-line:     rgba(185,131,31,.32);  --re-warn-ink: #8a6312;
+  --re-crit:          #c2543c;  --re-crit-soft: rgba(194,84,60,.11);
+  --re-crit-line:     rgba(194,84,60,.30);
+  --re-info:          #2f72c4;  --re-info-soft: rgba(47,114,196,.10);
+  --re-info-line:     rgba(47,114,196,.30);
+
+  /* ---- Quote lifecycle status dots (on white pills) ---- */
+  --re-st-draft:      #7c828c;  /* Borrador  */
+  --re-st-sent:       #3f7fc9;  /* Enviado   */
+  --re-st-appr:       #2f9e54;  /* Aprobado  */
+  --re-st-rej:        #c2543c;  /* Rechazado */
+  --re-st-cancel:     #a2a7af;  /* Cancelado */
+
+  /* ============================================================
+     ELEVATION — soft warm shadows on light (no heavy black)
+     ============================================================ */
+  --re-shadow-sm:    0 1px 2px rgba(28,26,22,.06);
+  --re-shadow:       0 1px 2px rgba(28,26,22,.06), 0 1px 3px rgba(28,26,22,.09);
+  --re-shadow-panel: 0 10px 28px rgba(28,26,22,.14), 0 2px 6px rgba(28,26,22,.08);
+  --re-shadow-paper: 0 18px 48px rgba(28,26,22,.16), 0 4px 12px rgba(28,26,22,.08);
+  --re-shadow-bar:   0 -2px 16px rgba(28,26,22,.10);
+
+  /* focus ring — amber, a touch stronger on light */
+  --re-ring:        0 0 0 3px rgba(224,145,30,.28);
+  --re-ring-amber:  0 0 0 3px rgba(224,145,30,.34);
+}
+
+/* Give the light root a sensible base canvas + ink when the attribute
+   sits on <html>/<body> directly (mirrors base.css .re-root). */
+[data-theme="light"]{
+  background-color: var(--re-canvas);
+  color: var(--re-ink);
+}

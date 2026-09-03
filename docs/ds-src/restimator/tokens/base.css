@@ -1,0 +1,20 @@
+/* ============================================================
+   Presupuestador RE — base reset & shared primitives
+   Loaded after tokens. Keeps consumer pages consistent with
+   the frozen V1 shell without forcing a class on <body>.
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+
+svg { display: block; }
+a { color: inherit; text-decoration: none; }
+::placeholder { color: var(--re-ink-4); }
+
+/* Opt-in document styling: add class="re-root" to <body> (or a wrapper). */
+.re-root{
+  margin: 0;
+  background: var(--re-bg);
+  color: var(--re-text);
+}
+
+/* Selection uses the brand amber, lightly. */
+.re-root ::selection{ background: rgba(224,145,30,.22); }

@@ -1,0 +1,71 @@
+/* ============================================================
+   Presupuestador RE — COLOR SYSTEM (Dark Industrial)
+   Black / graphite surfaces, near-white ink, a single amber
+   brand accent. No gradients, no glass. Amber is concentrated
+   on the few moments that matter: the recommended price, the
+   active nav rail, the primary send action, the logo mark.
+   ============================================================ */
+:root{
+  /* ---- Graphite ramp (base, dark) ---- */
+  --re-canvas:        #0d0e11;  /* app background — near-black */
+  --re-surface:       #16181d;  /* cards, panels */
+  --re-surface-2:     #1d2026;  /* inset / hover fill, inputs */
+  --re-surface-3:     #262a31;  /* deeper inset, tracks */
+  --re-ink:           #f2f3f4;  /* primary text — near-white */
+  --re-ink-2:         #c2c6cc;  /* secondary text */
+  --re-ink-3:         #9197a0;  /* tertiary / hints */
+  --re-ink-4:         #7f858e;  /* faint labels, placeholders — lifted to clear WCAG AA 4.5:1 on surfaces (was #686d76 ≈ 3.4:1) */
+  --re-line:          #262a31;  /* hairline dividers, card borders */
+  --re-line-2:        #313641;  /* input borders */
+  --re-line-strong:   #434954;  /* emphasised borders, dashed */
+
+  /* ---- Deepest panels (recommended block, logo backdrop) ---- */
+  --re-charcoal:      #0a0b0e;  /* deeper than canvas */
+  --re-charcoal-2:    #14161b;
+  --re-charcoal-line: #2b2f37;
+  --re-on-dark:       #ffffff;  /* text on charcoal */
+  --re-on-dark-2:     #c2c6cc;
+  --re-on-dark-3:     #9197a0;
+
+  /* ---- Amber (brand accent) — from the REstimator mark + IDEA concept ---- */
+  --re-amber:         #e0911e;  /* brand amber — primary CTA, active rail */
+  --re-amber-strong:  #f0a634;  /* hover / press (brighter on dark) */
+  --re-amber-bright:  #f5b342;  /* recommended value, headline figures */
+  --re-amber-soft:    rgba(224,145,30,.13);  /* tint background */
+  --re-amber-line:    rgba(224,145,30,.34);  /* tint border */
+  --re-amber-ink:     #f0b45e;  /* amber text on dark tint */
+
+  /* ---- Semantic (tuned for dark) ---- */
+  --re-ok:            #52b06e;  --re-ok-bright: #6fd08a;
+  --re-ok-soft:       rgba(82,176,110,.13);  --re-ok-line: rgba(82,176,110,.32);
+  --re-warn:          #d99a3a;  --re-warn-soft: rgba(217,154,58,.12);
+  --re-warn-line:     rgba(217,154,58,.32);  --re-warn-ink: #e6c188;
+  --re-crit:          #d86a52;  --re-crit-soft: rgba(216,106,82,.13);
+  --re-crit-line:     rgba(216,106,82,.32);
+  --re-info:          #5b9be0;  --re-info-soft: rgba(91,155,224,.13);
+  --re-info-line:     rgba(91,155,224,.32);
+
+  /* ---- Quote lifecycle status (History) ---- */
+  --re-st-draft:      #8a909a;  /* Borrador  */
+  --re-st-sent:       #5b9be0;  /* Enviado   */
+  --re-st-appr:       #52b06e;  /* Aprobado  */
+  --re-st-rej:        #d86a52;  /* Rechazado */
+  --re-st-cancel:     #686d76;  /* Cancelado */
+
+  /* ============================================================
+     SEMANTIC ALIASES — prefer these in components & screens
+     ============================================================ */
+  --re-bg:            var(--re-canvas);
+  --re-text:          var(--re-ink);
+  --re-text-muted:    var(--re-ink-2);
+  --re-text-subtle:   var(--re-ink-3);
+  --re-text-faint:    var(--re-ink-4);
+  --re-border:        var(--re-line);
+  --re-border-field:  var(--re-line-2);
+  --re-border-strong: var(--re-line-strong);
+  --re-focus:         var(--re-amber);          /* focus ring color */
+  --re-accent:        var(--re-amber);
+  --re-accent-hover:  var(--re-amber-strong);
+  --re-primary:       var(--re-amber);           /* dark UI: the hero action is amber */
+  --re-primary-hover: var(--re-amber-strong);
+}

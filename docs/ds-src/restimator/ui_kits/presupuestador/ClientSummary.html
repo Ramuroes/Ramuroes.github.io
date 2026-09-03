@@ -1,0 +1,307 @@
+<!-- @dsCard group="Presupuestador RE" viewport="1440x900" name="Client Summary" subtitle="Formal quote document + estimate composer" --><!-- @startingPoint section="Presupuestador RE" subtitle="Client Summary — formal quote document + estimate composer" viewport="1440x980" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resumen para el cliente — Presupuestador RE</title>
+<link rel="stylesheet" href="kit.css">
+<style>
+  .page-head{display:flex;align-items:center;gap:var(--re-s4);margin-bottom:var(--re-s4);}
+  .page-head .eyebrow{font-size:var(--re-text-xs);font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--re-ink-4);}
+  .page-head h1{font-size:var(--re-text-2xl);font-weight:600;letter-spacing:-.02em;margin:2px 0 0;}
+  .meta-row{display:flex;align-items:center;gap:var(--re-s2);margin-top:8px;}
+  .head-actions{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:9px;}
+  .ha-btns{display:flex;gap:8px;}
+  .head-cap{font-size:12.5px;color:var(--re-ink-4);}
+  /* mode bar */
+  .mode-bar{display:flex;align-items:center;gap:var(--re-s4);margin-bottom:var(--re-s5);}
+  .mode-hint{font-size:12.5px;color:var(--re-ink-4);}
+  .content{display:grid;grid-template-columns:minmax(0,1fr) 332px;gap:var(--re-s6);align-items:start;}
+  .paper-wrap{display:flex;justify-content:center;}
+  /* The client document is a true white sheet (the printable / exportable artifact) */
+  .paper{--p-ink:#16181d;--p-ink-2:#3d424a;--p-ink-3:#6a7079;--p-ink-4:#9aa0a8;--p-line:#e6e8ec;--p-line-2:#dadde2;--p-amber:#c2761a;
+    background:#fff;border:1px solid #d4d7db;border-radius:var(--re-r-lg);box-shadow:var(--re-shadow-paper);width:100%;max-width:680px;padding:44px 48px 40px;color:var(--p-ink);}
+  .dp-head{display:flex;align-items:flex-start;gap:var(--re-s4);padding-bottom:var(--re-s5);border-bottom:2px solid var(--p-ink);}
+  .dp-brand{display:flex;align-items:center;gap:var(--re-s3);}
+  .dp-brand .lm{width:36px;height:36px;border-radius:9px;background:var(--re-amber);color:#0d0e11;display:grid;place-items:center;font-weight:700;font-size:14px;letter-spacing:.4px;}
+  .dp-brand .who b{display:block;font-size:15px;font-weight:700;letter-spacing:-.01em;}
+  .dp-brand .who span{display:block;font-size:11.5px;color:var(--p-ink-3);}
+  .dp-head .dr{margin-left:auto;text-align:right;}
+  .dp-head .dr .t{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--p-ink-4);}
+  .dp-head .dr .n{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px;}
+  .dp-head .dr .dte{font-size:12px;color:var(--p-ink-3);margin-top:2px;}
+  .dp-valid{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:var(--p-ink-2);background:#f4f5f6;border:1px solid var(--p-line-2);border-radius:20px;padding:3px 11px;margin-top:8px;}
+  .dp-valid svg{width:13px;height:13px;color:var(--p-ink-3);}
+  .dp-sec{padding:var(--re-s5) 0;border-bottom:1px solid var(--p-line);}
+  .dp-sec:last-of-type{border-bottom:0;}
+  .dp-label{font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--p-ink-4);margin-bottom:var(--re-s3);}
+  .dp-meta{display:grid;grid-template-columns:1fr 1fr;gap:var(--re-s3) var(--re-s5);}
+  .dp-meta .k{font-size:11.5px;color:var(--p-ink-4);}.dp-meta .v{font-size:13.5px;font-weight:600;color:var(--p-ink);margin-top:1px;}
+  .dp-proj{font-size:16px;font-weight:600;letter-spacing:-.01em;}
+  .dp-proj-sub{font-size:13px;color:var(--p-ink-3);margin-top:3px;max-width:480px;text-wrap:pretty;}
+  .dp-dims{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--re-s3);}
+  .dp-dim{border:1px solid var(--p-line-2);border-radius:var(--re-r-sm);padding:10px 12px;}
+  .dp-dim .k{font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--p-ink-4);}
+  .dp-dim .v{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:3px;}
+  .dp-dim .v small{font-size:11px;font-weight:500;color:var(--p-ink-4);}
+  .dp-items{width:100%;border-collapse:collapse;font-size:13.5px;}
+  .dp-items td{padding:9px 0;border-bottom:1px solid var(--p-line);vertical-align:top;}
+  .dp-items tr:last-child td{border-bottom:0;}
+  .dp-items .it b{font-weight:600;color:var(--p-ink);}.dp-items .it small{display:block;font-size:11.5px;color:var(--p-ink-4);margin-top:1px;}
+  .dp-items .amt{text-align:right;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .dp-totals{margin-top:var(--re-s4);border:1px solid var(--p-line-2);border-radius:var(--re-r);overflow:hidden;}
+  .dp-trow{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;font-size:13.5px;border-bottom:1px solid var(--p-line);background:#fff;}
+  .dp-trow .k{color:var(--p-ink-3);}.dp-trow .v{font-weight:600;font-variant-numeric:tabular-nums;}
+  .dp-trow.total{background:var(--re-charcoal);border-bottom:0;padding:14px 16px;}
+  .dp-trow.total .k{color:rgba(255,255,255,.7);font-weight:500;}
+  .dp-trow.total .v{font-size:19px;font-weight:700;letter-spacing:-.01em;color:var(--re-amber-bright);}
+  .dp-band{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--p-ink-3);background:#f7f8f9;border:1px solid var(--p-line);border-radius:var(--re-r-sm);padding:11px 13px;margin-top:var(--re-s3);line-height:1.5;}
+  .dp-band svg{width:15px;height:15px;flex:none;margin-top:1px;color:var(--p-ink-4);}.dp-band b{color:var(--p-ink-2);font-weight:600;}
+  .dp-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;}
+  .dp-list li{display:flex;gap:9px;font-size:13px;color:var(--p-ink-2);line-height:1.5;}
+  .dp-list li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--p-line-2);flex:none;margin-top:7px;}
+  .dp-warn{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:#7a5e1c;background:#faf6ed;border:1px solid #ecdfc4;border-radius:var(--re-r-sm);padding:11px 13px;line-height:1.5;}
+  .dp-warn svg{width:14px;height:14px;flex:none;margin-top:2px;color:#c2761a;}
+  .dp-warn + .dp-warn{margin-top:8px;}
+  .dp-foot{padding-top:var(--re-s5);margin-top:var(--re-s2);border-top:2px solid var(--p-ink);display:flex;align-items:flex-end;gap:var(--re-s4);}
+  .dp-foot .fc{font-size:12px;color:var(--p-ink-3);line-height:1.6;}.dp-foot .fc b{color:var(--p-ink);font-weight:600;}
+  .dp-foot .fv{margin-left:auto;text-align:right;font-size:12px;color:var(--p-ink-3);}.dp-foot .fv b{display:block;color:var(--p-ink);font-weight:600;font-size:13px;}
+  /* estimate composer */
+  .composer{width:100%;max-width:680px;}
+  .comp-head{padding:var(--re-s5) var(--re-s5) 0;}
+  .comp-title{font-size:16px;font-weight:600;letter-spacing:-.01em;}
+  .comp-sub{font-size:12.5px;color:var(--re-ink-3);margin-top:4px;}
+  .comp-summary{display:flex;gap:var(--re-s5);padding:var(--re-s4) var(--re-s5);margin:var(--re-s4) var(--re-s5) 0;background:var(--re-surface-2);border:1px solid var(--re-line);border-radius:var(--re-r);}
+  .cs-item .k{font-size:11px;color:var(--re-ink-4);}.cs-item .v{font-size:13.5px;font-weight:600;color:var(--re-ink);margin-top:2px;}
+  .comp-editor{padding:var(--re-s4) var(--re-s5) var(--re-s5);}
+  .ce-label{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--re-ink-3);margin-bottom:8px;}
+  .comp-text{width:100%;font-family:var(--re-font-sans);font-size:13.5px;color:var(--re-ink);background:var(--re-surface-2);border:1px solid var(--re-line-2);border-radius:var(--re-r-sm);padding:12px 14px;line-height:1.6;resize:vertical;outline:none;}
+  .comp-text:focus{border-color:var(--re-focus);box-shadow:var(--re-ring);}
+  .comp-actions{display:flex;gap:8px;margin-top:var(--re-s3);}
+  .rail{position:sticky;top:calc(var(--re-topbar-h) + var(--re-s5));display:flex;flex-direction:column;gap:var(--re-s4);}
+  .card-body{padding:var(--re-s4) var(--re-s5);}
+  .btn-col{display:flex;flex-direction:column;gap:8px;}
+  .opt{display:flex;align-items:center;gap:var(--re-s3);padding:10px 0;border-bottom:1px solid var(--re-line);}
+  .opt:last-child{border-bottom:0;}.opt .on{flex:1;font-size:13px;font-weight:500;color:var(--re-ink);}.opt .on small{display:block;font-size:11.5px;color:var(--re-ink-4);font-weight:400;}
+  .opt .select{width:auto;}.opt .select select{height:32px;min-width:96px;}
+  .privacy-note{display:flex;gap:9px;align-items:flex-start;font-size:12px;color:var(--re-ink-4);background:var(--re-surface);border:1px solid var(--re-line);border-radius:var(--re-r);padding:12px 13px;line-height:1.5;}
+  .privacy-note svg{width:15px;height:15px;flex:none;margin-top:1px;color:var(--re-ink-3);}.privacy-note b{color:var(--re-ink-2);font-weight:600;}
+  .sent-row{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--re-ink-4);padding-top:var(--re-s3);margin-top:var(--re-s3);border-top:1px solid var(--re-line);}
+  .sent-row svg{width:14px;height:14px;flex:none;color:var(--re-ink-4);}
+  body[data-mode="estimate"] .formal-only{display:none;}
+  body[data-mode="formal"] .estimate-only{display:none;}
+  @media (max-width:1200px){.content{grid-template-columns:1fr;}.rail{position:static;}}
+</style>
+</head>
+<body class="re-root" data-active="hist" data-crumbs="Operación|Historial|PRE-2026-0148|Resumen" data-mode="formal">
+<div class="app">
+  <aside class="sidebar" id="re-sidebar"></aside>
+  <header class="topbar" id="re-topbar"></header>
+  <main class="main">
+    <a class="back" href="History.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> Volver al historial</a>
+    <div class="page-head">
+      <div>
+        <div class="eyebrow" id="eyebrow">Resumen para el cliente</div>
+        <h1 id="docH1">Escalera recta — Mariana Soto</h1>
+        <div class="meta-row"><span class="code-chip formal-only" id="chipNum">PRE-2026-0148</span><span class="code-chip estimate-only">Estimación preliminar · sin N.º</span><span class="badge warn" id="docBadge"><span class="d"></span>Borrador — sin enviar</span></div>
+      </div>
+      <div class="head-actions">
+        <div class="ha-btns">
+          <button class="btn btn-primary" id="editBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20h4L18.5 9.5a2 2 0 0 0-2.8-2.8L5 17.2V20z" stroke-linejoin="round"/><path d="M13.5 6.5l3 3" stroke-linecap="round"/></svg> Editar</button>
+          <button class="btn" onclick="REToast('Presupuesto duplicado')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9" stroke-linecap="round"/></svg> Duplicar</button>
+        </div>
+        <div class="head-cap formal-only">Calculado 16/06/2026 · parámetros congelados v1.5.1</div>
+      </div>
+    </div>
+
+    <div class="mode-bar">
+      <div class="segmented" role="tablist">
+        <button data-mode="estimate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a8 8 0 0 0-6.9 12l-1 4 4.1-1A8 8 0 1 0 12 4z"/></svg> Estimación rápida</button>
+        <button data-mode="formal" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5"/></svg> Presupuesto formal</button>
+      </div>
+      <div class="mode-hint" id="modeHint">Documento detallado con numeración, validez y exportación a PDF.</div>
+    </div>
+
+    <div class="content">
+      <div class="paper-wrap">
+        <!-- FORMAL DOCUMENT -->
+        <article class="paper formal-only" data-screen-label="Documento cliente">
+          <header class="dp-head">
+            <div class="dp-brand"><div class="lm">RE</div><div class="who"><b>Herrería RE</b><span>Estructuras y herrería de obra · Montevideo</span></div></div>
+            <div class="dr"><div class="t">Presupuesto estimado</div><div class="n num" id="docNum">N.º PRE-2026-0148</div><div class="dte">16 de junio de 2026</div><span class="dp-valid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg> <span id="validTop">Válido hasta el 01/07/2026</span></span></div>
+          </header>
+          <section class="dp-sec"><div class="dp-label">Cliente y obra</div><div class="dp-meta">
+            <div><div class="k">Cliente</div><div class="v" id="mClient">Mariana Soto</div></div>
+            <div><div class="k">Contacto</div><div class="v num" id="mContact">099 412 387</div></div>
+            <div><div class="k">Obra</div><div class="v" id="mObra">Parque del Plata, Canelones</div></div>
+            <div><div class="k">Atendido por</div><div class="v" id="mAtendido">Ramiro Estavillo</div></div>
+          </div></section>
+          <section class="dp-sec"><div class="dp-label">Proyecto</div><div class="dp-proj" id="docProj">Escalera recta de un tramo — hierro</div><div class="dp-proj-sub" id="docProjSub">Estructura en hierro con terminación DTM (pintura al horno), baranda de un lado en caño y planchuela, y contrahuella en chapa plegada. Colocación incluida.</div></section>
+          <section class="dp-sec"><div class="dp-label">Medidas</div><div class="dp-dims" id="docDims">
+            <div class="dp-dim"><div class="k">Ancho de paso</div><div class="v num">1,00 <small>m</small></div></div>
+            <div class="dp-dim"><div class="k">Altura total</div><div class="v num">2,90 <small>m</small></div></div>
+            <div class="dp-dim"><div class="k">Avance</div><div class="v num">3,55 <small>m</small></div></div>
+            <div class="dp-dim"><div class="k">Descanso</div><div class="v">No</div></div>
+          </div></section>
+          <section class="dp-sec"><div class="dp-label">Detalle del presupuesto</div>
+            <table class="dp-items"><tbody id="docItems">
+              <tr><td class="it"><b>Fabricación — escalera recta</b><small>estructura en hierro, terminación DTM</small></td><td class="amt num">$169.000</td></tr>
+              <tr><td class="it"><b>Baranda lado izquierdo</b><small>caño y planchuela, misma terminación</small></td><td class="amt num">$14.800</td></tr>
+              <tr><td class="it"><b>Contrahuella</b><small>chapa plegada en todos los escalones</small></td><td class="amt num">$13.500</td></tr>
+              <tr><td class="it"><b>Colocación — incluida (simple)</b><small>montaje y anclajes en obra</small></td><td class="amt num">$19.700</td></tr>
+              <tr><td class="it"><b>Traslado — zona Canelones</b><small>viático por distancia de obra</small></td><td class="amt num">$2.500</td></tr>
+            </tbody></table>
+            <div class="dp-totals">
+              <div class="dp-trow"><span class="k">Subtotal</span><span class="v num" id="subVal2">$219.500</span></div>
+              <div class="dp-trow" id="rowIva"><span class="k">IVA (22%)</span><span class="v num" id="ivaVal2">$48.300</span></div>
+              <div class="dp-trow total"><span class="k" id="totalK">Total estimado</span><span class="v num" id="totalV">$267.800</span></div>
+            </div>
+            <div class="dp-band" id="bandRow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span>El valor final puede ubicarse entre <b class="num" id="bandMin">$187.000</b> y <b class="num" id="bandMax">$252.000</b> (sin IVA), según el relevamiento de medidas y condiciones en obra.</span></div>
+          </section>
+          <section class="dp-sec" id="plazoSec"><div class="dp-label">Plazo estimado</div><div class="dp-meta"><div><div class="k">Taller (fabricación)</div><div class="v">3 a 4 semanas desde la seña</div></div><div><div class="k">Colocación</div><div class="v">1 día de obra, a coordinar</div></div></div></section>
+          <section class="dp-sec"><div class="dp-label">Notas y supuestos</div><ul class="dp-list">
+            <li>Las medidas indicadas fueron informadas por el cliente y se verifican en obra antes de fabricar.</li>
+            <li>No incluye trabajos de albañilería, terminaciones de piso ni pintura de muros.</li>
+            <li>Los anclajes químicos y la fijación estructural están incluidos en la colocación.</li>
+            <li>Forma de pago: 50% de seña para iniciar fabricación, saldo contra colocación.</li>
+          </ul></section>
+          <section class="dp-sec"><div class="dp-label">A confirmar antes de fabricar</div>
+            <div class="dp-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l9 16H3l9-16z"/><path d="M12 10v4M12 17h.01"/></svg> Confirmar altura libre y condiciones de acceso para la colocación.</div>
+            <div class="dp-warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l9 16H3l9-16z"/><path d="M12 10v4M12 17h.01"/></svg> Verificar en obra el punto de apoyo superior: el avance de 3,55 m asume llegada directa a losa.</div>
+          </section>
+          <footer class="dp-foot"><div class="fc"><b>Herrería RE</b><br>Ruta 8 km 17.500, Montevideo · 098 555 210<br>contacto@herreria-re.com.uy</div><div class="fv"><b id="validFoot">Válido hasta el 01/07/2026</b>Este presupuesto es una estimación y no constituye orden de trabajo.</div></footer>
+        </article>
+
+        <!-- ESTIMATE COMPOSER -->
+        <section class="card composer estimate-only" data-screen-label="Estimación cliente">
+          <div class="comp-head"><div class="comp-title">Estimación rápida</div><div class="comp-sub">Mensaje listo para enviar al cliente — editalo y pegalo directo en WhatsApp o el correo.</div></div>
+          <div class="comp-summary">
+            <div class="cs-item"><div class="k">Cliente</div><div class="v" id="compClient">Mariana Soto</div></div>
+            <div class="cs-item"><div class="k">Producto</div><div class="v" id="compProd">Recta (Escaleras)</div></div>
+            <div class="cs-item"><div class="k">Rango estimado</div><div class="v num" id="compRange">$187.000 – $252.000 <small style="font-weight:400;color:var(--re-ink-4)">+ IVA</small></div></div>
+          </div>
+          <div class="comp-editor">
+            <div class="ce-label"><span>Texto sugerido para WhatsApp / Email</span></div>
+            <textarea class="comp-text" id="compText" rows="11" spellcheck="false">Hola Mariana.
+
+Te enviamos una estimación preliminar para Recta (Escaleras).
+
+Valor estimado:
+$187.000 – $252.000 + IVA.
+
+Este valor es orientativo y puede variar luego de la rectificación de medidas, relevamiento en obra y definición final de materiales.
+
+Si el rango está dentro de lo esperado podemos avanzar con un presupuesto más preciso.
+
+Saludos.</textarea>
+            <div class="comp-actions">
+              <button class="btn btn-accent" onclick="REToast('Copiado para WhatsApp ✓')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a8 8 0 0 0-6.9 12l-1 4 4.1-1A8 8 0 1 0 12 4z"/></svg> Copiar WhatsApp</button>
+              <button class="btn" onclick="REToast('Copiado para Email ✓')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M4 7l8 6 8-6"/></svg> Copiar Email</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="rail">
+        <div class="formal-only">
+        <section class="card">
+          <div class="card-head"><span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.6"/><circle cx="17.5" cy="6" r="2.6"/><circle cx="17.5" cy="18" r="2.6"/><path d="M8.3 10.8l6.9-3.6M8.3 13.2l6.9 3.6"/></svg></span><h2>Compartir</h2></div>
+          <div class="card-body"><div class="btn-col">
+            <button class="btn btn-accent btn-block" onclick="REToast('Abriendo WhatsApp ✓')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a8 8 0 0 0-6.9 12l-1 4 4.1-1A8 8 0 1 0 12 4z"/></svg> Enviar por WhatsApp</button>
+            <button class="btn btn-block" onclick="REToast('Borrador de correo ✓')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M4 7l8 6 8-6"/></svg> Enviar por correo</button>
+            <button class="btn btn-block" id="copyLink" onclick="REToast('Enlace copiado ✓')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13.5a4 4 0 0 0 6 .5l2.5-2.5a4 4 0 0 0-5.7-5.7L11.5 7"/><path d="M14 10.5a4 4 0 0 0-6-.5L5.5 12.5a4 4 0 0 0 5.7 5.7L12.5 17"/></svg> Copiar enlace</button>
+          </div><div class="sent-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg> Aún no se envió al cliente.</div></div>
+        </section>
+        <section class="card">
+          <div class="card-head"><span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></span><h2>Exportar</h2></div>
+          <div class="card-body"><div class="btn-col">
+            <button class="btn btn-block" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5"/></svg> Descargar PDF</button>
+            <button class="btn btn-block" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V4h12v5M6 18H4a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-2"/><rect x="6" y="14" width="12" height="7" rx="1"/></svg> Imprimir</button>
+          </div></div>
+        </section>
+        <section class="card">
+          <div class="card-head"><span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/><circle cx="9" cy="8" r="2.6" fill="var(--re-surface)"/><circle cx="15" cy="16" r="2.6" fill="var(--re-surface)"/></svg></span><h2>Opciones del resumen</h2></div>
+          <div class="card-body" style="padding-top:var(--re-s2)">
+            <div class="opt"><div class="on">IVA desglosado <small>subtotal e IVA por separado</small></div><button class="toggle sm" aria-label="Mostrar IVA desglosado" aria-pressed="true" id="optIva"></button></div>
+            <div class="opt"><div class="on">Banda estimada <small>rango posible del valor final</small></div><button class="toggle sm" aria-label="Mostrar banda estimada" aria-pressed="true" id="optBand"></button></div>
+            <div class="opt"><div class="on">Plazo estimado <small>tiempos de taller y colocación</small></div><button class="toggle sm" aria-label="Mostrar plazo estimado" aria-pressed="true" id="optPlazo"></button></div>
+            <div class="opt"><div class="on">Validez</div><div class="select"><select id="optVal"><option value="7">7 días</option><option value="15" selected>15 días</option><option value="30">30 días</option></select><span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div></div>
+          </div>
+        </section>
+        </div>
+        <div class="privacy-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.4-3 8.1-7 9.5C8 19.1 5 15.4 5 11V6l7-3z"/><path d="M9.3 11.8l2 2 3.4-3.8"/></svg><span><b>Vista del cliente.</b> Este resumen no incluye datos internos: rangos de calibración, jornales ni márgenes quedan fuera del documento.</span></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="shell.js"></script>
+<script src="quotes.js"></script>
+<script>
+  var $=function(id){return document.getElementById(id);};
+  function fmt(n){return '$'+Math.round(n).toLocaleString('es-UY');}
+  function whenReady(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn); else fn(); }
+  // ---- reopen loop: load the real estimate from ?id ----
+  var params=new URLSearchParams(location.search);
+  var QID=params.get('id');
+  var Q=(window.RE_QUOTES&&QID)?window.RE_QUOTES[QID]:null;
+  if(!Q&&QID){ try{ var ss=sessionStorage.getItem('re_quote_'+QID); if(ss)Q=JSON.parse(ss); }catch(e){} }
+  var BASE_SUB=219500, BASE_TOTAL=267800, BASE_MIN=187000, BASE_MAX=252000;
+  function patchDoc(q){
+    BASE_SUB=q.sub; BASE_TOTAL=q.total; BASE_MIN=Math.round(q.sub*0.85); BASE_MAX=Math.round(q.sub*1.15);
+    var st=(window.RE_STATUS&&window.RE_STATUS[q.status])||{label:q.status,badge:'',dot:'d-draft'};
+    $('docH1').textContent=q.title.split(' — ')[0]+' — '+q.client;
+    $('chipNum').textContent=q.num;
+    var bd=$('docBadge'); bd.className='badge '+st.badge; bd.innerHTML='<span class="d '+st.dot+'"></span>'+st.label;
+    $('docNum').textContent='N.º '+q.num;
+    $('mClient').textContent=q.client; $('mContact').textContent=q.contact; $('mObra').textContent=q.obra; $('mAtendido').textContent=q.atendido;
+    $('docProj').textContent=q.title; $('docProjSub').textContent=q.desc;
+    $('docDims').innerHTML=q.dims.map(function(d){return '<div class="dp-dim"><div class="k">'+d[0]+'</div><div class="v num">'+d[1]+'</div></div>';}).join('');
+    $('docItems').innerHTML=q.items.map(function(it){return '<tr><td class="it"><b>'+it[0]+'</b><small>'+it[1]+'</small></td><td class="amt num">'+fmt(it[2])+'</td></tr>';}).join('');
+    $('compClient').textContent=q.client; $('compProd').textContent=q.sub+' ('+q.fam+')';
+    $('compRange').innerHTML=fmt(BASE_MIN)+' – '+fmt(BASE_MAX)+' <small style="font-weight:400;color:var(--re-ink-4)">+ IVA</small>';
+    $('compText').value='Hola '+q.client.split(' ')[0]+'.\n\nTe enviamos una estimación preliminar para '+q.sub+' ('+q.fam+').\n\nValor estimado:\n'+fmt(BASE_MIN)+' – '+fmt(BASE_MAX)+' + IVA.\n\nEste valor es orientativo y puede variar luego de la rectificación de medidas, relevamiento en obra y definición final de materiales.\n\nSi el rango está dentro de lo esperado podemos avanzar con un presupuesto más preciso.\n\nSaludos.';
+    whenReady(function(){ var cr=document.querySelectorAll('#re-topbar .crumbs a, #re-topbar .crumbs b'); if(cr[2])cr[2].textContent=q.num; });
+    document.title=q.title+' — Presupuestador RE';
+  }
+  if(Q) patchDoc(Q);
+  // Editar → reopen this estimate in the Calculator (S1), carrying the id
+  $('editBtn').addEventListener('click',function(){ window.location.href='Calculator.html'+(QID?('?id='+encodeURIComponent(QID)):''); });
+  // mode switching
+  function setMode(m){
+    if(m!=='estimate'&&m!=='formal')m='formal';
+    document.body.setAttribute('data-mode',m);
+    document.querySelectorAll('.segmented button').forEach(function(b){b.setAttribute('aria-selected',b.getAttribute('data-mode')===m?'true':'false');});
+    $('eyebrow').textContent = m==='estimate'?'Estimación rápida':'Resumen para el cliente';
+    $('modeHint').textContent = m==='estimate'?'Comunicación por rango — no genera PDF ni numeración PRE/GV.':'Documento detallado con numeración, validez y exportación a PDF.';
+  }
+  document.querySelectorAll('.segmented button').forEach(function(b){b.addEventListener('click',function(){setMode(b.getAttribute('data-mode'));});});
+  // options
+  function toggle(el){el.setAttribute('aria-pressed',el.getAttribute('aria-pressed')==='true'?'false':'true');}
+  function on(id){return $(id).getAttribute('aria-pressed')==='true';}
+  function applyOptions(){
+    $('rowIva').style.display=on('optIva')?'':'none';
+    $('totalK').textContent=on('optIva')?'Total estimado':'Total estimado (sin IVA)';
+    $('subVal2').textContent=fmt(BASE_SUB);
+    $('ivaVal2').textContent=fmt(BASE_TOTAL-BASE_SUB);
+    $('totalV').textContent=on('optIva')?fmt(BASE_TOTAL):fmt(BASE_SUB);
+    $('bandMin').textContent=fmt(BASE_MIN);
+    $('bandMax').textContent=fmt(BASE_MAX);
+    $('bandRow').style.display=on('optBand')?'':'none';
+    $('plazoSec').style.display=on('optPlazo')?'':'none';
+  }
+  ['optIva','optBand','optPlazo'].forEach(function(id){$(id).addEventListener('click',function(){toggle($(id));applyOptions();});});
+  function setValidity(){
+    var base=new Date(2026,5,16), days=parseInt($('optVal').value,10)||15;
+    var d=new Date(base.getTime()+days*864e5);
+    var s=('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear();
+    $('validTop').textContent='Válido hasta el '+s; $('validFoot').textContent='Válido hasta el '+s;
+  }
+  $('optVal').addEventListener('change',setValidity);
+  // boot from ?mode
+  var m=new URLSearchParams(location.search).get('mode')||'formal';
+  setMode(m); applyOptions(); setValidity();
+</script>
+</body>
+</html>

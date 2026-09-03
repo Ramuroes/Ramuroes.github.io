@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile v1 — Spec de implementación · Presupuestador RE</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  html,body{margin:0;padding:0;}
+  body{background:#0a0b0e;color:var(--re-ink);font-family:var(--re-font-sans);font-size:14px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1,"ss01" 1;}
+  *{box-sizing:border-box;}
+  .num,.mono{font-variant-numeric:tabular-nums;}
+  .mono{font-family:var(--re-font-mono);}
+  svg{display:block;}
+  .wrap{max-width:1280px;margin:0 auto;padding:48px 40px 120px;}
+
+  /* cover */
+  .cover{border-bottom:1px solid var(--re-line);padding-bottom:var(--re-s6);margin-bottom:var(--re-s7);}
+  .brand{display:flex;align-items:center;gap:12px;margin-bottom:var(--re-s5);}
+  .logo-mark{width:34px;height:34px;border-radius:8px;background:var(--re-amber);color:#0d0e11;display:grid;place-items:center;font-weight:700;font-size:14px;letter-spacing:.5px;flex:none;}
+  .brand .pn{font-weight:600;font-size:14px;line-height:1.2;}
+  .brand .pn span{display:block;font-size:11px;color:var(--re-ink-4);font-weight:500;}
+  .eyebrow{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--re-amber-ink);}
+  h1{font-size:34px;font-weight:700;letter-spacing:-.025em;margin:12px 0 8px;}
+  .lede{font-size:16px;color:var(--re-ink-2);max-width:74ch;margin:0;text-wrap:pretty;}
+  .frozen{display:inline-flex;align-items:center;gap:8px;margin-top:var(--re-s5);font-size:12px;font-weight:600;
+    color:var(--re-ok-bright);background:var(--re-ok-soft);border:1px solid var(--re-ok-line);border-radius:var(--re-r-pill);padding:6px 14px;}
+  .frozen svg{width:14px;height:14px;}
+
+  h2.sec{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--re-ink-4);
+    margin:var(--re-s8) 0 var(--re-s5);padding-bottom:10px;border-bottom:1px solid var(--re-line);}
+
+  /* global system grid */
+  .gsys{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--re-s4);}
+  .gcard{background:var(--re-surface);border:1px solid var(--re-line);border-radius:var(--re-r-lg);padding:var(--re-s5);}
+  .gcard .k{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--re-ink-4);}
+  .gcard .v{font-size:24px;font-weight:700;letter-spacing:-.02em;margin:8px 0 4px;}
+  .gcard .v .u{font-size:13px;color:var(--re-ink-4);font-weight:500;}
+  .gcard .d{font-size:12px;color:var(--re-ink-3);line-height:1.45;}
+
+  /* screen block */
+  .screen-row{display:grid;grid-template-columns:auto 1fr;gap:var(--re-s8);align-items:start;margin-bottom:var(--re-s8);}
+  .device-wrap{display:flex;gap:var(--re-s5);}
+  .device-cap{font-size:12px;font-weight:600;color:var(--re-ink-2);margin-bottom:10px;display:flex;align-items:center;gap:9px;}
+  .device-cap .pill{font-family:var(--re-font-mono);font-size:11px;font-weight:600;color:var(--re-amber-ink);border:1px solid var(--re-amber-line);background:var(--re-amber-soft);border-radius:5px;padding:2px 7px;}
+  .device-cap .st{font-family:var(--re-font-mono);font-size:11px;color:var(--re-ink-4);}
+  .screen{background:var(--re-canvas);border:1px solid var(--re-line-2);border-radius:18px;overflow:hidden;box-shadow:0 26px 70px rgba(0,0,0,.5);}
+
+  /* spec panel */
+  .spec h3{font-size:18px;font-weight:600;letter-spacing:-.01em;margin:0 0 4px;}
+  .spec .sub{font-size:13px;color:var(--re-ink-3);margin:0 0 var(--re-s5);}
+  .spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--re-s4);}
+  .sg{background:var(--re-surface);border:1px solid var(--re-line);border-radius:var(--re-r);padding:var(--re-s4) var(--re-s5);}
+  .sg .gh{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--re-amber-ink);margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+  .sg .gh svg{width:13px;height:13px;}
+  .sg dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:7px 12px;}
+  .sg dt{font-size:12.5px;color:var(--re-ink-2);}
+  .sg dd{margin:0;font-family:var(--re-font-mono);font-size:12px;color:var(--re-ink);font-weight:500;text-align:right;}
+  .sg dd.amber{color:var(--re-amber-ink);}
+  .sg.full{grid-column:1 / -1;}
+
+  table.tb{width:100%;border-collapse:collapse;font-size:13px;border:1px solid var(--re-line);border-radius:var(--re-r-lg);overflow:hidden;}
+  table.tb th,table.tb td{text-align:left;padding:11px 15px;border-bottom:1px solid var(--re-line);vertical-align:top;}
+  table.tb thead th{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--re-ink-4);background:var(--re-surface-2);}
+  table.tb tbody td{color:var(--re-ink-2);}
+  table.tb tbody td:first-child{color:var(--re-ink);font-weight:600;}
+  table.tb tbody tr:last-child td{border-bottom:0;}
+  table.tb .mono{font-size:11.5px;color:var(--re-ink-3);}
+  table.tb .tok{font-family:var(--re-font-mono);font-size:11.5px;color:var(--re-amber-ink);}
+
+  /* ===== shared mobile component CSS (final, locked) ===== */
+  .avatar{width:34px;height:34px;border-radius:50%;background:var(--re-surface-3);color:var(--re-ink);display:grid;place-items:center;font-size:11px;font-weight:600;}
+  .lm{width:32px;height:32px;border-radius:8px;background:var(--re-amber);color:#0d0e11;display:grid;place-items:center;font-weight:700;font-size:13px;letter-spacing:.5px;flex:none;}
+  .sec-idx{width:22px;height:22px;border-radius:6px;background:var(--re-surface-2);border:1px solid var(--re-line);display:grid;place-items:center;font-size:11px;font-weight:600;color:var(--re-ink-3);flex:none;}
+  .sec-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+  .sec-title{font-size:15px;font-weight:600;letter-spacing:-.01em;}
+  .field{display:flex;flex-direction:column;gap:7px;min-width:0;}
+  .field label{font-size:12.5px;font-weight:500;color:var(--re-ink-2);}
+  .field label .opt{font-size:11px;color:var(--re-ink-4);font-weight:400;}
+  .input,.sel{width:100%;font-size:14px;color:var(--re-ink);background:var(--re-surface);border:1px solid var(--re-line-2);border-radius:var(--re-r-sm);padding:0 12px;height:42px;outline:none;display:flex;align-items:center;}
+  .sel{color:var(--re-ink-2);justify-content:space-between;cursor:pointer;}
+  .sel svg{width:15px;height:15px;color:var(--re-ink-3);}
+  .btn{font-family:var(--re-font-sans);font-size:13px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:var(--re-r-sm);border:1px solid var(--re-line-2);background:var(--re-surface);color:var(--re-ink-2);padding:0 12px;height:42px;white-space:nowrap;}
+  .btn svg{width:16px;height:16px;color:var(--re-ink-3);flex:none;}
+  .btn.primary{background:var(--re-amber);color:#0d0e11;border-color:var(--re-amber);font-weight:600;}
+  .btn.primary svg{color:#0d0e11;}
+
+  .m-shell{width:390px;height:780px;display:flex;flex-direction:column;position:relative;background:var(--re-canvas);}
+  .m-head{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--re-line);background:var(--re-surface);}
+  .m-back{width:36px;height:36px;border-radius:9px;border:1px solid var(--re-line-2);background:var(--re-surface);display:grid;place-items:center;color:var(--re-ink-2);flex:none;}
+  .m-back svg{width:18px;height:18px;}
+  .m-head .ht{font-size:17px;font-weight:600;letter-spacing:-.01em;line-height:1.15;}
+  .m-head .hs{font-size:11.5px;color:var(--re-ink-4);}
+  .m-head .brand{display:flex;align-items:center;gap:10px;}
+  .m-head .bt{font-size:15.5px;font-weight:600;line-height:1.1;}
+  .m-head .bs{font-size:11px;color:var(--re-ink-4);}
+  .m-summary{background:var(--re-charcoal);border-bottom:1px solid var(--re-charcoal-line);padding:14px 16px 13px;}
+  .m-sum-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+  .m-sum-lab{font-size:9.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--re-on-dark-3);display:flex;align-items:center;gap:6px;}
+  .m-sum-lab svg{width:11px;height:11px;color:var(--re-amber);}
+  .m-sum-big{font-size:30px;font-weight:700;letter-spacing:-.02em;color:var(--re-amber-bright);line-height:1.05;margin-top:3px;}
+  .m-sum-iva{font-size:11px;color:var(--re-on-dark-3);margin-top:1px;}
+  .m-sum-right{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:7px;}
+  .m-chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--re-on-dark-2);border:1px solid var(--re-charcoal-line);border-radius:var(--re-r-pill);padding:4px 10px;}
+  .m-rng{font-size:11.5px;color:var(--re-on-dark-3);}
+  .m-rng b{color:var(--re-on-dark-2);font-weight:600;}
+  .m-expand{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:11px;padding-top:11px;border-top:1px solid var(--re-charcoal-line);font-size:12px;font-weight:500;color:var(--re-amber-ink);}
+  .m-expand svg{width:14px;height:14px;}
+  .m-scroll{flex:1;overflow:hidden;padding:16px;display:flex;flex-direction:column;gap:14px;}
+  .m-card{background:var(--re-surface);border:1px solid var(--re-line);border-radius:var(--re-r-lg);padding:16px;}
+  .m-actionbar{position:absolute;left:0;right:0;bottom:64px;background:var(--re-surface);border-top:1px solid var(--re-line);padding:10px 14px;display:flex;gap:9px;box-shadow:0 -10px 26px rgba(0,0,0,.4);}
+  .m-actionbar .btn{flex:1;padding:0 8px;}
+  .m-actionbar .btn.primary{flex:1.4;}
+  .m-tabbar{position:absolute;left:0;right:0;bottom:0;height:64px;background:var(--re-surface);border-top:1px solid var(--re-line);display:flex;}
+  .m-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;color:var(--re-ink-4);font-weight:500;}
+  .m-tab svg{width:21px;height:21px;}
+  .m-tab.active{color:var(--re-amber-ink);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  /* inicio */
+  .greet{font-size:23px;font-weight:700;letter-spacing:-.02em;}
+  .greet-sub{font-size:13px;color:var(--re-ink-3);margin-top:4px;}
+  .greet-sub b{color:var(--re-amber-ink);font-weight:600;}
+  .eb{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--re-ink-4);}
+  .cta{display:flex;align-items:center;gap:14px;background:var(--re-charcoal);border:1px solid var(--re-charcoal-line);border-radius:var(--re-r-lg);padding:16px;}
+  .cta .ic{width:46px;height:46px;border-radius:11px;background:var(--re-amber);color:#0d0e11;display:grid;place-items:center;flex:none;}
+  .cta .ic svg{width:22px;height:22px;}
+  .cta .t{font-size:15px;font-weight:600;color:#fff;}
+  .cta .s{font-size:12px;color:var(--re-on-dark-3);margin-top:2px;}
+  .cta .arr{margin-left:auto;color:var(--re-on-dark-3);}
+  .qcard{background:var(--re-surface);border:1px solid var(--re-line);border-radius:var(--re-r-lg);padding:16px;}
+  .qcard .ic{width:38px;height:38px;border-radius:10px;background:var(--re-surface-2);border:1px solid var(--re-line);display:grid;place-items:center;color:var(--re-ink-2);margin-bottom:12px;}
+  .qcard .ic svg{width:19px;height:19px;}
+  .qcard .t{font-size:14px;font-weight:600;}
+  .qcard .s{font-size:11.5px;color:var(--re-ink-4);margin-top:2px;}
+  .recrow{display:flex;align-items:center;gap:12px;padding:13px 2px;border-bottom:1px solid var(--re-line);}
+  .recrow:last-child{border-bottom:0;}
+  .recrow .meta{min-width:0;flex:1;}
+  .recrow .code{font-family:var(--re-font-mono);font-size:10.5px;color:var(--re-ink-4);}
+  .recrow .ttl{font-size:13px;font-weight:600;letter-spacing:-.01em;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .recrow .who{font-size:11.5px;color:var(--re-ink-4);margin-top:2px;}
+  .recrow .amt{text-align:right;flex:none;}
+  .recrow .amt .v{font-size:14px;font-weight:700;letter-spacing:-.01em;}
+  .badge-st{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:500;color:var(--re-ink-3);border:1px solid var(--re-line-2);border-radius:var(--re-r-pill);padding:2px 8px;margin-top:5px;}
+  .badge-st .d{width:6px;height:6px;border-radius:50%;}
+  .d-draft{background:var(--re-st-draft);}.d-sent{background:var(--re-st-sent);}.d-appr{background:var(--re-st-appr);}
+  .tag-est{font-size:9.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--re-warn-ink);background:var(--re-warn-soft);border:1px solid var(--re-warn-line);border-radius:5px;padding:2px 6px;}
+  .seehead{display:flex;align-items:center;justify-content:space-between;}
+  .seehead a{font-size:12px;color:var(--re-amber-ink);display:inline-flex;align-items:center;gap:5px;}
+  .seehead a svg{width:13px;height:13px;}
+
+  /* historial */
+  .search{position:relative;}
+  .search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--re-ink-4);}
+  .search .input{padding-left:40px;}
+  .filters{display:flex;gap:8px;overflow:hidden;}
+  .fchip{font-size:13px;font-weight:500;color:var(--re-ink-3);background:var(--re-surface);border:1px solid var(--re-line-2);border-radius:var(--re-r-pill);padding:8px 15px;white-space:nowrap;}
+  .fchip.active{background:var(--re-amber);color:#0d0e11;border-color:var(--re-amber);font-weight:600;}
+  .hcount{font-size:11.5px;color:var(--re-ink-4);}
+  .hrow{background:var(--re-surface);border:1px solid var(--re-line);border-radius:var(--re-r-lg);padding:14px;display:flex;gap:12px;align-items:flex-start;}
+  .hrow .meta{min-width:0;flex:1;}
+  .hrow .top{display:flex;align-items:center;gap:8px;}
+  .hrow .code{font-family:var(--re-font-mono);font-size:11px;color:var(--re-ink-4);}
+  .hrow .ttl{font-size:14px;font-weight:600;letter-spacing:-.01em;margin-top:5px;}
+  .hrow .who{font-size:11.5px;color:var(--re-ink-4);margin-top:3px;}
+  .hrow .r{text-align:right;flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+  .hrow .amt{font-size:15px;font-weight:700;letter-spacing:-.01em;}
+  .ovf{width:32px;height:32px;border-radius:8px;border:1px solid var(--re-line-2);background:var(--re-surface);display:grid;place-items:center;color:var(--re-ink-3);}
+  .ovf svg{width:16px;height:16px;}
+
+  /* sheet detail */
+  .sheetwrap{width:390px;}
+  .m-sheet{background:var(--re-surface);border:1px solid var(--re-line-2);border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.5);overflow:hidden;}
+  .m-grab{width:38px;height:4px;border-radius:3px;background:var(--re-line-strong);margin:10px auto 4px;}
+  .m-sheet-head{display:flex;align-items:center;gap:10px;padding:6px 18px 12px;border-bottom:1px solid var(--re-line);}
+  .m-sheet-head .tt{font-size:15px;font-weight:600;}
+  .m-sheet-head .live{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--re-ink-3);}
+  .m-sheet-head .live .d{width:6px;height:6px;border-radius:50%;background:var(--re-ok-bright);}
+  .m-sheet-head .close{margin-left:auto;width:30px;height:30px;border-radius:8px;border:1px solid var(--re-line-2);display:grid;place-items:center;color:var(--re-ink-3);}
+  .m-sheet-head .close svg{width:16px;height:16px;}
+  .m-sheet-body{padding:16px 18px;display:flex;flex-direction:column;gap:16px;}
+  .rlabel{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--re-ink-3);margin-bottom:12px;}
+  .rlabel .step{width:17px;height:17px;border-radius:5px;background:var(--re-surface-2);border:1px solid var(--re-line);display:grid;place-items:center;font-size:9.5px;font-weight:600;color:var(--re-ink-3);flex:none;}
+  .rangev{display:flex;justify-content:space-between;align-items:flex-end;}
+  .rangev small{display:block;font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--re-ink-4);margin-bottom:2px;}
+  .rangev .v{font-size:16px;font-weight:600;letter-spacing:-.01em;}
+  .rangev .max{text-align:right;}
+  .track{position:relative;height:6px;border-radius:4px;background:var(--re-surface-3);margin-top:12px;}
+  .track .fill{position:absolute;left:8%;right:8%;top:0;bottom:0;border-radius:4px;background:var(--re-line-strong);}
+  .track .pin{position:absolute;left:46%;top:-3px;width:3px;height:12px;border-radius:2px;background:var(--re-amber);}
+  .jcells{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+  .jcell{border:1px solid var(--re-line);border-radius:var(--re-r-sm);padding:9px 6px;text-align:center;background:var(--re-surface);}
+  .jcell.rec{background:var(--re-amber-soft);border-color:var(--re-amber-line);}
+  .jcell .jn{font-size:18px;font-weight:700;}
+  .jcell.rec .jn{color:var(--re-amber-ink);}
+  .jcell .jt{font-size:9.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--re-ink-4);margin-top:2px;}
+  .totals{font-size:13px;}
+  .totals .tl{display:flex;justify-content:space-between;gap:16px;padding:4px 0;color:var(--re-ink-3);}
+  .totals .tl .n{color:var(--re-ink-2);font-weight:500;}
+  .totals .grand{margin-top:8px;padding-top:12px;border-top:1px solid var(--re-line);display:flex;justify-content:space-between;align-items:baseline;}
+  .totals .grand .gl{font-size:13px;font-weight:600;color:var(--re-ink);}
+  .totals .grand .gv{font-size:19px;font-weight:700;letter-spacing:-.015em;}
+
+  footer{border-top:1px solid var(--re-line);margin-top:var(--re-s8);padding-top:var(--re-s5);font-size:12px;color:var(--re-ink-4);display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+
+  @media (max-width:980px){.screen-row{grid-template-columns:1fr;}.gsys{grid-template-columns:1fr 1fr;}.spec-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- COVER -->
+  <header class="cover">
+    <div class="brand"><div class="logo-mark">RE</div><div class="pn">Presupuestador RE<span>REstimator · sistema de diseño</span></div></div>
+    <div class="eyebrow">Mobile v1 · Última iteración antes de implementación</div>
+    <h1>Spec de implementación — Mobile</h1>
+    <p class="lede">Versión final y bloqueada de las tres pantallas mobile core: <b style="color:var(--re-ink)">Calculadora · Inicio · Historial</b>.
+      Una sola variante por pantalla, con medidas, spacing, componentes y comportamiento sticky listos para construir en Claude Code.
+      No hay ideas nuevas ni patrones nuevos: se mantiene navegación inferior, header compacto, recomendado visible arriba y bottom sheet sólo para el desglose.</p>
+    <span class="frozen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11V7a5 5 0 0 1 10 0v4"/><rect x="5" y="11" width="14" height="9" rx="2"/></svg> Congelado para implementación · viewport base 390 × 844</span>
+  </header>
+
+  <!-- GLOBAL SYSTEM -->
+  <h2 class="sec">Sistema mobile · constantes globales</h2>
+  <div class="gsys">
+    <div class="gcard"><div class="k">Viewport base</div><div class="v">390<span class="u"> × 844</span></div><div class="d">iPhone lógico. Diseño fluido a 360–430; nada de ancho fijo salvo el canvas.</div></div>
+    <div class="gcard"><div class="k">Grilla</div><div class="v">4<span class="u"> px</span></div><div class="d">Escala <span class="mono">--re-s*</span>. Padding de pantalla 16 (s4); gap entre cards 14.</div></div>
+    <div class="gcard"><div class="k">Touch target</div><div class="v">≥ 44<span class="u"> px</span></div><div class="d">Mínimo táctil. Controles a 42 visual + área; tabs y botones cumplen.</div></div>
+    <div class="gcard"><div class="k">Safe area</div><div class="v">env()<span class="u"> bottom</span></div><div class="d">Tab bar y action bar suman <span class="mono">env(safe-area-inset-bottom)</span> al padding inferior.</div></div>
+  </div>
+
+  <table class="tb" style="margin-top:20px">
+    <thead><tr><th>Capa fija (de abajo hacia arriba)</th><th>Alto</th><th>Posición</th><th>z-index</th><th>Token base</th></tr></thead>
+    <tbody>
+      <tr><td>Bottom tab bar</td><td class="mono">64</td><td>fixed bottom 0</td><td class="mono">40</td><td class="tok">--re-surface / --re-line</td></tr>
+      <tr><td>Action bar (sólo Calculadora)</td><td class="mono">62</td><td>fixed bottom 64</td><td class="mono">35</td><td class="tok">--re-surface / shadow</td></tr>
+      <tr><td>Header compacto</td><td class="mono">~62</td><td>sticky top 0</td><td class="mono">30</td><td class="tok">--re-surface / --re-line</td></tr>
+      <tr><td>Resumen recomendado (Calculadora)</td><td class="mono">auto ~108</td><td>sticky bajo header</td><td class="mono">28</td><td class="tok">--re-charcoal</td></tr>
+      <tr><td>Bottom sheet (desglose)</td><td class="mono">máx 78%</td><td>overlay + scrim</td><td class="mono">60</td><td class="tok">--re-surface / radius 18</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ============ 1 · CALCULADORA ============ -->
+  <h2 class="sec">01 · Calculadora</h2>
+  <div class="screen-row">
+    <div class="device-wrap">
+      <div>
+        <div class="device-cap"><span class="pill">390 · default</span> Form + resumen pinneado</div>
+        <div class="screen">
+          <div class="m-shell">
+            <header class="m-head">
+              <div class="m-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></div>
+              <div><div class="ht">Calculadora</div><div class="hs">Cálculo en vivo</div></div>
+              <span class="avatar" style="margin-left:auto">RE</span>
+            </header>
+            <div class="m-summary">
+              <div class="m-sum-top">
+                <div>
+                  <div class="m-sum-lab"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 18.9 6.1 22l1.2-6.5L2.5 9.4l6.6-.9z"/></svg> Recomendado</div>
+                  <div class="m-sum-big num">$135.599</div>
+                  <div class="m-sum-iva">valor de fabricación · + IVA</div>
+                </div>
+                <div class="m-sum-right">
+                  <span class="m-chip"><span style="width:6px;height:6px;border-radius:50%;background:var(--re-ok-bright)"></span> Tamaño · Chico</span>
+                  <span class="m-rng">Rango <b class="num">$127.463–$143.735</b></span>
+                </div>
+              </div>
+              <div class="m-expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg> Ver desglose · jornales, colocación, total</div>
+            </div>
+            <div class="m-scroll">
+              <section class="m-card">
+                <div class="sec-head"><span class="sec-idx">1</span><span class="sec-title">Producto</span></div>
+                <div style="display:flex;flex-direction:column;gap:14px">
+                  <div class="field"><label>Familia</label><div class="sel">Escaleras <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div></div>
+                  <div class="field"><label>Subcategoría</label><div class="sel">Recta <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div></div>
+                </div>
+              </section>
+              <section class="m-card">
+                <div class="sec-head"><span class="sec-idx">2</span><span class="sec-title">Dimensiones</span></div>
+                <div class="grid2">
+                  <div class="field"><label>Ancho <span class="opt">m</span></label><div class="input num">0,62</div></div>
+                  <div class="field"><label>Altura <span class="opt">m</span></label><div class="input num">2,43</div></div>
+                </div>
+              </section>
+            </div>
+            <div class="m-actionbar">
+              <button class="btn primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/></svg> Guardar</button>
+              <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a8 8 0 0 0-6.9 12l-1 4 4.1-1A8 8 0 1 0 12 4z"/></svg> Estim.</button>
+              <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5"/></svg> Presup.</button>
+            </div>
+            <nav class="m-tabbar">
+              <div class="m-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg> Inicio</div>
+              <div class="m-tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 7h8M8 11h3" stroke-linecap="round"/><rect x="13.5" y="11" width="3" height="6" rx="1"/></svg> Calc</div>
+              <div class="m-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/></svg> Historial</div>
+              <div class="m-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 2.5l8 4.2v10.6L12 21.5 4 17.3V6.7z"/><path d="M4 6.7l8 4.3 8-4.3M12 11v10.5"/></svg> Catálogos</div>
+              <div class="m-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2.3"/><circle cx="8" cy="17" r="2.3"/></svg> Parám.</div>
+            </nav>
+          </div>
+        </div>
+      </div>
+      <!-- sheet state -->
+      <div class="sheetwrap">
+        <div class="device-cap"><span class="pill">390 · estado</span> Desglose — bottom sheet</div>
+        <div class="m-sheet">
+          <div class="m-grab"></div>
+          <div class="m-sheet-head"><span class="tt">Resultado</span><span class="live"><span class="d"></span> En vivo</span><span class="close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span></div>
+          <div class="m-sheet-body">
+            <div>
+              <div class="rlabel"><span class="step">1</span> Fabricación estimada</div>
+              <div class="rangev"><div><small>Mínimo</small><span class="v num">$127.463</span></div><div class="max"><small>Máximo</small><span class="v num">$143.735</span></div></div>
+              <div class="track"><div class="fill"></div><div class="pin"></div></div>
+            </div>
+            <div>
+              <div class="rlabel"><span class="step">2</span> Jornales · mano de obra</div>
+              <div class="jcells"><div class="jcell"><div class="jn num">5,3</div><div class="jt">Mín</div></div><div class="jcell rec"><div class="jn num">6,5</div><div class="jt">Rec.</div></div><div class="jcell"><div class="jn num">7,7</div><div class="jt">Máx</div></div></div>
+            </div>
+            <div>
+              <div class="rlabel"><span class="step">3</span> Subtotal</div>
+              <div class="totals"><div class="tl"><span>Fabricación recomendada</span><span class="n num">$135.599</span></div><div class="tl"><span>Colocación</span><span class="n num">$16.272</span></div><div class="grand"><span class="gl">Subtotal</span><span class="gv num">$151.871</span></div></div>
+            </div>
+            <button class="btn primary" style="height:46px;width:100%">Salida comercial</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec">
+      <h3>Calculadora</h3>
+      <p class="sub">Pantalla hero. El recomendado vive arriba (siempre visible); el desglose completo sólo aparece en el bottom sheet.</p>
+      <div class="spec-grid">
+        <div class="sg"><div class="gh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/></svg> Header</div>
+          <dl><dt>Alto</dt><dd>~62</dd><dt>Padding</dt><dd>14 · 16</dd><dt>Back btn</dt><dd>36 · r9</dd><dt>Título / sub</dt><dd>17·600 / 11,5</dd><dt>Avatar</dt><dd>34 · circle</dd></dl></div>
+        <div class="sg"><div class="gh"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 18.9 6.1 22l1.2-6.5L2.5 9.4l6.6-.9z"/></svg> Resumen recomendado</div>
+          <dl><dt>Fondo</dt><dd class="amber">--re-charcoal</dd><dt>Padding</dt><dd>14·16·13</dd><dt>Cifra</dt><dd class="amber">30·700</dd><dt>Color cifra</dt><dd class="amber">amber-bright</dd><dt>Expand</dt><dd>12·amber-ink</dd></dl></div>
+        <div class="sg"><div class="gh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10"/></svg> Form (scroll)</div>
+          <dl><dt>Padding</dt><dd>16</dd><dt>Gap cards</dt><dd>14</dd><dt>Card</dt><dd>r13 · pad 16</dd><dt>Input/select</dt><dd>h42 · r7</dd><dt>Gap campo</dt><dd>14</dd></dl></div>
+        <div class="sg"><div class="gh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="15" width="18" height="6" rx="2"/></svg> Action bar</div>
+          <dl><dt>Alto</dt><dd>62</dd><dt>Bottom</dt><dd>64 (sobre tabs)</dd><dt>Botones</dt><dd>h42 · gap 9</dd><dt>Guardar</dt><dd class="amber">primary 1.4×</dd><dt>Shadow</dt><dd>-10y arriba</dd></dl></div>
+        <div class="sg full"><div class="gh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12v6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-6"/><path d="M12 16V4M8 8l4-4 4 4" stroke-linecap="round" stroke-linejoin="round"/></svg> Bottom sheet · desglose (estado, no default)</div>
+          <dl style="grid-template-columns:1fr auto 1fr auto"><dt>Trigger</dt><dd>tap "Ver desglose"</dd><dt>Radio sup.</dt><dd>18</dd><dt>Alto máx</dt><dd>78%</dd><dt>Grab</dt><dd>38 × 4</dd><dt>Scrim</dt><dd>rgba 0.6</dd><dt>Contenido</dt><dd>rango·jornales·subtotal·CTA</dd></dl></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 2 · INICIO ============ -->
+  <h2 class="sec">02 · Inicio</h2>
+  <div class="screen-row">
+    <div class="device-wrap">
+      <div>
+        <div class="device-cap"><span class="pill">390 · default</span> Inicio</div>
+        <div class="screen">
+          <div class="m-shell">
+            <header class="m-head">
+              <div class="brand"><div class="lm">RE</div><div><div class="bt">Inicio</div><div class="bs">Presupuestador RE</div></div></div>
+              <span class="avatar" style="margin-left:auto">RE</span>
+            </header>
+            <div class="m-scroll" style="padding-bottom:18px;gap:16px">
+              <div><div class="greet">Buenos días, Ramiro</div><div class="greet-sub">Tenés <b>5 borradores</b> y <b>4 estimaciones</b> en curso.</div></div>
+              <div class="eb">Acción rápida</div>
+              <div class="cta">
+                <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+                <div><div class="t">Nuevo presupuesto</div><div class="s">Empezá una cotización en blanco</div></div>
+                <div class="arr"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></div>
+              </div>
+              <div class="grid2">
+                <div class="qcard"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 7h8M8 11h3" stroke-linecap="round"/><rect x="13.5" y="11" width="3" height="6" rx="1"/></svg></div><div class="t">Calculadora</div><div class="s">Cálculo en vivo</div></div>
+                <div class="qcard"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/></svg></div><div class="t">Historial</div><div class="s">Buscar y retomar</div></div>
+              </div>
+              <div class="seehead"><div class="eb">Presupuestos recientes</div><a href="#">Ver todo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a></div>
+              <div>
+                <div class="recrow"><div class="meta"><span class="code">GV-A-00159</span> <span class="tag-est">Estim.</span><div class="ttl">Baranda de balcón — copia</div><div class="who">Pedro Núñez · Barandas</div></div><div class="amt"><div class="v num">$96.000</div><span class="badge-st"><span class="d d-draft"></span> Borrador</span></div></div>
+                <div class="recrow"><div class="meta"><span class="code">EST-2026-014</span> <span class="tag-est">Estim.</span><div class="ttl">Baranda de balcón — inicial</div><div class="who">Pedro Núñez · Barandas</div></div><div class="amt"><div class="v num">$96.000</div><span class="badge-st"><span class="d d-sent"></span> Enviado</span></div></div>
+              </div>
+            </div>
+            <nav class="m-tabbar">
+              <div class="m-tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg> Inicio</div>
+              <div class="m-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 7h8M8 11h3" stroke-linecap="round"/><rect x="13.5" y="11" width="3" height="6" rx="1"/></svg> Calc</div>
+              <div class="m-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/></svg> Historial</div>
+              <div class="m-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 2.5l8 4.2v10.6L12 21.5 4 17.3V6.7z"/><path d="M4 6.7l8 4.3 8-4.3M12 11v10.5"/></svg> Catálogos</div>
+              <div class="m-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2.3"/><circle cx="8" cy="17" r="2.3"/></svg> Parám.</div>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec">
+      <h3>Inicio</h3>
+      <p class="sub">Una sola marca en el header (monograma = app, avatar = usuario). Recientes jerarquizados por tipografía, no por cajas pesadas.</p>
+      <div class="spec-grid">
+        <div class="sg"><div class="gh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/></svg> Header</div>
+          <dl><dt>Logo mark</dt><dd class="amber">32 · r8 amber</dd><dt>Título / sub</dt><dd>15,5·600 / 11</dd><dt>Avatar</dt><dd>34 · circle</dd><dt>Sticky</dt><dd>top 0</dd></dl></div>
+        <div class="sg"><div class="gh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg> CTA primaria</div>
+          <dl><dt>Fondo</dt><dd class="amber">--re-charcoal</dd><dt>Icon tile</dt><dd class="amber">46 · r11 amber</dd><dt>Padding</dt><dd>16</dd><dt>Radio</dt><dd>13</dd></dl></div>
+        <div class="sg"><div class="gh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="8" height="8" rx="1.5"/><rect x="13" y="4" width="8" height="8" rx="1.5"/></svg> Accesos rápidos</div>
+          <dl><dt>Grilla</dt><dd>2 col · gap 12</dd><dt>Card</dt><dd>r13 · pad 16</dd><dt>Icon tile</dt><dd>38 · r10</dd></dl></div>
+        <div class="sg"><div class="gh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h16"/></svg> Recientes</div>
+          <dl><dt>Fila</dt><dd>pad 13 · divisor</dd><dt>Código</dt><dd>mono 10,5</dd><dt>Título</dt><dd>13·600 · ellipsis</dd><dt>Status</dt><dd>StatusBadge</dd></dl></div>
+        <div class="sg full"><div class="gh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/></svg> Comportamiento sticky</div>
+          <dl style="grid-template-columns:1fr auto 1fr auto"><dt>Header</dt><dd>sticky top</dd><dt>Tab bar</dt><dd>fixed bottom</dd><dt>Contenido</dt><dd>scroll vertical</dd><dt>Action bar</dt><dd>— (no aplica)</dd></dl></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 3 · HISTORIAL ============ -->
+  <h2 class="sec">03 · Historial</h2>
+  <div class="screen-row">
+    <div class="device-wrap">
+      <div>
+        <div class="device-cap"><span class="pill">390 · default</span> Historial</div>
+        <div class="screen">
+          <div class="m-shell">
+            <header class="m-head">
+              <div class="brand"><div><div class="bt">Historial</div><div class="bs">16 presupuestos</div></div></div>
+              <button class="btn primary" style="margin-left:auto;width:42px;padding:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+            </header>
+            <div class="m-scroll" style="gap:14px;padding-bottom:18px">
+              <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><div class="input" style="color:var(--re-ink-4)">Buscar por N°, cliente, obra…</div></div>
+              <div class="filters"><div class="fchip active">Todos</div><div class="fchip">Estimaciones</div><div class="fchip">Presupuestos</div><div class="fchip">Borradores</div></div>
+              <div class="hcount">16 resultados</div>
+              <div class="hrow"><div class="meta"><div class="top"><span class="code">GV-A-00159</span> <span class="tag-est">Estim.</span></div><div class="ttl">Baranda de balcón — inicial</div><div class="who">Pedro Núñez · Barandas · 15/06</div></div><div class="r"><div class="ovf"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></div><div class="amt num">$96.000</div><span class="badge-st"><span class="d d-draft"></span> Borrador</span></div></div>
+              <div class="hrow"><div class="meta"><div class="top"><span class="code">EST-2026-013</span> <span class="tag-est">Estim.</span></div><div class="ttl">Escalera recta — 1er contacto</div><div class="who">Valentina Cruz · Escaleras · 12/06</div></div><div class="r"><div class="ovf"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></div><div class="amt num">$175.000</div><span class="badge-st"><span class="d d-appr"></span> Aprobado</span></div></div>
+            </div>
+            <nav class="m-tabbar">
+              <div class="m-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg> Inicio</div>
+              <div class="m-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 7h8M8 11h3" stroke-linecap="round"/><rect x="13.5" y="11" width="3" height="6" rx="1"/></svg> Calc</div>
+              <div class="m-tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/></svg> Historial</div>
+              <div class="m-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 2.5l8 4.2v10.6L12 21.5 4 17.3V6.7z"/><path d="M4 6.7l8 4.3 8-4.3M12 11v10.5"/></svg> Catálogos</div>
+              <div class="m-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2.3"/><circle cx="8" cy="17" r="2.3"/></svg> Parám.</div>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec">
+      <h3>Historial</h3>
+      <p class="sub">Fila = tap para abrir (acción dominante). Editar / Duplicar van en el overflow ⋯. Filtros en una línea con scroll horizontal y activo amber sólido.</p>
+      <div class="spec-grid">
+        <div class="sg"><div class="gh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg> Búsqueda</div>
+          <dl><dt>Input</dt><dd>h42 · r7</dd><dt>Pad izq</dt><dd>40 (icono)</dd><dt>Icono</dt><dd>17 · ink-4</dd></dl></div>
+        <div class="sg"><div class="gh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="9" width="6" height="6" rx="3"/><rect x="11" y="9" width="10" height="6" rx="3"/></svg> Filtros</div>
+          <dl><dt>Chip</dt><dd>pad 8·15 · pill</dd><dt>Gap</dt><dd>8</dd><dt>Activo</dt><dd class="amber">amber sólido</dd><dt>Overflow</dt><dd>scroll-x</dd></dl></div>
+        <div class="sg"><div class="gh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/></svg> Fila</div>
+          <dl><dt>Card</dt><dd>r13 · pad 14</dd><dt>Código</dt><dd>mono 11</dd><dt>Título</dt><dd>14·600</dd><dt>Monto</dt><dd>15·700</dd></dl></div>
+        <div class="sg"><div class="gh"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg> Acciones</div>
+          <dl><dt>Abrir</dt><dd>tap fila</dd><dt>Overflow ⋯</dt><dd>32 · r8</dd><dt>Menú</dt><dd>Editar·Duplicar</dd><dt>Status</dt><dd>StatusBadge</dd></dl></div>
+        <div class="sg full"><div class="gh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/></svg> Comportamiento sticky</div>
+          <dl style="grid-template-columns:1fr auto 1fr auto"><dt>Header + acción “+”</dt><dd>sticky top</dd><dt>Tab bar</dt><dd>fixed bottom</dd><dt>Búsqueda + filtros</dt><dd>scrollean con lista</dd><dt>Action bar</dt><dd>— (no aplica)</dd></dl></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPONENT INVENTORY -->
+  <h2 class="sec">Inventario de componentes · mapeo al Design System</h2>
+  <table class="tb">
+    <thead><tr><th>Componente</th><th>Pantallas</th><th>Estado en el DS</th><th>Nota de implementación</th></tr></thead>
+    <tbody>
+      <tr><td>AppShell · mobile</td><td>las 3</td><td>extender</td><td>Modo bottom-tab del <span class="tok">AppShell</span> existente. 5 tabs: Inicio · Calc · Historial · Catálogos · Parám.</td></tr>
+      <tr><td>BottomTabBar</td><td>las 3</td><td>nuevo</td><td>h64, fixed, +safe-area. Iconos 21, label 10. Activo = amber-ink. Usa <span class="tok">TaxonomyIcon</span>.</td></tr>
+      <tr><td>MobileHeader</td><td>las 3</td><td>nuevo (variante Topbar)</td><td>Compacto: back+título (Calc) o marca+título (Inicio/Historial). Sin breadcrumbs.</td></tr>
+      <tr><td>ResultSummary (pinned)</td><td>Calculadora</td><td>nuevo (variante ResultPanel)</td><td>Bloque charcoal sticky: recomendado + rango + tamaño + “Ver desglose”.</td></tr>
+      <tr><td>ResultSheet (desglose)</td><td>Calculadora</td><td>nuevo (variante ResultPanel)</td><td>Bottom sheet overlay. Mismos pasos del panel desktop, sin override editable inline.</td></tr>
+      <tr><td>BottomActionBar</td><td>Calculadora</td><td>nuevo</td><td>Guardar (primary) · Estimación · Presupuesto. Sobre la tab bar.</td></tr>
+      <tr><td>Card · Field · Input · Select</td><td>las 3</td><td>reutilizar</td><td>Sin cambios de API. Altura de control 42 en mobile.</td></tr>
+      <tr><td>Button</td><td>las 3</td><td>reutilizar</td><td>primary = amber; secundario = surface + hairline.</td></tr>
+      <tr><td>FilterChips</td><td>Historial</td><td>nuevo</td><td>Una línea, scroll-x, activo amber sólido.</td></tr>
+      <tr><td>RowActions (overflow)</td><td>Historial</td><td>ajustar</td><td>Acción dominante por tap; secundarias en menú ⋯.</td></tr>
+      <tr><td>StatusBadge · Badge</td><td>Inicio · Historial</td><td>reutilizar</td><td>Punto de estado sobre pill neutra (draft/sent/appr…).</td></tr>
+    </tbody>
+  </table>
+
+  <footer>
+    <span>Presupuestador RE · Mobile v1 — congelado para implementación</span>
+    <span class="mono">Calculadora · Inicio · Historial · viewport 390</span>
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,70 @@
+/* ============================================================
+   Presupuestador RE — TYPOGRAPHY  ·  FROZEN (2026-06-16)
+   Typeface pairing is final — do not re-explore.
+     · Primary UI       : Hanken Grotesk (400/500/600/700)
+     · Technical / codes: JetBrains Mono (400/500/600)
+   Hanken for everything UI; JetBrains Mono for codes, IDs and
+   tabular figures. Tight tracking on headings, tabular numerals
+   everywhere money/measurements appear.
+   ============================================================ */
+:root{
+  /* ---- Families ---- */
+  --re-font-sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --re-font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* ---- Type scale (px) ---- */
+  --re-text-display: 40px;  /* the "recommended" hero number */
+  --re-text-2xl:     23px;  /* page H1 */
+  --re-text-xl:      21px;  /* compact page H1 */
+  --re-text-lg:      17px;  /* section H2 */
+  --re-text-md:      14.5px;/* card titles */
+  --re-text-base:    14px;  /* body / controls */
+  --re-text-sm:      13px;  /* secondary body, table cells */
+  --re-text-xs:      12px;  /* hints, captions */
+  --re-text-2xs:     11px;  /* eyebrows, uppercase labels */
+
+  /* ---- Weights ---- */
+  --re-fw-regular:   400; /* @kind font */
+  --re-fw-medium:    500; /* @kind font */
+  --re-fw-semibold:  600; /* @kind font */
+  --re-fw-bold:      700; /* @kind font */
+
+  /* ---- Line heights ---- */
+  --re-lh-tight:     1.15; /* @kind font */
+  --re-lh-snug:      1.35; /* @kind font */
+  --re-lh-normal:    1.45; /* @kind font */
+  --re-lh-relaxed:   1.6;  /* @kind font */
+
+  /* ---- Tracking ---- */
+  --re-ls-body:      -0.005em;
+  --re-ls-heading:   -0.02em;
+  --re-ls-tight:     -0.01em;
+  --re-ls-eyebrow:    0.06em;  /* uppercase labels */
+  --re-ls-caps:       0.05em;
+}
+
+/* Base document type — applied by consumers via .re-root or body */
+.re-root,
+body.re-root{
+  font-family: var(--re-font-sans);
+  font-size: var(--re-text-base);
+  line-height: var(--re-lh-normal);
+  letter-spacing: var(--re-ls-body);
+  color: var(--re-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+}
+
+/* Tabular figures — money, measurements, codes, dates */
+.re-num{ font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+.re-mono{ font-family: var(--re-font-mono); }
+
+/* Eyebrow / section kicker */
+.re-eyebrow{
+  font-size: var(--re-text-2xs);
+  font-weight: var(--re-fw-semibold);
+  letter-spacing: var(--re-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--re-text-faint);
+}

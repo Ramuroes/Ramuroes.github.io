@@ -1,0 +1,283 @@
+<!-- @dsCard group="Presupuestador RE" viewport="1440x980" name="Catalogs (list)" subtitle="S4 — base products / adjustments / finishes, calibration badges, parent of the editor" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogos — Presupuestador RE</title>
+<link rel="stylesheet" href="kit.css">
+<style>
+  /* tabs + toolbar */
+  .cat-tabs{display:flex;align-items:center;gap:var(--re-s4);margin-bottom:var(--re-s5);flex-wrap:wrap;}
+  .seg-tabs{display:inline-flex;background:var(--re-surface-2);border:1px solid var(--re-line-2);border-radius:var(--re-r-sm);padding:3px;gap:2px;}
+  .seg-tabs button{font-family:var(--re-font-sans);font-size:var(--re-text-sm);font-weight:500;color:var(--re-ink-3);background:transparent;
+    border:0;padding:8px 15px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .12s,color .12s;}
+  .seg-tabs button svg{width:16px;height:16px;color:var(--re-ink-4);}
+  .seg-tabs button .cnt{font-size:11px;font-weight:600;color:var(--re-ink-4);background:var(--re-surface);border:1px solid var(--re-line-2);border-radius:20px;padding:0 7px;min-width:20px;text-align:center;line-height:18px;}
+  .seg-tabs button[aria-selected="true"]{background:var(--re-surface);color:var(--re-ink);font-weight:600;box-shadow:var(--re-shadow-sm);}
+  .seg-tabs button[aria-selected="true"] svg{color:var(--re-ink);}
+  .seg-tabs button[aria-selected="true"] .cnt{color:var(--re-amber-ink);border-color:var(--re-amber-line);background:var(--re-amber-soft);}
+  .cat-tools{margin-left:auto;display:flex;align-items:center;gap:var(--re-s3);}
+
+  /* calibration health strip */
+  .health{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--re-s3);margin-bottom:var(--re-s5);}
+  .health .kv .v{font-size:22px;}
+  .health .kv .v .u{font-size:13px;font-weight:500;color:var(--re-ink-4);}
+  .health .kv .v.ok-c{color:var(--re-ok-bright);}
+  .health .kv .v.warn-c{color:var(--re-warn);}
+
+  /* filter row */
+  .cat-filters{display:flex;align-items:center;gap:var(--re-s3);padding:var(--re-s4) var(--re-s5);}
+  .cat-filters .control{flex:1;min-width:220px;}
+  .cat-filters .control .prefix{left:13px;}
+  .cat-filters .input.with-prefix{padding-left:38px;height:40px;}
+  .cat-filters .field{min-width:170px;}
+
+  /* family icon tile */
+  .fam-cell{display:flex;align-items:center;gap:11px;}
+  .fam-ico{width:34px;height:34px;border-radius:9px;background:var(--re-surface-2);border:1px solid var(--re-line);display:grid;place-items:center;color:var(--re-ink-2);flex:none;}
+  .fam-ico svg{width:18px;height:18px;}
+  tr:hover .fam-ico{border-color:var(--re-line-strong);color:var(--re-ink);}
+  .prod-name{font-weight:600;color:var(--re-ink);}
+  .prod-fam{font-size:11.5px;color:var(--re-ink-4);}
+
+  .range-recom{font-weight:600;color:var(--re-ink);font-variant-numeric:tabular-nums;}
+  .range-band{display:block;font-size:11px;color:var(--re-ink-4);font-variant-numeric:tabular-nums;margin-top:1px;}
+
+  /* calibration badge variants */
+  .badge.recal{color:var(--re-warn);border-color:var(--re-warn-line);background:var(--re-warn-soft);}
+  .badge.recal .d{background:var(--re-warn);}
+  .badge.uncal{color:var(--re-crit);border-color:var(--re-crit-line);background:var(--re-crit-soft);}
+  .badge.uncal .d{background:var(--re-crit);}
+  .calmeta{display:block;font-size:11px;color:var(--re-ink-4);margin-top:3px;}
+
+  .estado-cell{display:inline-flex;align-items:center;gap:9px;}
+  .estado-cell .lbl{font-size:12px;color:var(--re-ink-3);min-width:50px;}
+  .estado-cell .lbl.off{color:var(--re-ink-4);}
+
+  .factor-pill{font-family:var(--re-font-mono);font-size:12.5px;font-weight:600;color:var(--re-ink);background:var(--re-surface-2);border:1px solid var(--re-line-2);border-radius:6px;padding:2px 9px;font-variant-numeric:tabular-nums;}
+  .adj-val{font-weight:600;color:var(--re-ink);font-variant-numeric:tabular-nums;}
+  .adj-kind{font-size:11.5px;color:var(--re-ink-4);}
+  .applies{display:inline-flex;flex-wrap:wrap;gap:4px;}
+  .applies .chip{font-size:11px;color:var(--re-ink-3);background:var(--re-surface-2);border:1px solid var(--re-line-2);border-radius:5px;padding:2px 8px;}
+  .def-tag{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--re-amber-ink);background:var(--re-amber-soft);border:1px solid var(--re-amber-line);border-radius:5px;padding:2px 7px;}
+
+  .add-row td{padding:0!important;}
+  .add-inner{display:flex;}
+  .btn-add-row{flex:1;border:0;background:transparent;color:var(--re-ink-3);font-family:var(--re-font-sans);font-size:13px;font-weight:500;
+    display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;cursor:pointer;border-top:1px dashed var(--re-line-strong);transition:background .12s,color .12s;}
+  .btn-add-row:hover{background:var(--re-surface-2);color:var(--re-ink);}
+  .btn-add-row svg{width:16px;height:16px;}
+
+  .qagate{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--re-ink-3);padding:12px var(--re-s5);border-top:1px solid var(--re-line);background:var(--re-surface-2);}
+  .qagate svg{width:15px;height:15px;flex:none;color:var(--re-ink-4);}
+  .qagate b{color:var(--re-ink-2);font-weight:600;}
+  .qagate a{color:var(--re-amber-ink);font-weight:600;margin-left:auto;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+  .qagate a svg{color:var(--re-amber-ink);}
+</style>
+</head>
+<body class="re-root" data-active="cat" data-crumbs="Configuración|Catálogos">
+<div class="app">
+  <aside class="sidebar" id="re-sidebar"></aside>
+  <header class="topbar" id="re-topbar"></header>
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <div class="eyebrow">Configuración · Owner</div>
+        <h1>Catálogos</h1>
+        <div class="sub">Productos base, ajustes y terminaciones que alimentan la calculadora. Toda edición se publica a producción pasando por QA de regresión.</div>
+      </div>
+      <div class="head-right">
+        <span class="code-chip" title="Versión de parámetros activa">PARÁM · v1.5.1</span>
+        <button class="btn btn-primary" id="newBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> Nuevo producto</button>
+      </div>
+    </div>
+
+    <!-- calibration health -->
+    <div class="health">
+      <div class="kv"><div class="k">Productos base</div><div class="v num">18</div><div class="vs">9 familias · escala MVP2</div></div>
+      <div class="kv"><div class="k">Calibrados</div><div class="v num ok-c">14<span class="u"> / 18</span></div><div class="vs">dentro de banda de confianza</div></div>
+      <div class="kv"><div class="k">Por recalibrar</div><div class="v num warn-c">3</div><div class="vs">rango con &gt; 90 días o cierres fuera de banda</div></div>
+      <div class="kv accent"><div class="k">Última publicación</div><div class="v">06/06/2026</div><div class="vs"><span class="dotok" style="display:inline-block;vertical-align:middle;margin-right:6px"></span>QA v1.5.1 · en verde</div></div>
+    </div>
+
+    <!-- tabs -->
+    <div class="cat-tabs">
+      <div class="seg-tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-tab="base"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3l7.5 4v10L12 21l-7.5-4V7L12 3z"/><path d="M4.7 7L12 11l7.3-4M12 11v10"/></svg> Productos base <span class="cnt" id="cnt-base">18</span></button>
+        <button role="tab" aria-selected="false" data-tab="adj"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 8h10M18 8h2M4 16h2M10 16h10"/><circle cx="16" cy="8" r="2.4"/><circle cx="8" cy="16" r="2.4"/></svg> Ajustes y extras <span class="cnt" id="cnt-adj">7</span></button>
+        <button role="tab" aria-selected="false" data-tab="fin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 3l2 2-9.5 9.5-3 1 1-3L19 3z"/><path d="M4 21c2-3 4-4 7-4"/></svg> Terminaciones <span class="cnt" id="cnt-fin">5</span></button>
+      </div>
+    </div>
+
+    <section class="card table-card">
+      <div class="cat-filters">
+        <div class="control"><span class="prefix"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></span><input class="input with-prefix" id="q" type="text" placeholder="Buscar por nombre o código…"></div>
+        <div class="field" id="famWrap"><div class="select"><select id="fFam"><option>Todas las familias</option><option>Escaleras</option><option>Barandas</option><option>Rejas</option><option>Cerramientos</option><option>Puertas</option><option>Portones</option></select><span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div></div>
+        <div class="field"><div class="select"><select id="fState"><option>Todos los estados</option><option>Calibrado</option><option>Por recalibrar</option><option>Sin calibrar</option><option>Inactivo</option></select><span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div></div>
+      </div>
+
+      <div class="table-scroll"><table class="grid" id="tbl">
+        <thead id="thead"></thead>
+        <tbody id="rows"></tbody>
+      </table></div>
+
+      <div class="qagate">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+        <span><b>Ninguna edición de catálogo llega a producción sin pasar por QA.</b> Editar un producto deja cambios pendientes hasta una corrida en verde.</span>
+        <a href="QA.html">Ir a QA de regresión <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="shell.js"></script>
+<script>
+  var $=function(id){return document.getElementById(id);};
+
+  var FAM_ICON={
+    Escaleras:'<path d="M4 20H8V15H12V10H16V5H20"/>',
+    Barandas:'<path d="M3 7H21"/><path d="M3 19H21"/><path d="M6 7V19M10 7V19M14 7V19M18 7V19"/>',
+    Rejas:'<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9.33 4V20M14.67 4V20"/><path d="M4 9.33H20M4 14.67H20"/>',
+    Cerramientos:'<rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M12 4V20"/><path d="M10.2 10.5V13.5M13.8 10.5V13.5"/>',
+    Puertas:'<rect x="6.5" y="3" width="11" height="18" rx="1"/><circle cx="14.2" cy="12" r="1"/><path d="M4 21H20"/>',
+    Portones:'<rect x="4" y="5" width="16" height="12" rx="1"/><path d="M8 5V17M12 5V17M16 5V17"/><path d="M4 11H20"/><path d="M2 20H22"/><circle cx="8" cy="18.6" r="1.3"/><circle cx="16" cy="18.6" r="1.3"/>'
+  };
+  function famSvg(fam){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(FAM_ICON[fam]||'')+'</svg>';}
+
+  // calibration: cal | recal | uncal ; active: true/false
+  var CAL={cal:{cls:'ok',lbl:'Calibrado'},recal:{cls:'recal',lbl:'Por recalibrar'},uncal:{cls:'uncal',lbl:'Sin calibrar'}};
+
+  var BASE=[
+    {code:'ESC-RECT',fam:'Escaleras',sub:'Recta',method:'Unidad',rec:'$169.000',band:'$105.000 – $252.000',cal:'cal',calwhen:'03/06',active:true},
+    {code:'ESC-CARA',fam:'Escaleras',sub:'Caracol',method:'Unidad',rec:'$214.000',band:'$150.000 – $310.000',cal:'cal',calwhen:'28/05',active:true},
+    {code:'ESC-U',fam:'Escaleras',sub:'U / con descanso',method:'Unidad',rec:'$248.000',band:'$180.000 – $360.000',cal:'recal',calwhen:'92 días',active:true},
+    {code:'BAR-BALC',fam:'Barandas',sub:'Balcón',method:'Metro lineal',rec:'$7.800',band:'$5.200 – $11.400 /m',cal:'cal',calwhen:'30/05',active:true},
+    {code:'BAR-ESC',fam:'Barandas',sub:'Escalera caño',method:'Metro lineal',rec:'$6.400',band:'$4.100 – $9.800 /m',cal:'cal',calwhen:'30/05',active:true},
+    {code:'BAR-TERR',fam:'Barandas',sub:'Terraza',method:'Metro lineal',rec:'$8.600',band:'$5.900 – $12.700 /m',cal:'recal',calwhen:'fuera de banda',active:true},
+    {code:'REJ-FIJA',fam:'Rejas',sub:'Fija',method:'Metro cuadrado',rec:'$4.300',band:'$2.900 – $6.800 /m²',cal:'cal',calwhen:'21/05',active:true},
+    {code:'REJ-COR',fam:'Rejas',sub:'Corrediza',method:'Metro cuadrado',rec:'$5.900',band:'$3.800 – $9.100 /m²',cal:'cal',calwhen:'21/05',active:true},
+    {code:'CER-PATIO',fam:'Cerramientos',sub:'Patio',method:'Metro cuadrado',rec:'$6.100',band:'$4.000 – $9.400 /m²',cal:'cal',calwhen:'14/05',active:true},
+    {code:'CER-DEP',fam:'Cerramientos',sub:'Depósito',method:'Metro cuadrado',rec:'$5.400',band:'$3.600 – $8.200 /m²',cal:'uncal',calwhen:'sin sesión',active:false},
+    {code:'PUE-SIMP',fam:'Puertas',sub:'Simple',method:'Unidad',rec:'$92.000',band:'$64.000 – $138.000',cal:'cal',calwhen:'09/05',active:true},
+    {code:'PUE-DOBL',fam:'Puertas',sub:'Doble hoja',method:'Unidad',rec:'$176.000',band:'$120.000 – $258.000',cal:'cal',calwhen:'09/05',active:true},
+    {code:'POR-CORR',fam:'Portones',sub:'Corredizo',method:'Unidad',rec:'$432.000',band:'$310.000 – $620.000',cal:'cal',calwhen:'02/05',active:true},
+    {code:'POR-BAT',fam:'Portones',sub:'Batiente',method:'Unidad',rec:'$268.000',band:'$190.000 – $390.000',cal:'recal',calwhen:'97 días',active:true},
+  ];
+
+  var ADJ=[
+    {code:'AJ-COL-S',name:'Colocación simple',kind:'Porcentaje',val:'+ 10%',applies:['Todas'],active:true},
+    {code:'AJ-COL-C',name:'Colocación compleja',kind:'Porcentaje',val:'+ 15%',applies:['Todas'],active:true},
+    {code:'AJ-VIAT',name:'Viático fuera de zona',kind:'Monto fijo',val:'$ por km',applies:['Todas'],active:true},
+    {code:'AJ-DESC',name:'Descanso intermedio',kind:'Monto fijo',val:'$ 42.000',applies:['Escaleras'],active:true},
+    {code:'AJ-PASA',name:'Pasamanos adicional',kind:'Metro lineal',val:'$ 4.800 /m',applies:['Escaleras','Barandas'],active:true},
+    {code:'AJ-CERR',name:'Cerradura reforzada',kind:'Monto fijo',val:'$ 6.500',applies:['Puertas','Portones'],active:true},
+    {code:'AJ-URG',name:'Urgencia (entrega ≤ 10 días)',kind:'Porcentaje',val:'+ 12%',applies:['Todas'],active:false},
+  ];
+
+  var FIN=[
+    {code:'FIN-DTM',name:'DTM — pintura al horno',factor:'× 1.00',def:true,active:true,note:'por defecto'},
+    {code:'FIN-GALV',name:'Galvanizado',factor:'× 1.15',def:false,active:true,note:''},
+    {code:'FIN-ESP',name:'Pintura especial',factor:'× 1.25',def:false,active:true,note:''},
+    {code:'FIN-EPOX',name:'Epoxi anticorrosivo',factor:'× 1.32',def:false,active:true,note:''},
+    {code:'FIN-SIN',name:'Sin tratamiento',factor:'× 0.92',def:false,active:false,note:''}
+  ];
+
+  var TAB='base';
+
+  var HEAD={
+    base:'<tr><th>Producto</th><th>Código</th><th>Método</th><th>Recomendado · banda</th><th>Calibración</th><th>Estado</th><th class="right">Acciones</th></tr>',
+    adj:'<tr><th>Ajuste / extra</th><th>Código</th><th>Tipo</th><th class="right">Valor</th><th>Aplica a</th><th>Estado</th><th class="right">Acciones</th></tr>',
+    fin:'<tr><th>Terminación</th><th>Código</th><th class="right">Factor</th><th>Por defecto</th><th>Estado</th><th class="right">Acciones</th></tr>'
+  };
+
+  var ICON={edit:'<path d="M4 20h4L18.5 9.5a2 2 0 0 0-2.8-2.8L5 17.2V20z" stroke-linejoin="round"/><path d="M13.5 6.5l3 3" stroke-linecap="round"/>',dup:'<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9" stroke-linecap="round"/>'};
+  function act(name,title,path,danger){return '<button class="act'+(danger?' danger':'')+'" data-act="'+name+'" title="'+title+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">'+path+'</svg></button>';}
+  function calBadge(r){var c=CAL[r.cal];return '<span class="badge '+c.cls+'"><span class="d"></span>'+c.lbl+'</span><span class="calmeta">'+(r.cal==='cal'?'última '+r.calwhen:r.calwhen)+'</span>';}
+  function estadoCell(active,name){return '<span class="estado-cell"><button class="toggle sm" aria-label="'+(active?'Desactivar':'Activar')+' '+(name||'elemento').replace(/"/g,'')+'" aria-pressed="'+(active?'true':'false')+'" onclick="event.stopPropagation();this.setAttribute(\'aria-pressed\',this.getAttribute(\'aria-pressed\')===\'true\'?\'false\':\'true\');this.nextElementSibling.textContent=this.getAttribute(\'aria-pressed\')===\'true\'?\'Activo\':\'Inactivo\';this.nextElementSibling.className=this.getAttribute(\'aria-pressed\')===\'true\'?\'lbl\':\'lbl off\';"></button><span class="lbl'+(active?'':' off')+'">'+(active?'Activo':'Inactivo')+'</span></span>';}
+
+  function matches(hay){var q=($('q').value||'').trim().toLowerCase();return !q || hay.toLowerCase().indexOf(q)>=0;}
+  function stateOk(r){
+    var st=$('fState').value;
+    if(st.indexOf('Todos')>=0)return true;
+    if(st==='Inactivo')return !r.active;
+    if(r.cal&&CAL[r.cal])return CAL[r.cal].lbl===st;
+    return true;
+  }
+  function famOk(r){var f=$('fFam').value;return f.indexOf('Todas')>=0 || r.fam===f;}
+
+  function render(){
+    $('thead').innerHTML=HEAD[TAB];
+    var html='', rows;
+    if(TAB==='base'){
+      rows=BASE.filter(function(r){return matches(r.sub+' '+r.fam+' '+r.code) && famOk(r) && stateOk(r);});
+      html=rows.map(function(r){return '<tr data-code="'+r.code+'">'+
+        '<td><div class="fam-cell"><span class="fam-ico">'+famSvg(r.fam)+'</span><span><span class="prod-name">'+r.sub+'</span><span class="prod-fam">'+r.fam+'</span></span></div></td>'+
+        '<td><span class="code-chip">'+r.code+'</span></td>'+
+        '<td><span class="method-tag">'+r.method+'</span></td>'+
+        '<td><span class="range-recom">'+r.rec+'</span><span class="range-band">'+r.band+'</span></td>'+
+        '<td>'+calBadge(r)+'</td>'+
+        '<td>'+estadoCell(r.active,r.sub)+'</td>'+
+        '<td class="right"><div class="row-actions">'+act('edit','Editar producto',ICON.edit)+act('dup','Duplicar',ICON.dup)+'</div></td>'+
+      '</tr>';}).join('');
+    } else if(TAB==='adj'){
+      rows=ADJ.filter(function(r){return matches(r.name+' '+r.code) && stateOk(r);});
+      html=rows.map(function(r){return '<tr data-code="'+r.code+'">'+
+        '<td><span class="prod-name">'+r.name+'</span></td>'+
+        '<td><span class="code-chip">'+r.code+'</span></td>'+
+        '<td><span class="adj-kind">'+r.kind+'</span></td>'+
+        '<td class="right"><span class="adj-val">'+r.val+'</span></td>'+
+        '<td><span class="applies">'+r.applies.map(function(a){return '<span class="chip">'+a+'</span>';}).join('')+'</span></td>'+
+        '<td>'+estadoCell(r.active,r.name)+'</td>'+
+        '<td class="right"><div class="row-actions">'+act('edit','Editar ajuste',ICON.edit)+act('dup','Duplicar',ICON.dup)+'</div></td>'+
+      '</tr>';}).join('');
+    } else {
+      rows=FIN.filter(function(r){return matches(r.name+' '+r.code) && stateOk(r);});
+      html=rows.map(function(r){return '<tr data-code="'+r.code+'">'+
+        '<td><span class="prod-name">'+r.name+'</span>'+(r.note?' <span class="adj-kind">· '+r.note+'</span>':'')+'</td>'+
+        '<td><span class="code-chip">'+r.code+'</span></td>'+
+        '<td class="right"><span class="factor-pill">'+r.factor+'</span></td>'+
+        '<td>'+(r.def?'<span class="def-tag">Por defecto</span>':'<span class="adj-kind">—</span>')+'</td>'+
+        '<td>'+estadoCell(r.active,r.name)+'</td>'+
+        '<td class="right"><div class="row-actions">'+act('edit','Editar terminación',ICON.edit)+act('dup','Duplicar',ICON.dup)+'</div></td>'+
+      '</tr>';}).join('');
+    }
+    var cols=(TAB==='fin')?6:7;
+    if(!html)html='<tr><td colspan="'+cols+'" style="padding:34px;text-align:center;color:var(--re-ink-4)">Nada coincide con los filtros.</td></tr>';
+    var addLabel=TAB==='base'?'Agregar producto':TAB==='adj'?'Agregar ajuste o extra':'Agregar terminación';
+    html+='<tr class="add-row"><td colspan="'+cols+'"><div class="add-inner"><button class="btn-add-row" id="addRow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg> '+addLabel+'</button></div></td></tr>';
+    $('rows').innerHTML=html;
+    wire();
+  }
+
+  function wire(){
+    document.querySelectorAll('#rows tr[data-code]').forEach(function(tr){
+      tr.addEventListener('click',function(e){ if(e.target.closest('.act')||e.target.closest('.toggle'))return; goEdit(); });
+    });
+    document.querySelectorAll('#rows .act').forEach(function(b){
+      b.addEventListener('click',function(e){e.stopPropagation();
+        if(b.getAttribute('data-act')==='dup'){REToast('Elemento duplicado · pendiente de QA');}
+        else goEdit();
+      });
+    });
+    var add=$('addRow'); if(add)add.addEventListener('click',function(){ if(TAB==='base')window.location.href='ProductEditor.html'; else REToast('Nuevo elemento · se abre en el editor'); });
+  }
+  function goEdit(){ window.location.href='ProductEditor.html'; }
+
+  // tabs
+  document.querySelectorAll('.seg-tabs button').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('.seg-tabs button').forEach(function(x){x.setAttribute('aria-selected','false');});
+      b.setAttribute('aria-selected','true');
+      TAB=b.getAttribute('data-tab');
+      $('famWrap').style.display=(TAB==='base')?'':'none';
+      render();
+    });
+  });
+  ['q','fFam','fState'].forEach(function(id){var el=$(id);el.addEventListener(id==='q'?'input':'change',render);});
+  $('newBtn').addEventListener('click',function(){window.location.href='ProductEditor.html';});
+
+  render();
+</script>
+</body>
+</html>
