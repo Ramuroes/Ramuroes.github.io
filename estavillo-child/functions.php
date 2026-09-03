@@ -20,6 +20,7 @@ require ES_CHILD_DIR . '/inc/enqueue.php';
 require ES_CHILD_DIR . '/inc/theme-options.php';
 require ES_CHILD_DIR . '/inc/selected-work-fallback.php';
 require ES_CHILD_DIR . '/inc/featured-case-fallback.php';
+require ES_CHILD_DIR . '/inc/featured-media.php';
 require ES_CHILD_DIR . '/inc/work-page-fallback.php';
 require ES_CHILD_DIR . '/inc/block-styles.php';
 require ES_CHILD_DIR . '/inc/how-i-work-illustrations.php';

@@ -251,6 +251,29 @@ function es_post_has_case_figure_video() {
 }
 
 /**
+ * ¿El Featured Media resuelto de Home o de Work/Trabajos es un video? A
+ * diferencia de es_post_has_case_figure_video() (que parsea post_content
+ * en busca de un BLOQUE), acá el dato vive en post meta del Case Study
+ * destacado — mismo criterio de "sólo pedir el asset donde realmente hace
+ * falta", pero leyendo la fuente ya resuelta (es_home_featured_source() /
+ * es_work_page_source(), ambas del propio tema — sin llamar nada del
+ * plugin acá, cero riesgo si estuviera inactivo) en vez de parsear bloques.
+ *
+ * @return bool
+ */
+function es_home_or_work_has_featured_video() {
+	if ( es_is_home_template() ) {
+		$es_case = es_home_featured_source();
+	} elseif ( is_page_template( 'templates/page-work.php' ) ) {
+		$es_data = es_work_page_source();
+		$es_case = isset( $es_data['featured'] ) ? $es_data['featured'] : array();
+	} else {
+		return false;
+	}
+	return isset( $es_case['media_type'] ) && 'video' === $es_case['media_type'];
+}
+
+/**
  * Versión de cache-bust por archivo: usa filemtime() para que CADA cambio de
  * un asset genere un ?ver= nuevo y el navegador/CDN vuelva a bajarlo.
  *
@@ -490,14 +513,15 @@ function es_child_enqueue_assets() {
 	}
 
 	/*
-	 * Case Figure media (video): lazy-load del archivo pesado con
-	 * IntersectionObserver + autoplay condicionado a prefers-reduced-motion
-	 * — ver el docblock de assets/js/case-figure-media.js. Sin ninguna
-	 * instancia de video, ni se pide: imagen/GIF no lo necesitan (ya son
-	 * <img> con loading="lazy" nativo). Sin CSS propio — el look de <video>
-	 * vive en case-study.css, que ya se encola en todo case study.
+	 * Video lazy-load + autoplay condicional: lo comparten Case Figure
+	 * (dentro del contenido de un caso) y Featured Media (Home/Work) — ver
+	 * el docblock de assets/js/case-figure-media.js. Sin ninguna instancia
+	 * de video en ningún lado, ni se pide: imagen/GIF no lo necesitan (ya
+	 * son <img> con loading="lazy" nativo). Sin CSS propio — el look de
+	 * <video> vive en case-study.css/pages-home.css/components.css, que ya
+	 * se encolan donde corresponde.
 	 */
-	if ( es_post_has_case_figure_video() ) {
+	if ( es_post_has_case_figure_video() || es_home_or_work_has_featured_video() ) {
 		wp_enqueue_script(
 			'es-case-figure-media',
 			ES_CHILD_URI . '/assets/js/case-figure-media.js',

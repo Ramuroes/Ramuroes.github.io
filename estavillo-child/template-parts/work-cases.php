@@ -42,6 +42,20 @@ $es_archive  = $es_data['archive'];
 $es_legacy   = isset( $args['legacy'] ) ? trim( (string) $args['legacy'] ) : '';
 
 $es_num = 0;
+
+// Featured Media (ticket "Featured media del Case Study"): mismo criterio
+// de whitelist defensiva que los templates de Home — ver
+// template-parts/featured-case.php. Se resuelve acá arriba, una vez, en
+// vez de adentro del if de abajo, sólo por prolijidad de la condición.
+$es_featured_layout_class = '';
+if ( ! empty( $es_featured ) ) {
+	$es_featured_layout = isset( $es_featured['layout'] ) ? $es_featured['layout'] : 'standard';
+	if ( 'wide' === $es_featured_layout ) {
+		$es_featured_layout_class = ' es-card--featured-wide';
+	} elseif ( 'full' === $es_featured_layout ) {
+		$es_featured_layout_class = ' es-card--featured-full';
+	}
+}
 ?>
 
 <?php if ( ! empty( $es_featured ) ) : ?>
@@ -55,8 +69,14 @@ $es_num = 0;
 				</div>
 			</div>
 
-			<a class="es-card es-card--wide" href="<?php echo esc_url( $es_featured['url'] ); ?>" data-es-reveal>
-				<div class="es-card__media"><?php es_work_media( $es_featured ); ?></div>
+			<a class="es-card es-card--wide<?php echo esc_attr( $es_featured_layout_class ); ?>" href="<?php echo esc_url( $es_featured['url'] ); ?>" data-es-reveal>
+				<div class="es-card__media">
+					<?php if ( function_exists( 'es_featured_has_media' ) && es_featured_has_media( $es_featured ) ) : ?>
+						<?php es_render_featured_media( $es_featured ); ?>
+					<?php else : ?>
+						<?php es_work_media( $es_featured ); ?>
+					<?php endif; ?>
+				</div>
 				<div class="es-card__body">
 					<div class="es-card__meta">
 						<?php if ( ! empty( $es_featured['label'] ) ) : ?>

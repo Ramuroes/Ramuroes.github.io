@@ -5,10 +5,79 @@
 /* ---------- featured case (Main case) ---------- */
 
 .es-featured__grid {
+	/* Featured Media (ticket "Featured media del Case Study"): un solo alto
+	   compartido por standard/wide/full — layout es horizontal-only por
+	   diseño, ver --wide/--full más abajo. Antes de este ticket el <img>
+	   no tenía ningún tope de alto propio (el componente crecía según el
+	   aspect ratio real de la imagen subida); ahora sí, para poder
+	   garantizar "el alto no crece" en wide/full sin inventar un número
+	   distinto por variante. Calibrado contra el aspect-ratio 16/10 que ya
+	   usaba el placeholder, al ancho real que tiene hoy la columna de
+	   media en standard (~510px en desktop ancho) — visualmente
+	   equivalente a como se veía antes con una imagen ya recortada 16:10
+	   (el caso típico), object-fit:cover se encarga del resto. */
+	--es-featured-media-h: clamp(250px, 27vw, 322px);
 	display: grid;
 	grid-template-columns: 0.95fr 1.05fr;
 	gap: clamp(32px, 5vw, 72px);
 	align-items: center;
+}
+
+/* Wide: el media pasa de ~52% a ~62% del ancho útil (rango 55-65% pedido
+   por el ticket) — mismo --es-featured-media-h, la diferencia es
+   horizontal nomás. */
+.es-featured__grid--wide {
+	grid-template-columns: 0.75fr 1.25fr;
+}
+
+/* Full: cancela la grilla de dos columnas — el media pasa a ocupar TODO
+   el ancho del componente (mismo --es-featured-media-h, nunca más alto) y
+   el texto se superpone encima, ancorado abajo, con un scrim para
+   contraste garantizado sin importar qué tan clara/oscura sea la imagen
+   de fondo — pedido explícito del ticket ("si el texto debe superponerse,
+   resolverlo... con buen contraste"). Los tokens --es-ink* son
+   theme-aware (claros en dark, oscuros en light) y evidentemente NO
+   sirven acá: el contraste tiene que ganarle a la imagen, no al theme del
+   sitio, así que el texto se fuerza a blanco fijo dentro de este
+   modificador únicamente. */
+.es-featured__grid--full {
+	position: relative;
+	display: block;
+}
+
+.es-featured__grid--full .es-featured__media {
+	width: 100%;
+}
+
+.es-featured__grid--full::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	background: linear-gradient(0deg, rgba(6, 8, 7, 0.88) 0%, rgba(6, 8, 7, 0.45) 45%, rgba(6, 8, 7, 0.05) 75%);
+	pointer-events: none;
+}
+
+.es-featured__grid--full .es-featured__text {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	padding: clamp(20px, 3vw, 40px);
+	color: #fff;
+}
+
+.es-featured__grid--full .es-featured__kicker,
+.es-featured__grid--full .es-featured__title,
+.es-featured__grid--full .es-featured__body,
+.es-featured__grid--full .es-featured__source {
+	color: #fff;
+}
+
+.es-featured__grid--full .es-featured__source {
+	color: rgba(255, 255, 255, 0.72);
 }
 
 .es-featured__kicker {
@@ -52,16 +121,64 @@
 
 .es-featured__media {
 	position: relative;
+	height: var(--es-featured-media-h);
+	/* Scopeado ACÁ, nunca en un ancestro — mismo criterio documentado en
+	   base.css junto a .es-page: overflow-x en un ancestro de elementos
+	   sticky (el header, en este caso más arriba en el DOM) les rompe el
+	   position:sticky. */
+	overflow: hidden;
+}
+
+.es-featured__media img,
+.es-featured__media video {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
 }
 
 .es-featured__placeholder {
-	aspect-ratio: 16 / 10;
+	width: 100%;
+	height: 100%;
 	background: var(--es-block-2);
 }
 
 @media (max-width: 900px) {
 	.es-featured__grid {
 		grid-template-columns: 1fr;
+	}
+
+	.es-featured__grid--wide {
+		grid-template-columns: 1fr;
+	}
+
+	/* Full en mobile: la grilla de standard/wide ya colapsa a una columna
+	   (texto arriba, media abajo) arriba — full ya ES una sola columna
+	   siempre (display:block), así que acá sólo hace falta un alto más
+	   chico para no ocupar toda la pantalla en un formato angosto, y
+	   volver el texto al flujo normal (ya no hace falta overlay: con
+	   media abajo del todo no hay superposición que resolver). */
+	.es-featured__grid--full {
+		display: block;
+	}
+
+	.es-featured__grid--full::before {
+		display: none;
+	}
+
+	.es-featured__grid--full .es-featured__text {
+		position: static;
+		inset: auto;
+		padding: 0;
+		color: inherit;
+		margin-bottom: clamp(20px, 5vw, 32px);
+	}
+
+	.es-featured__grid--full .es-featured__kicker,
+	.es-featured__grid--full .es-featured__title,
+	.es-featured__grid--full .es-featured__body,
+	.es-featured__grid--full .es-featured__source {
+		color: inherit;
 	}
 }
 

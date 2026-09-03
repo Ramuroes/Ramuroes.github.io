@@ -113,6 +113,141 @@ function es_case_category_choices() {
 }
 
 /**
+ * Featured Media (ticket "Featured media del Case Study"): CONCEPTO
+ * DISTINTO de las figuras de estavillo/case-figure dentro del contenido —
+ * esto es la representación del CASE STUDY ENTERO, mostrada en Home
+ * (Featured Case) y en Work/Trabajos (Featured Work), no una imagen suelta
+ * adentro del cuerpo del caso. Vive a nivel de post meta del CPT, nunca en
+ * un bloque Gutenberg — un caso puede tener Featured Media configurado sin
+ * un solo bloque case-figure en su contenido, y viceversa.
+ *
+ * Tipo de media. 'gif' es, igual que en case-figure, un alias de 'image'
+ * para el render — un <img> normal — sólo cambia qué picker de Biblioteca
+ * conviene usar mentalmente al elegir el archivo.
+ *
+ * @return array<string,string> valor => label legible.
+ */
+function es_case_featured_media_type_choices() {
+	return array(
+		'image' => __( 'Image', 'estavillo-portfolio-core' ),
+		'gif'   => __( 'GIF', 'estavillo-portfolio-core' ),
+		'video' => __( 'Video', 'estavillo-portfolio-core' ),
+	);
+}
+
+/**
+ * Layout del Featured Media. 'standard' es el layout de siempre (texto
+ * izquierda / media derecha en Home, card ancha en Work) y sigue siendo el
+ * default — un caso guardado antes de que este campo existiera no tiene
+ * este meta y cae acá, sin ningún cambio visual. 'wide' y 'full' sólo
+ * cambian cuánto ANCHO ocupa el media — el alto del componente es el
+ * mismo en los tres, ver pages-home.css/components.css.
+ *
+ * @return array<string,string> valor => label legible.
+ */
+function es_case_featured_layout_choices() {
+	return array(
+		'standard' => __( 'Standard — current layout (default)', 'estavillo-portfolio-core' ),
+		'wide'     => __( 'Wide — media takes ~60% of the width', 'estavillo-portfolio-core' ),
+		'full'     => __( 'Full — media spans the full width, text overlaid', 'estavillo-portfolio-core' ),
+	);
+}
+
+/**
+ * object-fit del Featured Media dentro de su marco de alto fijo. 'cover'
+ * (default) llena el marco sin deformar, recortando bordes si hace falta —
+ * lo esperable para un visual destacado. 'contain' es para el caso raro
+ * donde ningún recorte es aceptable (p. ej. un mockup con texto hasta el
+ * borde) a costa de dejar espacio vacío en los costados.
+ *
+ * @return array<string,string> valor => label legible.
+ */
+function es_case_featured_object_fit_choices() {
+	return array(
+		'cover'   => __( 'Cover — fills the frame (default)', 'estavillo-portfolio-core' ),
+		'contain' => __( 'Contain — shows the full asset, may add empty space', 'estavillo-portfolio-core' ),
+	);
+}
+
+/**
+ * Posición focal del recorte cuando object-fit es 'cover'. Sin efecto con
+ * 'contain' (no hay recorte que reposicionar).
+ *
+ * @return array<string,string> valor => label legible.
+ */
+function es_case_featured_focal_choices() {
+	return array(
+		'center' => __( 'Center (default)', 'estavillo-portfolio-core' ),
+		'left'   => __( 'Left', 'estavillo-portfolio-core' ),
+		'right'  => __( 'Right', 'estavillo-portfolio-core' ),
+	);
+}
+
+/**
+ * Resuelve los campos de Featured Media de un Case Study a un shape único,
+ * reusado tal cual tanto por es_portfolio_get_featured_case_for_home()
+ * (Home) como por la rama 'featured' de
+ * es_portfolio_get_case_studies_for_work_page() (Work) — una sola fuente
+ * de verdad, cero riesgo de que ambas páginas queden desincronizadas.
+ *
+ * video_url/video_poster sólo se resuelven cuando media_type es 'video'
+ * (si no, quedan en '' — nunca se arma una URL de video para un caso que
+ * no la va a usar). Sin poster propio elegido, cae al Featured Image
+ * nativo del caso si existe — reuso de lo que ya está cargado en la
+ * mayoría de los casos, en vez de pedir un archivo más.
+ *
+ * @param int $post_id ID del Case Study.
+ * @return array{media_type:string,layout:string,object_fit:string,focal:string,video_url:string,video_poster:string}
+ */
+function es_case_get_featured_media( $post_id ) {
+	$media_type = get_post_meta( $post_id, '_es_case_featured_media_type', true );
+	if ( ! array_key_exists( $media_type, es_case_featured_media_type_choices() ) ) {
+		$media_type = 'image';
+	}
+
+	$layout = get_post_meta( $post_id, '_es_case_featured_layout', true );
+	if ( ! array_key_exists( $layout, es_case_featured_layout_choices() ) ) {
+		$layout = 'standard';
+	}
+
+	$object_fit = get_post_meta( $post_id, '_es_case_featured_object_fit', true );
+	if ( ! array_key_exists( $object_fit, es_case_featured_object_fit_choices() ) ) {
+		$object_fit = 'cover';
+	}
+
+	$focal = get_post_meta( $post_id, '_es_case_featured_focal', true );
+	if ( ! array_key_exists( $focal, es_case_featured_focal_choices() ) ) {
+		$focal = 'center';
+	}
+
+	$video_url    = '';
+	$video_poster = '';
+	if ( 'video' === $media_type ) {
+		$video_id = (int) get_post_meta( $post_id, '_es_case_featured_video_id', true );
+		if ( $video_id ) {
+			$video_url = (string) wp_get_attachment_url( $video_id );
+		}
+
+		$poster_id = (int) get_post_meta( $post_id, '_es_case_featured_video_poster_id', true );
+		if ( $poster_id ) {
+			$video_poster = (string) wp_get_attachment_image_url( $poster_id, 'large' );
+		}
+		if ( '' === $video_poster ) {
+			$video_poster = (string) get_the_post_thumbnail_url( $post_id, 'large' );
+		}
+	}
+
+	return array(
+		'media_type'   => $media_type,
+		'layout'       => $layout,
+		'object_fit'   => $object_fit,
+		'focal'        => $focal,
+		'video_url'    => $video_url,
+		'video_poster' => $video_poster,
+	);
+}
+
+/**
  * Registra el CPT "Case Study" y su taxonomía de tags.
  */
 function es_register_case_study_cpt() {
@@ -173,6 +308,21 @@ function es_case_study_add_meta_box() {
 		ES_CASE_STUDY_CPT,
 		'normal',
 		'high'
+	);
+
+	// Panel LATERAL a propósito (ticket "Featured media del Case Study"):
+	// distinto de la caja grande de arriba, al lado del Featured Image
+	// nativo — la pareja natural, porque el poster del video cae a esa
+	// misma imagen si no se elige uno propio. No es un Case Figure ni vive
+	// en el contenido Gutenberg: es la config de CÓMO se muestra este caso
+	// como destacado en Home/Work.
+	add_meta_box(
+		'es_case_featured_media',
+		__( 'Featured Media', 'estavillo-portfolio-core' ),
+		'es_case_featured_media_render_meta_box',
+		ES_CASE_STUDY_CPT,
+		'side',
+		'default'
 	);
 }
 add_action( 'add_meta_boxes', 'es_case_study_add_meta_box' );
@@ -314,6 +464,135 @@ function es_case_study_render_meta_box( $post ) {
 }
 
 /**
+ * Un campo "elegir de la Biblioteca de medios" para el panel Featured
+ * Media: botón + input hidden con el attachment ID + preview de texto +
+ * botón "Quitar". El JS que activa el picker vive en
+ * assets/js/featured-media-admin.js (encolado sólo en esta pantalla, ver
+ * es_case_featured_media_enqueue_admin_assets() más abajo) — acá sólo se
+ * marca con data-es-picker-field/data-es-picker-library qué tipo de
+ * archivo ofrece el modal de wp.media.
+ *
+ * @param string $field_id  Id/name del input hidden (sin el prefijo _).
+ * @param string $label     Label visible.
+ * @param int    $value     Attachment ID guardado, 0 si no hay.
+ * @param string $library   'video' o 'image' — tipo de archivo que filtra el modal.
+ */
+function es_case_featured_media_picker_field( $field_id, $label, $value, $library ) {
+	$es_preview = $value ? get_the_title( $value ) : __( 'No file selected', 'estavillo-portfolio-core' );
+	?>
+	<p data-es-picker-field="<?php echo esc_attr( $field_id ); ?>">
+		<strong><?php echo esc_html( $label ); ?></strong><br>
+		<input type="hidden" id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $field_id ); ?>" value="<?php echo esc_attr( $value ); ?>">
+		<span class="es-picker-preview"><?php echo esc_html( $es_preview ); ?></span><br>
+		<button type="button" class="button" data-es-picker-open="<?php echo esc_attr( $field_id ); ?>" data-es-picker-library="<?php echo esc_attr( $library ); ?>"><?php esc_html_e( 'Select…', 'estavillo-portfolio-core' ); ?></button>
+		<button type="button" class="button" data-es-picker-clear="<?php echo esc_attr( $field_id ); ?>"><?php esc_html_e( 'Remove', 'estavillo-portfolio-core' ); ?></button>
+	</p>
+	<?php
+}
+
+/**
+ * Renderiza el panel lateral "Featured Media" — cómo se muestra ESTE caso
+ * como destacado en Home y Work, no un case-figure del contenido. Layout
+ * (standard/wide/full) es horizontal-only por diseño: el alto del
+ * componente en Home/Work no cambia entre variantes, ver pages-home.css/
+ * components.css — así "Wide"/"Full" nunca inflan la sección.
+ *
+ * @param WP_Post $post Post actual.
+ */
+function es_case_featured_media_render_meta_box( $post ) {
+	wp_nonce_field( 'es_case_featured_media_save', 'es_case_featured_media_nonce' );
+
+	$media_type   = get_post_meta( $post->ID, '_es_case_featured_media_type', true );
+	if ( ! array_key_exists( $media_type, es_case_featured_media_type_choices() ) ) {
+		$media_type = 'image';
+	}
+	$layout = get_post_meta( $post->ID, '_es_case_featured_layout', true );
+	if ( ! array_key_exists( $layout, es_case_featured_layout_choices() ) ) {
+		$layout = 'standard';
+	}
+	$object_fit = get_post_meta( $post->ID, '_es_case_featured_object_fit', true );
+	if ( ! array_key_exists( $object_fit, es_case_featured_object_fit_choices() ) ) {
+		$object_fit = 'cover';
+	}
+	$focal = get_post_meta( $post->ID, '_es_case_featured_focal', true );
+	if ( ! array_key_exists( $focal, es_case_featured_focal_choices() ) ) {
+		$focal = 'center';
+	}
+	$video_id  = (int) get_post_meta( $post->ID, '_es_case_featured_video_id', true );
+	$poster_id = (int) get_post_meta( $post->ID, '_es_case_featured_video_poster_id', true );
+	?>
+	<p>
+		<label for="es_case_featured_media_type"><strong><?php esc_html_e( 'Media', 'estavillo-portfolio-core' ); ?></strong></label><br>
+		<select id="es_case_featured_media_type" name="es_case_featured_media_type" data-es-featured-media-type>
+			<?php foreach ( es_case_featured_media_type_choices() as $es_key => $es_lbl ) : ?>
+				<option value="<?php echo esc_attr( $es_key ); ?>" <?php selected( $media_type, $es_key ); ?>><?php echo esc_html( $es_lbl ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<span class="description"><?php esc_html_e( 'Image/GIF use the Featured Image below (as always). Video uses the picker that appears when selected.', 'estavillo-portfolio-core' ); ?></span>
+	</p>
+	<p>
+		<label for="es_case_featured_layout"><strong><?php esc_html_e( 'Layout', 'estavillo-portfolio-core' ); ?></strong></label><br>
+		<select id="es_case_featured_layout" name="es_case_featured_layout">
+			<?php foreach ( es_case_featured_layout_choices() as $es_key => $es_lbl ) : ?>
+				<option value="<?php echo esc_attr( $es_key ); ?>" <?php selected( $layout, $es_key ); ?>><?php echo esc_html( $es_lbl ); ?></option>
+			<?php endforeach; ?>
+		</select>
+	</p>
+	<p>
+		<label for="es_case_featured_object_fit"><strong><?php esc_html_e( 'Object fit', 'estavillo-portfolio-core' ); ?></strong></label><br>
+		<select id="es_case_featured_object_fit" name="es_case_featured_object_fit">
+			<?php foreach ( es_case_featured_object_fit_choices() as $es_key => $es_lbl ) : ?>
+				<option value="<?php echo esc_attr( $es_key ); ?>" <?php selected( $object_fit, $es_key ); ?>><?php echo esc_html( $es_lbl ); ?></option>
+			<?php endforeach; ?>
+		</select>
+	</p>
+	<p>
+		<label for="es_case_featured_focal"><strong><?php esc_html_e( 'Focal position', 'estavillo-portfolio-core' ); ?></strong></label><br>
+		<select id="es_case_featured_focal" name="es_case_featured_focal">
+			<?php foreach ( es_case_featured_focal_choices() as $es_key => $es_lbl ) : ?>
+				<option value="<?php echo esc_attr( $es_key ); ?>" <?php selected( $focal, $es_key ); ?>><?php echo esc_html( $es_lbl ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<span class="description"><?php esc_html_e( 'Only matters with Cover.', 'estavillo-portfolio-core' ); ?></span>
+	</p>
+	<div data-es-featured-video-fields style="<?php echo 'video' === $media_type ? '' : 'display:none;'; ?>">
+		<hr>
+		<?php
+		es_case_featured_media_picker_field( 'es_case_featured_video_id', __( 'Video file', 'estavillo-portfolio-core' ), $video_id, 'video' );
+		es_case_featured_media_picker_field( 'es_case_featured_video_poster_id', __( 'Poster (optional)', 'estavillo-portfolio-core' ), $poster_id, 'image' );
+		?>
+		<p class="description"><?php esc_html_e( 'No poster selected falls back to this case\'s Featured Image. Video plays muted, looped, autoplaying (skipped when the visitor prefers reduced motion — the poster shows instead), no controls — a cinematic hero visual, same behaviour as Case Figure video.', 'estavillo-portfolio-core' ); ?></p>
+	</div>
+	<?php
+}
+
+/**
+ * Encola wp.media + el JS del picker SOLO en la pantalla de edición del
+ * Case Study — en cualquier otra pantalla de admin no hace falta y no se
+ * pide.
+ *
+ * @param string $hook Hook de la pantalla actual.
+ */
+function es_case_featured_media_enqueue_admin_assets( $hook ) {
+	if ( ! in_array( $hook, array( 'post.php', 'post-new.php' ), true ) ) {
+		return;
+	}
+	$screen = get_current_screen();
+	if ( ! $screen || ES_CASE_STUDY_CPT !== $screen->post_type ) {
+		return;
+	}
+	wp_enqueue_media();
+	wp_enqueue_script(
+		'es-featured-media-admin',
+		ES_PORTFOLIO_CORE_URI . 'assets/js/featured-media-admin.js',
+		array(),
+		ES_PORTFOLIO_CORE_VERSION,
+		true
+	);
+}
+add_action( 'admin_enqueue_scripts', 'es_case_featured_media_enqueue_admin_assets' );
+
+/**
  * Guarda los campos del meta box.
  *
  * @param int $post_id ID del post.
@@ -398,6 +677,69 @@ function es_save_case_study_meta( $post_id ) {
 	update_post_meta( $post_id, '_es_case_featured', isset( $_POST['es_case_featured'] ) ? '1' : '0' );
 }
 add_action( 'save_post_' . ES_CASE_STUDY_CPT, 'es_save_case_study_meta' );
+
+/**
+ * Guarda los campos del panel "Featured Media" — nonce propio, separado
+ * del meta box grande de arriba a propósito: dos paneles, dos nonces, cada
+ * uno se guarda con su propio candado sin depender del otro.
+ *
+ * @param int $post_id ID del post.
+ */
+function es_save_case_featured_media_meta( $post_id ) {
+	if ( ! isset( $_POST['es_case_featured_media_nonce'] ) || ! wp_verify_nonce( $_POST['es_case_featured_media_nonce'], 'es_case_featured_media_save' ) ) {
+		return;
+	}
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+
+	// Mismo criterio whitelist-o-default que hero_layout/status_tone/etc.
+	// más arriba: un valor fuera de la lista cae al default, nunca se
+	// guarda texto arbitrario.
+	if ( isset( $_POST['es_case_featured_media_type'] ) ) {
+		$es_choice = sanitize_key( wp_unslash( $_POST['es_case_featured_media_type'] ) );
+		if ( ! array_key_exists( $es_choice, es_case_featured_media_type_choices() ) ) {
+			$es_choice = 'image';
+		}
+		update_post_meta( $post_id, '_es_case_featured_media_type', $es_choice );
+	}
+
+	if ( isset( $_POST['es_case_featured_layout'] ) ) {
+		$es_choice = sanitize_key( wp_unslash( $_POST['es_case_featured_layout'] ) );
+		if ( ! array_key_exists( $es_choice, es_case_featured_layout_choices() ) ) {
+			$es_choice = 'standard';
+		}
+		update_post_meta( $post_id, '_es_case_featured_layout', $es_choice );
+	}
+
+	if ( isset( $_POST['es_case_featured_object_fit'] ) ) {
+		$es_choice = sanitize_key( wp_unslash( $_POST['es_case_featured_object_fit'] ) );
+		if ( ! array_key_exists( $es_choice, es_case_featured_object_fit_choices() ) ) {
+			$es_choice = 'cover';
+		}
+		update_post_meta( $post_id, '_es_case_featured_object_fit', $es_choice );
+	}
+
+	if ( isset( $_POST['es_case_featured_focal'] ) ) {
+		$es_choice = sanitize_key( wp_unslash( $_POST['es_case_featured_focal'] ) );
+		if ( ! array_key_exists( $es_choice, es_case_featured_focal_choices() ) ) {
+			$es_choice = 'center';
+		}
+		update_post_meta( $post_id, '_es_case_featured_focal', $es_choice );
+	}
+
+	if ( isset( $_POST['es_case_featured_video_id'] ) ) {
+		update_post_meta( $post_id, '_es_case_featured_video_id', absint( $_POST['es_case_featured_video_id'] ) );
+	}
+
+	if ( isset( $_POST['es_case_featured_video_poster_id'] ) ) {
+		update_post_meta( $post_id, '_es_case_featured_video_poster_id', absint( $_POST['es_case_featured_video_poster_id'] ) );
+	}
+}
+add_action( 'save_post_' . ES_CASE_STUDY_CPT, 'es_save_case_featured_media_meta' );
 
 /**
  * Case Studies publicados y marcados "mostrar en Home", en el shape que
@@ -516,15 +858,18 @@ function es_portfolio_get_featured_case_for_home() {
 	$es_post = $query->posts[0];
 	$es_url  = get_post_meta( $es_post->ID, '_es_case_url', true );
 
-	return array(
-		'kicker'            => get_post_meta( $es_post->ID, '_es_case_kicker', true ),
-		'title'             => get_the_title( $es_post ),
-		'body'              => get_the_excerpt( $es_post ),
-		'source'            => get_post_meta( $es_post->ID, '_es_case_source', true ),
-		'status'            => get_post_meta( $es_post->ID, '_es_case_label', true ),
-		'url'               => $es_url ? $es_url : get_permalink( $es_post ),
-		'image'             => get_the_post_thumbnail_url( $es_post, 'large' ),
-		'placeholder_label' => get_post_meta( $es_post->ID, '_es_case_placeholder_label', true ),
+	return array_merge(
+		array(
+			'kicker'            => get_post_meta( $es_post->ID, '_es_case_kicker', true ),
+			'title'             => get_the_title( $es_post ),
+			'body'              => get_the_excerpt( $es_post ),
+			'source'            => get_post_meta( $es_post->ID, '_es_case_source', true ),
+			'status'            => get_post_meta( $es_post->ID, '_es_case_label', true ),
+			'url'               => $es_url ? $es_url : get_permalink( $es_post ),
+			'image'             => get_the_post_thumbnail_url( $es_post, 'large' ),
+			'placeholder_label' => get_post_meta( $es_post->ID, '_es_case_placeholder_label', true ),
+		),
+		es_case_get_featured_media( $es_post->ID )
 	);
 }
 
@@ -608,7 +953,11 @@ function es_portfolio_get_case_studies_for_work_page() {
 		);
 
 		if ( $es_is_featured && empty( $featured ) ) {
-			$featured = $es_case_data;
+			// Featured Media sólo se resuelve para el ÚNICO caso featured —
+			// selected/archive no lo necesitan (sus cards siguen usando
+			// es_work_media(), sin tocar) así que ni vale la pena la
+			// consulta extra para el resto de los posts del loop.
+			$featured = array_merge( $es_case_data, es_case_get_featured_media( $es_post->ID ) );
 			continue;
 		}
 

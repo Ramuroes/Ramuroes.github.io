@@ -50,6 +50,14 @@ function es_work_featured_fallback_case() {
 		'url'               => $es_case['url'],
 		'image'             => $es_case['image'],
 		'placeholder_label' => '',
+		// Featured Media: mismos defaults que el placeholder de Home — ver
+		// el comentario en es_home_featured_fallback_case().
+		'media_type'        => $es_case['media_type'],
+		'layout'            => $es_case['layout'],
+		'object_fit'        => $es_case['object_fit'],
+		'focal'             => $es_case['focal'],
+		'video_url'         => $es_case['video_url'],
+		'video_poster'      => $es_case['video_poster'],
 	);
 }
 

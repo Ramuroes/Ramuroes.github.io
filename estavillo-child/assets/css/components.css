@@ -497,6 +497,102 @@
 	}
 }
 
+/* Featured media del Case Study (ticket "Featured media del Case Study"):
+   SÓLO para la card ancha del "Featured Work" — nunca las cards normales
+   de Selected Work/Archive (esas siguen usando .es-card a secas, sin
+   ninguna de estas clases). Mismo min-height que ya tenía .es-card--wide
+   (250px desktop / 190px mobile, heredado de arriba): la diferencia entre
+   variantes es sólo de ancho, igual que en Home.
+
+   min-width:768px A PROPÓSITO en las reglas que tocan grid-template-columns/
+   width/border de .es-card__media (bug real, encontrado con Playwright):
+   .es-card--wide y .es-card--featured-wide/--featured-full comparten
+   especificidad exacta (una clase) con la regla mobile YA EXISTENTE
+   @media(max-width:767px){.es-card--wide{grid-template-columns:1fr}} —
+   puestas sin media query, estas reglas nuevas quedan MÁS TARDE en el
+   archivo que esa regla mobile y le ganan el empate por orden de
+   aparición, así que el featured card mobile dejaba de colapsar a una
+   columna (texto exprimido a un ancho angosto, el alto se disparaba muy
+   por encima de los 190px de siempre). Con min-width:768px ninguna de
+   estas reglas compite nunca con la mobile — cero ambigüedad de orden,
+   no hay que confiar en dónde cae cada bloque en el archivo. */
+@media (min-width: 768px) {
+	.es-card--featured-wide {
+		grid-template-columns: 1.6fr 1fr;
+	}
+
+	.es-card--featured-full .es-card__media {
+		width: 100%;
+		border-right: none;
+		border-bottom: none;
+	}
+}
+
+.es-card--featured-full {
+	display: block;
+	position: relative;
+}
+
+/* Scrim + overlay: mismo lenguaje visual que .es-featured__grid--full en
+   pages-home.css (Home) — los tokens --es-ink* son theme-aware y no
+   sirven acá, el contraste tiene que ganarle a la imagen de fondo, no al
+   theme del sitio. */
+.es-card--featured-full::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	background: linear-gradient(0deg, rgba(6, 8, 7, 0.88) 0%, rgba(6, 8, 7, 0.45) 45%, rgba(6, 8, 7, 0.05) 75%);
+	pointer-events: none;
+}
+
+.es-card--featured-full .es-card__body {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	padding: clamp(22px, 2.8vw, 36px);
+}
+
+.es-card--featured-full .es-card__meta,
+.es-card--featured-full .es-card__kicker,
+.es-card--featured-full .es-card__label,
+.es-card--featured-full .es-card__title,
+.es-card--featured-full .es-card__excerpt,
+.es-card--featured-full .es-card__cta {
+	color: #fff;
+}
+
+@media (max-width: 767px) {
+	/* Igual que Home en mobile: sin overlay — media arriba, texto abajo en
+	   flujo normal, sin apostar el contraste a una imagen impredecible en
+	   una franja angosta. */
+	.es-card--featured-full {
+		display: grid;
+	}
+
+	.es-card--featured-full::before {
+		display: none;
+	}
+
+	.es-card--featured-full .es-card__body {
+		position: static;
+		inset: auto;
+		padding: 20px 22px 24px;
+	}
+
+	.es-card--featured-full .es-card__meta,
+	.es-card--featured-full .es-card__kicker,
+	.es-card--featured-full .es-card__label,
+	.es-card--featured-full .es-card__title,
+	.es-card--featured-full .es-card__excerpt,
+	.es-card--featured-full .es-card__cta {
+		color: inherit;
+	}
+}
+
 /* pill de estado "en vivo" (In progress) */
 .es-status-pill {
 	display: inline-flex;

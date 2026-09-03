@@ -20,6 +20,19 @@ $es_num = isset( $args['num'] ) ? $args['num'] : '02';
 $es_featured = apply_filters( 'es_home_featured', es_home_featured_source() );
 
 $es_featured_tag = ! empty( $es_featured['placeholder_label'] ) ? $es_featured['placeholder_label'] : 'featured-gv';
+
+// Featured Media (ticket "Featured media del Case Study"): layout es
+// horizontal-only por diseño (standard/wide/full sólo cambian el ANCHO —
+// ver pages-home.css, .es-featured__grid--wide/--full comparten el mismo
+// --es-featured-media-h que standard). Whitelist defensiva acá también,
+// no sólo en el plugin: si algún día 'es_home_featured' devuelve un valor
+// fuera de las tres opciones, cae a standard en vez de imprimir una clase
+// CSS que no existe.
+$es_featured_layout = isset( $es_featured['layout'] ) ? $es_featured['layout'] : 'standard';
+if ( ! in_array( $es_featured_layout, array( 'standard', 'wide', 'full' ), true ) ) {
+	$es_featured_layout = 'standard';
+}
+$es_featured_grid_class = 'es-featured__grid es-featured__grid--' . $es_featured_layout;
 ?>
 
 <section class="es-section es-section--block es-featured" id="featured">
@@ -31,7 +44,7 @@ $es_featured_tag = ! empty( $es_featured['placeholder_label'] ) ? $es_featured['
 			</div>
 		</div>
 
-		<div class="es-featured__grid">
+		<div class="<?php echo esc_attr( $es_featured_grid_class ); ?>">
 			<div class="es-featured__text" data-es-reveal>
 				<div class="es-eyebrow es-featured__kicker"><?php echo esc_html( $es_featured['kicker'] ); ?></div>
 				<h3 class="es-featured__title">
@@ -52,8 +65,8 @@ $es_featured_tag = ! empty( $es_featured['placeholder_label'] ) ? $es_featured['
 			</div>
 
 			<div class="es-featured__media" data-es-reveal style="--es-reveal-delay: 90ms">
-				<?php if ( ! empty( $es_featured['image'] ) ) : ?>
-					<img src="<?php echo esc_url( $es_featured['image'] ); ?>" alt="" loading="lazy" />
+				<?php if ( es_featured_has_media( $es_featured ) ) : ?>
+					<?php es_render_featured_media( $es_featured ); ?>
 				<?php else : ?>
 					<div class="es-placeholder es-featured__placeholder" role="img" aria-label="<?php esc_attr_e( 'Placeholder for the featured case visual', 'estavillo-child' ); ?>">
 						<span class="es-placeholder__tag">{asset: <?php echo esc_html( $es_featured_tag ); ?>}</span>
