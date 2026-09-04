@@ -531,13 +531,32 @@ function es_child_enqueue_assets() {
 		wp_enqueue_style( 'es-ds-overrides', ES_CHILD_URI . '/assets/css/ds-restimator/doc-overrides.css', array( 'es-ds-doc' ), es_asset_ver( 'assets/css/ds-restimator/doc-overrides.css' ) );
 
 		/*
-		 * Visor de pantallas: es EXACTAMENTE el mismo lightbox que usa Case
-		 * Figure (assets/js|css/case-figure-lightbox.*), sin una línea nueva.
-		 * Se dispara con [data-es-zoom-trigger], que no está acoplado a ningún
-		 * bloque — el documento del DS emite esos atributos en cada preview.
+		 * Visor de pantallas PROPIO de esta página, no el lightbox de Case
+		 * Figure. Los dos son <dialog> modales, pero resuelven cosas distintas:
+		 * el del portfolio ajusta la imagen entera al viewport y después hace
+		 * pan/zoom (correcto para una foto), y acá eso reducía una captura
+		 * full-page de 1440×3224 al 28% — la pantalla entraba entera pero no se
+		 * leía nada. El visor del DS abre la pantalla a su ancho real y deja
+		 * recorrerla verticalmente, como la aplicación de verdad.
+		 *
+		 * El lightbox compartido no se toca ni se carga acá: sigue igual en los
+		 * case studies. Sin CSS propio en un archivo aparte — el visor vive en
+		 * doc-overrides.css, que ya es la capa a mano de esta página.
 		 */
-		wp_enqueue_style( 'es-case-figure-lightbox', ES_CHILD_URI . '/assets/css/case-figure-lightbox.css', array( 'es-components' ), es_asset_ver( 'assets/css/case-figure-lightbox.css' ) );
-		wp_enqueue_script( 'es-case-figure-lightbox', ES_CHILD_URI . '/assets/js/case-figure-lightbox.js', array(), es_asset_ver( 'assets/js/case-figure-lightbox.js' ), array( 'in_footer' => true, 'strategy' => 'defer' ) );
+		wp_enqueue_script( 'es-ds-screen-viewer', ES_CHILD_URI . '/assets/js/ds-screen-viewer.js', array(), es_asset_ver( 'assets/js/ds-screen-viewer.js' ), array( 'in_footer' => true, 'strategy' => 'defer' ) );
+
+		// Labels del visor: los controles son iconos, así que el texto
+		// accesible viaja desde PHP en el idioma del documento (es_ds_text()).
+		wp_localize_script(
+			'es-ds-screen-viewer',
+			'esDsViewerL10n',
+			array(
+				'close'   => es_ds_text( 'viewer_close' ),
+				'zoomIn'  => es_ds_text( 'viewer_in' ),
+				'zoomOut' => es_ds_text( 'viewer_out' ),
+				'scroll'  => es_ds_text( 'viewer_scroll' ),
+			)
+		);
 
 		// Scroll-spy del rail. Mejora progresiva: sin él el rail navega igual.
 		wp_enqueue_script( 'es-ds-restimator', ES_CHILD_URI . '/assets/js/ds-restimator.js', array(), es_asset_ver( 'assets/js/ds-restimator.js' ), array( 'in_footer' => true, 'strategy' => 'defer' ) );

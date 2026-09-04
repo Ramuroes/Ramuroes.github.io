@@ -150,9 +150,14 @@ captura:
 - **3 mobile** — `01 Calculadora`, `02 Inicio`, `03 Historial` de la spec Mobile v1.
   El cuarto `device-cap` de la spec es un **estado** de Calculadora (desglose en
   bottom sheet), no una pantalla.
-- **+1 vista** — la comparación light/dark. Es una vista de auditoría, no una
-  pantalla de producto: por eso no entra en el contador, pero sí se publica
-  porque ya era uno de los tiles del documento.
+- **+1 exploración** — la comparación light/dark. No es una pantalla de
+  producto, así que **no entra en la grilla ni en el contador**: sale abajo, en
+  su propio bloque, con el pill `Exploración` y una línea que aclara que el
+  sistema publicado tiene un solo tema. Antes iba mezclada en la grilla, o sea
+  que la sección mostraba 6 tarjetas bajo un contador que dice "5 desktop", y la
+  exploración se leía como una pantalla más (y como prueba de que existe un tema
+  light). El build lo garantiza: `DESKTOP_SHOTS` se filtra por `kind`, y falla
+  si las de `kind:'screen'` dejan de ser 5.
 
 No se capturan pantallas extra sólo porque existan archivos HTML en el proyecto
 (hay variantes `.light.html` y un `QA.html` que el documento no expone).
@@ -171,6 +176,32 @@ No se capturan pantallas extra sólo porque existan archivos HTML en el proyecto
 
 Ninguna de las dos correcciones modifica el Design System: son ajustes del
 proceso de captura.
+
+### El defecto que rompía el contenedor (y el guard que lo impide)
+
+Durante meses el documento se publicó con `.pad` cerrando 20 KB antes de
+tiempo: el final de §08 ("Otras piezas"), §09 y §10 quedaban **fuera** del
+contenedor y se veían pegados a los bordes. Nada lo detectaba — el HTML tenía
+todo el contenido, sin refs rotas ni iframes, y el navegador lo renderizaba sin
+quejarse.
+
+Eran **dos bugs distintos que producían el mismo síntoma**:
+
+1. **El parser de `ds-i18n.mjs` no entendía `<?php … ?>` dentro de un
+   atributo.** Buscaba el `>` de cierre con un `indexOf` pelado, y lo
+   encontraba dentro de `data-es-screen-src="<?php … ?>"`. La etiqueta quedaba
+   truncada, cada `<?php` siguiente se trataba como un elemento sin nombre, y al
+   serializar aparecían 36 `</>` y niveles abiertos de más. Se arregla con
+   `findTagEnd()`, que ignora los `>` que viven dentro de comillas.
+2. **El splice del tile de mobile dejaba un `</div>` huérfano.** Cerraba el
+   tramo buscando el primer `'</div></div>'`, que en
+   `…<div class="ov"></div></div></div>` matchea los cierres de `.ov` y `.vp` y
+   deja sin consumir el de `.shot`. Se arregla contando anidamiento
+   (`endOfDiv()`).
+
+Ahora `verifyStructure()` corre en cada build y **rompe** si el documento no
+está bien anidado, si aparece un `</>`, o si alguna `<section class="sec">` cae
+fuera de `.pad`. Verificado contra el archivo que estaba publicado: lo detecta.
 
 ---
 
@@ -286,4 +317,73 @@ clase que el propio tema imprime vía `body_class`.
 
 Si el header cambia de altura, hay **un solo** número que actualizar, y está en
 los dos archivos (`case-study.css` y `doc-overrides.css`).
+
+La navegación mínima también es sticky, así que tiene su propio offset
+(`--es-ds-topbar-h`, 48px) gateado por `.es-ds-minimal-nav` — una clase que
+imprime el template según qué barra se haya renderizado. Sin ella el CSS no
+puede distinguir "sin header" de "header estático".
+
+La metadata del pie del rail lleva además `position: sticky; bottom: 0`.
+`margin-top:auto` sólo la manda al fondo cuando sobra alto; el rail es un
+scroller, y con el viewport bajo o con zoom la lista de secciones no entra y el
+pie se iba con el scroll.
+
+---
+
+## 10. Una sola geometría para toda la página
+
+El header institucional, la navegación mínima, el documento y el footer
+comparten la grilla del Design System: `[rail 264px][área principal]`.
+
+Antes cada franja traía la suya. El chrome del portfolio es un `.es-container`
+(max-width 1140px, centrado); el documento arranca pegado a la izquierda con el
+rail de 264px. Medido a 1920px: la marca ESTAVILLO empezaba en x=438 y la del
+rail en x=22 — 416px de desfase entre dos elementos que el ojo lee como la misma
+columna. La página se veía como dos sitios pegados.
+
+Los números viven en variables sobre `body.es-ds-page`, y **no son nuevos**: son
+los que el Design System ya usaba.
+
+| Variable | Valor | De dónde sale |
+|---|---|---|
+| `--es-ds-rail` | 264px | `.doc { grid-template-columns: 264px … }` |
+| `--es-ds-rail-pad` | 22px | `.rail` (12px) + `.rail-brand` (10px) |
+| `--es-ds-gutter` | 40px | `--re-s8`, el padding lateral de `.pad` y `.hero` |
+| `--es-ds-content` | 1180px, fluido ≥1500px | el `max-width` de `.pad` |
+| `--es-ds-topbar-h` | 48px | alto de la navegación mínima |
+
+`.pad`, `.hero .in`, el header, la barra mínima y el footer derivan todos de
+ahí, así que **se ensanchan juntos**. Debajo de 1100px el rail deja de existir
+(regla del propio DS) y el chrome vuelve a un contenedor normal, con el mismo
+margen lateral que toma el documento ahí (`--re-s5`).
+
+---
+
+## 11. Visor de pantallas
+
+`assets/js/ds-screen-viewer.js` — **propio de esta página**, no el lightbox de
+Case Figure.
+
+Los dos son `<dialog>` modales, pero resuelven cosas distintas. El del portfolio
+ajusta la imagen entera al viewport y después hace pan/zoom, que es lo correcto
+para una foto; con una captura full-page de 1440×3224 eso la reducía al 28%: la
+pantalla entraba completa pero no se leía nada, y lo que se veía era una
+infografía vertical, no una interfaz.
+
+El visor del DS abre la pantalla **a su ancho real** y limita el alto al del
+navegador: lo que sobra se recorre con scroll vertical, como se recorrería la
+aplicación.
+
+- `data-es-screen-cssw` trae el ancho de la **interfaz** (1440 desktop, 390
+  mobile), no el del archivo — las capturas están tomadas a 2× y 3×. Sin ese
+  dato el visor no puede saber a qué escala es "100%".
+- El ancho de trabajo arranca en `min(anchoReal, anchoDisponible)`, así que al
+  abrir **nunca** hay scroll horizontal. Recién con zoom deliberado puede
+  aparecer.
+- `<dialog>.showModal()` aporta foco atrapado, capa superior y Escape. El área
+  de scroll es focusable, así que las flechas y PageUp/PageDown recorren la
+  pantalla sin mouse.
+
+El lightbox compartido **no se toca ni se carga acá**: sigue igual en los case
+studies.
 

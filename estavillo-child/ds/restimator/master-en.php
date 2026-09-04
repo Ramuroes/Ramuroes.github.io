@@ -13,9 +13,12 @@
  *
  * Diferencias con la fuente, todas producidas por el script:
  *  - §08 Screen Examples: los <iframe> a archivos .html locales y los enlaces
- *    "Abrir ↗" se reemplazan por previews estáticas que abren el lightbox
- *    compartido del portfolio ([data-es-zoom-trigger]). Toda la tarjeta es el
- *    trigger, incluida la palabra "Ampliar".
+ *    "Abrir ↗" se reemplazan por previews estáticas que abren el visor de
+ *    pantallas de esta página ([data-es-screen-trigger], ver
+ *    assets/js/ds-screen-viewer.js). Toda la tarjeta es el trigger, incluida
+ *    la palabra "Ampliar".
+ *  - §08: la comparación light/dark sale de la grilla y pasa a un bloque
+ *    propio, etiquetado como exploración.
  *  - §08 "Otras piezas": la tabla de enlaces pasa a inventario de texto plano.
  *  - Tema: la publicación declara un solo tema (dark). Light figura como
  *    planificado, nunca como disponible.
@@ -52,7 +55,7 @@ if ( ! defined( 'ABSPATH' ) ) {
   <a class="nv" href="#s10"><span class="n">10</span> Design → Implementation</a>
   <div class="rail-grp">Status</div>
   <a class="nv" href="#needs-review"><span class="n">SE</span> System evolution</a>
-  <div class="rail-foot">Source of truth: the files in this project.<br>Dark theme. Light planned.<br>Typography frozen 2026‑06‑16.</div>
+  <div class="rail-foot">Master documentation for the system.<br>Dark theme.<br>Typography frozen 2026‑06‑16.</div>
 </nav>
 
 <main class="main">
@@ -62,12 +65,12 @@ if ( ! defined( 'ABSPATH' ) ) {
   <div class="in">
     <div class="eyebrow">Design System · Master documentation</div>
     <h1>REstimator Design System</h1>
-    <p class="sub">The design system behind <b style="color:#fff">Presupuestador RE</b> — a B2B quoting tool for metalwork and ironwork shops. Dark, industrial, dense, desktop-first, with a single rationed amber accent. This document consolidates foundations, components, product patterns and the responsive system into one navigable reference for design, development and archive.</p>
+    <p class="sub">The design system behind <b style="color:#fff">Presupuestador RE</b>, a B2B quoting tool for metalwork and ironwork shops. Dark, industrial, dense, desktop-first, with a single rationed amber accent. This documentation gathers its foundations, its components, its product patterns and its responsive system.</p>
     <div class="facts">
       <div><div class="k">Tokens</div><div class="v num">147</div><div class="d">colour · type · space · elevation</div></div>
       <div><div class="k">Components</div><div class="v num">33</div><div class="d">exports in the namespace</div></div>
-      <div><div class="k">Screens</div><div class="v num">5 + 3</div><div class="d">desktop kit + mobile v1</div></div>
-      <div><div class="k">Theme</div><div class="v">Dark</div><div class="d">single theme · light planned</div></div>
+      <div><div class="k">Screens</div><div class="v v--pair"><span class="n num">5</span> desktop <span class="n num">3</span> mobile</div><div class="d">from the UI kit and the Mobile v1 spec</div></div>
+      <div><div class="k">Theme</div><div class="v">Dark</div><div class="d">the system’s only theme</div></div>
     </div>
   </div>
 </header>
@@ -77,10 +80,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 <!-- ============================================================ 00 -->
 <section class="sec" id="s00">
   <div class="sec-h"><span class="num-badge">00</span><h2>Overview</h2></div>
-  <p class="lede">Presupuestador RE helps estimators and shop owners produce faster, more consistent quotes from standardised criteria: families → subcategories → dimensions, calibrated price ranges, labour days and material references. It is operational software, not a marketing site.</p>
+  <p class="lede">Presupuestador RE helps estimators and shop owners produce faster, more consistent quotes from standardised criteria: families → subcategories → dimensions, calibrated price ranges, labour days and material references. It is a tool for daily work.</p>
 
   <h3 class="sub"><span class="tick"></span>What the system is for</h3>
-  <p class="body">To codify that product as reusable foundations, components and screen recreations, so any new surface is built on-brand in minutes. The mid-fi prototype <b>V1, frozen</b> is the canonical reference: the information architecture, the flows and the screen structure are frozen — the system raises <b>visual quality only</b>, it does not redesign flows or change the IA.</p>
+  <p class="body">To codify that product as reusable foundations, components and screen recreations, so any new surface is built on-brand in minutes. The <b>frozen V1</b> mid-fi prototype is the reference: the information architecture, the flows and the screen structure are already settled. The system raises <b>visual quality only</b>; it does not redesign flows or change the IA.</p>
 
   <h3 class="sub"><span class="tick"></span>Principles</h3>
   <div class="prin">
@@ -115,7 +118,7 @@ if ( ! defined( 'ABSPATH' ) ) {
   </div>
 
   <h3 class="sub"><span class="tick"></span>Non-negotiable product rules</h3>
-  <p class="body">They come from S12 and are respected on every new surface. They are not design decisions: they are domain rules.</p>
+  <p class="body">They come from S12 and are respected on every new surface. They are rules of the business domain, not design criteria.</p>
   <div class="rules">
     <div class="rule"><span class="n">1</span><div class="tx"><b>Freeze</b>Every quote freezes the parameter version it was calculated with; published ones are immutable.</div></div>
     <div class="rule"><span class="n">2</span><div class="tx"><b>QA gate</b>A parameter or product change only reaches production through a QA Run.</div></div>
@@ -464,7 +467,7 @@ if ( ! defined( 'ABSPATH' ) ) {
       <h4 class="mini" style="margin-top:0">API</h4>
       <dl class="spec"><dt>Badge · tone</dt><dd>neutral | ok | warn | crit | info</dd><dt>Badge · dot</dt><dd>boolean</dd><dt>Badge · square</dt><dd>mono code chip</dd><dt>Badge · icon</dt><dd>ReactNode</dd><dt>StatusBadge · status</dt><dd>draft | sent | appr | rej | cancel</dd><dt>StatusBadge · label</dt><dd>overrides the default label</dd></dl>
       <h4 class="mini">Usage</h4>
-      <ul class="body" style="margin:0"><li><b>StatusBadge</b> maps dot colour + written label automatically — do not assemble the pill by hand.</li>
+      <ul class="body" style="margin:0"><li><b>StatusBadge</b> maps dot colour + written label automatically. Do not assemble the pill by hand.</li>
         <li><b>square</b> for codes (<span class="mono">GV-A-00148</span>, <span class="mono">ESC-RECT</span>): mono, 5px radius.</li>
         <li>State is never communicated by colour alone: always dot + text.</li></ul>
     </div></div>
@@ -536,7 +539,7 @@ if ( ! defined( 'ABSPATH' ) ) {
       <dl class="spec"><dt>label</dt><dd>uppercase</dd><dt>value</dt><dd>tabular</dd><dt>sub</dt><dd>supporting line</dd><dt>accent</dt><dd>charcoal variant</dd><dt>dot</dt><dd>live status dot</dd><dt>amberValue</dt><dd>figure in amber</dd></dl>
       <h4 class="mini">Usage</h4>
       <ul class="body" style="margin:0"><li>Dashboard KPI row and status grids.</li>
-        <li><b>accent</b> is for <b>one single</b> highlighted tile per row — it is the charcoal anchor.</li>
+        <li><b>accent</b> is for <b>one single</b> highlighted tile per row: it is the charcoal anchor.</li>
         <li><b>amberValue</b> sparingly: headline figures only (it respects amber rationing).</li>
         <li><b>dot</b> combines with <span class="mono">accent</span> for “Live” panels.</li></ul>
     </div></div>
@@ -546,9 +549,9 @@ if ( ! defined( 'ABSPATH' ) ) {
   <h3 class="sub"><span class="tick"></span>TechnicalPreviewCard · TechnicalRenderers</h3>
   <div class="grid2">
     <div class="card"><div class="card-b">
-      <p class="body" style="margin:0 0 var(--re-s4)">The <b>only sanctioned drawing</b> in the system: schematic plans and elevations generated parametrically from the quote's own dimensions. They are measured diagrams, not illustration — 1px graphite structure lines, token-driven dimension overlays, amber reserved for the entry/railing cue.</p>
+      <p class="body" style="margin:0 0 var(--re-s4)">The <b>only sanctioned drawing</b> in the system: schematic plans and elevations generated parametrically from the quote’s own dimensions. They are measured diagrams, with 1px graphite structure lines, token-driven dimension overlays and amber reserved for the entry/railing cue.</p>
       <h4 class="mini">Registry</h4>
-      <p class="body" style="margin:0">Registry-based: <span class="mono">family</span>/<span class="mono">variant</span> select a renderer. Stairs ships four — <span class="mono">straight</span> (side elevation), <span class="mono">L</span>, <span class="mono">U</span> and <span class="mono">spiral</span> (plan views). Unknown families fall back to a “no technical view” placeholder.</p>
+      <p class="body" style="margin:0">Registry-based: <span class="mono">family</span>/<span class="mono">variant</span> select a renderer. Stairs ships four: <span class="mono">straight</span> (side elevation), <span class="mono">L</span>, <span class="mono">U</span> and <span class="mono">spiral</span> (plan views). Unknown families fall back to a “no technical view” placeholder.</p>
       <h4 class="mini">Permitted use</h4>
       <ul class="body" style="margin:0"><li>Calculator and editor previews, history rows, the client-facing document.</li>
         <li><b>Never</b> hand-draw decorative product art.</li></ul>
@@ -561,7 +564,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <li><b>standard</b> — + 4 dimensions + chips.</li>
         <li><b>large</b> — bigger stage + 6 dimensions.</li></ul>
       <h4 class="mini">Extending</h4>
-      <p class="body" style="margin:0"><span class="mono">TechnicalRenderers.register(family, variant, def)</span> · <span class="mono">setFamilyLabel</span> · <span class="mono">has</span> · <span class="mono">variants</span> · <span class="mono">families</span> — chainable. <span class="mono">escalones</span> is clamped to 4–16; a chip matching <span class="mono">/baranda|pasamano/</span> draws the railing on <span class="mono">recta</span>.</p>
+      <p class="body" style="margin:0"><span class="mono">TechnicalRenderers.register(family, variant, def)</span> · <span class="mono">setFamilyLabel</span> · <span class="mono">has</span> · <span class="mono">variants</span> · <span class="mono">families</span>, all chainable. <span class="mono">escalones</span> is clamped to 4–16; a chip matching <span class="mono">/baranda|pasamano/</span> draws the railing on <span class="mono">recta</span>.</p>
     </div></div>
   </div>
 </section>
@@ -743,7 +746,7 @@ if ( ! defined( 'ABSPATH' ) ) {
       <h4 class="mini">Helpers</h4>
       <ul class="body" style="margin:0"><li>Header classes: <span class="mono">is-right</span> · <span class="mono">is-center</span> · <span class="mono">is-sortable</span>.</li>
         <li>Cell classes: <span class="mono">re-cell-strong</span> (primary) · <span class="mono">re-cell-sub</span> (secondary line).</li>
-        <li><b>Wrap in <span class="mono">&lt;Card flush&gt;</span></b> — the card clips the table's overflow.</li>
+        <li><b>Wrap in <span class="mono">&lt;Card flush&gt;</span></b>: the card clips the table’s overflow.</li>
         <li><span class="mono">RowActions</span> is revealed on row hover.</li></ul></div></div>
     <div class="card"><div class="card-b">
       <h4 class="mini" style="margin-top:0">Amounts and figures</h4>
@@ -751,7 +754,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <li>Code in mono at 11.5px, colour <span class="mono">--re-ink-3</span>.</li>
         <li>Two-line row: primary (<span class="mono">re-cell-strong</span>) + secondary client · date.</li></ul>
       <h4 class="mini">Empty state — the product's real pattern</h4>
-      <div class="al nt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><div>Only saved quotes are listed. There are no hard deletes — the state is changed softly.</div></div>
+      <div class="al nt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><div>Only saved quotes are listed. There are no hard deletes: the state is changed softly.</div></div>
       <p class="body" style="margin:var(--re-s3) 0 0;font-size:12.5px">Empty states <b>explain the rule</b>, they do not just say “no results”.</p>
       <div class="nr" style="margin-top:var(--re-s4)"><span class="id">NR‑07</span><p>There is no <b>loading / skeleton</b> component in the system, and empty states exist only as copy inside screens, not as a reusable component.</p></div>
     </div></div>
@@ -784,7 +787,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="card"><div class="card-b">
       <h4 class="mini" style="margin-top:0">Pattern rules</h4>
       <ul class="body" style="margin:0"><li>The <b>recommended value</b> is the only amber figure on the screen and sits on the deepest charcoal.</li>
-        <li>It is always shown <b>with its range</b> (min / max) and a pin on the track — the number never appears alone.</li>
+        <li>It is always shown <b>with its range</b> (min / max) and a pin on the track: the number never appears alone.</li>
         <li>The price comes from calibrated <span class="mono">Fab_min/Fab_max</span>, <b>not</b> from labour days × rate.</li>
         <li>Always labelled <b>“fabrication value · + VAT”</b>: it is never implied to be a final price.</li>
         <li>The panel carries the “Live” dot: continuous recalculation, no calculate button.</li></ul>
@@ -829,7 +832,7 @@ if ( ! defined( 'ABSPATH' ) ) {
       <h4 class="mini" style="margin-top:0">Lifecycle and actions</h4>
       <ul class="body" style="margin:0"><li><b>States</b>: Draft → Sent → Approved / Rejected / Cancelled.</li>
         <li><b>No hard deletes</b>: the state change is soft and reversible.</li>
-        <li><b>Duplicate</b> is first-class — picking up a previous quote is the most common path.</li>
+        <li><b>Duplicate</b> is first-class: picking up a previous quote is the most common path.</li>
         <li><b>Freeze</b>: on publication, the quote freezes its version of the parameters and becomes immutable.</li>
         <li><b>Override</b>: the manual adjustment is recorded; it does not silently replace the recommended value.</li></ul>
       <h4 class="mini">Filters and search</h4>
@@ -859,7 +862,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <!-- ============================================================ 07 -->
 <section class="sec" id="s07">
   <div class="sec-h"><span class="num-badge">07</span><h2>Responsive System</h2></div>
-  <p class="lede">The same system at three densities. Mobile is <b>not another product</b>: same tokens, same taxonomy, same result steps and same vocabulary — with the navigation and result pattern that suits the available space.</p>
+  <p class="lede">The same system at three densities. Mobile is <b>not another product</b>: same tokens, same taxonomy, same result steps and same vocabulary, with the navigation and result pattern that suits the available space.</p>
 
   <h3 class="sub"><span class="tick"></span>Transformation by aspect</h3>
   <div class="scrollx"><table class="tb">
@@ -883,7 +886,7 @@ if ( ! defined( 'ABSPATH' ) ) {
   <p class="body">Four options were evaluated (sticky side · summarised top · bottom sheet · hybrid) and the <b>hybrid composition</b> was chosen: no single option wins at all three sizes, so the pattern adapts to the space. The recommended value stays <b>glanceable at all times</b>; the breakdown is <b>one tap away</b>.</p>
   <div class="grid3">
     <div class="card"><div class="card-b"><h4 class="mini" style="margin-top:0">Desktop ≥ 1200</h4><div style="font-size:15px;font-weight:600;margin-bottom:6px">Side panel</div>
-      <p class="body" style="margin:0;font-size:13px">Horizontal space to spare: the full breakdown stays sticky beside the form. It is what already worked — it is kept.</p></div></div>
+      <p class="body" style="margin:0;font-size:13px">Horizontal space to spare: the full breakdown stays sticky beside the form, as it already worked.</p></div></div>
     <div class="card"><div class="card-b"><h4 class="mini" style="margin-top:0">Tablet 834</h4><div style="font-size:15px;font-weight:600;margin-bottom:6px">Bottom sheet</div>
       <p class="body" style="margin:0;font-size:13px">Form at a comfortable width; a bottom peek bar with the recommended value + range + CTA. It expands without covering fields.</p></div></div>
     <div class="card"><div class="card-b"><h4 class="mini" style="margin-top:0">Mobile 390</h4><div style="font-size:15px;font-weight:600;margin-bottom:6px">Summary on top + sheet</div>
@@ -901,7 +904,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <li><b>Chips on one line</b> with horizontal scroll; the active one is solid amber, never wrapping to two lines.</li>
         <li><b>No sub-copy in touch headers</b>: title + back and nothing else.</li>
         <li><b>One brand mark per header</b>: monogram = app, avatar = user.</li>
-        <li>The bottom sheet carries <b>only</b> the breakdown — it never becomes navigation.</li></ul>
+        <li>The bottom sheet carries <b>only</b> the breakdown: it never becomes navigation.</li></ul>
       <p class="body" style="margin:var(--re-s4) 0 0;font-size:12.5px">Full spec: <span class="art-name">Mobile v1 — Implementation spec</span></p>
     </div></div>
   </div>
@@ -911,20 +914,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 <!-- ============================================================ 08 -->
 <section class="sec" id="s08">
   <div class="sec-h"><span class="num-badge">08</span><h2>Screen Examples</h2><span class="cnt">5 desktop · 3 mobile</span></div>
-  <p class="lede">Real screens built with the system. The five desktop ones come from the UI kit; the three mobile ones come from the Mobile v1 implementation spec. Each is shown as a high-resolution capture and can be expanded to inspect in detail.</p>
+  <p class="lede">The product screens built with the system. The five desktop ones come from the UI kit; the three mobile ones come from the Mobile v1 implementation spec. Each is captured at high resolution and can be opened to scroll through.</p>
 
   <h3 class="sub"><span class="tick"></span>Desktop — UI kit</h3>
   <div class="shots">
     <figure class="shot">
       <button type="button" class="vp"
-        data-es-zoom-trigger
-        data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'calculator.webp' ); ?>"
-        data-es-zoom-w="2880" data-es-zoom-h="3224"
-        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
-        aria-label="Expand screen: Calculator">
+        data-es-screen-trigger
+        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'calculator.webp' ); ?>"
+        data-es-screen-w="2880" data-es-screen-h="3224" data-es-screen-cssw="1440"
+        data-es-screen-name="Calculator"
+        data-es-screen-meta="Calculator.html"
+        aria-label="Open screen: Calculator">
         <span class="cap">
           <span class="nm">Calculator</span><span class="fl">Calculator.html</span>
           <span class="r"><span class="zoom-hint">Expand</span></span>
@@ -937,18 +938,16 @@ if ( ! defined( 'ABSPATH' ) ) {
             <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
           </span>
         </span>
-      </></></></></button>
+      </button>
     </figure>
     <figure class="shot">
       <button type="button" class="vp"
-        data-es-zoom-trigger
-        data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'history.webp' ); ?>"
-        data-es-zoom-w="2880" data-es-zoom-h="3086"
-        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
-        aria-label="Expand screen: History">
+        data-es-screen-trigger
+        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'history.webp' ); ?>"
+        data-es-screen-w="2880" data-es-screen-h="3086" data-es-screen-cssw="1440"
+        data-es-screen-name="History"
+        data-es-screen-meta="History.html"
+        aria-label="Open screen: History">
         <span class="cap">
           <span class="nm">History</span><span class="fl">History.html</span>
           <span class="r"><span class="zoom-hint">Expand</span></span>
@@ -961,18 +960,16 @@ if ( ! defined( 'ABSPATH' ) ) {
             <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
           </span>
         </span>
-      </></></></></button>
+      </button>
     </figure>
     <figure class="shot">
       <button type="button" class="vp"
-        data-es-zoom-trigger
-        data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'product-editor.webp' ); ?>"
-        data-es-zoom-w="2880" data-es-zoom-h="4592"
-        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
-        aria-label="Expand screen: Product editor">
+        data-es-screen-trigger
+        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'product-editor.webp' ); ?>"
+        data-es-screen-w="2880" data-es-screen-h="4592" data-es-screen-cssw="1440"
+        data-es-screen-name="Product editor"
+        data-es-screen-meta="ProductEditor.html"
+        aria-label="Open screen: Product editor">
         <span class="cap">
           <span class="nm">Product editor</span><span class="fl">ProductEditor.html</span>
           <span class="r"><span class="zoom-hint">Expand</span></span>
@@ -985,18 +982,16 @@ if ( ! defined( 'ABSPATH' ) ) {
             <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
           </span>
         </span>
-      </></></></></button>
+      </button>
     </figure>
     <figure class="shot">
       <button type="button" class="vp"
-        data-es-zoom-trigger
-        data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'client-summary.webp' ); ?>"
-        data-es-zoom-w="2880" data-es-zoom-h="4098"
-        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
-        aria-label="Expand screen: Client summary">
+        data-es-screen-trigger
+        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'client-summary.webp' ); ?>"
+        data-es-screen-w="2880" data-es-screen-h="4098" data-es-screen-cssw="1440"
+        data-es-screen-name="Client summary"
+        data-es-screen-meta="ClientSummary.html"
+        aria-label="Open screen: Client summary">
         <span class="cap">
           <span class="nm">Client summary</span><span class="fl">ClientSummary.html</span>
           <span class="r"><span class="zoom-hint">Expand</span></span>
@@ -1009,18 +1004,16 @@ if ( ! defined( 'ABSPATH' ) ) {
             <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
           </span>
         </span>
-      </></></></></button>
+      </button>
     </figure>
     <figure class="shot">
       <button type="button" class="vp"
-        data-es-zoom-trigger
-        data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'catalogs.webp' ); ?>"
-        data-es-zoom-w="2880" data-es-zoom-h="3274"
-        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
-        aria-label="Expand screen: Catalogues">
+        data-es-screen-trigger
+        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'catalogs.webp' ); ?>"
+        data-es-screen-w="2880" data-es-screen-h="3274" data-es-screen-cssw="1440"
+        data-es-screen-name="Catalogues"
+        data-es-screen-meta="Catalogs.html"
+        aria-label="Open screen: Catalogues">
         <span class="cap">
           <span class="nm">Catalogues</span><span class="fl">Catalogs.html</span>
           <span class="r"><span class="zoom-hint">Expand</span></span>
@@ -1033,48 +1026,22 @@ if ( ! defined( 'ABSPATH' ) ) {
             <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
           </span>
         </span>
-      </></></></></button>
-    </figure>
-    <figure class="shot">
-      <button type="button" class="vp"
-        data-es-zoom-trigger
-        data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'light-dark.webp' ); ?>"
-        data-es-zoom-w="2880" data-es-zoom-h="6224"
-        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
-        aria-label="Expand screen: Light / dark comparison">
-        <span class="cap">
-          <span class="nm">Light / dark comparison</span><span class="fl">Light &amp; Dark Comparison.html</span>
-          <span class="r"><span class="zoom-hint">Expand</span></span>
-        </span>
-        <span class="vp-media">
-          <img src="<?php echo esc_url( $es_ds_screens . 'light-dark-preview.webp' ); ?>"
-               alt="Light / dark comparison — Presupuestador RE"
-               width="1520" height="3285" loading="lazy" decoding="async">
-          <span class="vp-expand" aria-hidden="true">
-            <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
-          </span>
-        </span>
-      </></></></></button>
+      </button>
     </figure>
   </div>
-  <p class="body" style="margin-top:var(--re-s4);font-size:12.5px;color:var(--re-ink-4)">High-resolution captures of the kit’s real screens. Click any of them to expand and inspect it in detail.</p>
+  <p class="body" style="margin-top:var(--re-s4);font-size:12.5px;color:var(--re-ink-4)">Captures of the kit’s real screens. Click any of them to open it and scroll through the full screen.</p>
 
   <h3 class="sub"><span class="tick"></span>Mobile v1 — final screens</h3>
-  <p class="body">Calculator, Home and History were frozen for implementation, with measurements, spacing, components and sticky behaviour per screen. They are documented in their own file so the source of truth is not duplicated.</p>
+  <p class="body">Calculator, Home and History were frozen for implementation, with measurements, spacing, components and sticky behaviour per screen. They are documented in their own file so they are not duplicated here.</p>
   <div class="shots shots--mobile">
     <figure class="shot shot--mobile">
       <button type="button" class="vp"
-        data-es-zoom-trigger
-        data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'mobile-calculator.webp' ); ?>"
-        data-es-zoom-w="1176" data-es-zoom-h="2349"
-        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
-        aria-label="Expand screen: Calculator">
+        data-es-screen-trigger
+        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'mobile-calculator.webp' ); ?>"
+        data-es-screen-w="1176" data-es-screen-h="2349" data-es-screen-cssw="392"
+        data-es-screen-name="Calculator"
+        data-es-screen-meta="390 · default — form + pinned summary"
+        aria-label="Open screen: Calculator">
         <span class="cap">
           <span class="nm">Calculator</span><span class="fl">390 · default — form + pinned summary</span>
           <span class="r"><span class="zoom-hint">Expand</span></span>
@@ -1087,18 +1054,16 @@ if ( ! defined( 'ABSPATH' ) ) {
             <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
           </span>
         </span>
-      </></></></></button>
+      </button>
     </figure>
     <figure class="shot shot--mobile">
       <button type="button" class="vp"
-        data-es-zoom-trigger
-        data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'mobile-home.webp' ); ?>"
-        data-es-zoom-w="1176" data-es-zoom-h="2349"
-        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
-        aria-label="Expand screen: Home">
+        data-es-screen-trigger
+        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'mobile-home.webp' ); ?>"
+        data-es-screen-w="1176" data-es-screen-h="2349" data-es-screen-cssw="392"
+        data-es-screen-name="Home"
+        data-es-screen-meta="390 · default"
+        aria-label="Open screen: Home">
         <span class="cap">
           <span class="nm">Home</span><span class="fl">390 · default</span>
           <span class="r"><span class="zoom-hint">Expand</span></span>
@@ -1111,18 +1076,16 @@ if ( ! defined( 'ABSPATH' ) ) {
             <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
           </span>
         </span>
-      </></></></></button>
+      </button>
     </figure>
     <figure class="shot shot--mobile">
       <button type="button" class="vp"
-        data-es-zoom-trigger
-        data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'mobile-history.webp' ); ?>"
-        data-es-zoom-w="1176" data-es-zoom-h="2349"
-        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
-        aria-label="Expand screen: History">
+        data-es-screen-trigger
+        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'mobile-history.webp' ); ?>"
+        data-es-screen-w="1176" data-es-screen-h="2349" data-es-screen-cssw="392"
+        data-es-screen-name="History"
+        data-es-screen-meta="390 · default"
+        aria-label="Open screen: History">
         <span class="cap">
           <span class="nm">History</span><span class="fl">390 · default</span>
           <span class="r"><span class="zoom-hint">Expand</span></span>
@@ -1135,11 +1098,39 @@ if ( ! defined( 'ABSPATH' ) ) {
             <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
           </span>
         </span>
-      </></></></></button>
+      </button>
     </figure>
-  </div></section></div>
+  </div>
 
-  <h3 class="sub"><span class="tick"></span>Other pieces of the project</h3>
+  <h3 class="sub"><span class="tick"></span>Colour exploration</h3>
+  <p class="body" style="max-width:78ch">A colour remap tried while the system was being designed, kept as a record. The published system has one theme, dark; this comparison is not an available theme.</p>
+  <div class="shots shots--single">
+    <figure class="shot">
+      <button type="button" class="vp"
+        data-es-screen-trigger
+        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'light-dark.webp' ); ?>"
+        data-es-screen-w="2880" data-es-screen-h="6224" data-es-screen-cssw="1440"
+        data-es-screen-name="Light / dark comparison"
+        data-es-screen-meta="Light &amp; Dark Comparison.html"
+        aria-label="Open screen: Light / dark comparison">
+        <span class="cap">
+          <span class="nm">Light / dark comparison</span><span class="art-kind">Exploration</span><span class="fl">Light &amp; Dark Comparison.html</span>
+          <span class="r"><span class="zoom-hint">Expand</span></span>
+        </span>
+        <span class="vp-media">
+          <img src="<?php echo esc_url( $es_ds_screens . 'light-dark-preview.webp' ); ?>"
+               alt="Light / dark comparison — Presupuestador RE"
+               width="1520" height="3285" loading="lazy" decoding="async">
+          <span class="vp-expand" aria-hidden="true">
+            <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+          </span>
+        </span>
+      </button>
+    </figure>
+  </div>
+
+  <h3 class="sub"><span class="tick"></span>Supporting documentation</h3>
+  <p class="lede">The documents where the things this system takes as settled were decided: audits, the V1 scope lock and the handoff package.</p>
   <div class="scrollx"><table class="tb">
     <thead><tr><th>Artifact</th><th>Type</th><th>What it contains</th></tr></thead>
     <tbody>
@@ -1149,20 +1140,21 @@ if ( ! defined( 'ABSPATH' ) ) {
       <tr><td><span class="art-name">Accessibility Review · UX Review</span></td><td><span class="art-kind">Review</span></td><td>Results of the accessibility and UX reviews of the frozen kit.</td></tr>
       <tr><td><span class="art-name">Claude Code Handoff Package</span></td><td><span class="art-kind">Handoff</span></td><td>Handoff package for development.</td></tr>
     </tbody></table></div>
-  <p class="body" style="margin-top:var(--re-s4);font-size:12.5px;color:var(--re-ink-4)">Internal project documents. Listed as an inventory: they are not part of this publication.</p>
-
+  <p class="body" style="margin-top:var(--re-s4);font-size:12.5px;color:var(--re-ink-4)">Listed as an inventory, not published. Names are each document’s original title, in the language it was written in.</p>
+</section>
 
 <!-- ============================================================ 09 -->
 <section class="sec" id="s09">
   <div class="sec-h"><span class="num-badge">09</span><h2>Component Inventory</h2><span class="cnt">33 built · 6 specified</span></div>
-  <p class="lede">Full inventory. <b>Status</b>: <span class="tag stable">Stable</span> built and in use · <span class="tag ext">Extended</span> exists but needs extending for mobile · <span class="tag new">New</span> specified in Mobile v1, not built · <span class="tag rev">Needs review</span> documented inconsistency.</p>
+  <p class="lede">The 33 components that were built and the 6 that were specified, with what each one covers today on desktop and on mobile. The <b>Status</b> column says where in the system it stands:</p>
+  <dl class="ivt-legend"><div><dt><span class="tag stable">Stable</span></dt><dd>built and in use.</dd></div><div><dt><span class="tag ext">Extended</span></dt><dd>exists, and still needs mobile coverage.</dd></div><div><dt><span class="tag new">New</span></dt><dd>specified in Mobile v1, not built yet.</dd></div><div><dt><span class="tag rev">Needs review</span></dt><dd>has a documented inconsistency.</dd></div></dl>
   <div class="scrollx"><table class="tb dense">
     <thead><tr><th>Component</th><th>Category</th><th>Variants</th><th>States</th><th>Desktop</th><th>Mobile</th><th>Status</th><th>Implementation notes</th></tr></thead>
     <tbody>
       <tr><td>Button</td><td>Forms</td><td>secondary · primary · accent · ghost / sm·md·lg</td><td>default · hover · focus · disabled</td><td>Yes</td><td>Yes</td><td><span class="tag stable">Stable</span></td><td>One primary/accent per view. Mobile uses h42 in action bars.</td></tr>
       <tr><td>IconButton</td><td>Forms</td><td>default 34 · bare 30 · danger</td><td>default · hover · focus · disabled</td><td>Yes</td><td>Partial</td><td><span class="tag stable">Stable</span></td><td><span class="mono">title</span> required. On mobile, raise the hit area to ≥44.</td></tr>
       <tr><td>Field</td><td>Forms</td><td>label · optional · note</td><td>—</td><td>Yes</td><td>Yes</td><td><span class="tag stable">Stable</span></td><td>Wrapper for every control.</td></tr>
-      <tr><td>Input</td><td>Forms</td><td>prefix · suffix · leadIcon · num</td><td>default · focus · disabled · placeholder</td><td>Yes</td><td>Yes</td><td><span class="tag rev">Needs review</span></td><td>No error/invalid state — see NR‑06.</td></tr>
+      <tr><td>Input</td><td>Forms</td><td>prefix · suffix · leadIcon · num</td><td>default · focus · disabled · placeholder</td><td>Yes</td><td>Yes</td><td><span class="tag rev">Needs review</span></td><td>No error/invalid state (see NR‑06).</td></tr>
       <tr><td>Select</td><td>Forms</td><td>native + chevron</td><td>default · focus · disabled</td><td>Yes</td><td>Yes</td><td><span class="tag stable">Stable</span></td><td>Pass <span class="mono">&lt;option&gt;</span> as children.</td></tr>
       <tr><td>Textarea</td><td>Forms</td><td>vertical resize</td><td>default · focus · disabled</td><td>Yes</td><td>Yes</td><td><span class="tag stable">Stable</span></td><td>Quote notes.</td></tr>
       <tr><td>Toggle</td><td>Forms</td><td>md 38 · sm 32 · accent</td><td>on · off · disabled</td><td>Yes</td><td>Yes</td><td><span class="tag stable">Stable</span></td><td>Charcoal track when on; <span class="mono">sm</span> for table rows.</td></tr>
@@ -1180,7 +1172,7 @@ if ( ! defined( 'ABSPATH' ) ) {
       <tr><td>TechnicalRenderers</td><td>Layout</td><td>registry API</td><td>—</td><td>Yes</td><td>Yes</td><td><span class="tag stable">Stable</span></td><td><span class="mono">register · setFamilyLabel · has · variants · families</span></td></tr>
       <tr><td>AppShell</td><td>Navigation</td><td>sidebar + topbar + main</td><td>—</td><td>Yes</td><td>Mode required</td><td><span class="tag ext">Extended</span></td><td>Needs 3 modes: sidebar / tabs / bottom bar.</td></tr>
       <tr><td>Sidebar</td><td>Navigation</td><td>logo · footer</td><td>—</td><td>Yes</td><td>Not applicable</td><td><span class="tag stable">Stable</span></td><td>248px fixed, sticky.</td></tr>
-      <tr><td>LogoMark</td><td>Navigation</td><td>mark · name · tagline</td><td>—</td><td>Yes</td><td>Yes</td><td><span class="tag rev">Needs review</span></td><td>Default tagline is misaligned — see NR‑02.</td></tr>
+      <tr><td>LogoMark</td><td>Navigation</td><td>mark · name · tagline</td><td>—</td><td>Yes</td><td>Yes</td><td><span class="tag rev">Needs review</span></td><td>Default tagline is misaligned (see NR‑02).</td></tr>
       <tr><td>NavGroup</td><td>Navigation</td><td>label · first</td><td>—</td><td>Yes</td><td>Not applicable</td><td><span class="tag stable">Stable</span></td><td>The sidebar's uppercase eyebrow.</td></tr>
       <tr><td>NavItem</td><td>Navigation</td><td>icon · label · as</td><td>default · hover · active</td><td>Yes</td><td>Replaced</td><td><span class="tag stable">Stable</span></td><td>Active = 3px amber rail + bold label.</td></tr>
       <tr><td>Topbar</td><td>Navigation</td><td>breadcrumbs · actions</td><td>—</td><td>Yes</td><td>Compact variant</td><td><span class="tag ext">Extended</span></td><td>Mobile: back + title, no breadcrumbs.</td></tr>
@@ -1189,7 +1181,7 @@ if ( ! defined( 'ABSPATH' ) ) {
       <tr><td>Table</td><td>Data</td><td>is-right/center/sortable helpers</td><td>row hover</td><td>Yes</td><td>Row → card</td><td><span class="tag stable">Stable</span></td><td>Wrap in <span class="mono">Card flush</span>.</td></tr>
       <tr><td>TableToolbar</td><td>Data</td><td>title · count · actions</td><td>—</td><td>Yes</td><td>Simplified</td><td><span class="tag stable">Stable</span></td><td>Result count pill.</td></tr>
       <tr><td>RowActions</td><td>Data</td><td>cluster of IconButtons</td><td>revealed on hover</td><td>Yes</td><td>⋯ overflow</td><td><span class="tag ext">Extended</span></td><td>There is no hover on touch: it needs a ⋯ menu.</td></tr>
-      <tr><td>Pagination</td><td>Data</td><td>showing · pages · current</td><td>current · hover</td><td>Yes</td><td>Not documented</td><td><span class="tag ext">Extended</span></td><td>Mobile will probably be infinite scroll or “load more” — undefined.</td></tr>
+      <tr><td>Pagination</td><td>Data</td><td>showing · pages · current</td><td>current · hover</td><td>Yes</td><td>Not documented</td><td><span class="tag ext">Extended</span></td><td>On mobile it will be infinite scroll or “load more”, still undefined.</td></tr>
       <tr><td>TaxonomyIcon</td><td>Icons</td><td>10 categories · size · strokeWidth</td><td>currentColor · amber when active</td><td>Yes</td><td>Yes</td><td><span class="tag stable">Stable</span></td><td>Also used in the bottom tab bar.</td></tr>
       <tr><td>TAXONOMY_ICONS</td><td>Icons</td><td>ordered array</td><td>—</td><td>Yes</td><td>Yes</td><td><span class="tag stable">Stable</span></td><td>Iterate it for menus and catalogues.</td></tr>
       <tr><td>BottomTabBar</td><td>Navigation</td><td>5 tabs</td><td>active · inactive</td><td>Not applicable</td><td>Yes</td><td><span class="tag new">New</span></td><td>h64 + safe area. Icons 21, label 10.</td></tr>
@@ -1198,8 +1190,8 @@ if ( ! defined( 'ABSPATH' ) ) {
       <tr><td>ResultSummary</td><td>Product</td><td>pinned charcoal</td><td>sticky · live</td><td>Not applicable</td><td>Yes</td><td><span class="tag new">New</span></td><td>A ResultPanel variant: recommended + range + size + “View breakdown”.</td></tr>
       <tr><td>ResultSheet</td><td>Product</td><td>bottom sheet</td><td>open · closed</td><td>Not applicable</td><td>Yes</td><td><span class="tag new">New</span></td><td>Top radius 18, max 78%, grab 38×4, scrim .6.</td></tr>
       <tr><td>FilterChips</td><td>Data</td><td>one line, scroll-x</td><td>active solid amber · inactive</td><td>Partial</td><td>Yes</td><td><span class="tag new">New</span></td><td>Never wraps to two lines.</td></tr>
-      <tr><td>Checkbox · Radio</td><td>Forms</td><td>—</td><td>—</td><td>No</td><td>No</td><td><span class="tag rev">Needs review</span></td><td>They do not exist in the system — see NR‑13.</td></tr>
-      <tr><td>Skeleton · Spinner</td><td>Feedback</td><td>—</td><td>—</td><td>No</td><td>No</td><td><span class="tag rev">Needs review</span></td><td>No loading component — see NR‑07.</td></tr>
+      <tr><td>Checkbox · Radio</td><td>Forms</td><td>—</td><td>—</td><td>No</td><td>No</td><td><span class="tag rev">Needs review</span></td><td>They do not exist in the system (see NR‑13).</td></tr>
+      <tr><td>Skeleton · Spinner</td><td>Feedback</td><td>—</td><td>—</td><td>No</td><td>No</td><td><span class="tag rev">Needs review</span></td><td>No loading component (see NR‑07).</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -1214,7 +1206,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="lk"><div class="st">02 · Token</div><div class="k">Variable</div><div class="ex">--re-amber #e0911e<br>--re-amber-bright #f5b342</div><div class="d">It lives in <span class="mono">tokens/colors.css</span>. Everything else references it.</div></div>
     <div class="lk"><div class="st">03 · Component</div><div class="k">Primitive</div><div class="ex">Button variant="accent"<br>StatTile amberValue</div><div class="d">The component never hardcodes the hex: it reads the variable.</div></div>
     <div class="lk"><div class="st">04 · Pattern</div><div class="k">Composition</div><div class="ex">Recommended value<br>+ range + track</div><div class="d">The amber figure on charcoal with its range: business meaning.</div></div>
-    <div class="lk"><div class="st">05 · Screen</div><div class="k">Instance</div><div class="ex">Calculator.html<br>ResultSummary (mobile)</div><div class="d">The same pattern, three densities — without deciding anything again.</div></div>
+    <div class="lk"><div class="st">05 · Screen</div><div class="k">Instance</div><div class="ex">Calculator.html<br>ResultSummary (mobile)</div><div class="d">The same pattern at three densities, without deciding anything again.</div></div>
   </div>
 
   <h3 class="sub"><span class="tick"></span>How to consume the system</h3>
@@ -1231,7 +1223,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="card"><div class="card-b">
       <h4 class="mini" style="margin-top:0">Rules for new surfaces</h4>
       <ul class="body" style="margin:0"><li><b>Never</b> a literal hex: always <span class="mono">var(--re-*)</span>. If a token is missing, it is added to the system, not to the screen.</li>
-        <li><b>Never</b> re-explore typography — it is frozen.</li>
+        <li><b>Never</b> re-explore typography: it is frozen.</li>
         <li><b>Respect amber rationing</b>: recommended value · active rail/tab · CTA · logo.</li>
         <li><b>Icons</b>: copy the shapes from the kit; 24×24, stroke 1.7–1.8, round caps.</li>
         <li><b>No emoji</b>, no gradients, no glass, no decorative blur.</li>
@@ -1264,7 +1256,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
   <details class="ev-audit">
     <summary>Internal audit log (13 notes)</summary>
-    <p class="body">Inconsistencies and gaps found during the system audit. None were fixed silently: they stay documented so each is resolved as an explicit decision. This is internal working material, not a list of product defects.</p>
+    <p class="body">Inconsistencies and gaps found while auditing the system. They stay written down so each is resolved as an explicit decision rather than patched along the way. This is internal working material.</p>
     <div class="stack">
     <div class="nr"><span class="id">NR‑01</span><p><b>Prose vs. token in <span class="mono">--re-ink-4</span>.</b> The readme describes <span class="mono">#686d76</span>; the real token is <span class="mono">#7f858e</span> (raised to meet WCAG AA). The readme's prose fell out of date with the token file.</p></div>
     <div class="nr"><span class="id">NR‑02</span><p><b><span class="mono">LogoMark</span> default tagline.</b> The component ships <span class="mono">'RE · v1.0'</span>; the kit and the mockups show <span class="mono">“REstimator · motor v1.5”</span>. Decide which one is canonical.</p></div>
@@ -1275,7 +1267,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="nr"><span class="id">NR‑07</span><p><b>No loading or empty state as components.</b> There is no skeleton/spinner; empty states are copy inside screens.</p></div>
     <div class="nr"><span class="id">NR‑08</span><p><b>Amber rationing on mobile.</b> The rule defines four moments; mobile adds the active tab (amber-ink) and the active filter chip (solid amber). The rule needs restating for touch, or those uses reclassifying as “active rail”.</p></div>
     <div class="nr"><span class="id">NR‑09</span><p><b>6 mobile components specified but not built.</b> <span class="mono">BottomTabBar · MobileHeader · BottomActionBar · ResultSummary · ResultSheet · FilterChips</span> exist in Mobile v1 but not in <span class="mono">components/</span>.</p></div>
-    <div class="nr"><span class="id">NR‑10</span><p><b>Obsolete starting points.</b> The kit's 4 screens are marked <span class="mono">@startingPoint</span>, a mechanism consuming projects no longer offer — <span class="mono">templates/</span> replaced it, and today there are 0 templates.</p></div>
+    <div class="nr"><span class="id">NR‑10</span><p><b>Obsolete starting points.</b> The kit’s 4 screens are marked <span class="mono">@startingPoint</span>, a mechanism consuming projects no longer offer. <span class="mono">templates/</span> replaced it, and today there are 0 templates.</p></div>
     <div class="nr"><span class="id">NR‑11</span><p><b>Fonts over CDN.</b> <span class="mono">tokens/fonts.css</span> imports Hanken Grotesk and JetBrains Mono from Google Fonts. A truly offline standalone export would need them self-hosted or inlined.</p></div>
     <div class="nr"><span class="id">NR‑12</span><p><b>Tablet without an artifact.</b> The layer is documented but there is no tablet screen in <span class="mono">ui_kits/</span>; its values come from the refinement mockups.</p></div>
     <div class="nr"><span class="id">NR‑13</span><p><b>No Checkbox or Radio.</b> The product avoids them (it uses Select, SegmentedControl and Toggle), but this is worth stating as an explicit system decision rather than leaving it as a gap.</p></div>
@@ -1285,6 +1277,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <footer style="border-top:1px solid var(--re-line);margin-top:var(--re-s9);padding-top:var(--re-s5);display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;font-size:12px;color:var(--re-ink-4)"><span>REstimator Design System — Master Documentation</span> <span class="mono">147 tokens · 33 components</span></footer>
 
-</main></div>
-
-
+</div>
+</main>
+</div>

@@ -243,7 +243,19 @@ const DESKTOP_SHOTS = [
 	{ id: 'product-editor', name: { es: 'Editor de producto', en: 'Product editor' },                     file: 'ProductEditor.html', kind: 'screen' },
 	{ id: 'client-summary', name: { es: 'Resumen cliente', en: 'Client summary' },                        file: 'ClientSummary.html', kind: 'screen' },
 	{ id: 'catalogs',       name: { es: 'Catálogos', en: 'Catalogues' },                                  file: 'Catalogs.html',      kind: 'screen' },
-	{ id: 'light-dark',     name: { es: 'Comparación light / dark', en: 'Light / dark comparison' },       file: 'Light & Dark Comparison.html', kind: 'view', prepare: prepareLightDark, tallViewport: true },
+	{
+		id: 'light-dark',
+		name: { es: 'Comparación light / dark', en: 'Light / dark comparison' },
+		file: 'Light & Dark Comparison.html',
+		// No es una pantalla del producto: es el registro de una exploración. Va
+		// fuera de la grilla de Screen Examples y etiquetada como tal, para que
+		// el contador "5 desktop" siga siendo cierto y para que nadie la lea
+		// como prueba de que existe un tema light disponible.
+		kind: 'view',
+		tag: { es: 'Exploración', en: 'Exploration' },
+		prepare: prepareLightDark,
+		tallViewport: true,
+	},
 ];
 
 /**
@@ -386,40 +398,70 @@ const SYSTEM_EVOLUTION = [
  */
 const UI = {
 	es: {
-		shotsLede: 'Pantallas reales construidas con el sistema. Las cinco de desktop son las del UI kit; las tres de mobile vienen de la spec de implementación Mobile v1. Cada una se muestra como captura de alta resolución y se puede ampliar para inspeccionarla en detalle.',
-		shotsNote: 'Capturas de alta resolución de las pantallas reales del kit. Hacé click en cualquiera para ampliarla e inspeccionarla en detalle.',
+		shotsLede: 'Las pantallas del producto construidas con el sistema. Las cinco de desktop son las del UI kit; las tres de mobile vienen de la spec de implementación Mobile v1. Cada una está capturada en alta resolución y se puede abrir para recorrerla.',
+		shotsNote: 'Capturas de las pantallas reales del kit. Hacé click en cualquiera para abrirla y recorrerla completa.',
 		zoomHint: 'Ampliar',
-		expandAria: 'Ampliar pantalla: %s',
+		expandAria: 'Abrir pantalla: %s',
+		explorationTitle: 'Exploración de color',
+		explorationNote: 'Una prueba de remap de color hecha durante el diseño del sistema, guardada como registro. El sistema publicado tiene un solo tema, dark; esta comparación no es un tema disponible.',
+		artifactsTitle: 'Documentación de respaldo',
+		artifactsLede: 'Los documentos donde se decidieron las cosas que este sistema da por resueltas: auditorías, el cierre de alcance de la V1 y el paquete de handoff.',
 		artifactsHead: ['Artefacto', 'Tipo', 'Qué contiene'],
-		artifactsNote: 'Documentos internos del proyecto. Se listan como inventario: no forman parte de esta publicación.',
+		artifactsNote: 'Se listan como inventario, sin publicarse. Los nombres son los originales de cada documento.',
 		specFull: 'Spec completa:',
+		inventoryLede: 'Los 33 componentes construidos y los 6 que quedaron especificados, con lo que cada uno cubre hoy en desktop y en mobile. La columna <b>Estado</b> dice en qué punto del sistema está:',
+		inventoryStates: [
+			['Estable', 'stable', 'construido y en uso.'],
+			['Extendido', 'ext', 'existe, y le falta cobertura para mobile.'],
+			['Nuevo', 'new', 'especificado en Mobile v1, todavía sin construir.'],
+			['Requiere revisión', 'rev', 'tiene una inconsistencia documentada.'],
+		],
 		evolutionTitle: 'Evolución del sistema',
 		evolutionLede: 'Las líneas de trabajo abiertas del sistema y en qué estado está cada una.',
 		auditTitle: 'Notas de auditoría',
 		auditSummary: 'Registro interno de auditoría (13 notas)',
-		auditIntro: 'Inconsistencias y huecos detectados durante la auditoría del sistema. Ninguno se corrigió en silencio: quedan documentados para resolverse como decisión explícita. Es material de trabajo interno, no un listado de defectos del producto.',
-		railFoot: 'Fuente de verdad: los archivos de este proyecto.<br>Tema dark. Light planificado.<br>Tipografía congelada 2026‑06‑16.',
+		auditIntro: 'Inconsistencias y huecos detectados al auditar el sistema. Quedan escritos para resolverse como decisión explícita en vez de corregirse sobre la marcha. Es material de trabajo interno.',
+		railFoot: 'Documentación maestra del sistema.<br>Tema dark.<br>Tipografía congelada 2026‑06‑16.',
+		screensFactLabel: 'Pantallas',
+		screensDesktop: 'desktop',
+		screensMobile: 'mobile',
+		screensFactNote: 'del UI kit y de la spec Mobile v1',
 		themeFactLabel: 'Tema',
 		themeFactValue: 'Dark',
-		themeFactNote: 'único tema · light planificado',
+		themeFactNote: 'el único tema del sistema',
 	},
 	en: {
-		shotsLede: 'Real screens built with the system. The five desktop ones come from the UI kit; the three mobile ones come from the Mobile v1 implementation spec. Each is shown as a high-resolution capture and can be expanded to inspect in detail.',
-		shotsNote: 'High-resolution captures of the kit’s real screens. Click any of them to expand and inspect it in detail.',
+		shotsLede: 'The product screens built with the system. The five desktop ones come from the UI kit; the three mobile ones come from the Mobile v1 implementation spec. Each is captured at high resolution and can be opened to scroll through.',
+		shotsNote: 'Captures of the kit’s real screens. Click any of them to open it and scroll through the full screen.',
 		zoomHint: 'Expand',
-		expandAria: 'Expand screen: %s',
+		expandAria: 'Open screen: %s',
+		explorationTitle: 'Colour exploration',
+		explorationNote: 'A colour remap tried while the system was being designed, kept as a record. The published system has one theme, dark; this comparison is not an available theme.',
+		artifactsTitle: 'Supporting documentation',
+		artifactsLede: 'The documents where the things this system takes as settled were decided: audits, the V1 scope lock and the handoff package.',
 		artifactsHead: ['Artifact', 'Type', 'What it contains'],
-		artifactsNote: 'Internal project documents. Listed as an inventory: they are not part of this publication.',
+		artifactsNote: 'Listed as an inventory, not published. Names are each document’s original title, in the language it was written in.',
 		specFull: 'Full spec:',
+		inventoryLede: 'The 33 components that were built and the 6 that were specified, with what each one covers today on desktop and on mobile. The <b>Status</b> column says where in the system it stands:',
+		inventoryStates: [
+			['Stable', 'stable', 'built and in use.'],
+			['Extended', 'ext', 'exists, and still needs mobile coverage.'],
+			['New', 'new', 'specified in Mobile v1, not built yet.'],
+			['Needs review', 'rev', 'has a documented inconsistency.'],
+		],
 		evolutionTitle: 'System evolution',
 		evolutionLede: 'The system’s open workstreams and the state each one is in.',
 		auditTitle: 'Audit notes',
 		auditSummary: 'Internal audit log (13 notes)',
-		auditIntro: 'Inconsistencies and gaps found during the system audit. None were fixed silently: they stay documented so each is resolved as an explicit decision. This is internal working material, not a list of product defects.',
-		railFoot: 'Source of truth: the files in this project.<br>Dark theme. Light planned.<br>Typography frozen 2026‑06‑16.',
+		auditIntro: 'Inconsistencies and gaps found while auditing the system. They stay written down so each is resolved as an explicit decision rather than patched along the way. This is internal working material.',
+		railFoot: 'Master documentation for the system.<br>Dark theme.<br>Typography frozen 2026‑06‑16.',
+		screensFactLabel: 'Screens',
+		screensDesktop: 'desktop',
+		screensMobile: 'mobile',
+		screensFactNote: 'from the UI kit and the Mobile v1 spec',
 		themeFactLabel: 'Theme',
 		themeFactValue: 'Dark',
-		themeFactNote: 'single theme · light planned',
+		themeFactNote: 'the system’s only theme',
 	},
 };
 
@@ -457,19 +499,29 @@ function shotCard(shot, lang, { mobile = false } = {}) {
 	const name = typeof shot.name === 'string' ? shot.name : shot.name[lang];
 	const meta = mobile ? shot.note[lang] : shot.file;
 	const t = UI[lang];
+
+	/*
+	 * Ancho de la INTERFAZ, no de la captura. El visor abre la pantalla a su
+	 * tamaño real —1440px de diseño para desktop, 390 para mobile— y no a los
+	 * 2880/1170 px del archivo, que son el ancho multiplicado por el
+	 * deviceScaleFactor con el que se capturó (2× desktop, 3× mobile, ver
+	 * buildShots). Sin este dato el visor no puede saber a qué escala es "100%"
+	 * y tendría que adivinarlo.
+	 */
+	const dpr = mobile ? 3 : 2;
+	const cssW = full.w ? Math.round(full.w / dpr) : 0;
+
 	return `
     <figure class="${cls}" data-i18n-skip>
       <button type="button" class="vp"
-        data-es-zoom-trigger
-        data-es-zoom-src="<?php echo esc_url( $es_ds_screens . '${shot.id}.webp' ); ?>"
-        data-es-zoom-w="${full.w}" data-es-zoom-h="${full.h}"
-        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
+        data-es-screen-trigger
+        data-es-screen-src="<?php echo esc_url( $es_ds_screens . '${shot.id}.webp' ); ?>"
+        data-es-screen-w="${full.w}" data-es-screen-h="${full.h}" data-es-screen-cssw="${cssW}"
+        data-es-screen-name="${esc(name)}"
+        data-es-screen-meta="${esc(meta)}"
         aria-label="${esc(t.expandAria.replace('%s', name))}">
         <span class="cap">
-          <span class="nm">${esc(name)}</span><span class="fl">${esc(meta)}</span>
+          <span class="nm">${esc(name)}</span>${shot.tag ? `<span class="art-kind">${esc(shot.tag[lang])}</span>` : ''}<span class="fl">${esc(meta)}</span>
           <span class="r"><span class="zoom-hint">${esc(t.zoomHint)}</span></span>
         </span>
         <span class="vp-media">
@@ -504,6 +556,33 @@ function mustReplace(doc, pattern, replacement, label) {
 }
 
 /**
+ * Índice del carácter siguiente al `</div>` que cierra el `<div>` que empieza en
+ * `start`, contando anidamiento.
+ *
+ * Antes el tramo del tile de mobile se cerraba buscando el primer
+ * `'</div></div>'`, que en `…<div class="ov"></div></div></div>` matchea los
+ * cierres de `.ov` y `.vp` y deja SIN consumir el de `.shot`. Ese `</div>`
+ * huérfano quedaba en el documento y terminaba cerrando `.pad`: "Otras piezas",
+ * §09 y §10 se publicaban fuera del contenedor y perdían el padding lateral.
+ * Contar el anidamiento no depende de cuántos niveles tenga el tile por dentro.
+ */
+function endOfDiv(doc, start, label) {
+	const re = /<\/?div\b/g;
+	re.lastIndex = start;
+	let depth = 0;
+	let m;
+	while ((m = re.exec(doc)) !== null) {
+		depth += m[0][1] === '/' ? -1 : 1;
+		if (depth === 0) {
+			const gt = doc.indexOf('>', m.index);
+			if (gt === -1) break;
+			return gt + 1;
+		}
+	}
+	throw new Error(`${label}: el <div> no cierra`);
+}
+
+/**
  * Cierre público de la documentación: el estado de las líneas de trabajo
  * abiertas, y el registro de auditoría completo detrás de un <details>.
  */
@@ -529,12 +608,22 @@ function transformDoc(doc, lang) {
 	const t = UI[lang];
 	const skip = ' data-i18n-skip';
 
-	// --- §08 Screen Examples: desktop -------------------------------------
+	/*
+	 * --- §08 Screen Examples: desktop --------------------------------------
+	 *
+	 * Sólo las pantallas del producto entran en la grilla. La comparación
+	 * light/dark es kind:'view' —el registro de una exploración de color, no una
+	 * pantalla— y sale abajo, en su propio bloque etiquetado. Antes iba mezclada
+	 * en la grilla, así que la sección mostraba 6 tarjetas bajo un contador que
+	 * dice "5 desktop", y la exploración se leía como una pantalla más.
+	 */
+	const productShots = DESKTOP_SHOTS.filter((s) => s.kind === 'screen');
+	if (productShots.length !== 5) throw new Error(`§08: esperaba 5 pantallas de producto, hay ${productShots.length}`);
 	doc = spliceBetween(
 		doc,
 		'<div class="shots">',
 		'</div>\n  <p class="body"',
-		'<div class="shots">' + DESKTOP_SHOTS.map((s) => shotCard(s, lang)).join('') + '\n  </div>\n  <p class="body"',
+		'<div class="shots">' + productShots.map((s) => shotCard(s, lang)).join('') + '\n  </div>\n  <p class="body"',
 		'§08 grilla .shots'
 	);
 
@@ -560,21 +649,60 @@ function transformDoc(doc, lang) {
 	// 02 Inicio, 03 Historial), que es lo que anuncia el contador "3 mobile".
 	const mobStart = doc.indexOf('<div class="shot"><div class="cap"><span class="nm">Mobile v1');
 	if (mobStart === -1) throw new Error('§08 mobile: no se encontró el tile');
-	const mobEnd = doc.indexOf('</div></div>', doc.indexOf('<div class="vp"', mobStart)) + 12;
+	const mobEnd = endOfDiv(doc, mobStart, '§08 mobile');
+	const exploration = DESKTOP_SHOTS.filter((s) => s.kind === 'view');
 	doc = doc.slice(0, mobStart)
 		+ '<div class="shots shots--mobile">' + MOBILE_SHOTS.map((s) => shotCard(s, lang, { mobile: true })).join('') + '\n  </div>'
+		+ `\n\n  <h3 class="sub"${skip}><span class="tick"></span>${esc(t.explorationTitle)}</h3>`
+		+ `\n  <p class="body" style="max-width:78ch"${skip}>${esc(t.explorationNote)}</p>`
+		+ '\n  <div class="shots shots--single">' + exploration.map((s) => shotCard(s, lang)).join('') + '\n  </div>'
 		+ doc.slice(mobEnd);
 
-	// --- §08 "Otras piezas": tabla de links -> inventario sin navegación ---
+	/*
+	 * --- §08 "Otras piezas" -> documentación de respaldo -------------------
+	 *
+	 * Era una tabla de enlaces a los .html del proyecto y se leía como un
+	 * volcado de archivos internos. Sigue publicándose entera —es lo que
+	 * respalda las decisiones del sistema— pero con un título que dice qué es,
+	 * una línea que la enmarca antes de leerla, y sin enlaces.
+	 *
+	 * Los nombres NO se traducen: son los nombres propios de documentos que
+	 * existen, en el idioma en que se escribieron. La nota lo dice, para que en
+	 * inglés un nombre en español se lea como lo que es y no como un descuido.
+	 */
 	const rows = ARTIFACTS.map((a) =>
 		`      <tr><td><span class="art-name">${esc(a.name)}</span></td><td><span class="art-kind">${esc(a.kind[lang])}</span></td><td>${esc(a.what[lang])}</td></tr>`
 	).join('\n');
+	doc = mustReplace(
+		doc,
+		/<h3 class="sub"><span class="tick"><\/span>Otras piezas del proyecto<\/h3>/,
+		`<h3 class="sub"${skip}><span class="tick"></span>${esc(t.artifactsTitle)}</h3>\n  <p class="lede"${skip}>${esc(t.artifactsLede)}</p>`,
+		'§08 título de otras piezas'
+	);
 	doc = spliceBetween(
 		doc,
 		'<div class="scrollx"><table class="tb">\n    <thead><tr><th>Archivo</th>',
 		'</table></div>',
-		`<div class="scrollx"${skip}><table class="tb">\n    <thead><tr>${t.artifactsHead.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead>\n    <tbody>\n${rows}\n    </tbody></table></div>\n  <p class="body" style="margin-top:var(--re-s4);font-size:12.5px;color:var(--re-ink-4)"${skip}>${t.artifactsNote}</p>`,
+		`<div class="scrollx"${skip}><table class="tb">\n    <thead><tr>${t.artifactsHead.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead>\n    <tbody>\n${rows}\n    </tbody></table></div>\n  <p class="body" style="margin-top:var(--re-s4);font-size:12.5px;color:var(--re-ink-4)"${skip}>${esc(t.artifactsNote)}</p>`,
 		'§08 tabla de otras piezas'
+	);
+
+	/*
+	 * --- §09 Component Inventory: encabezado ------------------------------
+	 *
+	 * El lede era una sola línea con los cuatro estados encadenados por "·":
+	 * legible como referencia, pero leído de corrido sonaba a salida de un
+	 * script. Misma información exacta, presentada como lo que es —la leyenda de
+	 * la columna Estado— en una frase por estado.
+	 */
+	doc = spliceBetween(
+		doc,
+		'<p class="lede">Inventario completo.',
+		'</p>',
+		`<p class="lede"${skip}>${t.inventoryLede}</p>\n  <dl class="ivt-legend"${skip}>${t.inventoryStates
+			.map(([tag, cls, meaning]) => `<div><dt><span class="tag ${cls}">${esc(tag)}</span></dt><dd>${esc(meaning)}</dd></div>`)
+			.join('')}</dl>`,
+		'§09 lede del inventario'
 	);
 
 	// --- §07: link suelto a la spec mobile --------------------------------
@@ -597,8 +725,27 @@ function transformDoc(doc, lang) {
 		doc = mustReplace(doc, /<td class="mono">máx 78%<\/td>/, '<td class="mono">max 78%</td>', 'celda mono: máx 78%');
 	}
 
+	/*
+	 * --- Hero: las cuatro métricas -----------------------------------------
+	 *
+	 * "5 + 3" no se entiende sin leer el pie de la métrica: un visitante no
+	 * tiene por qué saber que el primer número son pantallas de desktop y el
+	 * segundo de mobile. El valor pasa a decirlo solo, con los números todavía
+	 * como el elemento dominante (.n los mantiene grandes y en ámbar) y las
+	 * unidades en texto chico. No cambia ningún dato: siguen siendo 5 y 3.
+	 */
+	doc = mustReplace(
+		doc,
+		/<div><div class="k">Pantallas<\/div><div class="v num">5 \+ 3<\/div><div class="d">desktop kit \+ mobile v1<\/div><\/div>/,
+		`<div${skip}><div class="k">${esc(t.screensFactLabel)}</div>` +
+		`<div class="v v--pair"><span class="n num">5</span> ${esc(t.screensDesktop)} <span class="n num">3</span> ${esc(t.screensMobile)}</div>` +
+		`<div class="d">${esc(t.screensFactNote)}</div></div>`,
+		'hero: fact de pantallas'
+	);
+
 	// --- Tema: la publicación no afirma que existan dos temas -------------
-	// Sólo existe dark. Light es trabajo planificado, y así se presenta.
+	// Sólo existe dark. Light es trabajo planificado y se anuncia UNA sola vez,
+	// en System evolution — no acá.
 	doc = mustReplace(
 		doc,
 		/<div><div class="k">Temas<\/div><div class="v num">2<\/div><div class="d">dark \(default\) · light<\/div><\/div>/,
@@ -688,6 +835,76 @@ function transformDoc(doc, lang) {
 	return doc;
 }
 
+/**
+ * Verifica que el documento emitido esté BIEN ANIDADO y que todas las secciones
+ * compartan el mismo contenedor.
+ *
+ * Esto existe porque el defecto que arregló esta pasada era invisible para el
+ * resto de las verificaciones: el HTML seguía teniendo todo el contenido, sin
+ * refs rotas ni iframes, y el navegador lo renderizaba sin quejarse — pero
+ * `.pad` cerraba 20 KB antes de tiempo y §08(final), §09 y §10 se publicaban
+ * fuera del contenedor, sin el padding lateral del documento. Un splice mal
+ * cerrado o un atributo que confunda al parser vuelven a producir exactamente
+ * lo mismo, así que a partir de acá el build se rompe en vez de publicarlo.
+ *
+ * @param {string} html HTML final del idioma.
+ * @param {string} lang Idioma, para el mensaje de error.
+ */
+function verifyStructure(html, lang) {
+	const VOID = new Set(['br', 'hr', 'img', 'input', 'meta', 'link', 'source', 'col', 'area', 'base', 'embed', 'param', 'track', 'wbr']);
+	const SELF_CLOSING_SVG = new Set(['path', 'circle', 'rect', 'line', 'polyline', 'polygon', 'ellipse', 'stop', 'use']);
+
+	if (html.includes('</>')) {
+		throw new Error(`master-${lang}: hay cierres sin nombre (</>), señal de que el parser no entendió una etiqueta`);
+	}
+
+	const stack = [];
+	let padDepth = null;
+	let padOpen = -1;
+	let padClose = -1;
+
+	for (const m of html.matchAll(/<(\/?)([a-zA-Z][a-zA-Z0-9]*)\b([^>]*?)(\/?)>/g)) {
+		const [, closing, rawName, attrs, selfClose] = m;
+		const name = rawName.toLowerCase();
+		if (VOID.has(name) || SELF_CLOSING_SVG.has(name) || selfClose) continue;
+
+		if (closing) {
+			if (!stack.length || stack[stack.length - 1].name !== name) {
+				const open = stack.length ? stack[stack.length - 1].name : '(nada)';
+				throw new Error(`master-${lang}: </${name}> cierra fuera de orden en ${m.index} (abierto: <${open}>)`);
+			}
+			stack.pop();
+			if (padDepth !== null && stack.length < padDepth) {
+				padClose = m.index;
+				padDepth = null;
+			}
+		} else {
+			stack.push({ name, at: m.index });
+			if (padDepth === null && padClose === -1 && /\bclass="pad"/.test(attrs)) {
+				padDepth = stack.length;
+				padOpen = m.index;
+			}
+		}
+	}
+
+	if (stack.length) {
+		throw new Error(`master-${lang}: quedaron etiquetas sin cerrar: ` + stack.map((s) => `<${s.name}>@${s.at}`).join(', '));
+	}
+	if (padOpen === -1) throw new Error(`master-${lang}: no se encontró el contenedor .pad`);
+	if (padClose === -1) throw new Error(`master-${lang}: .pad no cierra`);
+
+	const outside = [];
+	for (const m of html.matchAll(/<section class="sec" id="(s\d+)"/g)) {
+		if (m.index < padOpen || m.index > padClose) outside.push(m[1]);
+	}
+	if (outside.length) {
+		throw new Error(
+			`master-${lang}: ${outside.length} sección(es) quedaron FUERA de .pad y se publicarían sin padding lateral: ` +
+			outside.join(', ')
+		);
+	}
+}
+
 function buildHtml() {
 	ensure(PHP_OUT);
 	const html = readFileSync(join(SRC, 'master-documentation.html'), 'utf8');
@@ -722,6 +939,7 @@ function buildHtml() {
 		if (leftovers.length) throw new Error(`master-${lang}: quedaron refs a .html locales:\n  ` + leftovers.join('\n  '));
 		if (/<iframe/i.test(localized)) throw new Error(`master-${lang}: quedaron <iframe>`);
 		if (/data-i18n-skip/.test(localized)) throw new Error(`master-${lang}: quedó andamiaje data-i18n-skip en el HTML`);
+		verifyStructure(localized, lang);
 
 		const php = `<?php
 /**
@@ -738,9 +956,12 @@ function buildHtml() {
  *
  * Diferencias con la fuente, todas producidas por el script:
  *  - §08 Screen Examples: los <iframe> a archivos .html locales y los enlaces
- *    "Abrir ↗" se reemplazan por previews estáticas que abren el lightbox
- *    compartido del portfolio ([data-es-zoom-trigger]). Toda la tarjeta es el
- *    trigger, incluida la palabra "Ampliar".
+ *    "Abrir ↗" se reemplazan por previews estáticas que abren el visor de
+ *    pantallas de esta página ([data-es-screen-trigger], ver
+ *    assets/js/ds-screen-viewer.js). Toda la tarjeta es el trigger, incluida
+ *    la palabra "Ampliar".
+ *  - §08: la comparación light/dark sale de la grilla y pasa a un bloque
+ *    propio, etiquetado como exploración.
  *  - §08 "Otras piezas": la tabla de enlaces pasa a inventario de texto plano.
  *  - Tema: la publicación declara un solo tema (dark). Light figura como
  *    planificado, nunca como disponible.
