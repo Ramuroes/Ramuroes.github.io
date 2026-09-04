@@ -45,6 +45,16 @@ if ( have_posts() ) {
 
 $es_ds_header = es_ds_show_header();
 $es_ds_footer = es_ds_show_footer();
+
+/*
+ * Qué barra superior queda arriba del documento. El rail del Design System es
+ * sticky y tiene que arrancar JUSTO debajo de ella, así que su offset depende
+ * de cuál de las dos se imprimió: el header institucional (66px, marcado por el
+ * propio tema con .es-header-sticky) o la navegación mínima (48px). Sin esta
+ * clase el CSS no puede distinguir "sin header" de "header estático", y el rail
+ * quedaría tapado por la barra mínima.
+ */
+$es_ds_body_class = $es_ds_header ? array( 'es-ds-page' ) : array( 'es-ds-page', 'es-ds-minimal-nav' );
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -53,7 +63,7 @@ $es_ds_footer = es_ds_show_footer();
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<?php wp_head(); ?>
 </head>
-<body <?php body_class( 'es-ds-page' ); ?>>
+<body <?php body_class( $es_ds_body_class ); ?>>
 <?php
 if ( function_exists( 'wp_body_open' ) ) {
 	wp_body_open();

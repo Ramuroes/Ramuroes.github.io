@@ -96,22 +96,24 @@ function es_ds_restimator_lang() {
 function es_ds_text( $key ) {
 	$es_strings = array(
 		'es' => array(
-			'back_to_case'      => 'Volver al caso REstimator',
-			'owner'             => 'Ramiro Estavillo',
-			'missing'           => 'El documento del Design System no está disponible en esta instalación.',
-			'lightbox_close'    => 'Cerrar imagen',
-			'lightbox_zoom_in'  => 'Acercar',
-			'lightbox_zoom_out' => 'Alejar',
-			'lightbox_reset'    => 'Restablecer zoom',
+			'back_to_case'  => 'Volver al caso REstimator',
+			'owner'         => 'Ramiro Estavillo',
+			'nav_aria'      => 'Salir de la documentación',
+			'missing'       => 'El documento del Design System no está disponible en esta instalación.',
+			'viewer_close'  => 'Cerrar la pantalla',
+			'viewer_in'     => 'Acercar',
+			'viewer_out'    => 'Alejar',
+			'viewer_scroll' => 'Pantalla completa — usá las flechas para recorrerla',
 		),
 		'en' => array(
-			'back_to_case'      => 'Back to the REstimator case',
-			'owner'             => 'Ramiro Estavillo',
-			'missing'           => 'The Design System document is not available in this installation.',
-			'lightbox_close'    => 'Close image',
-			'lightbox_zoom_in'  => 'Zoom in',
-			'lightbox_zoom_out' => 'Zoom out',
-			'lightbox_reset'    => 'Reset zoom',
+			'back_to_case'  => 'Back to the REstimator case',
+			'owner'         => 'Ramiro Estavillo',
+			'nav_aria'      => 'Leave the documentation',
+			'missing'       => 'The Design System document is not available in this installation.',
+			'viewer_close'  => 'Close the screen',
+			'viewer_in'     => 'Zoom in',
+			'viewer_out'    => 'Zoom out',
+			'viewer_scroll' => 'Full screen — use the arrow keys to scroll through it',
 		),
 	);
 

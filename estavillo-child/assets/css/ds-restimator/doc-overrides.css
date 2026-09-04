@@ -34,9 +34,74 @@ html:has(> body.es-ds-page) {
 	}
 }
 
+/* -------------------------------------------------------------------------
+   GEOMETRÍA DE LA PÁGINA
+   -------------------------------------------------------------------------
+   Un solo juego de números para las CUATRO franjas de esta página: el header
+   institucional, la navegación mínima, el documento y el footer. Antes cada
+   una traía su propia grilla —el chrome del portfolio centrado a 1140px, el
+   documento pegado a la izquierda con un rail de 264px— y la página se leía
+   como dos sitios pegados: la marca ESTAVILLO arrancaba en un sitio y el rail
+   de REstimator en otro, sin ninguna alineación en común.
+
+   Los valores NO son nuevos: son los que el Design System ya usa.
+     --es-ds-rail      264px  = .doc { grid-template-columns: 264px … }
+     --es-ds-rail-pad   22px  = .rail (12px) + .rail-brand (10px), o sea la x
+                                donde empieza el texto de la marca del rail
+     --es-ds-gutter     40px  = --re-s8, el padding lateral de .pad y de .hero
+     --es-ds-content          = el max-width de .pad
+
+   Con esto, la marca del header cae exactamente sobre la marca del rail, y la
+   navegación y el footer terminan exactamente donde termina el contenido. */
+
 body.es-ds-page {
 	margin: 0;
 	background: var(--re-bg);
+
+	--es-ds-rail: 264px;
+	--es-ds-rail-pad: 22px;
+	--es-ds-gutter: 40px;
+	--es-ds-content: 1180px;
+	--es-ds-topbar-h: 48px;
+}
+
+/* Aprovechamiento de pantallas grandes.
+   Medido antes de tocar nada: `.pad{max-width:1180px}` es un tope fijo y sin
+   margin:auto, así que a 1600px quedaban 156px muertos a la derecha y a 1920px
+   quedaban 476px, con todo el documento pegado a la izquierda.
+
+   La legibilidad del texto NO depende de este contenedor: el propio Design
+   System ya acota la prosa por su cuenta (`p.body{max-width:78ch}`,
+   `.lede{max-width:76ch}`), independientemente de lo ancho que sea el padre.
+   Por eso alcanza con ensanchar el contenedor: los párrafos siguen igual de
+   angostos y son las grillas, las tarjetas, las tablas, las demos de
+   componentes y las Screen Examples —todas fluidas, sin tope propio— las que
+   se llevan el ancho extra.
+
+   La fórmula es fluida y no por saltos, y está construida para no poder
+   empeorar nada:
+     max()  — nunca por debajo del ancho de hoy, así ningún viewport queda más
+              angosto que antes;
+     calc() — reserva el rail (264px) y deja ~100px de margen a la derecha;
+     min()  — tope duro, para que en un monitor muy ancho las tablas y las
+              grillas no se estiren sin límite.
+
+   Vive en la variable y no en `.pad`, así el header, el footer y la barra
+   mínima se ensanchan con el documento en vez de quedarse atrás. */
+@media (min-width: 1500px) {
+	body.es-ds-page {
+		--es-ds-content: max(1180px, min(1720px, calc(100vw - 364px)));
+	}
+}
+
+.re-doc .pad {
+	max-width: var(--es-ds-content);
+}
+
+/* El hero no tiene el padding de .pad, así que su contenido se acota al mismo
+   ancho MENOS ese padding: los dos terminan alineados al mismo ancho de texto. */
+.re-doc .hero .in {
+	max-width: calc(var(--es-ds-content) - 2 * var(--es-ds-gutter));
 }
 
 /* -------------------------------------------------------------------------
@@ -158,25 +223,77 @@ body.es-ds-page {
 }
 
 /* -------------------------------------------------------------------------
-   2. Barra institucional del portfolio
+   2. Navegación mínima (fallback sin header institucional)
    -------------------------------------------------------------------------
-   Única franja de la página que pertenece al portfolio: usa tokens --es-*,
-   no --re-*. Discreta a propósito — no compite con el rail del DS. No es
-   sticky (ver el docblock de template-parts/ds-topbar.php). */
+   Se imprime SÓLO cuando el header institucional está apagado para esta
+   página. Es la única salida hacia afuera del documento, así que:
+
+     · es sticky, como el header real. Antes no lo era —el argumento era que
+       el rail ya navega— pero el rail navega DENTRO del documento: si esta
+       barra se va con el scroll, a mitad del documento no queda ninguna
+       manera de volver al caso. Al quedarse fija también deja de aparecer y
+       desaparecer, que es lo que la hacía leer como una barra de debug;
+     · usa tokens --re-*: pertenece a esta página, no al chrome del portfolio,
+       y con los --es-* quedaba de un color que no era ni el del sitio ni el
+       del documento;
+     · se alinea a la grilla del documento (§ GEOMETRÍA), igual que el header
+       institucional: el "volver" cae sobre la marca del rail y la atribución
+       sobre el borde derecho del contenido;
+     · 48px de alto contra los 66px del header institucional. Es deliberado:
+       es la barra secundaria, y el rail arranca justo abajo (§5). */
 
 .es-ds-topbar {
-	background: var(--es-bg, #0d0c0b);
-	border-bottom: 1px solid var(--es-line, rgba(255, 255, 255, 0.09));
-	font-family: var(--es-sans, system-ui, sans-serif);
+	position: sticky;
+	top: 0;
+	z-index: 80;
+	height: var(--es-ds-topbar-h);
+	background: color-mix(in srgb, var(--re-surface) 92%, transparent);
+	-webkit-backdrop-filter: blur(12px);
+	backdrop-filter: blur(12px);
+	border-bottom: 1px solid var(--re-line);
+	font-family: var(--re-font-sans, system-ui, sans-serif);
+}
+
+/* Sin color-mix (navegadores viejos) el fondo tiene que ser opaco igual, o la
+   barra deja ver el documento pasando por debajo. */
+@supports not (background: color-mix(in srgb, red 50%, transparent)) {
+	.es-ds-topbar {
+		background: var(--re-surface);
+	}
+}
+
+.admin-bar .es-ds-topbar {
+	top: 32px;
+}
+
+@media (max-width: 782px) {
+	.admin-bar .es-ds-topbar {
+		top: 46px;
+	}
 }
 
 .es-ds-topbar__in {
-	display: flex;
+	position: relative;
+	display: grid;
+	grid-template-columns: var(--es-ds-rail) minmax(0, 1fr);
 	align-items: center;
-	justify-content: space-between;
-	gap: 16px;
-	max-width: 1180px;
-	padding: 11px 24px;
+	height: 100%;
+	gap: 0;
+}
+
+/* Misma continuación del borde del rail que en el header institucional: las
+   dos barras tienen que leerse como la misma grilla que el documento. */
+@media (min-width: 1101px) {
+	.es-ds-topbar__in::before {
+		content: "";
+		position: absolute;
+		left: calc(var(--es-ds-rail) - 1px);
+		top: 0;
+		bottom: -1px;
+		width: 1px;
+		background: var(--re-line);
+		pointer-events: none;
+	}
 }
 
 .es-ds-topbar a {
@@ -191,58 +308,184 @@ body.es-ds-page {
 }
 
 .es-ds-topbar__back {
-	color: var(--es-ink-2, #b9b3ab);
-}
-
-.es-ds-topbar__back:hover,
-.es-ds-topbar__back:focus-visible {
-	color: var(--es-ink, #f3efe9);
-}
-
-.es-ds-topbar__arrow {
-	font-size: 14px;
-	line-height: 1;
-}
-
-.es-ds-topbar__owner {
-	color: var(--es-ink-3, #8b857e);
-	font-size: 12px;
-}
-
-.es-ds-topbar__owner:hover,
-.es-ds-topbar__owner:focus-visible {
-	color: var(--es-ink-2, #b9b3ab);
-}
-
-.es-ds-topbar a:focus-visible {
-	outline: 2px solid var(--es-accent, #c9a227);
-	outline-offset: 3px;
-	border-radius: 3px;
-}
-
-/* En pantallas angostas el que cede es el "volver", no el nombre: el nombre es
-   la atribución del portfolio y es la razón de ser de esta barra. El enlace se
-   trunca con puntos suspensivos en vez de empujar la fila.
-   (min-width:0 es obligatorio: sin él un ítem flex no baja del ancho de su
-   contenido y el text-overflow nunca llega a activarse.) */
-.es-ds-topbar__back {
+	padding-left: var(--es-ds-rail-pad);
+	color: var(--re-ink-2);
+	/* min-width:0 es obligatorio: sin él un ítem no baja del ancho de su
+	   contenido y el text-overflow nunca llega a activarse. */
 	min-width: 0;
+}
+
+.es-ds-topbar__back-text {
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 }
 
+.es-ds-topbar__back:hover,
+.es-ds-topbar__back:focus-visible {
+	color: var(--re-ink);
+}
+
 .es-ds-topbar__arrow {
+	font-size: 14px;
+	line-height: 1;
+	flex: none;
+	color: var(--re-amber-ink);
+}
+
+/* La atribución cierra sobre el borde derecho del contenido, igual que la
+   navegación del header institucional. */
+/* La caja se alinea al INICIO de la columna y se acota igual que `.pad`; el
+   texto se empuja a su borde derecho desde adentro. Con `justify-self:end` la
+   caja se pegaba al borde del viewport y la atribución terminaba 100px más a
+   la derecha que el contenido del documento. */
+.es-ds-topbar__owner {
+	justify-self: start;
+	width: 100%;
+	max-width: var(--es-ds-content);
+	box-sizing: border-box;
+	padding-right: var(--es-ds-gutter);
+	justify-content: flex-end;
+	color: var(--re-ink-4);
+	font-size: 12px;
 	flex: none;
 }
 
-.es-ds-topbar__owner {
-	flex: none;
+.es-ds-topbar__owner:hover,
+.es-ds-topbar__owner:focus-visible {
+	color: var(--re-ink-2);
+}
+
+.es-ds-topbar a:focus-visible {
+	outline: 2px solid var(--re-amber);
+	outline-offset: 3px;
+	border-radius: 3px;
+}
+
+/* Sin rail no hay columna que respetar: la barra vuelve a ser dos extremos. */
+@media (max-width: 1100px) {
+	.es-ds-topbar__in {
+		display: flex;
+		justify-content: space-between;
+		gap: 16px;
+	}
+
+	.es-ds-topbar__back {
+		padding-left: var(--re-s5);
+	}
+
+	.es-ds-topbar__owner {
+		width: auto;
+		padding-right: var(--re-s5);
+	}
 }
 
 @media (max-width: 640px) {
-	.es-ds-topbar__in {
-		padding: 10px 16px;
+	.es-ds-topbar__back {
+		padding-left: var(--re-s4);
+	}
+
+	.es-ds-topbar__owner {
+		padding-right: var(--re-s4);
+	}
+}
+
+/* -------------------------------------------------------------------------
+   2b. Header y footer institucionales: variante full-width de esta página
+   -------------------------------------------------------------------------
+   NO es un header nuevo ni otra marca: es EL header del portfolio, el mismo
+   template-part que imprime el resto del sitio, con la geometría adaptada a
+   esta página. Sólo cambian ancho y alineación; tipografía, color, altura,
+   comportamiento sticky, menú mobile y switch de idioma quedan intactos.
+
+   Qué se corrige. `.es-nav` es un `.es-container`: max-width 1140px, centrado,
+   con padding lateral clamp(20px,4.5vw,48px). El documento, en cambio, arranca
+   pegado a la izquierda con un rail de 264px. Medido a 1920px: la marca
+   ESTAVILLO empezaba en x=438 y la marca del rail en x=22 — 416px de desfase
+   entre dos elementos que el ojo lee como la misma columna. La navegación
+   terminaba en x=1482 y el contenido del documento en x=1780.
+
+   Acá el header pasa a la MISMA grilla del documento: [rail][área principal].
+   La marca cae en la columna del rail, alineada con la marca del rail; la
+   navegación cierra sobre el borde derecho del contenido. La franja sigue
+   ocupando el 100% del viewport, como siempre.
+
+   Se aplica sólo arriba de 1100px, que es donde el Design System mantiene el
+   rail; por debajo el rail pasa a bloque estático y el header vuelve a su
+   contenedor normal (con el mismo padding que toma el documento ahí, para que
+   tampoco en tablet queden dos márgenes distintos). */
+
+@media (min-width: 1101px) {
+	body.es-ds-page .es-site-header .es-nav {
+		position: relative;
+		display: grid;
+		grid-template-columns: var(--es-ds-rail) minmax(0, 1fr);
+		align-items: center;
+		gap: 0;
+		max-width: none;
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	/* Continuación exacta del borde derecho del rail a través del header: es
+	   lo que hace que las dos franjas se lean como una sola grilla y no como
+	   dos barras superpuestas. -1px porque el borde del rail es interior
+	   (box-sizing:border-box), o sea que ocupa 263→264. */
+	body.es-ds-page .es-site-header .es-nav::before {
+		content: "";
+		position: absolute;
+		left: calc(var(--es-ds-rail) - 1px);
+		top: 0;
+		bottom: -1px;
+		width: 1px;
+		background: var(--re-line);
+		pointer-events: none;
+	}
+
+	body.es-ds-page .es-site-header .es-nav__brand {
+		padding-left: var(--es-ds-rail-pad);
+	}
+
+	/* Mismo cálculo de caja que `.pad`: ancho tope + gutter. Así el borde
+	   derecho de la navegación y el del contenido del documento son el mismo,
+	   en cualquier viewport y con la fórmula fluida activa o no. */
+	body.es-ds-page .es-site-header .es-nav__right {
+		width: 100%;
+		max-width: var(--es-ds-content);
+		box-sizing: border-box;
+		padding-left: var(--es-ds-gutter);
+		padding-right: var(--es-ds-gutter);
+		justify-content: flex-end;
+	}
+
+	/* El footer va después del documento, cuando el rail ya terminó: sus filas
+	   se alinean con la columna de contenido —misma caja que `.pad`— y la
+	   franja sigue siendo full-width. Mismo criterio que el header: una sola
+	   geometría de punta a punta de la página. */
+	body.es-ds-page .es-site-footer__inner {
+		max-width: none;
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	body.es-ds-page .es-site-footer__inner > * {
+		max-width: var(--es-ds-content);
+		margin-left: var(--es-ds-rail);
+		padding-left: var(--es-ds-gutter);
+		padding-right: var(--es-ds-gutter);
+		box-sizing: border-box;
+	}
+}
+
+/* Tablet y abajo: sin rail, pero el chrome sigue tomando el mismo margen
+   lateral que el documento (--re-s5 = 20px) en vez del clamp del portfolio,
+   que ahí llega a 46px. */
+@media (max-width: 1100px) {
+	body.es-ds-page .es-site-header .es-nav,
+	body.es-ds-page .es-site-footer__inner {
+		max-width: none;
+		padding-left: var(--re-s5);
+		padding-right: var(--re-s5);
 	}
 }
 
@@ -395,6 +638,195 @@ body.es-ds-page {
 }
 
 /* -------------------------------------------------------------------------
+   3b. Visor de pantallas
+   -------------------------------------------------------------------------
+   La contraparte visual de assets/js/ds-screen-viewer.js: una ventana de
+   aplicación —barra de título arriba, lienzo scrolleable abajo— y no un
+   lightbox de foto. El JS calcula los anchos; acá va la superficie.
+
+   Todo con tokens --re-*: la ventana tiene que parecer parte del producto que
+   está mostrando. */
+
+.esv {
+	width: 100%;
+	max-width: 100%;
+	max-height: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	overflow: hidden;
+}
+
+.esv::backdrop {
+	background: rgba(6, 7, 9, 0.88);
+	-webkit-backdrop-filter: blur(3px);
+	backdrop-filter: blur(3px);
+}
+
+/* La ventana se centra sola; el JS le fija el ancho. */
+.esv__win {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	display: flex;
+	flex-direction: column;
+	max-width: calc(100% - 32px);
+	max-height: calc(100% - 32px);
+	border: 1px solid var(--re-line-2);
+	border-radius: var(--re-r-lg);
+	background: var(--re-surface);
+	box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+	overflow: hidden;
+}
+
+.esv__bar {
+	display: flex;
+	align-items: center;
+	gap: var(--re-s4);
+	flex: none;
+	padding: 0 var(--re-s3) 0 var(--re-s5);
+	height: 46px;
+	border-bottom: 1px solid var(--re-line);
+	background: var(--re-surface-2);
+	font-family: var(--re-font-sans, system-ui, sans-serif);
+}
+
+.esv__id {
+	display: flex;
+	align-items: baseline;
+	gap: var(--re-s3);
+	min-width: 0;
+}
+
+/* En una ventana angosta (una pantalla de mobile son 390px) el que cede es el
+   metadato, no el nombre: el nombre es lo que identifica la pantalla. Con los
+   dos al mismo flex-shrink, el título se recortaba a "Cal…" mientras el
+   metadato conservaba su ancho. */
+.esv__title {
+	flex: 0 1 auto;
+	min-width: 0;
+	font-size: 13.5px;
+	font-weight: 600;
+	color: var(--re-ink);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.esv__meta {
+	flex: 0 50 auto;
+	min-width: 0;
+	font-family: var(--re-font-mono);
+	font-size: 11px;
+	color: var(--re-ink-4);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.esv__tools {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	margin-left: auto;
+	flex: none;
+}
+
+.esv__level {
+	min-width: 46px;
+	text-align: center;
+	font-family: var(--re-font-mono);
+	font-variant-numeric: tabular-nums;
+	font-size: 11px;
+	color: var(--re-ink-3);
+}
+
+.esv__btn {
+	display: grid;
+	place-items: center;
+	width: 30px;
+	height: 30px;
+	border: 0;
+	border-radius: var(--re-r-sm);
+	background: none;
+	color: var(--re-ink-3);
+	cursor: pointer;
+	transition: background 140ms ease, color 140ms ease;
+}
+
+.esv__btn svg {
+	width: 17px;
+	height: 17px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.7;
+	stroke-linecap: round;
+}
+
+.esv__btn:hover:not(:disabled) {
+	background: var(--re-surface);
+	color: var(--re-ink);
+}
+
+.esv__btn:disabled {
+	opacity: 0.35;
+	cursor: default;
+}
+
+.esv__btn--close {
+	margin-left: var(--re-s3);
+}
+
+.esv__btn:focus-visible {
+	outline: 2px solid var(--re-amber) !important;
+	outline-offset: -2px !important;
+}
+
+/* El lienzo: acá vive el scroll de la pantalla. */
+.esv__scroll {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	overflow-x: hidden;
+	background: var(--re-canvas);
+	overscroll-behavior: contain;
+}
+
+/* Sólo con zoom por encima del ancho disponible. Al abrir nunca hay scroll
+   horizontal: el JS arranca en min(ancho real, ancho disponible). */
+.esv__scroll.is-wide {
+	overflow-x: auto;
+}
+
+.esv__scroll:focus-visible {
+	outline: 2px solid var(--re-amber) !important;
+	outline-offset: -2px !important;
+}
+
+/* height:auto es lo que impide la deformación: el ancho lo fija el JS y el
+   alto lo deduce el navegador del aspect-ratio real de la captura. */
+.esv__img {
+	display: block;
+	width: 100%;
+	height: auto;
+	max-width: none;
+}
+
+@media (max-width: 640px) {
+	.esv__bar {
+		padding-left: var(--re-s4);
+		height: 42px;
+	}
+
+	.esv__meta {
+		display: none;
+	}
+}
+
+/* -------------------------------------------------------------------------
    4. Overflow horizontal en mobile
    -------------------------------------------------------------------------
    Defecto real del documento original, medido antes de tocar nada: a 390px
@@ -494,13 +926,56 @@ body.es-ds-page {
 	}
 }
 
-/* Los anchors del rail tienen que caer por debajo del header, no atrás. */
+/* Mismo problema con la navegación mínima, que ahora también es sticky: sin
+   esto el rail arrancaba tapado por ella y su pie se iba 48px fuera de la
+   vista. La clase la imprime el template según qué barra se haya renderizado
+   (ver templates/page-restimator-ds.php). */
+.es-ds-minimal-nav .re-doc .rail {
+	top: var(--es-ds-topbar-h);
+	height: calc(100vh - var(--es-ds-topbar-h));
+}
+
+.admin-bar.es-ds-minimal-nav .re-doc .rail {
+	top: calc(var(--es-ds-topbar-h) + 32px);
+	height: calc(100vh - var(--es-ds-topbar-h) - 32px);
+}
+
+@media (max-width: 782px) {
+	.admin-bar.es-ds-minimal-nav .re-doc .rail {
+		top: calc(var(--es-ds-topbar-h) + 46px);
+		height: calc(100vh - var(--es-ds-topbar-h) - 46px);
+	}
+}
+
+/* Los anchors del rail tienen que caer por debajo de la barra, no atrás. */
 .es-header-sticky .re-doc .sec {
 	scroll-margin-top: 78px;
 }
 
 .admin-bar.es-header-sticky .re-doc .sec {
 	scroll-margin-top: 110px;
+}
+
+.es-ds-minimal-nav .re-doc .sec {
+	scroll-margin-top: calc(var(--es-ds-topbar-h) + 12px);
+}
+
+.admin-bar.es-ds-minimal-nav .re-doc .sec {
+	scroll-margin-top: calc(var(--es-ds-topbar-h) + 44px);
+}
+
+/* La metadata del pie del rail se queda abajo SIEMPRE.
+   `margin-top:auto` ya la manda al fondo cuando sobra alto, pero el rail es un
+   scroller (`overflow-y:auto`) y en cuanto la lista de secciones no entra
+   —viewport bajo, zoom de navegador, la barra sticky comiéndose 48 o 66px— el
+   pie se iba con el scroll y cambiaba de posición mientras se lee el
+   documento. Con `position:sticky` queda anclado al borde inferior del
+   scroller pase lo que pase; el fondo opaco evita que el texto del rail se
+   lea por debajo. */
+.re-doc .rail-foot {
+	position: sticky;
+	bottom: 0;
+	background: var(--re-surface);
 }
 
 /* Bajo 1100px el rail deja de ser sticky (regla del propio Design System) y
@@ -515,45 +990,144 @@ body.es-ds-page {
 }
 
 /* -------------------------------------------------------------------------
-   6. Aprovechamiento de pantallas grandes
+   6. Hero
    -------------------------------------------------------------------------
-   Medido antes de tocar nada: `.pad{max-width:1180px}` es un tope fijo y sin
-   margin:auto, así que a 1600px quedaban 156px muertos a la derecha y a 1920px
-   quedaban 476px, con todo el documento pegado a la izquierda.
+   Tres problemas medidos a 1920px, con el contenedor del documento ya
+   ensanchado a 1556px:
 
-   La legibilidad del texto NO depende de este contenedor: el propio Design
-   System ya acota la prosa por su cuenta (`p.body{max-width:78ch}`,
-   `.lede{max-width:76ch}`), independientemente de lo ancho que sea el padre.
-   Por eso alcanza con ensanchar el contenedor: los párrafos siguen igual de
-   angostos y son las grillas, las tarjetas, las tablas, las demos de
-   componentes y las Screen Examples —todas fluidas, sin tope propio— las que
-   se llevan el ancho extra.
+     a) `.hero .facts{max-width:880px}` es un tope fijo. Las cuatro métricas
+        quedaban apretadas en los primeros 880px de un área de 1476, con 596px
+        vacíos a la derecha — justo lo contrario de lo que se buscaba al
+        ensanchar el contenedor;
+     b) cada columna traía su propio `border-top`. Con cuatro columnas y el
+        `border-bottom` del hero abajo, la franja se leía como dos reglas
+        horizontales paralelas encerrando las métricas: mucho peso estructural
+        para cuatro cifras;
+     c) el bloque nacía pegado al párrafo de arriba.
 
-   La fórmula es fluida y no por saltos, y está construida para no poder
-   empeorar nada:
+   Se recompone SÓLO esta franja: una regla horizontal única arriba, divisores
+   verticales entre columnas y la banda ocupando el ancho del hero. Ni el
+   párrafo ni el h1 se ensanchan: siguen con sus topes de 70ch y 20ch, que es
+   lo que sostiene la legibilidad. */
 
-     max()  — nunca por debajo del ancho de hoy (1180px de caja / 1100px de
-              contenido), así ningún viewport queda más angosto que antes;
-     calc() — reserva el rail (264px) y deja ~100px de margen a la derecha, para
-              que el documento no termine pegado al borde de la pantalla;
-     min()  — tope duro, para que en un monitor muy ancho las tablas y las
-              grillas no se estiren sin límite.
+.re-doc .hero .facts {
+	max-width: none;
+	gap: 0;
+	margin-top: var(--re-s9);
+	border-top: 1px solid var(--re-charcoal-line);
+}
 
-   `.hero .in` lleva la misma fórmula menos los 80px de padding de `.pad`, así
-   el hero y el cuerpo quedan alineados al mismo ancho de contenido.
+.re-doc .hero .facts > div {
+	border-top: 0;
+	padding: var(--re-s5) var(--re-s6) 0;
+}
 
-   Las Screen Examples se quedan en 2 columnas a propósito (decisión del
-   ticket): la idea es que cada pantalla gane tamaño y detalle con el ancho
-   extra, no que entren más por fila. */
+.re-doc .hero .facts > div + div {
+	border-left: 1px solid var(--re-charcoal-line);
+}
 
-@media (min-width: 1500px) {
-	.re-doc .pad {
-		max-width: max(1180px, min(1720px, calc(100vw - 364px)));
+.re-doc .hero .facts > div:first-child {
+	padding-left: 0;
+}
+
+/* Métrica de dos cifras ("5 desktop + 3 mobile"): los números mantienen el
+   peso visual de las otras métricas y las unidades van en texto chico, así el
+   dato se entiende sin leer el pie. Antes decía "5 + 3", que fuera de contexto
+   no dice qué es cada número. */
+.re-doc .hero .facts .v--pair {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 0 6px;
+	font-size: 13px;
+	font-weight: 500;
+	letter-spacing: 0;
+	color: var(--re-on-dark-2);
+}
+
+.re-doc .hero .facts .v--pair .n {
+	font-size: 26px;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	color: var(--re-amber-bright);
+}
+
+.re-doc .hero .facts .v--pair .n + .n,
+.re-doc .hero .facts .v--pair .n:not(:first-child) {
+	margin-left: 4px;
+}
+
+@media (max-width: 1100px) {
+	/* Dos columnas: los divisores verticales tienen que reordenarse o quedan
+	   colgando en medio de la segunda fila. */
+	.re-doc .hero .facts > div + div {
+		border-left: 0;
 	}
 
-	.re-doc .hero .in {
-		max-width: max(1100px, min(1640px, calc(100vw - 444px)));
+	.re-doc .hero .facts > div:nth-child(even) {
+		border-left: 1px solid var(--re-charcoal-line);
 	}
+
+	.re-doc .hero .facts > div:nth-child(odd) {
+		padding-left: 0;
+	}
+
+	.re-doc .hero .facts > div:nth-child(n + 3) {
+		margin-top: var(--re-s5);
+		border-top: 1px solid var(--re-charcoal-line);
+	}
+}
+
+/* -------------------------------------------------------------------------
+   6b. Leyenda del inventario (§09) y bloques de §08
+   ------------------------------------------------------------------------- */
+
+/* Los cuatro estados del inventario, como leyenda de la columna Estado. Antes
+   iban encadenados por "·" en una sola línea de lede: toda la información
+   estaba, pero leída de corrido sonaba a salida de un script. */
+/* Dos columnas fijas y no auto-fit: con auto-fit entraban tres y el cuarto
+   estado caía solo en una segunda fila, con el texto partido. En 2×2 los
+   cuatro estados se leen como un bloque. */
+.re-doc .ivt-legend {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: var(--re-s3) var(--re-s7);
+	margin: 0 0 var(--re-s6);
+	max-width: 1060px;
+}
+
+@media (min-width: 860px) {
+	.re-doc .ivt-legend {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+.re-doc .ivt-legend > div {
+	display: flex;
+	align-items: baseline;
+	gap: var(--re-s3);
+}
+
+.re-doc .ivt-legend dt {
+	flex: none;
+}
+
+.re-doc .ivt-legend dd {
+	font-size: 13px;
+	color: var(--re-ink-3);
+}
+
+/* La exploración de color es una sola pieza y va a ancho completo: no es una
+   pantalla más de la grilla de dos columnas. */
+.re-doc .shots--single {
+	grid-template-columns: 1fr;
+	max-width: 760px;
+}
+
+/* Etiqueta de la tarjeta ("Exploración"): usa el mismo pill del inventario de
+   artefactos, para no inventar un componente nuevo. */
+.re-doc .shot .cap .art-kind {
+	flex: none;
 }
 
 /* -------------------------------------------------------------------------

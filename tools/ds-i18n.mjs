@@ -37,6 +37,45 @@ const VOID = new Set(['br', 'hr', 'img', 'input', 'meta', 'link', 'source', 'col
 const OPAQUE = new Set(['svg', 'code', 'pre', 'script', 'style']);
 
 /**
+ * Encuentra el `>` que CIERRA la etiqueta abierta en `lt`, ignorando los que
+ * viven dentro del valor entrecomillado de un atributo.
+ *
+ * No es un refinamiento teórico. El documento que produce el build lleva PHP
+ * dentro de los atributos de las tarjetas de pantalla:
+ *
+ *     <button … data-es-zoom-src="<?php echo esc_url( … ); ?>" …>
+ *
+ * Con un `indexOf('>')` pelado, la etiqueta se cortaba en el `>` del `?>`: el
+ * parser veía un `<button>` truncado y después trataba cada `<?php` restante
+ * como un elemento sin nombre, que al serializar escupía un `</>` de más y
+ * dejaba un nivel abierto en la pila. Los cierres siguientes se aplicaban al
+ * elemento equivocado y el árbol terminaba mal anidado: `</div></section></div>`
+ * caía justo después de la grilla de §08 y cerraba `.pad` 11 KB antes de tiempo,
+ * así que "Otras piezas", §09 y §10 se publicaban FUERA del contenedor y perdían
+ * el padding lateral del documento.
+ *
+ * @param {string} html
+ * @param {number} lt Posición del `<`.
+ * @returns {number} Índice del `>`, o -1.
+ */
+function findTagEnd(html, lt) {
+	let quote = null;
+	for (let i = lt + 1; i < html.length; i++) {
+		const c = html[i];
+		if (quote) {
+			if (c === quote) quote = null;
+			continue;
+		}
+		if (c === '"' || c === "'") {
+			quote = c;
+			continue;
+		}
+		if (c === '>') return i;
+	}
+	return -1;
+}
+
+/**
  * Parsea HTML a un árbol liviano.
  *
  * Nodos: {type:'text', value} | {type:'el', tag, attrs, raw, children, selfClose}
@@ -67,7 +106,17 @@ export function parseHtml(html) {
 			continue;
 		}
 
-		const gt = html.indexOf('>', lt);
+		// Bloque PHP suelto (fuera de un atributo): opaco, como un comentario.
+		// Dentro de un atributo lo absorbe findTagEnd() al buscar el `>`.
+		if (html.startsWith('<?', lt)) {
+			const end = html.indexOf('?>', lt + 2);
+			const stop = end === -1 ? html.length : end + 2;
+			push({ type: 'text', value: html.slice(lt, stop) });
+			i = stop;
+			continue;
+		}
+
+		const gt = findTagEnd(html, lt);
 		if (gt === -1) {
 			push({ type: 'text', value: html.slice(lt) });
 			break;

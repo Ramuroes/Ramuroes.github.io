@@ -67,7 +67,8 @@
   "en": "REstimator Design System"
  },
  "El sistema de diseño de <b style=\"color:#fff\">Presupuestador RE</b> — una herramienta B2B de presupuestación para talleres de herrería y metalurgia. Dark industrial, denso, desktop‑first y con un único acento ámbar racionado. Este documento consolida foundations, componentes, patrones de producto y el sistema responsive en una sola referencia navegable para diseño, desarrollo y archivo.": {
-  "en": "The design system behind <b style=\"color:#fff\">Presupuestador RE</b> — a B2B quoting tool for metalwork and ironwork shops. Dark, industrial, dense, desktop-first, with a single rationed amber accent. This document consolidates foundations, components, product patterns and the responsive system into one navigable reference for design, development and archive."
+  "en": "The design system behind <b style=\"color:#fff\">Presupuestador RE</b>, a B2B quoting tool for metalwork and ironwork shops. Dark, industrial, dense, desktop-first, with a single rationed amber accent. This documentation gathers its foundations, its components, its product patterns and its responsive system.",
+  "es": "El sistema de diseño de <b style=\"color:#fff\">Presupuestador RE</b>, una herramienta B2B de presupuestación para talleres de herrería y metalurgia. Dark industrial, denso, desktop‑first y con un único acento ámbar racionado. Esta documentación reúne sus foundations, sus componentes, sus patrones de producto y su sistema responsive."
  },
  "Tokens": {
   "en": "Tokens"
@@ -92,13 +93,15 @@
   "es": "Visión general"
  },
  "Presupuestador RE ayuda a presupuestadores y dueños de taller a producir cotizaciones más rápidas y consistentes con criterios estandarizados: familias → subcategorías → dimensiones, rangos de precio calibrados, jornales y referencias de material. Es software operativo, no un sitio de marketing.": {
-  "en": "Presupuestador RE helps estimators and shop owners produce faster, more consistent quotes from standardised criteria: families → subcategories → dimensions, calibrated price ranges, labour days and material references. It is operational software, not a marketing site."
+  "en": "Presupuestador RE helps estimators and shop owners produce faster, more consistent quotes from standardised criteria: families → subcategories → dimensions, calibrated price ranges, labour days and material references. It is a tool for daily work.",
+  "es": "Presupuestador RE ayuda a presupuestadores y dueños de taller a producir cotizaciones más rápidas y consistentes con criterios estandarizados: familias → subcategorías → dimensiones, rangos de precio calibrados, jornales y referencias de material. Es una herramienta de trabajo diario."
  },
  "<span class=\"tick\"></span>Propósito del sistema": {
   "en": "<span class=\"tick\"></span>What the system is for"
  },
  "Codificar ese producto como foundations, componentes y recreaciones de pantalla reutilizables, para que cualquier superficie nueva se construya on‑brand en minutos. El prototipo mid‑fi <b>V1 congelado</b> es la referencia canónica: la arquitectura de información, los flujos y la estructura de pantallas están congelados — el sistema eleva <b>únicamente la calidad visual</b>, no rediseña flujos ni cambia la IA.": {
-  "en": "To codify that product as reusable foundations, components and screen recreations, so any new surface is built on-brand in minutes. The mid-fi prototype <b>V1, frozen</b> is the canonical reference: the information architecture, the flows and the screen structure are frozen — the system raises <b>visual quality only</b>, it does not redesign flows or change the IA."
+  "en": "To codify that product as reusable foundations, components and screen recreations, so any new surface is built on-brand in minutes. The <b>frozen V1</b> mid-fi prototype is the reference: the information architecture, the flows and the screen structure are already settled. The system raises <b>visual quality only</b>; it does not redesign flows or change the IA.",
+  "es": "Codificar ese producto como foundations, componentes y recreaciones de pantalla reutilizables, para que cualquier superficie nueva se construya on‑brand en minutos. El prototipo mid‑fi <b>V1 congelado</b> es la referencia: la arquitectura de información, los flujos y la estructura de pantallas ya están decididos. El sistema eleva <b>únicamente la calidad visual</b>; no rediseña flujos ni cambia la IA."
  },
  "<span class=\"tick\"></span>Principios": {
   "en": "<span class=\"tick\"></span>Principles"
@@ -212,7 +215,8 @@
   "en": "<span class=\"tick\"></span>Non-negotiable product rules"
  },
  "Provienen de S12 y se respetan en toda superficie nueva. No son decisiones de diseño: son reglas del dominio.": {
-  "en": "They come from S12 and are respected on every new surface. They are not design decisions: they are domain rules."
+  "en": "They come from S12 and are respected on every new surface. They are rules of the business domain, not design criteria.",
+  "es": "Vienen de S12 y se respetan en toda superficie nueva. Son reglas del dominio del negocio, no criterios de diseño."
  },
  "<b>Freeze</b>Cada presupuesto congela la versión de parámetros con la que fue calculado; los publicados son inmutables.": {
   "en": "<b>Freeze</b>Every quote freezes the parameter version it was calculated with; published ones are immutable."
@@ -237,7 +241,8 @@
   "en": "147 tokens"
  },
  "Todos los valores de esta sección son los tokens reales del sistema, leídos de <span class=\"mono\">tokens/</span>. Los componentes leen siempre <span class=\"mono\">var(--re-*)</span>, por eso el tema light es un remap de color puro.": {
-  "en": "Every value in this section is a real system token, read from <span class=\"mono\">tokens/</span>. Components always read <span class=\"mono\">var(--re-*)</span>, so nothing hardcodes a value."
+  "en": "Every value in this section is a real system token, read from <span class=\"mono\">tokens/</span>. Components always read <span class=\"mono\">var(--re-*)</span>, so nothing hardcodes a value.",
+  "es": "Todos los valores de esta sección son los tokens reales del sistema, leídos de <span class=\"mono\">tokens/</span>. Los componentes leen siempre <span class=\"mono\">var(--re-*)</span>, así que ninguno fija un valor a mano."
  },
  "<span class=\"tick\"></span>Color · rampa grafito (base dark)": {
   "en": "<span class=\"tick\"></span>Colour · graphite ramp (dark base)"
@@ -1061,7 +1066,8 @@
   "es": "Uso"
  },
  "<b>StatusBadge</b> mapea automáticamente color de punto + etiqueta en español — no armes el pill a mano.": {
-  "en": "<b>StatusBadge</b> maps dot colour + written label automatically — do not assemble the pill by hand."
+  "en": "<b>StatusBadge</b> maps dot colour + written label automatically. Do not assemble the pill by hand.",
+  "es": "<b>StatusBadge</b> mapea automáticamente color de punto + etiqueta en español. No armes el pill a mano."
  },
  "<b>square</b> para códigos (<span class=\"mono\">GV-A-00148</span>, <span class=\"mono\">ESC-RECT</span>): mono, radio 5px.": {
   "en": "<b>square</b> for codes (<span class=\"mono\">GV-A-00148</span>, <span class=\"mono\">ESC-RECT</span>): mono, 5px radius."
@@ -1242,7 +1248,8 @@
   "en": "Dashboard KPI row and status grids."
  },
  "<b>accent</b> es para <b>un solo</b> tile destacado por fila — es el ancla charcoal.": {
-  "en": "<b>accent</b> is for <b>one single</b> highlighted tile per row — it is the charcoal anchor."
+  "en": "<b>accent</b> is for <b>one single</b> highlighted tile per row: it is the charcoal anchor.",
+  "es": "<b>accent</b> es para <b>un solo</b> tile destacado por fila: es el ancla charcoal."
  },
  "<b>amberValue</b> con moderación: sólo cifras headline (respeta el racionamiento del ámbar).": {
   "en": "<b>amberValue</b> sparingly: headline figures only (it respects amber rationing)."
@@ -1254,14 +1261,16 @@
   "en": "<span class=\"tick\"></span>TechnicalPreviewCard · TechnicalRenderers"
  },
  "El <b>único dibujo sancionado</b> del sistema: planos y elevaciones esquemáticos generados paramétricamente desde las dimensiones del propio presupuesto. Son diagramas medidos, no ilustración — líneas de estructura grafito de 1px, overlays de dimensión token‑driven, ámbar reservado al indicio de entrada/baranda.": {
-  "en": "The <b>only sanctioned drawing</b> in the system: schematic plans and elevations generated parametrically from the quote's own dimensions. They are measured diagrams, not illustration — 1px graphite structure lines, token-driven dimension overlays, amber reserved for the entry/railing cue."
+  "en": "The <b>only sanctioned drawing</b> in the system: schematic plans and elevations generated parametrically from the quote’s own dimensions. They are measured diagrams, with 1px graphite structure lines, token-driven dimension overlays and amber reserved for the entry/railing cue.",
+  "es": "El <b>único dibujo sancionado</b> del sistema: planos y elevaciones esquemáticos generados paramétricamente desde las dimensiones del propio presupuesto. Son diagramas medidos, con líneas de estructura grafito de 1px, overlays de dimensión token‑driven y ámbar reservado al indicio de entrada/baranda."
  },
  "Registry": {
   "en": "Registry",
   "es": "Registro"
  },
  "Basado en registro: <span class=\"mono\">family</span>/<span class=\"mono\">variant</span> seleccionan un renderer. Escaleras trae cuatro — <span class=\"mono\">recta</span> (elevación lateral), <span class=\"mono\">L</span>, <span class=\"mono\">U</span> y <span class=\"mono\">caracol</span> (vistas en planta). Las familias desconocidas caen a un placeholder “sin vista técnica”.": {
-  "en": "Registry-based: <span class=\"mono\">family</span>/<span class=\"mono\">variant</span> select a renderer. Stairs ships four — <span class=\"mono\">straight</span> (side elevation), <span class=\"mono\">L</span>, <span class=\"mono\">U</span> and <span class=\"mono\">spiral</span> (plan views). Unknown families fall back to a “no technical view” placeholder."
+  "en": "Registry-based: <span class=\"mono\">family</span>/<span class=\"mono\">variant</span> select a renderer. Stairs ships four: <span class=\"mono\">straight</span> (side elevation), <span class=\"mono\">L</span>, <span class=\"mono\">U</span> and <span class=\"mono\">spiral</span> (plan views). Unknown families fall back to a “no technical view” placeholder.",
+  "es": "Basado en registro: <span class=\"mono\">family</span>/<span class=\"mono\">variant</span> seleccionan un renderer. Escaleras trae cuatro: <span class=\"mono\">recta</span> (elevación lateral), <span class=\"mono\">L</span>, <span class=\"mono\">U</span> y <span class=\"mono\">caracol</span> (vistas en planta). Las familias desconocidas caen a un placeholder “sin vista técnica”."
  },
  "Uso permitido": {
   "en": "Permitted use"
@@ -1330,7 +1339,8 @@
   "en": "Extending"
  },
  "<span class=\"mono\">TechnicalRenderers.register(family, variant, def)</span> · <span class=\"mono\">setFamilyLabel</span> · <span class=\"mono\">has</span> · <span class=\"mono\">variants</span> · <span class=\"mono\">families</span> — encadenables. <span class=\"mono\">escalones</span> se clampea a 4–16; un chip que matchee <span class=\"mono\">/baranda|pasamano/</span> dibuja la baranda en <span class=\"mono\">recta</span>.": {
-  "en": "<span class=\"mono\">TechnicalRenderers.register(family, variant, def)</span> · <span class=\"mono\">setFamilyLabel</span> · <span class=\"mono\">has</span> · <span class=\"mono\">variants</span> · <span class=\"mono\">families</span> — chainable. <span class=\"mono\">escalones</span> is clamped to 4–16; a chip matching <span class=\"mono\">/baranda|pasamano/</span> draws the railing on <span class=\"mono\">recta</span>."
+  "en": "<span class=\"mono\">TechnicalRenderers.register(family, variant, def)</span> · <span class=\"mono\">setFamilyLabel</span> · <span class=\"mono\">has</span> · <span class=\"mono\">variants</span> · <span class=\"mono\">families</span>, all chainable. <span class=\"mono\">escalones</span> is clamped to 4–16; a chip matching <span class=\"mono\">/baranda|pasamano/</span> draws the railing on <span class=\"mono\">recta</span>.",
+  "es": "<span class=\"mono\">TechnicalRenderers.register(family, variant, def)</span> · <span class=\"mono\">setFamilyLabel</span> · <span class=\"mono\">has</span> · <span class=\"mono\">variants</span> · <span class=\"mono\">families</span>, todos encadenables. <span class=\"mono\">escalones</span> se clampea a 4–16; un chip que matchee <span class=\"mono\">/baranda|pasamano/</span> dibuja la baranda en <span class=\"mono\">recta</span>."
  },
  "Navigation &amp; App Shell": {
   "en": "Navigation &amp; App Shell",
@@ -1763,7 +1773,8 @@
   "en": "Cell classes: <span class=\"mono\">re-cell-strong</span> (primary) · <span class=\"mono\">re-cell-sub</span> (secondary line)."
  },
  "<b>Envolver en <span class=\"mono\">&lt;Card flush&gt;</span></b> — la card recorta el desborde de la tabla.": {
-  "en": "<b>Wrap in <span class=\"mono\">&lt;Card flush&gt;</span></b> — the card clips the table's overflow."
+  "en": "<b>Wrap in <span class=\"mono\">&lt;Card flush&gt;</span></b>: the card clips the table’s overflow.",
+  "es": "<b>Envolver en <span class=\"mono\">&lt;Card flush&gt;</span></b>: la card recorta el desborde de la tabla."
  },
  "<span class=\"mono\">RowActions</span> se revela en hover de fila.": {
   "en": "<span class=\"mono\">RowActions</span> is revealed on row hover."
@@ -1784,7 +1795,8 @@
   "en": "Empty state — the product's real pattern"
  },
  "Sólo se listan presupuestos guardados. No hay borrado físico — el estado se cambia de forma suave.": {
-  "en": "Only saved quotes are listed. There are no hard deletes — the state is changed softly."
+  "en": "Only saved quotes are listed. There are no hard deletes: the state is changed softly.",
+  "es": "Sólo se listan presupuestos guardados. No hay borrado físico: el estado se cambia de forma suave."
  },
  "Los estados vacíos <b>explican la regla</b>, no sólo dicen “sin resultados”.": {
   "en": "Empty states <b>explain the rule</b>, they do not just say “no results”."
@@ -1830,7 +1842,8 @@
   "en": "The <b>recommended value</b> is the only amber figure on the screen and sits on the deepest charcoal."
  },
  "Siempre se muestra <b>con su rango</b> (mín / máx) y un pin en el track — el número nunca aparece solo.": {
-  "en": "It is always shown <b>with its range</b> (min / max) and a pin on the track — the number never appears alone."
+  "en": "It is always shown <b>with its range</b> (min / max) and a pin on the track: the number never appears alone.",
+  "es": "Siempre se muestra <b>con su rango</b> (mín / máx) y un pin en el track: el número nunca aparece solo."
  },
  "El precio sale de <span class=\"mono\">Fab_min/Fab_max</span> calibrados, <b>no</b> de jornales × valor.": {
   "en": "The price comes from calibrated <span class=\"mono\">Fab_min/Fab_max</span>, <b>not</b> from labour days × rate."
@@ -1950,7 +1963,8 @@
   "en": "<b>No hard deletes</b>: the state change is soft and reversible."
  },
  "<b>Duplicar</b> es de primera clase — retomar una cotización previa es el camino más común.": {
-  "en": "<b>Duplicate</b> is first-class — picking up a previous quote is the most common path."
+  "en": "<b>Duplicate</b> is first-class: picking up a previous quote is the most common path.",
+  "es": "<b>Duplicar</b> es de primera clase: retomar una cotización previa es el camino más común."
  },
  "<b>Freeze</b>: al publicarse, el presupuesto congela su versión de parámetros y queda inmutable.": {
   "en": "<b>Freeze</b>: on publication, the quote freezes its version of the parameters and becomes immutable."
@@ -2026,7 +2040,8 @@
   "es": "Sistema responsive"
  },
  "El mismo sistema en tres densidades. Mobile <b>no es otro producto</b>: son los mismos tokens, la misma taxonomía, los mismos pasos de resultado y el mismo vocabulario — con el patrón de navegación y de resultado que corresponde al espacio disponible.": {
-  "en": "The same system at three densities. Mobile is <b>not another product</b>: same tokens, same taxonomy, same result steps and same vocabulary — with the navigation and result pattern that suits the available space."
+  "en": "The same system at three densities. Mobile is <b>not another product</b>: same tokens, same taxonomy, same result steps and same vocabulary, with the navigation and result pattern that suits the available space.",
+  "es": "El mismo sistema en tres densidades. Mobile <b>no es otro producto</b>: son los mismos tokens, la misma taxonomía, los mismos pasos de resultado y el mismo vocabulario, con el patrón de navegación y de resultado que corresponde al espacio disponible."
  },
  "<span class=\"tick\"></span>Transformación por aspecto": {
   "en": "<span class=\"tick\"></span>Transformation by aspect"
@@ -2173,7 +2188,8 @@
   "en": "Side panel"
  },
  "Espacio horizontal de sobra: desglose completo sticky junto al formulario. Es lo que ya funcionaba — se conserva.": {
-  "en": "Horizontal space to spare: the full breakdown stays sticky beside the form. It is what already worked — it is kept."
+  "en": "Horizontal space to spare: the full breakdown stays sticky beside the form, as it already worked.",
+  "es": "Espacio horizontal de sobra: el desglose completo queda sticky junto al formulario, como ya venía funcionando."
  },
  "Tablet 834": {
   "en": "Tablet 834"
@@ -2242,7 +2258,8 @@
   "en": "<b>One brand mark per header</b>: monogram = app, avatar = user."
  },
  "El bottom sheet <b>sólo</b> transporta el desglose — no se convierte en navegación.": {
-  "en": "The bottom sheet carries <b>only</b> the breakdown — it never becomes navigation."
+  "en": "The bottom sheet carries <b>only</b> the breakdown: it never becomes navigation.",
+  "es": "El bottom sheet <b>sólo</b> transporta el desglose: nunca se convierte en navegación."
  },
  "Spec completa: <span class=\"art-name\">Mobile v1 — Spec de implementación</span>": {
   "en": "Full spec: <span class=\"art-name\">Mobile v1 — Implementation spec</span>"
@@ -2267,7 +2284,8 @@
   "en": "<span class=\"tick\"></span>Mobile v1 — final screens"
  },
  "Calculadora, Inicio e Historial quedaron congeladas para implementación, con medidas, spacing, componentes y comportamiento sticky por pantalla. Se documentan en su propio archivo para no duplicar la fuente de verdad.": {
-  "en": "Calculator, Home and History were frozen for implementation, with measurements, spacing, components and sticky behaviour per screen. They are documented in their own file so the source of truth is not duplicated."
+  "en": "Calculator, Home and History were frozen for implementation, with measurements, spacing, components and sticky behaviour per screen. They are documented in their own file so they are not duplicated here.",
+  "es": "Calculadora, Inicio e Historial quedaron congeladas para implementación, con medidas, spacing, componentes y comportamiento sticky por pantalla. Se documentan en su propio archivo para no duplicarlas acá."
  },
  "<span class=\"tick\"></span>Otras piezas del proyecto": {
   "en": "<span class=\"tick\"></span>Other pieces of the project"
@@ -2284,23 +2302,28 @@
   "es": "Inventario completo. <b>Estado</b>: <span class=\"tag stable\">Estable</span> construido y en uso · <span class=\"tag ext\">Extendido</span> existe pero necesita ampliarse para mobile · <span class=\"tag new\">Nuevo</span> especificado en Mobile v1, sin construir · <span class=\"tag rev\">Requiere revisión</span> inconsistencia documentada."
  },
  "Component": {
-  "en": "Component"
+  "en": "Component",
+  "es": "Componente"
  },
  "Category": {
-  "en": "Category"
+  "en": "Category",
+  "es": "Categoría"
  },
  "Variants": {
-  "en": "Variants"
+  "en": "Variants",
+  "es": "Variantes"
  },
  "States": {
-  "en": "States"
+  "en": "States",
+  "es": "Estados de UI"
  },
  "Status": {
   "en": "Status",
   "es": "Estado"
  },
  "Implementation notes": {
-  "en": "Implementation notes"
+  "en": "Implementation notes",
+  "es": "Notas de implementación"
  },
  "Button": {
   "en": "Button"
@@ -2345,7 +2368,8 @@
   "es": "<span class=\"tag rev\">Requiere revisión</span>"
  },
  "Sin estado de error/invalid — ver NR‑06.": {
-  "en": "No error/invalid state — see NR‑06."
+  "en": "No error/invalid state (see NR‑06).",
+  "es": "Sin estado de error/invalid (ver NR‑06)."
  },
  "native + chevron": {
   "en": "native + chevron"
@@ -2497,7 +2521,8 @@
   "en": "mark · name · tagline"
  },
  "Tagline default desalineado — ver NR‑02.": {
-  "en": "Default tagline is misaligned — see NR‑02."
+  "en": "Default tagline is misaligned (see NR‑02).",
+  "es": "Tagline default desalineado (ver NR‑02)."
  },
  "label · first": {
   "en": "label · first"
@@ -2588,7 +2613,8 @@
   "en": "current · hover"
  },
  "Mobile probablemente scroll infinito o “cargar más” — sin definir.": {
-  "en": "Mobile will probably be infinite scroll or “load more” — undefined."
+  "en": "On mobile it will be infinite scroll or “load more”, still undefined.",
+  "es": "En mobile va a ser scroll infinito o “cargar más”, todavía sin definir."
  },
  "TaxonomyIcon": {
   "en": "TaxonomyIcon"
@@ -2686,13 +2712,15 @@
   "en": "No"
  },
  "No existen en el sistema — ver NR‑13.": {
-  "en": "They do not exist in the system — see NR‑13."
+  "en": "They do not exist in the system (see NR‑13).",
+  "es": "No existen en el sistema (ver NR‑13)."
  },
  "Skeleton · Spinner": {
   "en": "Skeleton · Spinner"
  },
  "Sin componente de loading — ver NR‑07.": {
-  "en": "No loading component — see NR‑07."
+  "en": "No loading component (see NR‑07).",
+  "es": "Sin componente de loading (ver NR‑07)."
  },
  "Design → Implementation": {
   "en": "Design → Implementation",
@@ -2756,7 +2784,8 @@
   "en": "Calculator.html<br>ResultSummary (mobile)"
  },
  "El mismo patrón, tres densidades — sin volver a decidir nada.": {
-  "en": "The same pattern, three densities — without deciding anything again."
+  "en": "The same pattern at three densities, without deciding anything again.",
+  "es": "El mismo patrón, tres densidades, sin volver a decidir nada."
  },
  "<span class=\"tick\"></span>Cómo consumir el sistema": {
   "en": "<span class=\"tick\"></span>How to consume the system"
@@ -2778,7 +2807,8 @@
   "en": "<b>Never</b> a literal hex: always <span class=\"mono\">var(--re-*)</span>. If a token is missing, it is added to the system, not to the screen."
  },
  "<b>Nunca</b> re‑explorar tipografía — está congelada.": {
-  "en": "<b>Never</b> re-explore typography — it is frozen."
+  "en": "<b>Never</b> re-explore typography: it is frozen.",
+  "es": "<b>Nunca</b> re‑explorar tipografía: está congelada."
  },
  "<b>Respetá el racionamiento del ámbar</b>: recomendado · rail/tab activo · CTA · logo.": {
   "en": "<b>Respect amber rationing</b>: recommended value · active rail/tab · CTA · logo."
@@ -2853,7 +2883,8 @@
   "en": "NR‑10"
  },
  "<b>Starting points obsoletos.</b> Las 4 pantallas del kit están marcadas <span class=\"mono\">@startingPoint</span>, mecanismo que los proyectos consumidores ya no ofrecen — los reemplazaron los <span class=\"mono\">templates/</span>, y hoy hay 0 templates.": {
-  "en": "<b>Obsolete starting points.</b> The kit's 4 screens are marked <span class=\"mono\">@startingPoint</span>, a mechanism consuming projects no longer offer — <span class=\"mono\">templates/</span> replaced it, and today there are 0 templates."
+  "en": "<b>Obsolete starting points.</b> The kit’s 4 screens are marked <span class=\"mono\">@startingPoint</span>, a mechanism consuming projects no longer offer. <span class=\"mono\">templates/</span> replaced it, and today there are 0 templates.",
+  "es": "<b>Starting points obsoletos.</b> Las 4 pantallas del kit están marcadas <span class=\"mono\">@startingPoint</span>, un mecanismo que los proyectos consumidores ya no ofrecen. Lo reemplazaron los <span class=\"mono\">templates/</span>, y hoy hay 0 templates."
  },
  "NR‑11": {
   "en": "NR‑11"
