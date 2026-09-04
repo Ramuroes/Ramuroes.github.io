@@ -34,6 +34,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { applyI18n, parseHtml, collectSegments } from './ds-i18n.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = join(ROOT, 'docs/ds-src/restimator');
@@ -101,6 +102,15 @@ function scopeSelector(sel) {
 	if (s === 'body' || s === 'body.re-root' || s === '.re-root') return SCOPE;
 	if (s.startsWith('body.re-root ')) return `${SCOPE} ${s.slice(13)}`;
 	if (s.startsWith('body ')) return `${SCOPE} ${s.slice(5)}`;
+	/*
+	 * `.re-root <algo>` — p. ej. `.re-root ::selection` de tokens/base.css.
+	 * Sin este caso caía en el catch-all y salía `.re-doc .re-root ::selection`,
+	 * que pide que .re-root sea DESCENDIENTE de .re-doc; en el DOM real las dos
+	 * clases van en el MISMO elemento (<main class="re-doc re-root">), así que
+	 * esa regla no matcheaba nunca y el ::selection del Design System quedaba
+	 * muerto — dejando ganar al ::selection global del portfolio.
+	 */
+	if (s.startsWith('.re-root ')) return `${SCOPE} ${s.slice(9)}`;
 
 	// `*`, `*::before`, `*::after`: la raíz también tiene que recibirlos.
 	const star = s.match(/^\*(::?[a-z-]+)?$/);
@@ -228,12 +238,12 @@ function buildCss() {
 
 /** Pantallas documentadas en §08. `screens` = producto; `view` = vista de auditoría. */
 const DESKTOP_SHOTS = [
-	{ id: 'calculator',      name: 'Calculadora',              file: 'Calculator.html',    kind: 'screen' },
-	{ id: 'history',         name: 'Historial',                file: 'History.html',       kind: 'screen' },
-	{ id: 'product-editor',  name: 'Editor de producto',       file: 'ProductEditor.html', kind: 'screen' },
-	{ id: 'client-summary',  name: 'Resumen cliente',          file: 'ClientSummary.html', kind: 'screen' },
-	{ id: 'catalogs',        name: 'Catálogos',                file: 'Catalogs.html',      kind: 'screen' },
-	{ id: 'light-dark',      name: 'Comparación light / dark', file: 'Light & Dark Comparison.html', kind: 'view', prepare: prepareLightDark, tallViewport: true },
+	{ id: 'calculator',     name: { es: 'Calculadora', en: 'Calculator' },                                file: 'Calculator.html',    kind: 'screen' },
+	{ id: 'history',        name: { es: 'Historial', en: 'History' },                                     file: 'History.html',       kind: 'screen' },
+	{ id: 'product-editor', name: { es: 'Editor de producto', en: 'Product editor' },                     file: 'ProductEditor.html', kind: 'screen' },
+	{ id: 'client-summary', name: { es: 'Resumen cliente', en: 'Client summary' },                        file: 'ClientSummary.html', kind: 'screen' },
+	{ id: 'catalogs',       name: { es: 'Catálogos', en: 'Catalogues' },                                  file: 'Catalogs.html',      kind: 'screen' },
+	{ id: 'light-dark',     name: { es: 'Comparación light / dark', en: 'Light / dark comparison' },       file: 'Light & Dark Comparison.html', kind: 'view', prepare: prepareLightDark, tallViewport: true },
 ];
 
 /**
@@ -302,19 +312,116 @@ async function shotTallViewport(page, width) {
 }
 
 const MOBILE_SHOTS = [
-	{ id: 'mobile-calculator', name: 'Calculadora', note: '390 · default — form + resumen pinneado' },
-	{ id: 'mobile-home',       name: 'Inicio',      note: '390 · default' },
-	{ id: 'mobile-history',    name: 'Historial',   note: '390 · default' },
+	{ id: 'mobile-calculator', name: { es: 'Calculadora', en: 'Calculator' }, note: { es: '390 · por defecto — formulario + resumen fijo', en: '390 · default — form + pinned summary' } },
+	{ id: 'mobile-home',       name: { es: 'Inicio',      en: 'Home' },       note: { es: '390 · por defecto', en: '390 · default' } },
+	{ id: 'mobile-history',    name: { es: 'Historial',   en: 'History' },    note: { es: '390 · por defecto', en: '390 · default' } },
 ];
 
-/** Inventario de artefactos del proyecto (ex-tabla "Otras piezas"), sin links. */
+/**
+ * Inventario de artefactos del proyecto (ex-tabla "Otras piezas"), sin links.
+ * Los nombres son los de los archivos reales del proyecto: no se traducen.
+ */
 const ARTIFACTS = [
-	['Refinamiento HiFi — Auditoría y Decisiones', 'Auditoría', 'Auditoría wireframe vs HiFi, problemas UX/visuales, comparación A/B/C/D del panel de resultado.'],
-	['Typography Comparison',                      'Auditoría', 'Hanken vs Plus Jakarta contra pantallas reales — decisión de congelar Hanken.'],
-	['V1 Design Freeze · Readiness Audit',         'Freeze',    'Cierre de alcance V1 y verificación de que el sistema estaba listo para congelarse.'],
-	['Accessibility Review · UX Review',           'Review',    'Resultados de las revisiones de accesibilidad y de UX sobre el kit congelado.'],
-	['Claude Code Handoff Package',                'Handoff',   'Paquete de handoff a desarrollo.'],
+	{
+		name: 'Refinamiento HiFi — Auditoría y Decisiones',
+		kind: { es: 'Auditoría', en: 'Audit' },
+		what: {
+			es: 'Auditoría wireframe vs HiFi, problemas UX/visuales, comparación A/B/C/D del panel de resultado.',
+			en: 'Wireframe vs. hi-fi audit, UX and visual issues, A/B/C/D comparison of the result panel.',
+		},
+	},
+	{
+		name: 'Typography Comparison',
+		kind: { es: 'Auditoría', en: 'Audit' },
+		what: {
+			es: 'Hanken vs Plus Jakarta contra pantallas reales — decisión de congelar Hanken.',
+			en: 'Hanken vs. Plus Jakarta against real screens — the decision to freeze Hanken.',
+		},
+	},
+	{
+		name: 'V1 Design Freeze · Readiness Audit',
+		kind: { es: 'Freeze', en: 'Freeze' },
+		what: {
+			es: 'Cierre de alcance V1 y verificación de que el sistema estaba listo para congelarse.',
+			en: 'V1 scope lock, and the check that the system was ready to be frozen.',
+		},
+	},
+	{
+		name: 'Accessibility Review · UX Review',
+		kind: { es: 'Review', en: 'Review' },
+		what: {
+			es: 'Resultados de las revisiones de accesibilidad y de UX sobre el kit congelado.',
+			en: 'Results of the accessibility and UX reviews of the frozen kit.',
+		},
+	},
+	{
+		name: 'Claude Code Handoff Package',
+		kind: { es: 'Handoff', en: 'Handoff' },
+		what: {
+			es: 'Paquete de handoff a desarrollo.',
+			en: 'Handoff package for development.',
+		},
+	},
 ];
+
+/**
+ * "System evolution" — presentación pública del roadmap, en lugar del registro
+ * completo de auditoría.
+ *
+ * Los 13 NR siguen publicándose, pero dentro de un <details> secundario: son
+ * notas internas de auditoría y no deberían dominar el cierre del documento ni
+ * leerse como una lista de defectos del producto. Acá arriba queda sólo el
+ * estado de alto nivel de las tres líneas de trabajo abiertas.
+ */
+const SYSTEM_EVOLUTION = [
+	{ name: { es: 'Tablet', en: 'Tablet' },           state: { es: 'En progreso', en: 'In progress' },   tone: 'progress' },
+	{ name: { es: 'Expansión V2', en: 'V2 expansion' }, state: { es: 'En desarrollo', en: 'In development' }, tone: 'progress' },
+	{ name: { es: 'Tema light', en: 'Light theme' },  state: { es: 'Planificado', en: 'Planned' },       tone: 'planned' },
+];
+
+/**
+ * Textos que escribe el propio build (no vienen de la fuente), en los dos
+ * idiomas. Todo lo que sale de acá se emite ya traducido y marcado con
+ * data-i18n-skip, así el diccionario no lo vuelve a tocar.
+ */
+const UI = {
+	es: {
+		shotsLede: 'Pantallas reales construidas con el sistema. Las cinco de desktop son las del UI kit; las tres de mobile vienen de la spec de implementación Mobile v1. Cada una se muestra como captura de alta resolución y se puede ampliar para inspeccionarla en detalle.',
+		shotsNote: 'Capturas de alta resolución de las pantallas reales del kit. Hacé click en cualquiera para ampliarla e inspeccionarla en detalle.',
+		zoomHint: 'Ampliar',
+		expandAria: 'Ampliar pantalla: %s',
+		artifactsHead: ['Artefacto', 'Tipo', 'Qué contiene'],
+		artifactsNote: 'Documentos internos del proyecto. Se listan como inventario: no forman parte de esta publicación.',
+		specFull: 'Spec completa:',
+		evolutionTitle: 'Evolución del sistema',
+		evolutionLede: 'Las líneas de trabajo abiertas del sistema y en qué estado está cada una.',
+		auditTitle: 'Notas de auditoría',
+		auditSummary: 'Registro interno de auditoría (13 notas)',
+		auditIntro: 'Inconsistencias y huecos detectados durante la auditoría del sistema. Ninguno se corrigió en silencio: quedan documentados para resolverse como decisión explícita. Es material de trabajo interno, no un listado de defectos del producto.',
+		railFoot: 'Fuente de verdad: los archivos de este proyecto.<br>Tema dark. Light planificado.<br>Tipografía congelada 2026‑06‑16.',
+		themeFactLabel: 'Tema',
+		themeFactValue: 'Dark',
+		themeFactNote: 'único tema · light planificado',
+	},
+	en: {
+		shotsLede: 'Real screens built with the system. The five desktop ones come from the UI kit; the three mobile ones come from the Mobile v1 implementation spec. Each is shown as a high-resolution capture and can be expanded to inspect in detail.',
+		shotsNote: 'High-resolution captures of the kit’s real screens. Click any of them to expand and inspect it in detail.',
+		zoomHint: 'Expand',
+		expandAria: 'Expand screen: %s',
+		artifactsHead: ['Artifact', 'Type', 'What it contains'],
+		artifactsNote: 'Internal project documents. Listed as an inventory: they are not part of this publication.',
+		specFull: 'Full spec:',
+		evolutionTitle: 'System evolution',
+		evolutionLede: 'The system’s open workstreams and the state each one is in.',
+		auditTitle: 'Audit notes',
+		auditSummary: 'Internal audit log (13 notes)',
+		auditIntro: 'Inconsistencies and gaps found during the system audit. None were fixed silently: they stay documented so each is resolved as an explicit decision. This is internal working material, not a list of product defects.',
+		railFoot: 'Source of truth: the files in this project.<br>Dark theme. Light planned.<br>Typography frozen 2026‑06‑16.',
+		themeFactLabel: 'Theme',
+		themeFactValue: 'Dark',
+		themeFactNote: 'single theme · light planned',
+	},
+};
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -325,75 +432,126 @@ function readSize(id) {
 }
 
 /**
- * Emite una tarjeta de pantalla: toda la preview es el trigger del lightbox
+ * Emite una tarjeta de pantalla: TODA la tarjeta es el trigger del lightbox
  * compartido del portfolio (assets/js/case-figure-lightbox.js). Sin <a>, sin
  * iframe y sin ninguna ruta a .html local.
  *
- * El visor lee data-es-zoom-src/-w/-h, el alt del <img> interno y el
- * .es-case-caption del <figure> contenedor — por eso el markup es un
- * <figure> con <button> adentro y no un <div>.
+ * La cabecera (nombre · archivo · "Ampliar") va DENTRO del <button>, no al
+ * lado. Antes era hermana del trigger, y como el visor se dispara por
+ * delegación (`e.target.closest('[data-es-zoom-trigger]')`), un click sobre
+ * la palabra "Ampliar" no encontraba trigger y no abría nada: se veía como
+ * un botón muerto. Con la cabecera adentro hay un único elemento
+ * interactivo, nativo, que cubre la tarjeta entera — el teclado sigue
+ * funcionando igual porque sigue siendo el mismo <button> de siempre.
+ *
+ * Es un <div class="cap"> y no un <figcaption>: <figcaption> pertenece al
+ * <figure> y no debe anidarse dentro de un control. Las clases son las
+ * mismas, así que el CSS del Design System no cambia.
+ *
+ * El visor lee data-es-zoom-src/-w/-h y el alt del <img> interno.
  */
-function shotCard(shot, { mobile = false } = {}) {
+function shotCard(shot, lang, { mobile = false } = {}) {
 	const full = readSize(shot.id) || { w: 0, h: 0, pw: 0, ph: 0, samePreview: false };
 	const previewFile = full.samePreview ? `${shot.id}.webp` : `${shot.id}-preview.webp`;
 	const cls = mobile ? 'shot shot--mobile' : 'shot';
-	const meta = mobile ? shot.note : shot.file;
+	const name = typeof shot.name === 'string' ? shot.name : shot.name[lang];
+	const meta = mobile ? shot.note[lang] : shot.file;
+	const t = UI[lang];
 	return `
-    <figure class="${cls}">
-      <figcaption class="cap">
-        <span class="nm">${esc(shot.name)}</span><span class="fl">${esc(meta)}</span>
-        <span class="r"><span class="zoom-hint" aria-hidden="true">Ampliar</span></span>
-      </figcaption>
+    <figure class="${cls}" data-i18n-skip>
       <button type="button" class="vp"
         data-es-zoom-trigger
         data-es-zoom-src="<?php echo esc_url( $es_ds_screens . '${shot.id}.webp' ); ?>"
         data-es-zoom-w="${full.w}" data-es-zoom-h="${full.h}"
-        data-es-zoom-close-label="<?php echo esc_attr( es__( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es__( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es__( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es__( 'lightbox_reset' ) ); ?>"
-        aria-label="<?php echo esc_attr( sprintf( es__( 'ds_expand_screen' ), '${esc(shot.name).replace(/'/g, "\\'")}' ) ); ?>">
-        <img src="<?php echo esc_url( $es_ds_screens . '${previewFile}' ); ?>"
-             alt="${esc(shot.name)} — Presupuestador RE"
-             width="${full.pw}" height="${full.ph}" loading="lazy" decoding="async">
-        <span class="vp-expand" aria-hidden="true">
-          <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
+        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
+        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
+        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
+        aria-label="${esc(t.expandAria.replace('%s', name))}">
+        <span class="cap">
+          <span class="nm">${esc(name)}</span><span class="fl">${esc(meta)}</span>
+          <span class="r"><span class="zoom-hint">${esc(t.zoomHint)}</span></span>
+        </span>
+        <span class="vp-media">
+          <img src="<?php echo esc_url( $es_ds_screens . '${previewFile}' ); ?>"
+               alt="${esc(name)} — Presupuestador RE"
+               width="${full.pw}" height="${full.ph}" loading="lazy" decoding="async">
+          <span class="vp-expand" aria-hidden="true">
+            <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+          </span>
         </span>
       </button>
     </figure>`;
 }
 
-function buildHtml() {
-	ensure(PHP_OUT);
-	let html = readFileSync(join(SRC, 'master-documentation.html'), 'utf8');
+/**
+ * Reemplaza un tramo delimitado por dos anclas, fallando fuerte si el ancla no
+ * está. El build NO debe generar a medias: si la fuente cambió de estructura,
+ * es preferible que se rompa acá y no que publique un documento con una
+ * sección vieja mezclada con una nueva.
+ */
+function spliceBetween(doc, startAnchor, endAnchor, replacement, label) {
+	const a = doc.indexOf(startAnchor);
+	if (a === -1) throw new Error(`${label}: no se encontró el ancla inicial`);
+	const b = doc.indexOf(endAnchor, a + startAnchor.length);
+	if (b === -1) throw new Error(`${label}: no se encontró el ancla final`);
+	return doc.slice(0, a) + replacement + doc.slice(b + endAnchor.length);
+}
 
-	// --- cuerpo del documento --------------------------------------------
-	const start = html.indexOf('<div class="doc">');
-	const scriptAt = html.indexOf('<script>', start);
-	if (start === -1 || scriptAt === -1) throw new Error('master-documentation.html: no se encontró <div class="doc"> / <script>');
-	const lastClose = html.lastIndexOf('</div>', scriptAt);
-	let doc = html.slice(start, lastClose + 6);
+function mustReplace(doc, pattern, replacement, label) {
+	if (!pattern.test(doc)) throw new Error(`${label}: el patrón no matcheó`);
+	return doc.replace(pattern, replacement);
+}
 
-	const before = doc;
+/**
+ * Cierre público de la documentación: el estado de las líneas de trabajo
+ * abiertas, y el registro de auditoría completo detrás de un <details>.
+ */
+function systemEvolutionBlock(lang) {
+	const t = UI[lang];
+	const items = SYSTEM_EVOLUTION.map((i) => `
+      <div class="ev">
+        <span class="ev-name">${esc(i.name[lang])}</span>
+        <span class="ev-state ev-state--${i.tone}">${esc(i.state[lang])}</span>
+      </div>`).join('');
+
+	return `<h3 class="sub" id="needs-review" data-i18n-skip><span class="tick"></span>${esc(t.evolutionTitle)}</h3>
+  <p class="lede" data-i18n-skip>${esc(t.evolutionLede)}</p>
+  <div class="ev-grid" data-i18n-skip>${items}
+  </div>`;
+}
+
+/**
+ * Todas las transformaciones estructurales, aplicadas sobre la fuente ES
+ * pristina y emitiendo ya en el idioma destino.
+ */
+function transformDoc(doc, lang) {
+	const t = UI[lang];
+	const skip = ' data-i18n-skip';
 
 	// --- §08 Screen Examples: desktop -------------------------------------
-	const gridStart = doc.indexOf('<div class="shots">');
-	const gridEnd = doc.indexOf('</div>\n  <p class="body"', gridStart);
-	if (gridStart === -1 || gridEnd === -1) throw new Error('§08: no se encontró la grilla .shots');
-	doc = doc.slice(0, gridStart)
-		+ '<div class="shots">' + DESKTOP_SHOTS.map((s) => shotCard(s)).join('') + '\n  </div>'
-		+ doc.slice(gridEnd + 6);
+	doc = spliceBetween(
+		doc,
+		'<div class="shots">',
+		'</div>\n  <p class="body"',
+		'<div class="shots">' + DESKTOP_SHOTS.map((s) => shotCard(s, lang)).join('') + '\n  </div>\n  <p class="body"',
+		'§08 grilla .shots'
+	);
 
 	// Lede de la sección: describía los embeds vivos, que ya no existen.
-	doc = doc.replace(
+	doc = mustReplace(
+		doc,
 		/<p class="lede">Pantallas reales construidas con el sistema\.[\s\S]*?<\/p>/,
-		'<p class="lede">Pantallas reales construidas con el sistema. Las cinco de desktop son las del UI kit; las tres de mobile vienen de la spec de implementación Mobile v1. Cada una se muestra como captura de alta resolución y se puede ampliar para inspeccionarla en detalle.</p>'
+		`<p class="lede"${skip}>${t.shotsLede}</p>`,
+		'§08 lede'
 	);
 
 	// Nota bajo la grilla: describía los embeds interactivos y "Abrir ↗".
-	doc = doc.replace(
+	doc = mustReplace(
+		doc,
 		/<p class="body" style="margin-top:var\(--re-s4\);font-size:12\.5px;color:var\(--re-ink-4\)">Los embeds[\s\S]*?<\/p>/,
-		'<p class="body" style="margin-top:var(--re-s4);font-size:12.5px;color:var(--re-ink-4)">Capturas de alta resolución de las pantallas reales del kit. Hacé click en cualquiera para ampliarla e inspeccionarla en detalle.</p>'
+		`<p class="body" style="margin-top:var(--re-s4);font-size:12.5px;color:var(--re-ink-4)"${skip}>${t.shotsNote}</p>`,
+		'§08 nota de embeds'
 	);
 
 	// --- §08 Screen Examples: mobile --------------------------------------
@@ -401,51 +559,196 @@ function buildHtml() {
 	// ser las TRES pantallas que la propia spec documenta (01 Calculadora,
 	// 02 Inicio, 03 Historial), que es lo que anuncia el contador "3 mobile".
 	const mobStart = doc.indexOf('<div class="shot"><div class="cap"><span class="nm">Mobile v1');
-	if (mobStart === -1) throw new Error('§08: no se encontró el tile de mobile');
+	if (mobStart === -1) throw new Error('§08 mobile: no se encontró el tile');
 	const mobEnd = doc.indexOf('</div></div>', doc.indexOf('<div class="vp"', mobStart)) + 12;
 	doc = doc.slice(0, mobStart)
-		+ '<div class="shots shots--mobile">' + MOBILE_SHOTS.map((s) => shotCard(s, { mobile: true })).join('') + '\n  </div>'
+		+ '<div class="shots shots--mobile">' + MOBILE_SHOTS.map((s) => shotCard(s, lang, { mobile: true })).join('') + '\n  </div>'
 		+ doc.slice(mobEnd);
 
 	// --- §08 "Otras piezas": tabla de links -> inventario sin navegación ---
-	const tblStart = doc.indexOf('<div class="scrollx"><table class="tb">\n    <thead><tr><th>Archivo</th>');
-	if (tblStart === -1) throw new Error('§08: no se encontró la tabla de otras piezas');
-	const tblEnd = doc.indexOf('</table></div>', tblStart) + 14;
-	const rows = ARTIFACTS.map(([name, kind, what]) =>
-		`      <tr><td><span class="art-name">${esc(name)}</span></td><td><span class="art-kind">${esc(kind)}</span></td><td>${esc(what)}</td></tr>`
+	const rows = ARTIFACTS.map((a) =>
+		`      <tr><td><span class="art-name">${esc(a.name)}</span></td><td><span class="art-kind">${esc(a.kind[lang])}</span></td><td>${esc(a.what[lang])}</td></tr>`
 	).join('\n');
-	doc = doc.slice(0, tblStart)
-		+ `<div class="scrollx"><table class="tb">\n    <thead><tr><th>Artefacto</th><th>Tipo</th><th>Qué contiene</th></tr></thead>\n    <tbody>\n${rows}\n    </tbody></table></div>\n  <p class="body" style="margin-top:var(--re-s4);font-size:12.5px;color:var(--re-ink-4)">Documentos internos del proyecto. Se listan como inventario: no forman parte de esta publicación.</p>`
-		+ doc.slice(tblEnd);
-
-	// --- §07: link suelto a la spec mobile --------------------------------
-	doc = doc.replace(
-		/Spec completa: <a href="[^"]*\.html">([^<]*)<\/a>/,
-		'Spec completa: <span class="art-name">$1</span>'
+	doc = spliceBetween(
+		doc,
+		'<div class="scrollx"><table class="tb">\n    <thead><tr><th>Archivo</th>',
+		'</table></div>',
+		`<div class="scrollx"${skip}><table class="tb">\n    <thead><tr>${t.artifactsHead.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead>\n    <tbody>\n${rows}\n    </tbody></table></div>\n  <p class="body" style="margin-top:var(--re-s4);font-size:12.5px;color:var(--re-ink-4)"${skip}>${t.artifactsNote}</p>`,
+		'§08 tabla de otras piezas'
 	);
 
-	if (doc === before) throw new Error('ninguna transformación se aplicó — ¿cambió la fuente?');
+	// --- §07: link suelto a la spec mobile --------------------------------
+	doc = mustReplace(
+		doc,
+		/Spec completa: <a href="[^"]*\.html">([^<]*)<\/a>/,
+		'Spec completa: <span class="art-name">$1</span>',
+		'§07 link a la spec mobile'
+	);
 
-	// --- verificación dura: cero navegación a archivos locales ------------
-	const leftovers = [...doc.matchAll(/(?:href|src)="([^"]*\.html[^"]*)"/g)].map((m) => m[1]);
-	if (leftovers.length) throw new Error('quedaron refs a .html locales:\n  ' + leftovers.join('\n  '));
-	if (/<iframe/i.test(doc)) throw new Error('quedaron <iframe> en el documento');
+	/*
+	 * Dos celdas `.mono` mezclan un token con una palabra en español. El
+	 * diccionario nunca toca `.mono` —ahí viven tokens e identificadores, y
+	 * traducirlos los rompería—, así que estas dos se resuelven acá. Al no ser
+	 * segmentos traducibles, no afectan la paridad de claves entre idiomas.
+	 */
+	if (lang === 'en') {
+		doc = mustReplace(doc, /<td class="mono">≥ 1200 · diseño 1440<\/td>/, '<td class="mono">≥ 1200 · design 1440</td>', 'celda mono: diseño 1440');
+		doc = mustReplace(doc, /<td class="mono">--re-ring 3px ámbar<\/td>/, '<td class="mono">--re-ring 3px amber</td>', 'celda mono: 3px ámbar');
+		doc = mustReplace(doc, /<td class="mono">máx 78%<\/td>/, '<td class="mono">max 78%</td>', 'celda mono: máx 78%');
+	}
 
-	const php = `<?php
+	// --- Tema: la publicación no afirma que existan dos temas -------------
+	// Sólo existe dark. Light es trabajo planificado, y así se presenta.
+	doc = mustReplace(
+		doc,
+		/<div><div class="k">Temas<\/div><div class="v num">2<\/div><div class="d">dark \(default\) · light<\/div><\/div>/,
+		`<div${skip}><div class="k">${esc(t.themeFactLabel)}</div><div class="v">${esc(t.themeFactValue)}</div><div class="d">${esc(t.themeFactNote)}</div></div>`,
+		'hero: fact de temas'
+	);
+
+	doc = mustReplace(
+		doc,
+		/<li>147 tokens · 2 temas \(dark default, light\)\.<\/li>/,
+		`<li${skip}>${lang === 'es' ? '147 tokens · tema dark.' : '147 tokens · dark theme.'}</li>`,
+		'§00: "2 temas"'
+	);
+
+	doc = mustReplace(
+		doc,
+		/<div class="rail-foot">Fuente de verdad[\s\S]*?<\/div>/,
+		`<div class="rail-foot"${skip}>${t.railFoot}</div>`,
+		'rail-foot: claim de light theme'
+	);
+
+	// §01: la subsección describía el tema light en presente, como si estuviera
+	// en uso. Pasa a clave de trabajo planificado, y se quita el caveat de
+	// implementación (era guía para algo que no está publicado).
+	doc = spliceBetween(
+		doc,
+		'<h4 class="mini">Tema light — remap de color puro</h4>',
+		'y un flip de variables puede dejarlos a mitad de transición.</p></div>',
+		lang === 'es'
+			? `<h4 class="mini"${skip}>Tema light — planificado</h4>\n  <p class="body"${skip}><span class="art-kind">Planificado</span> El sistema publicado tiene <b>un solo tema: dark</b>. Existe un remap de color explorado —superficies blanco cálido, tinta grafito, bordes gris cálido— que dejaría intactos espaciado, tipografía, radios, jerarquía e interacción, con el ámbar como único acento. Todavía no forma parte del sistema y no se documenta como disponible.</p>`
+			: `<h4 class="mini"${skip}>Light theme — planned</h4>\n  <p class="body"${skip}><span class="art-kind">Planned</span> The published system has <b>a single theme: dark</b>. A colour remap has been explored —warm white surfaces, graphite ink, warm grey borders— which would leave spacing, typography, radii, hierarchy and interaction untouched, with amber as the only accent. It is not part of the system yet and is not documented as available.</p>`,
+		'§01 subsección de tema light'
+	);
+
+	// §10: el paso "2 · Tema" mostraba cómo activar light como si existiera.
+	doc = spliceBetween(
+		doc,
+		'<h4 class="mini">2 · Tema</h4>',
+		'<h4 class="mini">3 · Componentes</h4>',
+		lang === 'es'
+			? `<h4 class="mini"${skip}>2 · Tema</h4>\n      <p class="body" style="margin:0 0 var(--re-s4)"${skip}>No hay nada que configurar: dark es el único tema del sistema, y es el que aplica <span class="mono">:root</span> por defecto.</p>\n      <h4 class="mini">3 · Componentes</h4>`
+			: `<h4 class="mini"${skip}>2 · Theme</h4>\n      <p class="body" style="margin:0 0 var(--re-s4)"${skip}>Nothing to configure: dark is the system’s only theme, and it is what <span class="mono">:root</span> applies by default.</p>\n      <h4 class="mini">3 · Componentes</h4>`,
+		'§10 paso de tema'
+	);
+
+	/*
+	 * --- Needs review -> System evolution + disclosure secundario ----------
+	 *
+	 * Los 13 NR no se borran ni se reescriben: se mueven tal cual adentro de un
+	 * <details>, y el cierre del documento pasa a ser el estado de las líneas
+	 * de trabajo abiertas. Son notas internas de auditoría; presentarlas como
+	 * el cierre del documento las hacía leer como una lista de defectos.
+	 */
+	const nrStart = doc.indexOf('<h3 class="sub" id="needs-review">');
+	if (nrStart === -1) throw new Error('Needs review: no se encontró el encabezado');
+	const STACK_OPEN = '<div class="stack">';
+	const STACK_CLOSE = '</div>\n</section>';
+	const stackStart = doc.indexOf(STACK_OPEN, nrStart);
+	const stackEnd = doc.indexOf(STACK_CLOSE, stackStart);
+	if (stackStart === -1 || stackEnd === -1) throw new Error('Needs review: no se encontró el .stack de notas');
+	const nrItems = doc.slice(stackStart + STACK_OPEN.length, stackEnd);
+	if (!/NR‑13/.test(nrItems)) throw new Error('Needs review: el .stack capturado no contiene las 13 notas');
+
+	doc = doc.slice(0, nrStart)
+		+ systemEvolutionBlock(lang)
+		+ `\n\n  <details class="ev-audit">`
+		+ `\n    <summary${skip}>${esc(t.auditSummary)}</summary>`
+		+ `\n    <p class="body"${skip}>${esc(t.auditIntro)}</p>`
+		+ `\n    <div class="stack">${nrItems}</div>`
+		+ `\n  </details>\n</section>`
+		+ doc.slice(stackEnd + STACK_CLOSE.length);
+
+	// El pie del documento contaba los 13 items de auditoría como métrica.
+	/*
+	 * El pie contaba los 13 items de auditoría como si fueran una métrica del
+	 * sistema. Se emite SIEMPRE en español y lo traduce el diccionario: el
+	 * <footer> es un bloque traducible y, si el texto variara por idioma, su
+	 * clave cambiaría y el diccionario dejaría de matchear.
+	 */
+	doc = mustReplace(
+		doc,
+		/<span class="mono">147 tokens · 33 componentes · 13 items en Needs review<\/span>/,
+		'<span class="mono">147 tokens · 33 componentes</span>',
+		'footer del documento'
+	);
+
+	return doc;
+}
+
+function buildHtml() {
+	ensure(PHP_OUT);
+	const html = readFileSync(join(SRC, 'master-documentation.html'), 'utf8');
+
+	// --- cuerpo del documento --------------------------------------------
+	const start = html.indexOf('<div class="doc">');
+	const scriptAt = html.indexOf('<script>', start);
+	if (start === -1 || scriptAt === -1) throw new Error('master-documentation.html: no se encontró <div class="doc"> / <script>');
+	const lastClose = html.lastIndexOf('</div>', scriptAt);
+	const source = html.slice(start, lastClose + 6);
+
+	const dict = JSON.parse(readFileSync(join(SRC, 'i18n.json'), 'utf8'));
+	const report = [];
+
+	for (const lang of ['es', 'en']) {
+		const doc = transformDoc(source, lang);
+		if (process.env.DS_DUMP_TRANSFORMED) writeFileSync(join(SRC, `transformed-${lang}.html`), doc);
+		const { html: localized, missing, total, changed } = applyI18n(doc, dict, lang);
+
+		if (missing.length) {
+			writeFileSync(join(SRC, `missing-${lang}.txt`), missing.join('\n') + '\n');
+			const preview = missing.slice(0, 10).map((m) => '    · ' + m.slice(0, 96)).join('\n');
+			const msg = `master-${lang}: ${missing.length} de ${total} segmentos sin traducir:\n${preview}` +
+				(missing.length > 10 ? `\n    … y ${missing.length - 10} más` : '') +
+				`\n  Lista completa en docs/ds-src/restimator/missing-${lang}.txt`;
+			if (process.env.DS_ALLOW_MISSING) log('AVISO ' + msg);
+			else throw new Error(msg);
+		}
+
+		// --- verificación dura --------------------------------------------
+		const leftovers = [...localized.matchAll(/(?:href|src)="([^"]*\.html[^"]*)"/g)].map((m) => m[1]);
+		if (leftovers.length) throw new Error(`master-${lang}: quedaron refs a .html locales:\n  ` + leftovers.join('\n  '));
+		if (/<iframe/i.test(localized)) throw new Error(`master-${lang}: quedaron <iframe>`);
+		if (/data-i18n-skip/.test(localized)) throw new Error(`master-${lang}: quedó andamiaje data-i18n-skip en el HTML`);
+
+		const php = `<?php
 /**
- * REstimator Design System — cuerpo del documento (ES).
+ * REstimator Design System — cuerpo del documento (${lang.toUpperCase()}).
  *
  * GENERADO POR tools/build-ds.mjs — NO EDITAR A MANO.
- * Fuente: docs/ds-src/restimator/master-documentation.html
+ * Fuente:  docs/ds-src/restimator/master-documentation.html
+ * Idioma:  docs/ds-src/restimator/i18n.json
+ *
+ * Los dos idiomas salen de la MISMA fuente estructural: el documento se
+ * transforma una vez y después se le aplica el diccionario del idioma, así no
+ * hay dos documentos que mantener a mano y una actualización del Design System
+ * se propaga a los dos.
  *
  * Diferencias con la fuente, todas producidas por el script:
  *  - §08 Screen Examples: los <iframe> a archivos .html locales y los enlaces
  *    "Abrir ↗" se reemplazan por previews estáticas que abren el lightbox
- *    compartido del portfolio ([data-es-zoom-trigger]).
+ *    compartido del portfolio ([data-es-zoom-trigger]). Toda la tarjeta es el
+ *    trigger, incluida la palabra "Ampliar".
  *  - §08 "Otras piezas": la tabla de enlaces pasa a inventario de texto plano.
+ *  - Tema: la publicación declara un solo tema (dark). Light figura como
+ *    planificado, nunca como disponible.
+ *  - Cierre: "Needs review" pasa a "System evolution" (estado de las líneas de
+ *    trabajo abiertas) con el registro de auditoría completo en un <details>.
  *  - Cero href/src a archivos .html locales (verificado por el script).
  *
- * El markup NO se reordena ni se simplifica: es el mismo documento.
+ * El resto del markup NO se reordena ni se simplifica: es el mismo documento.
  *
  * @package estavillo-child
  * @var string $es_ds_screens URI base de assets/ds/restimator/screens/.
@@ -455,10 +758,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
-${doc}
+${localized}
 `;
-	writeFileSync(join(PHP_OUT, 'master-es.php'), php);
-	log(`master-es.php  ${(php.length / 1024).toFixed(1)} KB  · 0 refs .html · 0 iframes`);
+		writeFileSync(join(PHP_OUT, `master-${lang}.php`), php);
+		report.push(`master-${lang}.php  ${(php.length / 1024).toFixed(1)} KB · ${changed}/${total} segmentos traducidos`);
+	}
+
+	report.forEach((r) => log(r));
+	log('0 refs .html · 0 iframes · 0 andamiaje i18n');
 }
 
 /* ==========================================================================

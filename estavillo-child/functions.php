@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.66' );
+define( 'ES_CHILD_VERSION', '0.2.67' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -155,24 +155,16 @@ function es_child_ui_strings() {
 		'connect_lead'        => "I'm open to Product Design, Design Systems and UX Research roles — anywhere the goal is making a real system work better, not just look better.",
 
 		/*
-		 * REstimator Design System (templates/page-restimator-ds.php).
+		 * Los strings del REstimator Design System NO viven acá.
 		 *
-		 * El CONTENIDO del Design System está en español y no se traduce acá:
-		 * el documento vive en ds/restimator/master-<lang>.php y se elige por
-		 * idioma (ver es_ds_restimator_lang()). Estas claves son sólo el
-		 * chrome del portfolio alrededor de ese documento, más las labels del
-		 * visor de pantallas — todo eso sí queda traducible por Polylang como
-		 * cualquier otro string del tema.
+		 * Esta tabla guarda su texto en inglés y delega la traducción a
+		 * Polylang → String translations, o sea que depende de que alguien la
+		 * cargue a mano en wp-admin; sin ese paso, la página en español muestra
+		 * el chrome en inglés. Los textos de esa página son sólo suyos y su
+		 * idioma ya está resuelto por es_ds_restimator_lang(), así que se
+		 * sirven directo desde es_ds_text() (inc/ds-restimator.php) y no
+		 * dependen de ningún paso manual.
 		 */
-		'ds_back_to_case'     => 'Back to the REstimator case',
-		'ds_owner'            => 'Ramiro Estavillo',
-		'ds_missing'          => 'The Design System document is not available in this installation.',
-		/* translators: %s: nombre de la pantalla (p. ej. "Calculadora"). */
-		'ds_expand_screen'    => 'Expand screen: %s',
-		'lightbox_close'      => 'Close image',
-		'lightbox_zoom_in'    => 'Zoom in',
-		'lightbox_zoom_out'   => 'Zoom out',
-		'lightbox_reset'      => 'Reset zoom',
 	);
 }
 

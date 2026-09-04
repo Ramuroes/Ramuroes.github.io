@@ -40,7 +40,7 @@ Eso es todo. No hay que tocar el template, ni el CSS, ni el PHP.
 |---|---|
 | `node tools/build-ds.mjs css` | Regenera `tokens.css` + `doc.css` scopeados. |
 | `node tools/build-ds.mjs shots` | Recaptura las pantallas (necesita Playwright + red para las fuentes). |
-| `node tools/build-ds.mjs html` | Regenera `master-es.php`. **Corre después de `shots`**: lee las dimensiones que deja el manifest. |
+| `node tools/build-ds.mjs html` | Regenera `master-es.php` **y** `master-en.php`. **Corre después de `shots`**: lee las dimensiones que deja el manifest. |
 | `node tools/build-ds.mjs` | Los tres, en el orden correcto. |
 
 El script **falla fuerte** —no genera nada a medias— si:
@@ -49,7 +49,10 @@ El script **falla fuerte** —no genera nada a medias— si:
 - queda algún `<iframe>`;
 - ninguna transformación aplicó (señal de que la fuente cambió de estructura);
 - las pantallas mobile de la spec dejan de ser 3;
-- `inc/enqueue.php` no encola las familias tipográficas que declara el DS.
+- `inc/enqueue.php` no encola las familias tipográficas que declara el DS;
+- **queda algún segmento sin traducir al inglés** (escribe la lista completa en
+  `docs/ds-src/restimator/missing-en.txt`). Para iterar sin que falle, exportá
+  `DS_ALLOW_MISSING=1`.
 
 ---
 
@@ -67,6 +70,9 @@ El script **falla fuerte** —no genera nada a medias— si:
 | `estavillo-child/inc/ds-restimator.php` | ❌ | ✅ |
 | `estavillo-child/assets/js/ds-restimator.js` | ❌ | ✅ |
 | `docs/ds-src/restimator/screens-meta.json` | ✅ | ❌ metadata de build |
+| `docs/ds-src/restimator/i18n.json` | ❌ | ✅ **el diccionario de traducción** |
+| `estavillo-child/ds/restimator/master-en.php` | ✅ | ❌ se sobrescribe |
+| `estavillo-child/inc/ds-restimator.php` | ❌ | ✅ |
 
 `docs/` **no** entra al ZIP del theme, así que ni la fuente ni el manifest viajan
 a producción.
@@ -186,3 +192,98 @@ El anillo de foco de los triggers va con `outline-offset` **negativo**:
 `assets/css/base.css` impone un offset positivo con `!important` para todo el
 sitio, y `.shot { overflow: hidden }` del DS lo recortaría, dejando el foco de
 teclado invisible.
+
+---
+
+## 7. Los dos idiomas
+
+`master-es.php` y `master-en.php` **salen de la misma fuente**. El build hace
+dos pasadas sobre el mismo documento: primero las transformaciones estructurales
+(que emiten ya en el idioma destino), después el diccionario de
+`docs/ds-src/restimator/i18n.json`.
+
+El diccionario está indexado por el **HTML interno del bloque en español**, y
+cada entrada tiene:
+
+```json
+"Densidad operativa. El estimador carga medidas…": {
+  "en": "Operational density. The estimator enters measurements…",
+  "es": "…"   // opcional: sólo si el español de la fuente hay que corregirlo
+}
+```
+
+Se traduce **a nivel de bloque, no de nodo de texto**: una frase suele venir
+partida por markup inline (`El token real es <span class="mono">#7f858e</span>`),
+y traducir fragmento por fragmento daría un inglés con el orden de palabras del
+español. Tomando el bloque hoja entero, la traducción controla el orden y
+conserva los tramos técnicos intactos.
+
+**Qué nunca se traduce**, en ninguno de los dos idiomas: `<span class="mono">`,
+`<code>`, celdas `.tok`, `<svg>`, y todo segmento sin letras. Ahí viven los
+tokens, las rutas y los identificadores: traducirlos los rompería.
+
+### Cuando el Design System se actualiza
+
+1. Reemplazá la fuente y corré `node tools/build-ds.mjs`.
+2. Si hay texto nuevo, el build **falla** y lista los segmentos sin traducir en
+   `docs/ds-src/restimator/missing-en.txt`.
+3. Agregá esas claves a `i18n.json` con su `en` y volvé a correr.
+
+Los segmentos que no cambiaron conservan su traducción: la clave es el texto
+español, no una posición.
+
+> ⚠️ Nunca regeneres `i18n.json` desde cero: perdés las traducciones. Toda
+> herramienta que lo reescriba tiene que preservar las entradas existentes.
+
+### Reglas de idioma aplicadas
+
+Se traduce navegación, títulos, labels, explicaciones, captions, ayudas,
+botones y todo el texto editorial. **No** se traducen nombres de componentes
+(`Button`, `AppShell`, `StatTile`), tokens (`--re-*`), nombres de archivo, APIs
+ni identificadores del producto.
+
+Quedan a propósito en español dentro de la versión inglesa: los nombres de
+archivo reales de los artefactos del proyecto, un nombre propio en datos de
+ejemplo, y el microcopy español citado como **ejemplo** en la sección de Voz
+(“Agregá notas…”, “buscá, filtrá y retomá”) — ahí el español ES el contenido.
+
+---
+
+## 8. Chrome institucional por página
+
+El header y el footer del portfolio son opcionales **por página**, desde el meta
+box “REstimator Design System” en el editor. Los dos vienen **activos por
+defecto**, sin sembrar nada en la base de datos: la ausencia de meta se lee como
+activo, así que una página ya publicada no necesita ninguna migración.
+
+Cuando están activos se imprimen los `template-parts/site-header.php` y
+`site-footer.php` **reales** del portfolio — no una copia—, dentro del wrapper
+`.es-page` que `base.css` documenta como ancestro necesario del header sticky.
+
+Con el header apagado queda `template-parts/ds-topbar.php`: una barra mínima
+con “← Volver al caso REstimator”, para que nunca haya una página sin salida.
+
+### Strings de esta página
+
+Viven en `es_ds_text()` (`inc/ds-restimator.php`), resueltos por
+`es_ds_restimator_lang()`. **No** usan `es__()`/Polylang a propósito: esa tabla
+guarda su texto en inglés y depende de que alguien cargue la traducción a mano
+en wp-admin; sin ese paso, la página en español mostraba el chrome en inglés.
+El sistema de traducciones del resto del portfolio no cambia.
+
+---
+
+## 9. Rail sticky y header
+
+El rail del Design System es `position:sticky; top:0; height:100vh`. Con el
+header institucional activo hay que descontarle su altura, o la metadata del pie
+del rail queda empujada fuera de la vista.
+
+El offset usa los **mismos valores que `.es-case-index`** en `case-study.css`,
+que ya tenía este problema resuelto: 66px de header, 98px con la admin bar de
+escritorio, 112px con la de mobile. Todo gateado por `.es-header-sticky`, la
+clase que el propio tema imprime vía `body_class`.
+
+Si el header cambia de altura, hay **un solo** número que actualizar, y está en
+los dos archivos (`case-study.css` y `doc-overrides.css`).
+

@@ -3,16 +3,27 @@
  * REstimator Design System — cuerpo del documento (ES).
  *
  * GENERADO POR tools/build-ds.mjs — NO EDITAR A MANO.
- * Fuente: docs/ds-src/restimator/master-documentation.html
+ * Fuente:  docs/ds-src/restimator/master-documentation.html
+ * Idioma:  docs/ds-src/restimator/i18n.json
+ *
+ * Los dos idiomas salen de la MISMA fuente estructural: el documento se
+ * transforma una vez y después se le aplica el diccionario del idioma, así no
+ * hay dos documentos que mantener a mano y una actualización del Design System
+ * se propaga a los dos.
  *
  * Diferencias con la fuente, todas producidas por el script:
  *  - §08 Screen Examples: los <iframe> a archivos .html locales y los enlaces
  *    "Abrir ↗" se reemplazan por previews estáticas que abren el lightbox
- *    compartido del portfolio ([data-es-zoom-trigger]).
+ *    compartido del portfolio ([data-es-zoom-trigger]). Toda la tarjeta es el
+ *    trigger, incluida la palabra "Ampliar".
  *  - §08 "Otras piezas": la tabla de enlaces pasa a inventario de texto plano.
+ *  - Tema: la publicación declara un solo tema (dark). Light figura como
+ *    planificado, nunca como disponible.
+ *  - Cierre: "Needs review" pasa a "System evolution" (estado de las líneas de
+ *    trabajo abiertas) con el registro de auditoría completo en un <details>.
  *  - Cero href/src a archivos .html locales (verificado por el script).
  *
- * El markup NO se reordena ni se simplifica: es el mismo documento.
+ * El resto del markup NO se reordena ni se simplifica: es el mismo documento.
  *
  * @package estavillo-child
  * @var string $es_ds_screens URI base de assets/ds/restimator/screens/.
@@ -28,20 +39,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 <nav class="rail">
   <div class="rail-brand"><div class="lm">RE</div><div class="t">REstimator<span>Design System · master doc</span></div></div>
   <div class="rail-grp">Documentación</div>
-  <a class="nv on" href="#s00"><span class="n">00</span> Overview</a>
-  <a class="nv" href="#s01"><span class="n">01</span> Foundations</a>
-  <a class="nv" href="#s02"><span class="n">02</span> Components</a>
-  <a class="nv" href="#s03"><span class="n">03</span> Navigation &amp; App Shell</a>
-  <a class="nv" href="#s04"><span class="n">04</span> Forms &amp; Data Entry</a>
-  <a class="nv" href="#s05"><span class="n">05</span> Data Display</a>
-  <a class="nv" href="#s06"><span class="n">06</span> Product Patterns</a>
-  <a class="nv" href="#s07"><span class="n">07</span> Responsive System</a>
-  <a class="nv" href="#s08"><span class="n">08</span> Screen Examples</a>
-  <a class="nv" href="#s09"><span class="n">09</span> Component Inventory</a>
-  <a class="nv" href="#s10"><span class="n">10</span> Design → Implementation</a>
-  <div class="rail-grp">Auditoría</div>
-  <a class="nv" href="#needs-review"><span class="n">NR</span> Needs review</a>
-  <div class="rail-foot">Fuente de verdad: los archivos de este proyecto.<br>Dark default + light theme.<br>Tipografía congelada 2026‑06‑16.</div>
+  <a class="nv on" href="#s00"><span class="n">00</span> Visión general</a>
+  <a class="nv" href="#s01"><span class="n">01</span> Fundamentos</a>
+  <a class="nv" href="#s02"><span class="n">02</span> Componentes</a>
+  <a class="nv" href="#s03"><span class="n">03</span> Navegación y App Shell</a>
+  <a class="nv" href="#s04"><span class="n">04</span> Formularios y entrada de datos</a>
+  <a class="nv" href="#s05"><span class="n">05</span> Visualización de datos</a>
+  <a class="nv" href="#s06"><span class="n">06</span> Patrones de producto</a>
+  <a class="nv" href="#s07"><span class="n">07</span> Sistema responsive</a>
+  <a class="nv" href="#s08"><span class="n">08</span> Ejemplos de pantalla</a>
+  <a class="nv" href="#s09"><span class="n">09</span> Inventario de componentes</a>
+  <a class="nv" href="#s10"><span class="n">10</span> Diseño → Implementación</a>
+  <div class="rail-grp">Estado</div>
+  <a class="nv" href="#needs-review"><span class="n">EV</span> Evolución del sistema</a>
+  <div class="rail-foot">Fuente de verdad: los archivos de este proyecto.<br>Tema dark. Light planificado.<br>Tipografía congelada 2026‑06‑16.</div>
 </nav>
 
 <main class="main">
@@ -59,7 +70,7 @@ if ( ! defined( 'ABSPATH' ) ) {
       <div><div class="k">Tokens</div><div class="v num">147</div><div class="d">color · tipo · espacio · elevación</div></div>
       <div><div class="k">Componentes</div><div class="v num">33</div><div class="d">exports en el namespace</div></div>
       <div><div class="k">Pantallas</div><div class="v num">5 + 3</div><div class="d">desktop kit + mobile v1</div></div>
-      <div><div class="k">Temas</div><div class="v num">2</div><div class="d">dark (default) · light</div></div>
+      <div><div class="k">Tema</div><div class="v">Dark</div><div class="d">único tema · light planificado</div></div>
     </div>
   </div>
 </header>
@@ -68,7 +79,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <!-- ============================================================ 00 -->
 <section class="sec" id="s00">
-  <div class="sec-h"><span class="num-badge">00</span><h2>Overview</h2></div>
+  <div class="sec-h"><span class="num-badge">00</span><h2>Visión general</h2></div>
   <p class="lede">Presupuestador RE ayuda a presupuestadores y dueños de taller a producir cotizaciones más rápidas y
     consistentes con criterios estandarizados: familias → subcategorías → dimensiones, rangos de precio calibrados,
     jornales y referencias de material. Es software operativo, no un sitio de marketing.</p>
@@ -106,7 +117,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="card"><div class="card-b"><h4 class="mini" style="margin-top:0">Congelado</h4>
       <ul class="body" style="margin:0"><li>IA, flujos y estructura de pantallas (V1).</li><li>Pairing tipográfico (2026‑06‑16) — no re‑explorar.</li><li>Las 5 reglas de producto (abajo).</li></ul></div></div>
     <div class="card"><div class="card-b"><h4 class="mini" style="margin-top:0">Estable y en uso</h4>
-      <ul class="body" style="margin:0"><li>147 tokens · 2 temas (dark default, light).</li><li>33 componentes exportados.</li><li>5 pantallas desktop del kit.</li></ul></div></div>
+      <ul class="body" style="margin:0"><li>147 tokens · tema dark.</li><li>33 componentes exportados.</li><li>5 pantallas desktop del kit.</li></ul></div></div>
     <div class="card"><div class="card-b"><h4 class="mini" style="margin-top:0">Especificado, sin construir</h4>
       <ul class="body" style="margin:0"><li>6 componentes mobile (Mobile v1).</li><li>Capa tablet (documentada, sin artefacto).</li><li><span class="mono">templates/</span> — 0 templates.</li></ul></div></div>
   </div>
@@ -124,7 +135,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <!-- ============================================================ 01 -->
 <section class="sec" id="s01">
-  <div class="sec-h"><span class="num-badge">01</span><h2>Foundations</h2><span class="cnt">147 tokens</span></div>
+  <div class="sec-h"><span class="num-badge">01</span><h2>Fundamentos</h2><span class="cnt">147 tokens</span></div>
   <p class="lede">Todos los valores de esta sección son los tokens reales del sistema, leídos de <span class="mono">tokens/</span>.
     Los componentes leen siempre <span class="mono">var(--re-*)</span>, por eso el tema light es un remap de color puro.</p>
 
@@ -195,16 +206,8 @@ if ( ! defined( 'ABSPATH' ) ) {
     </tbody>
   </table></div>
 
-  <h4 class="mini">Tema light — remap de color puro</h4>
-  <p class="body">Dark es el tema por defecto (<span class="mono">:root</span>). Light se activa con <span class="mono">data-theme="light"</span> en
-    <span class="mono">&lt;html&gt;</span> o cualquier wrapper: superficies blanco cálido (<span class="mono">canvas #f3f1ec</span>, cards <span class="mono">#fff</span>),
-    tinta grafito, bordes gris cálido. Espaciado, tipo, radios, jerarquía, interacción y accesibilidad quedan intactos. El ámbar
-    sigue siendo el único acento pero <b>oscurece</b> en hover en vez de aclarar. Los bloques charcoal (recomendado, total del
-    documento, KPI acento) <b>siguen oscuros en ambos temas</b> — son el ancla de contraste industrial.</p>
-  <div class="callout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
-    <p><b>Caveat para consumidores:</b> definí <span class="mono">data-theme</span> antes del primer paint. Si lo cambiás en runtime,
-      suprimí transiciones por un frame (<span class="mono">*{transition:none}</span>) — varios elementos llevan <span class="mono">transition: background</span>
-      y un flip de variables puede dejarlos a mitad de transición.</p></div>
+  <h4 class="mini">Tema light — planificado</h4>
+  <p class="body"><span class="art-kind">Planificado</span> El sistema publicado tiene <b>un solo tema: dark</b>. Existe un remap de color explorado —superficies blanco cálido, tinta grafito, bordes gris cálido— que dejaría intactos espaciado, tipografía, radios, jerarquía e interacción, con el ámbar como único acento. Todavía no forma parte del sistema y no se documenta como disponible.</p>
 
   <h3 class="sub"><span class="tick"></span>Tipografía · CONGELADA</h3>
   <p class="body">El pairing es final y no se re‑explora. Se evaluó una alternativa con Plus Jakarta Sans contra las pantallas
@@ -388,7 +391,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <!-- ============================================================ 02 -->
 <section class="sec" id="s02">
-  <div class="sec-h"><span class="num-badge">02</span><h2>Components</h2><span class="cnt">33 exports · 6 categorías</span></div>
+  <div class="sec-h"><span class="num-badge">02</span><h2>Componentes</h2><span class="cnt">33 exports · 6 categorías</span></div>
   <p class="lede">Los 33 componentes exportados por <span class="mono">window.PresupuestadorREDesignSystem_84f335</span>.
     Cada directorio tiene <span class="mono">&lt;Name&gt;.jsx</span> + <span class="mono">.d.ts</span> + <span class="mono">.prompt.md</span>
     y un specimen <span class="mono">*.card.html</span>. Los especímenes de abajo son réplicas token‑driven de los componentes reales
@@ -497,7 +500,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="card"><div class="card-b">
       <h4 class="mini" style="margin-top:0">API</h4>
       <dl class="spec"><dt>Badge · tone</dt><dd>neutral | ok | warn | crit | info</dd><dt>Badge · dot</dt><dd>boolean</dd><dt>Badge · square</dt><dd>chip mono de código</dd><dt>Badge · icon</dt><dd>ReactNode</dd><dt>StatusBadge · status</dt><dd>draft | sent | appr | rej | cancel</dd><dt>StatusBadge · label</dt><dd>override del español</dd></dl>
-      <h4 class="mini">Usage</h4>
+      <h4 class="mini">Uso</h4>
       <ul class="body" style="margin:0"><li><b>StatusBadge</b> mapea automáticamente color de punto + etiqueta en español — no armes el pill a mano.</li>
         <li><b>square</b> para códigos (<span class="mono">GV-A-00148</span>, <span class="mono">ESC-RECT</span>): mono, radio 5px.</li>
         <li>El estado nunca se comunica sólo por color: siempre punto + texto.</li></ul>
@@ -550,7 +553,7 @@ if ( ! defined( 'ABSPATH' ) ) {
       <h4 class="mini">Anatomía</h4>
       <p class="body" style="margin:0">Superficie grafito, borde <span class="mono">--re-line</span> de 1px, <span class="mono">--re-shadow-sm</span>, radio <span class="mono">--re-r-lg 13px</span>.
         <span class="mono">flush</span> cuando la card envuelve una tabla a sangre.</p>
-      <h4 class="mini">Do / Don't</h4>
+      <h4 class="mini">Hacer / No hacer</h4>
       <ul class="body" style="margin:0"><li><b>Do</b> — usar <span class="mono">SectionHead</span> numerado para pasos de un flujo largo (calculadora, editor).</li>
         <li><b>Don't</b> — anidar cards dentro de cards; para agrupar dentro de una card usá <span class="mono">SectionHead</span> + divisores.</li></ul>
     </div></div>
@@ -569,7 +572,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="card"><div class="card-b">
       <h4 class="mini" style="margin-top:0">API</h4>
       <dl class="spec"><dt>label</dt><dd>uppercase</dd><dt>value</dt><dd>tabular</dd><dt>sub</dt><dd>línea de apoyo</dd><dt>accent</dt><dd>variante charcoal</dd><dt>dot</dt><dd>punto de estado live</dd><dt>amberValue</dt><dd>cifra en ámbar</dd></dl>
-      <h4 class="mini">Usage</h4>
+      <h4 class="mini">Uso</h4>
       <ul class="body" style="margin:0"><li>Fila de KPI del dashboard y grillas de estado.</li>
         <li><b>accent</b> es para <b>un solo</b> tile destacado por fila — es el ancla charcoal.</li>
         <li><b>amberValue</b> con moderación: sólo cifras headline (respeta el racionamiento del ámbar).</li>
@@ -584,7 +587,7 @@ if ( ! defined( 'ABSPATH' ) ) {
       <p class="body" style="margin:0 0 var(--re-s4)">El <b>único dibujo sancionado</b> del sistema: planos y elevaciones esquemáticos
         generados paramétricamente desde las dimensiones del propio presupuesto. Son diagramas medidos, no ilustración —
         líneas de estructura grafito de 1px, overlays de dimensión token‑driven, ámbar reservado al indicio de entrada/baranda.</p>
-      <h4 class="mini">Registry</h4>
+      <h4 class="mini">Registro</h4>
       <p class="body" style="margin:0">Basado en registro: <span class="mono">family</span>/<span class="mono">variant</span> seleccionan un renderer.
         Escaleras trae cuatro — <span class="mono">recta</span> (elevación lateral), <span class="mono">L</span>, <span class="mono">U</span> y
         <span class="mono">caracol</span> (vistas en planta). Las familias desconocidas caen a un placeholder “sin vista técnica”.</p>
@@ -608,7 +611,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <!-- ============================================================ 03 -->
 <section class="sec" id="s03">
-  <div class="sec-h"><span class="num-badge">03</span><h2>Navigation &amp; App Shell</h2></div>
+  <div class="sec-h"><span class="num-badge">03</span><h2>Navegación y App Shell</h2></div>
   <p class="lede">El shell desktop es la capa primaria y está congelado desde V1: sidebar sticky de 248px + topbar sticky de 60px +
     main con scroll. Mobile no comprime ese shell: cambia de patrón.</p>
 
@@ -649,20 +652,20 @@ if ( ! defined( 'ABSPATH' ) ) {
     </div></div>
   </div>
 
-  <h3 class="sub"><span class="tick"></span>Mobile — bottom navigation + header compacto</h3>
+  <h3 class="sub"><span class="tick"></span>Mobile — navegación inferior y header compacto</h3>
   <p class="body">Mobile es <b>diseñada, no adaptada</b>: el sidebar no se “oculta”, se reemplaza por una bottom tab bar de 5 familias.
     Los breadcrumbs desaparecen (los sustituye título + back) y el branding aparece una sola vez por header.</p>
   <div class="scrollx"><table class="tb">
     <thead><tr><th>Elemento</th><th>Medida</th><th>Comportamiento</th><th>Estado en el DS</th></tr></thead>
     <tbody>
-      <tr><td>BottomTabBar</td><td class="mono">h 64 + safe-area</td><td>fixed bottom. 5 tabs: Inicio · Calc · Historial · Catálogos · Parám. Iconos 21, label 10. Activo <span class="mono">--re-amber-ink</span>.</td><td><span class="tag new">New</span></td></tr>
-      <tr><td>MobileHeader</td><td class="mono">h ~62</td><td>sticky top. Back + título (Calculadora) o marca + título (Inicio / Historial). Sin breadcrumbs, sin sub‑copy.</td><td><span class="tag new">New</span></td></tr>
-      <tr><td>BottomActionBar</td><td class="mono">h 62 · bottom 64</td><td>fixed sobre la tab bar. Sólo Calculadora: Guardar (primary) · Estimación · Presupuesto.</td><td><span class="tag new">New</span></td></tr>
-      <tr><td>AppShell (modo mobile)</td><td class="mono">—</td><td>Mismo árbol de rutas, tres modos de navegación (sidebar / tabs / bottom bar).</td><td><span class="tag ext">Extended</span></td></tr>
+      <tr><td>BottomTabBar</td><td class="mono">h 64 + safe-area</td><td>fixed bottom. 5 tabs: Inicio · Calc · Historial · Catálogos · Parám. Iconos 21, label 10. Activo <span class="mono">--re-amber-ink</span>.</td><td><span class="tag new">Nuevo</span></td></tr>
+      <tr><td>MobileHeader</td><td class="mono">h ~62</td><td>sticky top. Back + título (Calculadora) o marca + título (Inicio / Historial). Sin breadcrumbs, sin sub‑copy.</td><td><span class="tag new">Nuevo</span></td></tr>
+      <tr><td>BottomActionBar</td><td class="mono">h 62 · bottom 64</td><td>fixed sobre la tab bar. Sólo Calculadora: Guardar (primary) · Estimación · Presupuesto.</td><td><span class="tag new">Nuevo</span></td></tr>
+      <tr><td>AppShell (modo mobile)</td><td class="mono">—</td><td>Mismo árbol de rutas, tres modos de navegación (sidebar / tabs / bottom bar).</td><td><span class="tag ext">Extendido</span></td></tr>
     </tbody>
   </table></div>
 
-  <h3 class="sub"><span class="tick"></span>Sticky / fixed behavior</h3>
+  <h3 class="sub"><span class="tick"></span>Comportamiento sticky / fijo</h3>
   <div class="scrollx"><table class="tb">
     <thead><tr><th>Capa (de abajo hacia arriba)</th><th>Alto</th><th>Posición</th><th>z-index</th><th>Dónde</th></tr></thead>
     <tbody>
@@ -680,7 +683,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <!-- ============================================================ 04 -->
 <section class="sec" id="s04">
-  <div class="sec-h"><span class="num-badge">04</span><h2>Forms &amp; Data Entry</h2></div>
+  <div class="sec-h"><span class="num-badge">04</span><h2>Formularios y entrada de datos</h2></div>
   <p class="lede">Los formularios son el corazón del producto: la calculadora es un formulario largo con resultado en vivo.
     La entrada de datos privilegia velocidad de tipeo y lectura tabular por encima de adornos.</p>
 
@@ -750,7 +753,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <!-- ============================================================ 05 -->
 <section class="sec" id="s05">
-  <div class="sec-h"><span class="num-badge">05</span><h2>Data Display</h2></div>
+  <div class="sec-h"><span class="num-badge">05</span><h2>Visualización de datos</h2></div>
   <p class="lede">Historial es la superficie de datos principal: tabla densa, filtros que funcionan, estado como punto de color
     sobre pill neutra y acciones de fila reveladas en hover.</p>
 
@@ -815,7 +818,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <!-- ============================================================ 06 -->
 <section class="sec" id="s06">
-  <div class="sec-h"><span class="num-badge">06</span><h2>Product Patterns</h2></div>
+  <div class="sec-h"><span class="num-badge">06</span><h2>Patrones de producto</h2></div>
   <p class="lede">Patrones propios de REstimator. No son componentes: son composiciones con significado de negocio, y varias
     están gobernadas por las reglas no negociables del §00.</p>
 
@@ -916,7 +919,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <!-- ============================================================ 07 -->
 <section class="sec" id="s07">
-  <div class="sec-h"><span class="num-badge">07</span><h2>Responsive System</h2></div>
+  <div class="sec-h"><span class="num-badge">07</span><h2>Sistema responsive</h2></div>
   <p class="lede">El mismo sistema en tres densidades. Mobile <b>no es otro producto</b>: son los mismos tokens, la misma taxonomía,
     los mismos pasos de resultado y el mismo vocabulario — con el patrón de navegación y de resultado que corresponde al espacio disponible.</p>
 
@@ -971,142 +974,154 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <!-- ============================================================ 08 -->
 <section class="sec" id="s08">
-  <div class="sec-h"><span class="num-badge">08</span><h2>Screen Examples</h2><span class="cnt">5 desktop · 3 mobile</span></div>
+  <div class="sec-h"><span class="num-badge">08</span><h2>Ejemplos de pantalla</h2><span class="cnt">5 desktop · 3 mobile</span></div>
   <p class="lede">Pantallas reales construidas con el sistema. Las cinco de desktop son las del UI kit; las tres de mobile vienen de la spec de implementación Mobile v1. Cada una se muestra como captura de alta resolución y se puede ampliar para inspeccionarla en detalle.</p>
 
   <h3 class="sub"><span class="tick"></span>Desktop — UI kit</h3>
   <div class="shots">
     <figure class="shot">
-      <figcaption class="cap">
-        <span class="nm">Calculadora</span><span class="fl">Calculator.html</span>
-        <span class="r"><span class="zoom-hint" aria-hidden="true">Ampliar</span></span>
-      </figcaption>
       <button type="button" class="vp"
         data-es-zoom-trigger
         data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'calculator.webp' ); ?>"
         data-es-zoom-w="2880" data-es-zoom-h="3224"
-        data-es-zoom-close-label="<?php echo esc_attr( es__( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es__( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es__( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es__( 'lightbox_reset' ) ); ?>"
-        aria-label="<?php echo esc_attr( sprintf( es__( 'ds_expand_screen' ), 'Calculadora' ) ); ?>">
-        <img src="<?php echo esc_url( $es_ds_screens . 'calculator-preview.webp' ); ?>"
-             alt="Calculadora — Presupuestador RE"
-             width="1520" height="1702" loading="lazy" decoding="async">
-        <span class="vp-expand" aria-hidden="true">
-          <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
+        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
+        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
+        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
+        aria-label="Ampliar pantalla: Calculadora">
+        <span class="cap">
+          <span class="nm">Calculadora</span><span class="fl">Calculator.html</span>
+          <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
-      </button>
+        <span class="vp-media">
+          <img src="<?php echo esc_url( $es_ds_screens . 'calculator-preview.webp' ); ?>"
+               alt="Calculadora — Presupuestador RE"
+               width="1520" height="1702" loading="lazy" decoding="async">
+          <span class="vp-expand" aria-hidden="true">
+            <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+          </span>
+        </span>
+      </></></></></button>
     </figure>
     <figure class="shot">
-      <figcaption class="cap">
-        <span class="nm">Historial</span><span class="fl">History.html</span>
-        <span class="r"><span class="zoom-hint" aria-hidden="true">Ampliar</span></span>
-      </figcaption>
       <button type="button" class="vp"
         data-es-zoom-trigger
         data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'history.webp' ); ?>"
         data-es-zoom-w="2880" data-es-zoom-h="3086"
-        data-es-zoom-close-label="<?php echo esc_attr( es__( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es__( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es__( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es__( 'lightbox_reset' ) ); ?>"
-        aria-label="<?php echo esc_attr( sprintf( es__( 'ds_expand_screen' ), 'Historial' ) ); ?>">
-        <img src="<?php echo esc_url( $es_ds_screens . 'history-preview.webp' ); ?>"
-             alt="Historial — Presupuestador RE"
-             width="1520" height="1629" loading="lazy" decoding="async">
-        <span class="vp-expand" aria-hidden="true">
-          <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
+        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
+        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
+        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
+        aria-label="Ampliar pantalla: Historial">
+        <span class="cap">
+          <span class="nm">Historial</span><span class="fl">History.html</span>
+          <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
-      </button>
+        <span class="vp-media">
+          <img src="<?php echo esc_url( $es_ds_screens . 'history-preview.webp' ); ?>"
+               alt="Historial — Presupuestador RE"
+               width="1520" height="1629" loading="lazy" decoding="async">
+          <span class="vp-expand" aria-hidden="true">
+            <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+          </span>
+        </span>
+      </></></></></button>
     </figure>
     <figure class="shot">
-      <figcaption class="cap">
-        <span class="nm">Editor de producto</span><span class="fl">ProductEditor.html</span>
-        <span class="r"><span class="zoom-hint" aria-hidden="true">Ampliar</span></span>
-      </figcaption>
       <button type="button" class="vp"
         data-es-zoom-trigger
         data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'product-editor.webp' ); ?>"
         data-es-zoom-w="2880" data-es-zoom-h="4592"
-        data-es-zoom-close-label="<?php echo esc_attr( es__( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es__( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es__( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es__( 'lightbox_reset' ) ); ?>"
-        aria-label="<?php echo esc_attr( sprintf( es__( 'ds_expand_screen' ), 'Editor de producto' ) ); ?>">
-        <img src="<?php echo esc_url( $es_ds_screens . 'product-editor-preview.webp' ); ?>"
-             alt="Editor de producto — Presupuestador RE"
-             width="1520" height="2424" loading="lazy" decoding="async">
-        <span class="vp-expand" aria-hidden="true">
-          <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
+        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
+        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
+        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
+        aria-label="Ampliar pantalla: Editor de producto">
+        <span class="cap">
+          <span class="nm">Editor de producto</span><span class="fl">ProductEditor.html</span>
+          <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
-      </button>
+        <span class="vp-media">
+          <img src="<?php echo esc_url( $es_ds_screens . 'product-editor-preview.webp' ); ?>"
+               alt="Editor de producto — Presupuestador RE"
+               width="1520" height="2424" loading="lazy" decoding="async">
+          <span class="vp-expand" aria-hidden="true">
+            <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+          </span>
+        </span>
+      </></></></></button>
     </figure>
     <figure class="shot">
-      <figcaption class="cap">
-        <span class="nm">Resumen cliente</span><span class="fl">ClientSummary.html</span>
-        <span class="r"><span class="zoom-hint" aria-hidden="true">Ampliar</span></span>
-      </figcaption>
       <button type="button" class="vp"
         data-es-zoom-trigger
         data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'client-summary.webp' ); ?>"
         data-es-zoom-w="2880" data-es-zoom-h="4098"
-        data-es-zoom-close-label="<?php echo esc_attr( es__( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es__( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es__( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es__( 'lightbox_reset' ) ); ?>"
-        aria-label="<?php echo esc_attr( sprintf( es__( 'ds_expand_screen' ), 'Resumen cliente' ) ); ?>">
-        <img src="<?php echo esc_url( $es_ds_screens . 'client-summary-preview.webp' ); ?>"
-             alt="Resumen cliente — Presupuestador RE"
-             width="1520" height="2163" loading="lazy" decoding="async">
-        <span class="vp-expand" aria-hidden="true">
-          <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
+        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
+        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
+        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
+        aria-label="Ampliar pantalla: Resumen cliente">
+        <span class="cap">
+          <span class="nm">Resumen cliente</span><span class="fl">ClientSummary.html</span>
+          <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
-      </button>
+        <span class="vp-media">
+          <img src="<?php echo esc_url( $es_ds_screens . 'client-summary-preview.webp' ); ?>"
+               alt="Resumen cliente — Presupuestador RE"
+               width="1520" height="2163" loading="lazy" decoding="async">
+          <span class="vp-expand" aria-hidden="true">
+            <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+          </span>
+        </span>
+      </></></></></button>
     </figure>
     <figure class="shot">
-      <figcaption class="cap">
-        <span class="nm">Catálogos</span><span class="fl">Catalogs.html</span>
-        <span class="r"><span class="zoom-hint" aria-hidden="true">Ampliar</span></span>
-      </figcaption>
       <button type="button" class="vp"
         data-es-zoom-trigger
         data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'catalogs.webp' ); ?>"
         data-es-zoom-w="2880" data-es-zoom-h="3274"
-        data-es-zoom-close-label="<?php echo esc_attr( es__( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es__( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es__( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es__( 'lightbox_reset' ) ); ?>"
-        aria-label="<?php echo esc_attr( sprintf( es__( 'ds_expand_screen' ), 'Catálogos' ) ); ?>">
-        <img src="<?php echo esc_url( $es_ds_screens . 'catalogs-preview.webp' ); ?>"
-             alt="Catálogos — Presupuestador RE"
-             width="1520" height="1728" loading="lazy" decoding="async">
-        <span class="vp-expand" aria-hidden="true">
-          <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
+        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
+        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
+        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
+        aria-label="Ampliar pantalla: Catálogos">
+        <span class="cap">
+          <span class="nm">Catálogos</span><span class="fl">Catalogs.html</span>
+          <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
-      </button>
+        <span class="vp-media">
+          <img src="<?php echo esc_url( $es_ds_screens . 'catalogs-preview.webp' ); ?>"
+               alt="Catálogos — Presupuestador RE"
+               width="1520" height="1728" loading="lazy" decoding="async">
+          <span class="vp-expand" aria-hidden="true">
+            <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+          </span>
+        </span>
+      </></></></></button>
     </figure>
     <figure class="shot">
-      <figcaption class="cap">
-        <span class="nm">Comparación light / dark</span><span class="fl">Light &amp; Dark Comparison.html</span>
-        <span class="r"><span class="zoom-hint" aria-hidden="true">Ampliar</span></span>
-      </figcaption>
       <button type="button" class="vp"
         data-es-zoom-trigger
         data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'light-dark.webp' ); ?>"
         data-es-zoom-w="2880" data-es-zoom-h="6224"
-        data-es-zoom-close-label="<?php echo esc_attr( es__( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es__( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es__( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es__( 'lightbox_reset' ) ); ?>"
-        aria-label="<?php echo esc_attr( sprintf( es__( 'ds_expand_screen' ), 'Comparación light / dark' ) ); ?>">
-        <img src="<?php echo esc_url( $es_ds_screens . 'light-dark-preview.webp' ); ?>"
-             alt="Comparación light / dark — Presupuestador RE"
-             width="1520" height="3285" loading="lazy" decoding="async">
-        <span class="vp-expand" aria-hidden="true">
-          <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
+        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
+        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
+        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
+        aria-label="Ampliar pantalla: Comparación light / dark">
+        <span class="cap">
+          <span class="nm">Comparación light / dark</span><span class="fl">Light &amp; Dark Comparison.html</span>
+          <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
-      </button>
+        <span class="vp-media">
+          <img src="<?php echo esc_url( $es_ds_screens . 'light-dark-preview.webp' ); ?>"
+               alt="Comparación light / dark — Presupuestador RE"
+               width="1520" height="3285" loading="lazy" decoding="async">
+          <span class="vp-expand" aria-hidden="true">
+            <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+          </span>
+        </span>
+      </></></></></button>
     </figure>
   </div>
   <p class="body" style="margin-top:var(--re-s4);font-size:12.5px;color:var(--re-ink-4)">Capturas de alta resolución de las pantallas reales del kit. Hacé click en cualquiera para ampliarla e inspeccionarla en detalle.</p>
@@ -1116,72 +1131,78 @@ if ( ! defined( 'ABSPATH' ) ) {
     comportamiento sticky por pantalla. Se documentan en su propio archivo para no duplicar la fuente de verdad.</p>
   <div class="shots shots--mobile">
     <figure class="shot shot--mobile">
-      <figcaption class="cap">
-        <span class="nm">Calculadora</span><span class="fl">390 · default — form + resumen pinneado</span>
-        <span class="r"><span class="zoom-hint" aria-hidden="true">Ampliar</span></span>
-      </figcaption>
       <button type="button" class="vp"
         data-es-zoom-trigger
         data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'mobile-calculator.webp' ); ?>"
         data-es-zoom-w="1176" data-es-zoom-h="2349"
-        data-es-zoom-close-label="<?php echo esc_attr( es__( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es__( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es__( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es__( 'lightbox_reset' ) ); ?>"
-        aria-label="<?php echo esc_attr( sprintf( es__( 'ds_expand_screen' ), 'Calculadora' ) ); ?>">
-        <img src="<?php echo esc_url( $es_ds_screens . 'mobile-calculator.webp' ); ?>"
-             alt="Calculadora — Presupuestador RE"
-             width="1176" height="2349" loading="lazy" decoding="async">
-        <span class="vp-expand" aria-hidden="true">
-          <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
+        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
+        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
+        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
+        aria-label="Ampliar pantalla: Calculadora">
+        <span class="cap">
+          <span class="nm">Calculadora</span><span class="fl">390 · por defecto — formulario + resumen fijo</span>
+          <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
-      </button>
+        <span class="vp-media">
+          <img src="<?php echo esc_url( $es_ds_screens . 'mobile-calculator.webp' ); ?>"
+               alt="Calculadora — Presupuestador RE"
+               width="1176" height="2349" loading="lazy" decoding="async">
+          <span class="vp-expand" aria-hidden="true">
+            <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+          </span>
+        </span>
+      </></></></></button>
     </figure>
     <figure class="shot shot--mobile">
-      <figcaption class="cap">
-        <span class="nm">Inicio</span><span class="fl">390 · default</span>
-        <span class="r"><span class="zoom-hint" aria-hidden="true">Ampliar</span></span>
-      </figcaption>
       <button type="button" class="vp"
         data-es-zoom-trigger
         data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'mobile-home.webp' ); ?>"
         data-es-zoom-w="1176" data-es-zoom-h="2349"
-        data-es-zoom-close-label="<?php echo esc_attr( es__( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es__( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es__( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es__( 'lightbox_reset' ) ); ?>"
-        aria-label="<?php echo esc_attr( sprintf( es__( 'ds_expand_screen' ), 'Inicio' ) ); ?>">
-        <img src="<?php echo esc_url( $es_ds_screens . 'mobile-home.webp' ); ?>"
-             alt="Inicio — Presupuestador RE"
-             width="1176" height="2349" loading="lazy" decoding="async">
-        <span class="vp-expand" aria-hidden="true">
-          <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
+        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
+        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
+        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
+        aria-label="Ampliar pantalla: Inicio">
+        <span class="cap">
+          <span class="nm">Inicio</span><span class="fl">390 · por defecto</span>
+          <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
-      </button>
+        <span class="vp-media">
+          <img src="<?php echo esc_url( $es_ds_screens . 'mobile-home.webp' ); ?>"
+               alt="Inicio — Presupuestador RE"
+               width="1176" height="2349" loading="lazy" decoding="async">
+          <span class="vp-expand" aria-hidden="true">
+            <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+          </span>
+        </span>
+      </></></></></button>
     </figure>
     <figure class="shot shot--mobile">
-      <figcaption class="cap">
-        <span class="nm">Historial</span><span class="fl">390 · default</span>
-        <span class="r"><span class="zoom-hint" aria-hidden="true">Ampliar</span></span>
-      </figcaption>
       <button type="button" class="vp"
         data-es-zoom-trigger
         data-es-zoom-src="<?php echo esc_url( $es_ds_screens . 'mobile-history.webp' ); ?>"
         data-es-zoom-w="1176" data-es-zoom-h="2349"
-        data-es-zoom-close-label="<?php echo esc_attr( es__( 'lightbox_close' ) ); ?>"
-        data-es-zoom-in-label="<?php echo esc_attr( es__( 'lightbox_zoom_in' ) ); ?>"
-        data-es-zoom-out-label="<?php echo esc_attr( es__( 'lightbox_zoom_out' ) ); ?>"
-        data-es-zoom-reset-label="<?php echo esc_attr( es__( 'lightbox_reset' ) ); ?>"
-        aria-label="<?php echo esc_attr( sprintf( es__( 'ds_expand_screen' ), 'Historial' ) ); ?>">
-        <img src="<?php echo esc_url( $es_ds_screens . 'mobile-history.webp' ); ?>"
-             alt="Historial — Presupuestador RE"
-             width="1176" height="2349" loading="lazy" decoding="async">
-        <span class="vp-expand" aria-hidden="true">
-          <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+        data-es-zoom-close-label="<?php echo esc_attr( es_ds_text( 'lightbox_close' ) ); ?>"
+        data-es-zoom-in-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_in' ) ); ?>"
+        data-es-zoom-out-label="<?php echo esc_attr( es_ds_text( 'lightbox_zoom_out' ) ); ?>"
+        data-es-zoom-reset-label="<?php echo esc_attr( es_ds_text( 'lightbox_reset' ) ); ?>"
+        aria-label="Ampliar pantalla: Historial">
+        <span class="cap">
+          <span class="nm">Historial</span><span class="fl">390 · por defecto</span>
+          <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
-      </button>
+        <span class="vp-media">
+          <img src="<?php echo esc_url( $es_ds_screens . 'mobile-history.webp' ); ?>"
+               alt="Historial — Presupuestador RE"
+               width="1176" height="2349" loading="lazy" decoding="async">
+          <span class="vp-expand" aria-hidden="true">
+            <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
+          </span>
+        </span>
+      </></></></></button>
     </figure>
-  </div></div>
+  </div></section></div>
 
   <h3 class="sub"><span class="tick"></span>Otras piezas del proyecto</h3>
   <div class="scrollx"><table class="tb">
@@ -1194,66 +1215,63 @@ if ( ! defined( 'ABSPATH' ) ) {
       <tr><td><span class="art-name">Claude Code Handoff Package</span></td><td><span class="art-kind">Handoff</span></td><td>Paquete de handoff a desarrollo.</td></tr>
     </tbody></table></div>
   <p class="body" style="margin-top:var(--re-s4);font-size:12.5px;color:var(--re-ink-4)">Documentos internos del proyecto. Se listan como inventario: no forman parte de esta publicación.</p>
-</section>
+
 
 <!-- ============================================================ 09 -->
 <section class="sec" id="s09">
-  <div class="sec-h"><span class="num-badge">09</span><h2>Component Inventory</h2><span class="cnt">33 construidos · 6 especificados</span></div>
-  <p class="lede">Inventario completo. <b>Status</b>: <span class="tag stable">Stable</span> construido y en uso ·
-    <span class="tag ext">Extended</span> existe pero necesita ampliarse para mobile ·
-    <span class="tag new">New</span> especificado en Mobile v1, sin construir ·
-    <span class="tag rev">Needs review</span> inconsistencia documentada.</p>
+  <div class="sec-h"><span class="num-badge">09</span><h2>Inventario de componentes</h2><span class="cnt">33 construidos · 6 especificados</span></div>
+  <p class="lede">Inventario completo. <b>Estado</b>: <span class="tag stable">Estable</span> construido y en uso · <span class="tag ext">Extendido</span> existe pero necesita ampliarse para mobile · <span class="tag new">Nuevo</span> especificado en Mobile v1, sin construir · <span class="tag rev">Requiere revisión</span> inconsistencia documentada.</p>
   <div class="scrollx"><table class="tb dense">
-    <thead><tr><th>Component</th><th>Category</th><th>Variants</th><th>States</th><th>Desktop</th><th>Mobile</th><th>Status</th><th>Implementation notes</th></tr></thead>
+    <thead><tr><th>Component</th><th>Category</th><th>Variants</th><th>States</th><th>Desktop</th><th>Mobile</th><th>Estado</th><th>Implementation notes</th></tr></thead>
     <tbody>
-      <tr><td>Button</td><td>Forms</td><td>secondary · primary · accent · ghost / sm·md·lg</td><td>default · hover · focus · disabled</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Stable</span></td><td>Un solo primary/accent por vista. Mobile usa h42 en barras de acción.</td></tr>
-      <tr><td>IconButton</td><td>Forms</td><td>default 34 · bare 30 · danger</td><td>default · hover · focus · disabled</td><td>Sí</td><td>Parcial</td><td><span class="tag stable">Stable</span></td><td><span class="mono">title</span> obligatorio. En mobile subir a ≥44 de área.</td></tr>
-      <tr><td>Field</td><td>Forms</td><td>label · optional · note</td><td>—</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Stable</span></td><td>Wrapper de todos los controles.</td></tr>
-      <tr><td>Input</td><td>Forms</td><td>prefix · suffix · leadIcon · num</td><td>default · focus · disabled · placeholder</td><td>Sí</td><td>Sí</td><td><span class="tag rev">Needs review</span></td><td>Sin estado de error/invalid — ver NR‑06.</td></tr>
-      <tr><td>Select</td><td>Forms</td><td>native + chevron</td><td>default · focus · disabled</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Stable</span></td><td>Pasar <span class="mono">&lt;option&gt;</span> como children.</td></tr>
-      <tr><td>Textarea</td><td>Forms</td><td>resize vertical</td><td>default · focus · disabled</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Stable</span></td><td>Notas del presupuesto.</td></tr>
-      <tr><td>Toggle</td><td>Forms</td><td>md 38 · sm 32 · accent</td><td>on · off · disabled</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Stable</span></td><td>Track charcoal on; <span class="mono">sm</span> para filas de tabla.</td></tr>
-      <tr><td>SegmentedControl</td><td>Forms</td><td>2–3 opciones, con/sin icono</td><td>selected · unselected</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Stable</span></td><td>&gt;3 opciones → Select.</td></tr>
-      <tr><td>Badge</td><td>Feedback</td><td>5 tonos · dot · square</td><td>estático</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Stable</span></td><td><span class="mono">square</span> para códigos mono.</td></tr>
-      <tr><td>StatusBadge</td><td>Feedback</td><td>draft·sent·appr·rej·cancel</td><td>estático</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Stable</span></td><td>Mapea color + etiqueta español automáticamente.</td></tr>
-      <tr><td>Alert</td><td>Feedback</td><td>warn·ok·info·crit·neutral</td><td>estático · con/sin título</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Stable</span></td><td>warn es default: el motor nunca bloquea.</td></tr>
-      <tr><td>AlertGroup</td><td>Feedback</td><td>title · items</td><td>estático</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Stable</span></td><td>Panel “Alertas y recordatorios”.</td></tr>
-      <tr><td>Card</td><td>Layout</td><td>pad · flush</td><td>estático · hover en filas</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Stable</span></td><td><span class="mono">flush</span> para tablas a sangre.</td></tr>
-      <tr><td>CardHead</td><td>Layout</td><td>icon · title · hint · actions</td><td>estático</td><td>Sí</td><td>Parcial</td><td><span class="tag stable">Stable</span></td><td>En mobile las actions suelen pasar a overflow.</td></tr>
-      <tr><td>CardBody</td><td>Layout</td><td>default · tight</td><td>—</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Stable</span></td><td><span class="mono">tight</span> para tablas y listas de opciones.</td></tr>
-      <tr><td>SectionHead</td><td>Layout</td><td>index · title · hint · tools</td><td>estático</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Stable</span></td><td>Pasos numerados de calculadora / editor.</td></tr>
-      <tr><td>StatTile</td><td>Layout</td><td>default · accent · dot · amberValue</td><td>estático</td><td>Sí</td><td>Parcial</td><td><span class="tag stable">Stable</span></td><td>Un solo accent por fila.</td></tr>
-      <tr><td>TechnicalPreviewCard</td><td>Layout</td><td>compact · standard · large / 4 renderers</td><td>live · placeholder</td><td>Sí</td><td>No documentado</td><td><span class="tag ext">Extended</span></td><td>Registry extensible. Comportamiento mobile sin especificar.</td></tr>
-      <tr><td>TechnicalRenderers</td><td>Layout</td><td>registry API</td><td>—</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Stable</span></td><td><span class="mono">register · setFamilyLabel · has · variants · families</span></td></tr>
-      <tr><td>AppShell</td><td>Navigation</td><td>sidebar + topbar + main</td><td>—</td><td>Sí</td><td>Requiere modo</td><td><span class="tag ext">Extended</span></td><td>Necesita 3 modos: sidebar / tabs / bottom bar.</td></tr>
-      <tr><td>Sidebar</td><td>Navigation</td><td>logo · footer</td><td>—</td><td>Sí</td><td>No aplica</td><td><span class="tag stable">Stable</span></td><td>248px fijo, sticky.</td></tr>
-      <tr><td>LogoMark</td><td>Navigation</td><td>mark · name · tagline</td><td>—</td><td>Sí</td><td>Sí</td><td><span class="tag rev">Needs review</span></td><td>Tagline default desalineado — ver NR‑02.</td></tr>
-      <tr><td>NavGroup</td><td>Navigation</td><td>label · first</td><td>—</td><td>Sí</td><td>No aplica</td><td><span class="tag stable">Stable</span></td><td>Eyebrow uppercase del sidebar.</td></tr>
-      <tr><td>NavItem</td><td>Navigation</td><td>icon · label · as</td><td>default · hover · active</td><td>Sí</td><td>Sustituido</td><td><span class="tag stable">Stable</span></td><td>Active = rail ámbar de 3px + label bold.</td></tr>
-      <tr><td>Topbar</td><td>Navigation</td><td>breadcrumbs · actions</td><td>—</td><td>Sí</td><td>Variante compacta</td><td><span class="tag ext">Extended</span></td><td>Mobile: back + título, sin breadcrumbs.</td></tr>
-      <tr><td>Breadcrumbs</td><td>Navigation</td><td>items[]</td><td>—</td><td>Sí</td><td>Ocultos</td><td><span class="tag stable">Stable</span></td><td>Último item en bold.</td></tr>
-      <tr><td>UserChip</td><td>Navigation</td><td>name · role · initials</td><td>—</td><td>Sí</td><td>Sólo avatar</td><td><span class="tag stable">Stable</span></td><td>En mobile colapsa al avatar.</td></tr>
-      <tr><td>Table</td><td>Data</td><td>helpers is-right/center/sortable</td><td>row hover</td><td>Sí</td><td>Fila → card</td><td><span class="tag stable">Stable</span></td><td>Envolver en <span class="mono">Card flush</span>.</td></tr>
-      <tr><td>TableToolbar</td><td>Data</td><td>title · count · actions</td><td>—</td><td>Sí</td><td>Simplificado</td><td><span class="tag stable">Stable</span></td><td>Pill de recuento de resultados.</td></tr>
-      <tr><td>RowActions</td><td>Data</td><td>cluster de IconButtons</td><td>revelado en hover</td><td>Sí</td><td>Overflow ⋯</td><td><span class="tag ext">Extended</span></td><td>En táctil no hay hover: requiere menú ⋯.</td></tr>
-      <tr><td>Pagination</td><td>Data</td><td>showing · pages · current</td><td>current · hover</td><td>Sí</td><td>No documentado</td><td><span class="tag ext">Extended</span></td><td>Mobile probablemente scroll infinito o “cargar más” — sin definir.</td></tr>
-      <tr><td>TaxonomyIcon</td><td>Icons</td><td>10 categorías · size · strokeWidth</td><td>currentColor · activo ámbar</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Stable</span></td><td>Usado también en el bottom tab bar.</td></tr>
-      <tr><td>TAXONOMY_ICONS</td><td>Icons</td><td>array ordenado</td><td>—</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Stable</span></td><td>Iterar para menús y catálogos.</td></tr>
-      <tr><td>BottomTabBar</td><td>Navigation</td><td>5 tabs</td><td>active · inactive</td><td>No aplica</td><td>Sí</td><td><span class="tag new">New</span></td><td>h64 + safe-area. Iconos 21, label 10.</td></tr>
-      <tr><td>MobileHeader</td><td>Navigation</td><td>back+título · marca+título</td><td>sticky</td><td>No aplica</td><td>Sí</td><td><span class="tag new">New</span></td><td>Variante compacta de Topbar.</td></tr>
-      <tr><td>BottomActionBar</td><td>Navigation</td><td>1 primary + 2 secundarias</td><td>fixed</td><td>No aplica</td><td>Sí</td><td><span class="tag new">New</span></td><td>h62, bottom 64, shadow hacia arriba.</td></tr>
-      <tr><td>ResultSummary</td><td>Product</td><td>pinned charcoal</td><td>sticky · live</td><td>No aplica</td><td>Sí</td><td><span class="tag new">New</span></td><td>Variante de ResultPanel: recomendado + rango + tamaño + “Ver desglose”.</td></tr>
-      <tr><td>ResultSheet</td><td>Product</td><td>bottom sheet</td><td>abierto · cerrado</td><td>No aplica</td><td>Sí</td><td><span class="tag new">New</span></td><td>Radio sup. 18, máx 78%, grab 38×4, scrim .6.</td></tr>
-      <tr><td>FilterChips</td><td>Data</td><td>una línea scroll-x</td><td>active ámbar sólido · inactive</td><td>Parcial</td><td>Sí</td><td><span class="tag new">New</span></td><td>Nunca wrap a dos líneas.</td></tr>
-      <tr><td>Checkbox · Radio</td><td>Forms</td><td>—</td><td>—</td><td>No</td><td>No</td><td><span class="tag rev">Needs review</span></td><td>No existen en el sistema — ver NR‑13.</td></tr>
-      <tr><td>Skeleton · Spinner</td><td>Feedback</td><td>—</td><td>—</td><td>No</td><td>No</td><td><span class="tag rev">Needs review</span></td><td>Sin componente de loading — ver NR‑07.</td></tr>
+      <tr><td>Button</td><td>Formularios</td><td>secondary · primary · accent · ghost / sm·md·lg</td><td>default · hover · focus · disabled</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Estable</span></td><td>Un solo primary/accent por vista. Mobile usa h42 en barras de acción.</td></tr>
+      <tr><td>IconButton</td><td>Formularios</td><td>default 34 · bare 30 · danger</td><td>default · hover · focus · disabled</td><td>Sí</td><td>Parcial</td><td><span class="tag stable">Estable</span></td><td><span class="mono">title</span> obligatorio. En mobile subir a ≥44 de área.</td></tr>
+      <tr><td>Field</td><td>Formularios</td><td>label · optional · note</td><td>—</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Estable</span></td><td>Wrapper de todos los controles.</td></tr>
+      <tr><td>Input</td><td>Formularios</td><td>prefix · suffix · leadIcon · num</td><td>default · focus · disabled · placeholder</td><td>Sí</td><td>Sí</td><td><span class="tag rev">Requiere revisión</span></td><td>Sin estado de error/invalid — ver NR‑06.</td></tr>
+      <tr><td>Select</td><td>Formularios</td><td>native + chevron</td><td>default · focus · disabled</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Estable</span></td><td>Pasar <span class="mono">&lt;option&gt;</span> como children.</td></tr>
+      <tr><td>Textarea</td><td>Formularios</td><td>resize vertical</td><td>default · focus · disabled</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Estable</span></td><td>Notas del presupuesto.</td></tr>
+      <tr><td>Toggle</td><td>Formularios</td><td>md 38 · sm 32 · accent</td><td>on · off · disabled</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Estable</span></td><td>Track charcoal on; <span class="mono">sm</span> para filas de tabla.</td></tr>
+      <tr><td>SegmentedControl</td><td>Formularios</td><td>2–3 opciones, con/sin icono</td><td>selected · unselected</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Estable</span></td><td>&gt;3 opciones → Select.</td></tr>
+      <tr><td>Badge</td><td>Feedback</td><td>5 tonos · dot · square</td><td>estático</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Estable</span></td><td><span class="mono">square</span> para códigos mono.</td></tr>
+      <tr><td>StatusBadge</td><td>Feedback</td><td>draft·sent·appr·rej·cancel</td><td>estático</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Estable</span></td><td>Mapea color + etiqueta español automáticamente.</td></tr>
+      <tr><td>Alert</td><td>Feedback</td><td>warn·ok·info·crit·neutral</td><td>estático · con/sin título</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Estable</span></td><td>warn es default: el motor nunca bloquea.</td></tr>
+      <tr><td>AlertGroup</td><td>Feedback</td><td>title · items</td><td>estático</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Estable</span></td><td>Panel “Alertas y recordatorios”.</td></tr>
+      <tr><td>Card</td><td>Layout</td><td>pad · flush</td><td>estático · hover en filas</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Estable</span></td><td><span class="mono">flush</span> para tablas a sangre.</td></tr>
+      <tr><td>CardHead</td><td>Layout</td><td>icon · title · hint · actions</td><td>estático</td><td>Sí</td><td>Parcial</td><td><span class="tag stable">Estable</span></td><td>En mobile las actions suelen pasar a overflow.</td></tr>
+      <tr><td>CardBody</td><td>Layout</td><td>default · tight</td><td>—</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Estable</span></td><td><span class="mono">tight</span> para tablas y listas de opciones.</td></tr>
+      <tr><td>SectionHead</td><td>Layout</td><td>index · title · hint · tools</td><td>estático</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Estable</span></td><td>Pasos numerados de calculadora / editor.</td></tr>
+      <tr><td>StatTile</td><td>Layout</td><td>default · accent · dot · amberValue</td><td>estático</td><td>Sí</td><td>Parcial</td><td><span class="tag stable">Estable</span></td><td>Un solo accent por fila.</td></tr>
+      <tr><td>TechnicalPreviewCard</td><td>Layout</td><td>compact · standard · large / 4 renderers</td><td>live · placeholder</td><td>Sí</td><td>No documentado</td><td><span class="tag ext">Extendido</span></td><td>Registro extensible. Comportamiento mobile sin especificar.</td></tr>
+      <tr><td>TechnicalRenderers</td><td>Layout</td><td>registry API</td><td>—</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Estable</span></td><td><span class="mono">register · setFamilyLabel · has · variants · families</span></td></tr>
+      <tr><td>AppShell</td><td>Navegación</td><td>sidebar + topbar + main</td><td>—</td><td>Sí</td><td>Requiere modo</td><td><span class="tag ext">Extendido</span></td><td>Necesita 3 modos: sidebar / tabs / bottom bar.</td></tr>
+      <tr><td>Sidebar</td><td>Navegación</td><td>logo · footer</td><td>—</td><td>Sí</td><td>No aplica</td><td><span class="tag stable">Estable</span></td><td>248px fijo, sticky.</td></tr>
+      <tr><td>LogoMark</td><td>Navegación</td><td>mark · name · tagline</td><td>—</td><td>Sí</td><td>Sí</td><td><span class="tag rev">Requiere revisión</span></td><td>Tagline default desalineado — ver NR‑02.</td></tr>
+      <tr><td>NavGroup</td><td>Navegación</td><td>label · first</td><td>—</td><td>Sí</td><td>No aplica</td><td><span class="tag stable">Estable</span></td><td>Eyebrow uppercase del sidebar.</td></tr>
+      <tr><td>NavItem</td><td>Navegación</td><td>icon · label · as</td><td>default · hover · active</td><td>Sí</td><td>Sustituido</td><td><span class="tag stable">Estable</span></td><td>Active = rail ámbar de 3px + label bold.</td></tr>
+      <tr><td>Topbar</td><td>Navegación</td><td>breadcrumbs · actions</td><td>—</td><td>Sí</td><td>Variante compacta</td><td><span class="tag ext">Extendido</span></td><td>Mobile: back + título, sin breadcrumbs.</td></tr>
+      <tr><td>Breadcrumbs</td><td>Navegación</td><td>items[]</td><td>—</td><td>Sí</td><td>Ocultos</td><td><span class="tag stable">Estable</span></td><td>Último item en bold.</td></tr>
+      <tr><td>UserChip</td><td>Navegación</td><td>name · role · initials</td><td>—</td><td>Sí</td><td>Sólo avatar</td><td><span class="tag stable">Estable</span></td><td>En mobile colapsa al avatar.</td></tr>
+      <tr><td>Table</td><td>Datos</td><td>helpers is-right/center/sortable</td><td>row hover</td><td>Sí</td><td>Fila → card</td><td><span class="tag stable">Estable</span></td><td>Envolver en <span class="mono">Card flush</span>.</td></tr>
+      <tr><td>TableToolbar</td><td>Datos</td><td>title · count · actions</td><td>—</td><td>Sí</td><td>Simplificado</td><td><span class="tag stable">Estable</span></td><td>Pill de recuento de resultados.</td></tr>
+      <tr><td>RowActions</td><td>Datos</td><td>cluster de IconButtons</td><td>revelado en hover</td><td>Sí</td><td>Overflow ⋯</td><td><span class="tag ext">Extendido</span></td><td>En táctil no hay hover: requiere menú ⋯.</td></tr>
+      <tr><td>Pagination</td><td>Datos</td><td>showing · pages · current</td><td>current · hover</td><td>Sí</td><td>No documentado</td><td><span class="tag ext">Extendido</span></td><td>Mobile probablemente scroll infinito o “cargar más” — sin definir.</td></tr>
+      <tr><td>TaxonomyIcon</td><td>Iconos</td><td>10 categorías · size · strokeWidth</td><td>currentColor · activo ámbar</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Estable</span></td><td>Usado también en el bottom tab bar.</td></tr>
+      <tr><td>TAXONOMY_ICONS</td><td>Iconos</td><td>array ordenado</td><td>—</td><td>Sí</td><td>Sí</td><td><span class="tag stable">Estable</span></td><td>Iterar para menús y catálogos.</td></tr>
+      <tr><td>BottomTabBar</td><td>Navegación</td><td>5 tabs</td><td>active · inactive</td><td>No aplica</td><td>Sí</td><td><span class="tag new">Nuevo</span></td><td>h64 + safe-area. Iconos 21, label 10.</td></tr>
+      <tr><td>MobileHeader</td><td>Navegación</td><td>back+título · marca+título</td><td>sticky</td><td>No aplica</td><td>Sí</td><td><span class="tag new">Nuevo</span></td><td>Variante compacta de Topbar.</td></tr>
+      <tr><td>BottomActionBar</td><td>Navegación</td><td>1 primary + 2 secundarias</td><td>fixed</td><td>No aplica</td><td>Sí</td><td><span class="tag new">Nuevo</span></td><td>h62, bottom 64, shadow hacia arriba.</td></tr>
+      <tr><td>ResultSummary</td><td>Producto</td><td>pinned charcoal</td><td>sticky · live</td><td>No aplica</td><td>Sí</td><td><span class="tag new">Nuevo</span></td><td>Variante de ResultPanel: recomendado + rango + tamaño + “Ver desglose”.</td></tr>
+      <tr><td>ResultSheet</td><td>Producto</td><td>bottom sheet</td><td>abierto · cerrado</td><td>No aplica</td><td>Sí</td><td><span class="tag new">Nuevo</span></td><td>Radio sup. 18, máx 78%, grab 38×4, scrim .6.</td></tr>
+      <tr><td>FilterChips</td><td>Datos</td><td>una línea scroll-x</td><td>active ámbar sólido · inactive</td><td>Parcial</td><td>Sí</td><td><span class="tag new">Nuevo</span></td><td>Nunca wrap a dos líneas.</td></tr>
+      <tr><td>Checkbox · Radio</td><td>Formularios</td><td>—</td><td>—</td><td>No</td><td>No</td><td><span class="tag rev">Requiere revisión</span></td><td>No existen en el sistema — ver NR‑13.</td></tr>
+      <tr><td>Skeleton · Spinner</td><td>Feedback</td><td>—</td><td>—</td><td>No</td><td>No</td><td><span class="tag rev">Requiere revisión</span></td><td>Sin componente de loading — ver NR‑07.</td></tr>
     </tbody>
   </table></div>
 </section>
 
 <!-- ============================================================ 10 -->
 <section class="sec" id="s10">
-  <div class="sec-h"><span class="num-badge">10</span><h2>Design → Implementation</h2></div>
+  <div class="sec-h"><span class="num-badge">10</span><h2>Diseño → Implementación</h2></div>
   <p class="lede">Cómo escala el sistema: una decisión de foundation se convierte en token, el token viste un componente,
     el componente compone un patrón de producto y el patrón se instancia en una pantalla. La cadena es la misma para todo.</p>
 
@@ -1269,10 +1287,10 @@ if ( ! defined( 'ABSPATH' ) ) {
   <div class="grid2">
     <div class="card"><div class="card-b">
       <h4 class="mini" style="margin-top:0">1 · Estilos</h4>
-      <p class="body" style="margin:0 0 var(--re-s4)">Enlazá <b>un solo archivo</b>. Es un manifiesto de <span class="mono">@import</span>: trae fuentes, colores, tipografía, spacing, elevación, tema light y el reset base.</p>
+      <p class="body" style="margin:0 0 var(--re-s4)">Enlazá <b>un solo archivo</b>. Es un manifiesto de <span class="mono">@import</span>: trae fuentes, colores, tipografía, spacing, elevación y el reset base.</p>
       <div class="stage" style="display:block"><code class="mono" style="font-size:12px;color:var(--re-ink-2);line-height:1.7">&lt;link rel="stylesheet" href="styles.css"&gt;<br>&lt;body class="re-root"&gt;</code></div>
       <h4 class="mini">2 · Tema</h4>
-      <div class="stage" style="display:block"><code class="mono" style="font-size:12px;color:var(--re-ink-2);line-height:1.7">&lt;html data-theme="light"&gt;  <span style="color:var(--re-ink-4)">/* dark es el default */</span></code></div>
+      <p class="body" style="margin:0 0 var(--re-s4)">No hay nada que configurar: dark es el único tema del sistema, y es el que aplica <span class="mono">:root</span> por defecto.</p>
       <h4 class="mini">3 · Componentes</h4>
       <div class="stage" style="display:block"><code class="mono" style="font-size:12px;color:var(--re-ink-2);line-height:1.7">const { Button, Card, StatusBadge } =<br>&nbsp;&nbsp;window.PresupuestadorREDesignSystem_84f335;</code></div>
     </div></div>
@@ -1293,10 +1311,27 @@ if ( ! defined( 'ABSPATH' ) ) {
   </div>
 
   <!-- NEEDS REVIEW REGISTER -->
-  <h3 class="sub" id="needs-review"><span class="tick"></span>Registro “Needs review”</h3>
-  <p class="body">Inconsistencias y huecos detectados en la auditoría. <b>Ninguno fue corregido en silencio</b>: quedan documentados
-    para que se resuelvan como decisión explícita.</p>
-  <div class="stack">
+  <h3 class="sub" id="needs-review"><span class="tick"></span>Evolución del sistema</h3>
+  <p class="lede">Las líneas de trabajo abiertas del sistema y en qué estado está cada una.</p>
+  <div class="ev-grid">
+      <div class="ev">
+        <span class="ev-name">Tablet</span>
+        <span class="ev-state ev-state--progress">En progreso</span>
+      </div>
+      <div class="ev">
+        <span class="ev-name">Expansión V2</span>
+        <span class="ev-state ev-state--progress">En desarrollo</span>
+      </div>
+      <div class="ev">
+        <span class="ev-name">Tema light</span>
+        <span class="ev-state ev-state--planned">Planificado</span>
+      </div>
+  </div>
+
+  <details class="ev-audit">
+    <summary>Registro interno de auditoría (13 notas)</summary>
+    <p class="body">Inconsistencias y huecos detectados durante la auditoría del sistema. Ninguno se corrigió en silencio: quedan documentados para resolverse como decisión explícita. Es material de trabajo interno, no un listado de defectos del producto.</p>
+    <div class="stack">
     <div class="nr"><span class="id">NR‑01</span><p><b>Prosa vs token en <span class="mono">--re-ink-4</span>.</b> El readme describe <span class="mono">#686d76</span>; el token real es <span class="mono">#7f858e</span> (elevado para cumplir WCAG AA). La prosa del readme quedó desactualizada respecto del archivo de tokens.</p></div>
     <div class="nr"><span class="id">NR‑02</span><p><b>Tagline por defecto de <span class="mono">LogoMark</span>.</b> El componente trae <span class="mono">'RE · v1.0'</span>; el kit y los mockups muestran <span class="mono">“REstimator · motor v1.5”</span>. Definir cuál es el canónico.</p></div>
     <div class="nr"><span class="id">NR‑03</span><p><b><span class="mono">--re-text-xl (21px)</span> no documentado.</b> Existe en <span class="mono">tokens/typography.css</span> pero falta en la escala descrita en el readme (40 · 23 · 17 · 14.5 · 14 · 13 · 12 · 11).</p></div>
@@ -1311,13 +1346,14 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="nr"><span class="id">NR‑12</span><p><b>Tablet sin artefacto.</b> La capa está documentada pero no hay pantalla tablet en <span class="mono">ui_kits/</span>; sus valores vienen de los mockups de refinamiento.</p></div>
     <div class="nr"><span class="id">NR‑13</span><p><b>Sin Checkbox ni Radio.</b> El producto los evita (usa Select, SegmentedControl y Toggle), pero conviene declararlo como decisión explícita del sistema en vez de un hueco.</p></div>
   </div>
+  </details>
 </section>
 
 <footer style="border-top:1px solid var(--re-line);margin-top:var(--re-s9);padding-top:var(--re-s5);display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;font-size:12px;color:var(--re-ink-4)">
   <span>REstimator Design System — Master Documentation</span>
-  <span class="mono">147 tokens · 33 componentes · 13 items en Needs review</span>
+  <span class="mono">147 tokens · 33 componentes</span>
 </footer>
 
-</div>
-</main>
-</div>
+</main></div>
+
+
