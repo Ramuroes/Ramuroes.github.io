@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Light &amp; Dark — Presupuestador RE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --canvas:#0d0e11; --panel:#16181d; --line:#2a2e37; --line-2:#343945;
+    --ink:#f4f5f7; --ink-2:#c4c8d0; --ink-3:#8b909c; --ink-4:#5f6573;
+    --amber:#e0911e;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--canvas);color:var(--ink);font-family:'Hanken Grotesk',sans-serif;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;padding:48px 40px 90px;}
+
+  .doc-head{max-width:1320px;margin:0 auto 36px;}
+  .doc-eyebrow{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);}
+  .doc-head h1{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:12px 0 10px;}
+  .doc-head p{font-size:14.5px;line-height:1.6;color:var(--ink-3);max-width:760px;margin:0;text-wrap:pretty;}
+  .doc-head .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
+  .chip{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:500;color:var(--ink-2);
+    background:var(--panel);border:1px solid var(--line);border-radius:30px;padding:6px 13px;}
+  .chip .sw{width:11px;height:11px;border-radius:4px;flex:none;border:1px solid var(--line-2);}
+  .chip.d .sw{background:#16181d;}
+  .chip.l .sw{background:#f3f1ec;}
+  .chip.a .sw{background:var(--amber);border-color:var(--amber);}
+
+  .screen{max-width:1400px;margin:0 auto 52px;}
+  .screen-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line);}
+  .screen-head .idx{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--amber);
+    background:rgba(224,145,30,.12);border:1px solid rgba(224,145,30,.25);border-radius:7px;padding:4px 9px;}
+  .screen-head h2{font-size:20px;font-weight:700;letter-spacing:-.02em;margin:0;}
+  .screen-head .note{font-size:12.5px;color:var(--ink-4);margin-left:auto;}
+
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .frame{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .frame.l{background:#fff;border-color:#e7e3da;}
+  .frame .fh{display:flex;align-items:center;gap:9px;padding:11px 16px;border-bottom:1px solid var(--line);
+    font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);}
+  .frame.l .fh{border-color:#e7e3da;color:#6b7079;}
+  .frame .fh .sw{width:10px;height:10px;border-radius:3px;border:1px solid var(--line-2);}
+  .frame.d .fh .sw{background:#0d0e11;}
+  .frame.l .fh .sw{background:#f3f1ec;border-color:#d9d4ca;}
+  .frame .fh .tag{margin-left:auto;font-weight:500;text-transform:none;letter-spacing:0;color:var(--ink-4);}
+  .frame.l .fh .tag{color:#9a9ea7;}
+  .viewport{position:relative;width:100%;height:430px;overflow:hidden;}
+  .frame.d .viewport{background:#0d0e11;}
+  .frame.l .viewport{background:#f3f1ec;}
+  .viewport iframe{position:absolute;top:0;left:0;border:0;
+    width:1330px;height:1660px;transform:scale(.4895);transform-origin:top left;}
+
+  .note-block{max-width:1320px;margin:54px auto 0;background:var(--panel);border:1px solid var(--line);
+    border-left:3px solid var(--amber);border-radius:12px;padding:24px 26px;}
+  .note-block .vk{font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);margin-bottom:12px;}
+  .note-block h3{font-size:18px;font-weight:700;letter-spacing:-.015em;margin:0 0 14px;}
+  .note-block ul{margin:0;padding-left:18px;}
+  .note-block li{font-size:13.5px;line-height:1.65;color:var(--ink-2);margin-bottom:9px;max-width:1040px;text-wrap:pretty;}
+  .note-block li:last-child{margin-bottom:0;}
+  .note-block b{color:var(--ink);font-weight:600;}
+  .note-block code{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--amber);
+    background:rgba(224,145,30,.1);border-radius:5px;padding:1px 6px;}
+  .disclaimer{max-width:1320px;margin:24px auto 0;font-size:12px;color:var(--ink-4);line-height:1.6;}
+</style>
+</head>
+<body>
+
+  <header class="doc-head">
+    <div class="doc-eyebrow">Tema · Light Mode — segundo tema soportado</div>
+    <h1>Light &amp; Dark — lado a lado</h1>
+    <p>Las cinco pantallas reales del producto, renderizadas en ambos temas. El tema claro es un
+      remapeo de <b>color</b> únicamente —superficies, tinta, bordes y sombras— activado con
+      <code>data-theme="light"</code>. Espaciado, tipografía, jerarquía, interacción y componentes
+      son idénticos. El sistema oscuro sigue siendo el predeterminado.</p>
+    <div class="meta">
+      <span class="chip d"><span class="sw"></span>Dark — predeterminado</span>
+      <span class="chip l"><span class="sw"></span>Light — data-theme="light"</span>
+      <span class="chip a"><span class="sw"></span>Amber — acento en ambos</span>
+    </div>
+  </header>
+
+  <section class="screen">
+    <div class="screen-head"><span class="idx">01</span><h2>Dashboard</h2><span class="note">KPIs, recordatorios, actividad — el tile "total" sigue oscuro en ambos</span></div>
+    <div class="pair">
+      <div class="frame d"><div class="fh"><span class="sw"></span>Dark<span class="tag">predeterminado</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/index.html" loading="lazy"></iframe></div></div>
+      <div class="frame l"><div class="fh"><span class="sw"></span>Light<span class="tag">data-theme</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/index.html" data-light="1" loading="lazy"></iframe></div></div>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="screen-head"><span class="idx">02</span><h2>Calculadora</h2><span class="note">El valor recomendado conserva el bloque charcoal oscuro como ancla premium</span></div>
+    <div class="pair">
+      <div class="frame d"><div class="fh"><span class="sw"></span>Dark<span class="tag">predeterminado</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/Calculator.html" loading="lazy"></iframe></div></div>
+      <div class="frame l"><div class="fh"><span class="sw"></span>Light<span class="tag">data-theme</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/Calculator.html" data-light="1" loading="lazy"></iframe></div></div>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="screen-head"><span class="idx">03</span><h2>Historial</h2><span class="note">Tabla densa — badges de estado y cifras tabulares en ambos temas</span></div>
+    <div class="pair">
+      <div class="frame d"><div class="fh"><span class="sw"></span>Dark<span class="tag">predeterminado</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/History.html" loading="lazy"></iframe></div></div>
+      <div class="frame l"><div class="fh"><span class="sw"></span>Light<span class="tag">data-theme</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/History.html" data-light="1" loading="lazy"></iframe></div></div>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="screen-head"><span class="idx">04</span><h2>Editor de producto</h2><span class="note">Formulario + preview en vivo; barra de guardado fija</span></div>
+    <div class="pair">
+      <div class="frame d"><div class="fh"><span class="sw"></span>Dark<span class="tag">predeterminado</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/ProductEditor.html" loading="lazy"></iframe></div></div>
+      <div class="frame l"><div class="fh"><span class="sw"></span>Light<span class="tag">data-theme</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/ProductEditor.html" data-light="1" loading="lazy"></iframe></div></div>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="screen-head"><span class="idx">05</span><h2>Resumen cliente</h2><span class="note">El documento blanco es igual en ambos — sólo cambia el banco de trabajo</span></div>
+    <div class="pair">
+      <div class="frame d"><div class="fh"><span class="sw"></span>Dark<span class="tag">predeterminado</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/ClientSummary.html" loading="lazy"></iframe></div></div>
+      <div class="frame l"><div class="fh"><span class="sw"></span>Light<span class="tag">data-theme</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/ClientSummary.html" data-light="1" loading="lazy"></iframe></div></div>
+    </div>
+  </section>
+
+  <section class="note-block">
+    <div class="vk">Cómo funciona / decisiones</div>
+    <h3>Un solo remapeo de tokens — cero cambios en componentes</h3>
+    <ul>
+      <li><b>Activación:</b> <code>data-theme="light"</code> en <code>&lt;html&gt;</code> (o cualquier contenedor). El alcance es un único selector, así que el compilador lo indexa como variante de tema. Dark queda como predeterminado en <code>:root</code>.</li>
+      <li><b>Sólo color:</b> superficies (blanco / gris cálido), tinta grafito, bordes cálidos y sombras suaves. <b>No</b> se tocó spacing, tipografía, radios, jerarquía ni interacción — los mismos componentes se re-tematizan solos porque ya leen <code>var(--re-*)</code>.</li>
+      <li><b>Amber se mantiene</b> como único acento de marca (riel activo, CTA, logo, valor recomendado). En claro, el hover/press <b>oscurece</b> el amber (en oscuro lo aclara).</li>
+      <li><b>Bloques charcoal a propósito oscuros:</b> el valor recomendado, el total del documento y el tile KPI "total" siguen en grafito oscuro — un ancla de contraste premium que mantiene el tono industrial y evita el dashboard plano y colorido de SaaS.</li>
+      <li><b>Semánticos preservados:</b> mismos matices (ok/warn/crit/info); en claro se oscurecen los textos y se aclaran los rellenos para legibilidad sobre blanco. Azul restringido a "Enviado" y alertas info.</li>
+    </ul>
+  </section>
+
+  <p class="disclaimer">No destructivo. El tema claro se añade como <code>tokens/theme-light.css</code> en la cadena de imports; las pantallas oscuras no se modifican (su render por defecto sigue siendo oscuro). La columna derecha sólo fija <code>data-theme="light"</code> en el documento del iframe.</p>
+
+<script>
+  // Activate light mode in the right column. We suppress CSS transitions during
+  // the switch: these screens put `transition: background` on many elements, and
+  // flipping a var()-driven theme at runtime can leave them stuck mid-transition.
+  // (In real use data-theme is set before paint, so no transition fires.)
+  function goLight(f){
+    try{
+      const d = f.contentDocument;
+      const kill = d.createElement('style');
+      kill.textContent = '*,*::before,*::after{transition:none !important;animation:none !important}';
+      d.head.appendChild(kill);
+      d.documentElement.setAttribute('data-theme','light');
+      void d.body.offsetWidth;                       // force the new theme to apply
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{ kill.remove(); }));
+    }catch(e){}
+  }
+  const frames = Array.from(document.querySelectorAll('iframe[data-src]'));
+  frames.forEach(f=>{
+    f.addEventListener('load', ()=>{ if(f.dataset.light) goLight(f); });
+    f.src = f.dataset.src;
+  });
+</script>
+</body>
+</html>

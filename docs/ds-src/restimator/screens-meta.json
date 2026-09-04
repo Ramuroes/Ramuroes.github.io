@@ -1,0 +1,65 @@
+{
+  "calculator": {
+    "w": 2880,
+    "h": 3224,
+    "pw": 1520,
+    "ph": 1702,
+    "samePreview": false
+  },
+  "history": {
+    "w": 2880,
+    "h": 3086,
+    "pw": 1520,
+    "ph": 1629,
+    "samePreview": false
+  },
+  "product-editor": {
+    "w": 2880,
+    "h": 4592,
+    "pw": 1520,
+    "ph": 2424,
+    "samePreview": false
+  },
+  "client-summary": {
+    "w": 2880,
+    "h": 4098,
+    "pw": 1520,
+    "ph": 2163,
+    "samePreview": false
+  },
+  "catalogs": {
+    "w": 2880,
+    "h": 3274,
+    "pw": 1520,
+    "ph": 1728,
+    "samePreview": false
+  },
+  "light-dark": {
+    "w": 2880,
+    "h": 6224,
+    "pw": 1520,
+    "ph": 3285,
+    "samePreview": false
+  },
+  "mobile-calculator": {
+    "w": 1176,
+    "h": 2349,
+    "pw": 1176,
+    "ph": 2349,
+    "samePreview": true
+  },
+  "mobile-home": {
+    "w": 1176,
+    "h": 2349,
+    "pw": 1176,
+    "ph": 2349,
+    "samePreview": true
+  },
+  "mobile-history": {
+    "w": 1176,
+    "h": 2349,
+    "pw": 1176,
+    "ph": 2349,
+    "samePreview": true
+  }
+}

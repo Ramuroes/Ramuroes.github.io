@@ -1,0 +1,31 @@
+/* ============================================================
+   Presupuestador RE — SPACING & RADII
+   4px base grid. Dense but breathable; desktop-first.
+   ============================================================ */
+:root{
+  /* ---- Spacing scale (4px base) ---- */
+  --re-s1:  4px;
+  --re-s2:  8px;
+  --re-s3:  12px;
+  --re-s4:  16px;
+  --re-s5:  20px;
+  --re-s6:  24px;
+  --re-s7:  32px;
+  --re-s8:  40px;
+  --re-s9:  48px;
+  --re-s10: 64px;
+
+  /* ---- Corner radii ---- */
+  --re-r-sm:   7px;   /* inputs, small buttons, chips */
+  --re-r:      9px;   /* default — alerts, inner blocks */
+  --re-r-lg:   13px;  /* cards, panels, paper */
+  --re-r-pill: 30px;  /* pills, badges, user chip */
+  --re-r-full: 999px; /* avatars, dots */
+
+  /* ---- Layout constants (from frozen V1 shell) ---- */
+  --re-sidebar-w:   248px;
+  --re-topbar-h:    60px;
+  --re-content-max: 1080px;  /* document / reading width */
+  --re-control-h:   40px;    /* standard input/button height */
+  --re-control-h-sm:32px;    /* compact control height */
+}

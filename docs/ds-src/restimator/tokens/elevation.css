@@ -1,0 +1,22 @@
+/* ============================================================
+   Presupuestador RE — ELEVATION (Dark Industrial)
+   On dark surfaces, depth comes from a lighter surface + a
+   1px border; shadows are deep and quiet underneath. The
+   client "paper" lifts most; cards barely.
+   ============================================================ */
+:root{
+  /* hairline lift — default cards, key-value tiles */
+  --re-shadow-sm:    0 1px 2px rgba(0,0,0,.40);
+  /* resting card */
+  --re-shadow:       0 1px 3px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.40);
+  /* floating panel — sticky result / preview / menus */
+  --re-shadow-panel: 0 8px 24px rgba(0,0,0,.50), 0 2px 6px rgba(0,0,0,.40);
+  /* the client document "paper" */
+  --re-shadow-paper: 0 16px 44px rgba(0,0,0,.60), 0 3px 10px rgba(0,0,0,.45);
+  /* fixed save bar (shadow points up) */
+  --re-shadow-bar:  0 -2px 16px rgba(0,0,0,.50);
+
+  /* focus ring — amber on dark */
+  --re-ring:        0 0 0 3px rgba(224,145,30,.26);
+  --re-ring-amber:  0 0 0 3px rgba(224,145,30,.32);
+}

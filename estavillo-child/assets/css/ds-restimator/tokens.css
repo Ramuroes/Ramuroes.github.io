@@ -1,0 +1,335 @@
+/* GENERADO POR tools/build-ds.mjs — NO EDITAR A MANO.
+   Fuente: docs/ds-src/restimator/tokens/ (orden de styles.css).
+   Los custom properties --re-* viven en :root y no colisionan con --es-*. */
+
+/* ---------- tokens/fonts.css ---------- */
+/* ============================================================
+   Presupuestador RE — Webfonts
+   Both families are open-source and ship via Google Fonts.
+   They match the frozen V1 product exactly (no substitution).
+   - Hanken Grotesk : UI / display — humanist grotesque, industrial-neutral
+   - JetBrains Mono : codes, IDs, tabular figures
+   ============================================================ */
+/* @import movido a wp_enqueue_style(): https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap */
+
+
+/* ---------- tokens/colors.css ---------- */
+/* ============================================================
+   Presupuestador RE — COLOR SYSTEM (Dark Industrial)
+   Black / graphite surfaces, near-white ink, a single amber
+   brand accent. No gradients, no glass. Amber is concentrated
+   on the few moments that matter: the recommended price, the
+   active nav rail, the primary send action, the logo mark.
+   ============================================================ */
+:root{
+  /* ---- Graphite ramp (base, dark) ---- */
+  --re-canvas:        #0d0e11;  /* app background — near-black */
+  --re-surface:       #16181d;  /* cards, panels */
+  --re-surface-2:     #1d2026;  /* inset / hover fill, inputs */
+  --re-surface-3:     #262a31;  /* deeper inset, tracks */
+  --re-ink:           #f2f3f4;  /* primary text — near-white */
+  --re-ink-2:         #c2c6cc;  /* secondary text */
+  --re-ink-3:         #9197a0;  /* tertiary / hints */
+  --re-ink-4:         #7f858e;  /* faint labels, placeholders — lifted to clear WCAG AA 4.5:1 on surfaces (was #686d76 ≈ 3.4:1) */
+  --re-line:          #262a31;  /* hairline dividers, card borders */
+  --re-line-2:        #313641;  /* input borders */
+  --re-line-strong:   #434954;  /* emphasised borders, dashed */
+
+  /* ---- Deepest panels (recommended block, logo backdrop) ---- */
+  --re-charcoal:      #0a0b0e;  /* deeper than canvas */
+  --re-charcoal-2:    #14161b;
+  --re-charcoal-line: #2b2f37;
+  --re-on-dark:       #ffffff;  /* text on charcoal */
+  --re-on-dark-2:     #c2c6cc;
+  --re-on-dark-3:     #9197a0;
+
+  /* ---- Amber (brand accent) — from the REstimator mark + IDEA concept ---- */
+  --re-amber:         #e0911e;  /* brand amber — primary CTA, active rail */
+  --re-amber-strong:  #f0a634;  /* hover / press (brighter on dark) */
+  --re-amber-bright:  #f5b342;  /* recommended value, headline figures */
+  --re-amber-soft:    rgba(224,145,30,.13);  /* tint background */
+  --re-amber-line:    rgba(224,145,30,.34);  /* tint border */
+  --re-amber-ink:     #f0b45e;  /* amber text on dark tint */
+
+  /* ---- Semantic (tuned for dark) ---- */
+  --re-ok:            #52b06e;  --re-ok-bright: #6fd08a;
+  --re-ok-soft:       rgba(82,176,110,.13);  --re-ok-line: rgba(82,176,110,.32);
+  --re-warn:          #d99a3a;  --re-warn-soft: rgba(217,154,58,.12);
+  --re-warn-line:     rgba(217,154,58,.32);  --re-warn-ink: #e6c188;
+  --re-crit:          #d86a52;  --re-crit-soft: rgba(216,106,82,.13);
+  --re-crit-line:     rgba(216,106,82,.32);
+  --re-info:          #5b9be0;  --re-info-soft: rgba(91,155,224,.13);
+  --re-info-line:     rgba(91,155,224,.32);
+
+  /* ---- Quote lifecycle status (History) ---- */
+  --re-st-draft:      #8a909a;  /* Borrador  */
+  --re-st-sent:       #5b9be0;  /* Enviado   */
+  --re-st-appr:       #52b06e;  /* Aprobado  */
+  --re-st-rej:        #d86a52;  /* Rechazado */
+  --re-st-cancel:     #686d76;  /* Cancelado */
+
+  /* ============================================================
+     SEMANTIC ALIASES — prefer these in components & screens
+     ============================================================ */
+  --re-bg:            var(--re-canvas);
+  --re-text:          var(--re-ink);
+  --re-text-muted:    var(--re-ink-2);
+  --re-text-subtle:   var(--re-ink-3);
+  --re-text-faint:    var(--re-ink-4);
+  --re-border:        var(--re-line);
+  --re-border-field:  var(--re-line-2);
+  --re-border-strong: var(--re-line-strong);
+  --re-focus:         var(--re-amber);          /* focus ring color */
+  --re-accent:        var(--re-amber);
+  --re-accent-hover:  var(--re-amber-strong);
+  --re-primary:       var(--re-amber);           /* dark UI: the hero action is amber */
+  --re-primary-hover: var(--re-amber-strong);
+}
+
+
+/* ---------- tokens/typography.css ---------- */
+/* ============================================================
+   Presupuestador RE — TYPOGRAPHY  ·  FROZEN (2026-06-16)
+   Typeface pairing is final — do not re-explore.
+     · Primary UI       : Hanken Grotesk (400/500/600/700)
+     · Technical / codes: JetBrains Mono (400/500/600)
+   Hanken for everything UI; JetBrains Mono for codes, IDs and
+   tabular figures. Tight tracking on headings, tabular numerals
+   everywhere money/measurements appear.
+   ============================================================ */
+:root{
+  /* ---- Families ---- */
+  --re-font-sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --re-font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* ---- Type scale (px) ---- */
+  --re-text-display: 40px;  /* the "recommended" hero number */
+  --re-text-2xl:     23px;  /* page H1 */
+  --re-text-xl:      21px;  /* compact page H1 */
+  --re-text-lg:      17px;  /* section H2 */
+  --re-text-md:      14.5px;/* card titles */
+  --re-text-base:    14px;  /* body / controls */
+  --re-text-sm:      13px;  /* secondary body, table cells */
+  --re-text-xs:      12px;  /* hints, captions */
+  --re-text-2xs:     11px;  /* eyebrows, uppercase labels */
+
+  /* ---- Weights ---- */
+  --re-fw-regular:   400; /* @kind font */
+  --re-fw-medium:    500; /* @kind font */
+  --re-fw-semibold:  600; /* @kind font */
+  --re-fw-bold:      700; /* @kind font */
+
+  /* ---- Line heights ---- */
+  --re-lh-tight:     1.15; /* @kind font */
+  --re-lh-snug:      1.35; /* @kind font */
+  --re-lh-normal:    1.45; /* @kind font */
+  --re-lh-relaxed:   1.6;  /* @kind font */
+
+  /* ---- Tracking ---- */
+  --re-ls-body:      -0.005em;
+  --re-ls-heading:   -0.02em;
+  --re-ls-tight:     -0.01em;
+  --re-ls-eyebrow:    0.06em;  /* uppercase labels */
+  --re-ls-caps:       0.05em;
+}
+
+/* Base document type — applied by consumers via .re-root or body */
+.re-doc,.re-doc{
+  font-family: var(--re-font-sans);
+  font-size: var(--re-text-base);
+  line-height: var(--re-lh-normal);
+  letter-spacing: var(--re-ls-body);
+  color: var(--re-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+}
+
+/* Tabular figures — money, measurements, codes, dates */
+.re-doc .re-num{ font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+.re-doc .re-mono{ font-family: var(--re-font-mono); }
+
+/* Eyebrow / section kicker */
+.re-doc .re-eyebrow{
+  font-size: var(--re-text-2xs);
+  font-weight: var(--re-fw-semibold);
+  letter-spacing: var(--re-ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--re-text-faint);
+}
+
+
+/* ---------- tokens/spacing.css ---------- */
+/* ============================================================
+   Presupuestador RE — SPACING & RADII
+   4px base grid. Dense but breathable; desktop-first.
+   ============================================================ */
+:root{
+  /* ---- Spacing scale (4px base) ---- */
+  --re-s1:  4px;
+  --re-s2:  8px;
+  --re-s3:  12px;
+  --re-s4:  16px;
+  --re-s5:  20px;
+  --re-s6:  24px;
+  --re-s7:  32px;
+  --re-s8:  40px;
+  --re-s9:  48px;
+  --re-s10: 64px;
+
+  /* ---- Corner radii ---- */
+  --re-r-sm:   7px;   /* inputs, small buttons, chips */
+  --re-r:      9px;   /* default — alerts, inner blocks */
+  --re-r-lg:   13px;  /* cards, panels, paper */
+  --re-r-pill: 30px;  /* pills, badges, user chip */
+  --re-r-full: 999px; /* avatars, dots */
+
+  /* ---- Layout constants (from frozen V1 shell) ---- */
+  --re-sidebar-w:   248px;
+  --re-topbar-h:    60px;
+  --re-content-max: 1080px;  /* document / reading width */
+  --re-control-h:   40px;    /* standard input/button height */
+  --re-control-h-sm:32px;    /* compact control height */
+}
+
+
+/* ---------- tokens/elevation.css ---------- */
+/* ============================================================
+   Presupuestador RE — ELEVATION (Dark Industrial)
+   On dark surfaces, depth comes from a lighter surface + a
+   1px border; shadows are deep and quiet underneath. The
+   client "paper" lifts most; cards barely.
+   ============================================================ */
+:root{
+  /* hairline lift — default cards, key-value tiles */
+  --re-shadow-sm:    0 1px 2px rgba(0,0,0,.40);
+  /* resting card */
+  --re-shadow:       0 1px 3px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.40);
+  /* floating panel — sticky result / preview / menus */
+  --re-shadow-panel: 0 8px 24px rgba(0,0,0,.50), 0 2px 6px rgba(0,0,0,.40);
+  /* the client document "paper" */
+  --re-shadow-paper: 0 16px 44px rgba(0,0,0,.60), 0 3px 10px rgba(0,0,0,.45);
+  /* fixed save bar (shadow points up) */
+  --re-shadow-bar:  0 -2px 16px rgba(0,0,0,.50);
+
+  /* focus ring — amber on dark */
+  --re-ring:        0 0 0 3px rgba(224,145,30,.26);
+  --re-ring-amber:  0 0 0 3px rgba(224,145,30,.32);
+}
+
+
+/* ---------- tokens/theme-light.css ---------- */
+/* ============================================================
+   Presupuestador RE — LIGHT THEME (second supported theme)
+   ------------------------------------------------------------
+   Opt-in. Dark remains the default (:root). Activate by setting
+   data-theme="light" on <html> (or any wrapper):
+
+       <html data-theme="light">  …  </html>
+
+   This is a COLOR-ONLY remap — surfaces, ink, borders, shadows.
+   Spacing, typography, radii, hierarchy, interaction and
+   accessibility are untouched. Only the tokens declared below
+   change; everything else inherits the :root (dark) values.
+
+   Design intent:
+   · White cards on a warm off-white canvas (paper, not cold SaaS).
+   · Amber stays the single brand accent (active rail, CTA, logo,
+     recommended figure). Hover/press DARKENS amber (vs. brightens
+     on dark).
+   · Semantic hues preserved; text variants darkened + soft fills
+     lightened for legibility on white.
+   · The charcoal "feature" blocks (recommended value, totals,
+     KPI accent tile) DELIBERATELY stay dark — a premium contrast
+     anchor that keeps the industrial tone and avoids flat,
+     colorful-dashboard SaaS. (the charcoal and on-dark tokens are
+     intentionally NOT overridden, so they inherit the dark values.)
+   ============================================================ */
+.re-doc[data-theme="light"], .re-doc [data-theme="light"]{
+  /* ---- Warm-gray / white surfaces ---- */
+  --re-canvas:        #f3f1ec;  /* app background — warm off-white */
+  --re-surface:       #ffffff;  /* cards, panels, inputs */
+  --re-surface-2:     #efece5;  /* inset / hover fill, segmented track */
+  --re-surface-3:     #e6e1d8;  /* deeper inset, slider tracks */
+
+  /* ---- Graphite ink on light ---- */
+  --re-ink:           #1b1d22;  /* primary text — graphite near-black */
+  --re-ink-2:         #474b54;  /* secondary text */
+  --re-ink-3:         #6b7079;  /* tertiary / hints */
+  --re-ink-4:         #9a9ea7;  /* faint labels, placeholders */
+
+  /* ---- Warm borders ---- */
+  --re-line:          #e7e3da;  /* hairline dividers, card borders */
+  --re-line-2:        #d9d4ca;  /* input borders */
+  --re-line-strong:   #c2bcae;  /* emphasised borders, dashed */
+
+  /* ---- Amber (same brand accent; hover/press DARKENS on light) ---- */
+  --re-amber:         #e0911e;  /* unchanged brand amber */
+  --re-amber-strong:  #c67d12;  /* hover / press — darker on light */
+  /* --re-amber-bright kept (sits on the dark charcoal feature blocks) */
+  --re-amber-soft:    rgba(224,145,30,.14);  /* tint background on white */
+  --re-amber-line:    rgba(224,145,30,.40);  /* tint border */
+  --re-amber-ink:     #9a6510;               /* amber text on white / tint */
+
+  /* ---- Semantic — hues preserved, tuned for white ---- */
+  --re-ok:            #2f9e54;
+  --re-ok-soft:       rgba(47,158,84,.12);   --re-ok-line: rgba(47,158,84,.30);
+  /* --re-ok-bright kept (on dark KPI accent tile) */
+  --re-warn:          #b9831f;  --re-warn-soft: rgba(185,131,31,.13);
+  --re-warn-line:     rgba(185,131,31,.32);  --re-warn-ink: #8a6312;
+  --re-crit:          #c2543c;  --re-crit-soft: rgba(194,84,60,.11);
+  --re-crit-line:     rgba(194,84,60,.30);
+  --re-info:          #2f72c4;  --re-info-soft: rgba(47,114,196,.10);
+  --re-info-line:     rgba(47,114,196,.30);
+
+  /* ---- Quote lifecycle status dots (on white pills) ---- */
+  --re-st-draft:      #7c828c;  /* Borrador  */
+  --re-st-sent:       #3f7fc9;  /* Enviado   */
+  --re-st-appr:       #2f9e54;  /* Aprobado  */
+  --re-st-rej:        #c2543c;  /* Rechazado */
+  --re-st-cancel:     #a2a7af;  /* Cancelado */
+
+  /* ============================================================
+     ELEVATION — soft warm shadows on light (no heavy black)
+     ============================================================ */
+  --re-shadow-sm:    0 1px 2px rgba(28,26,22,.06);
+  --re-shadow:       0 1px 2px rgba(28,26,22,.06), 0 1px 3px rgba(28,26,22,.09);
+  --re-shadow-panel: 0 10px 28px rgba(28,26,22,.14), 0 2px 6px rgba(28,26,22,.08);
+  --re-shadow-paper: 0 18px 48px rgba(28,26,22,.16), 0 4px 12px rgba(28,26,22,.08);
+  --re-shadow-bar:   0 -2px 16px rgba(28,26,22,.10);
+
+  /* focus ring — amber, a touch stronger on light */
+  --re-ring:        0 0 0 3px rgba(224,145,30,.28);
+  --re-ring-amber:  0 0 0 3px rgba(224,145,30,.34);
+}
+
+/* Give the light root a sensible base canvas + ink when the attribute
+   sits on <html>/<body> directly (mirrors base.css .re-root). */
+.re-doc[data-theme="light"], .re-doc [data-theme="light"]{
+  background-color: var(--re-canvas);
+  color: var(--re-ink);
+}
+
+
+/* ---------- tokens/base.css ---------- */
+/* ============================================================
+   Presupuestador RE — base reset & shared primitives
+   Loaded after tokens. Keeps consumer pages consistent with
+   the frozen V1 shell without forcing a class on <body>.
+   ============================================================ */
+.re-doc, .re-doc *,.re-doc::before, .re-doc *::before,.re-doc::after, .re-doc *::after{ box-sizing: border-box; }
+
+.re-doc svg{ display: block; }
+.re-doc a{ color: inherit; text-decoration: none; }
+.re-doc ::placeholder{ color: var(--re-ink-4); }
+
+/* Opt-in document styling: add class="re-root" to <body> (or a wrapper). */
+.re-doc{
+  margin: 0;
+  background: var(--re-bg);
+  color: var(--re-text);
+}
+
+/* Selection uses the brand amber, lightly. */
+.re-doc .re-root ::selection{ background: rgba(224,145,30,.22); }
+

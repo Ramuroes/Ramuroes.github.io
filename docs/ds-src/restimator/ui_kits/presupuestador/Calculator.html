@@ -1,0 +1,416 @@
+<!-- @dsCard group="Presupuestador RE" viewport="1440x980" name="Calculator" subtitle="Live quote engine — sticky result, amber recommended value" --><!-- @startingPoint section="Presupuestador RE" subtitle="Calculator — live quote engine with sticky result panel" viewport="1440x980" -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora — Presupuestador RE</title>
+<link rel="stylesheet" href="kit.css">
+<style>
+  /* ===== result panel (calculator-specific) ===== */
+  .content{display:grid;grid-template-columns:minmax(0,1fr) 392px;gap:var(--re-s5);align-items:start;}
+  .form-col{display:flex;flex-direction:column;gap:var(--re-s5);min-width:0;}
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--re-s5);align-items:start;}
+  .result-col{position:sticky;top:calc(var(--re-topbar-h) + var(--re-s6));}
+  .result{background:var(--re-surface);border:1px solid var(--re-line-2);border-radius:var(--re-r-lg);box-shadow:var(--re-shadow-panel);overflow:hidden;}
+  .result-top{display:flex;align-items:center;gap:var(--re-s3);padding:var(--re-s4) var(--re-s5);border-bottom:1px solid var(--re-line);}
+  .result-top .rt-title{font-size:var(--re-text-base);font-weight:600;letter-spacing:-.01em;}
+  .result-top .live{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--re-ink-3);}
+  .result-top .live .d{width:6px;height:6px;border-radius:50%;background:var(--re-ok-bright);}
+  .result-top .hist{margin-left:auto;text-align:right;font-size:11px;color:var(--re-ink-4);line-height:1.35;}
+  .result-top .hist b{color:var(--re-ink-3);font-weight:600;}
+  .result-body{padding:var(--re-s5);display:flex;flex-direction:column;gap:var(--re-s5);}
+  .rlabel{display:flex;align-items:center;gap:8px;font-size:var(--re-text-2xs);font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--re-ink-3);margin-bottom:var(--re-s3);}
+  .rlabel .step{width:17px;height:17px;border-radius:5px;background:var(--re-surface-2);border:1px solid var(--re-line);display:grid;place-items:center;font-size:10px;font-weight:600;color:var(--re-ink-3);flex:none;}
+  .range-vals{display:flex;justify-content:space-between;align-items:flex-end;}
+  .range-vals .end small{display:block;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--re-ink-4);margin-bottom:2px;}
+  .range-vals .end .v{font-size:17px;font-weight:600;letter-spacing:-.01em;}
+  .range-vals .end.max{text-align:right;}
+  .track{position:relative;height:6px;border-radius:4px;background:var(--re-surface-3);margin-top:var(--re-s3);}
+  .track .fill{position:absolute;left:8%;right:8%;top:0;bottom:0;border-radius:4px;background:var(--re-line-strong);}
+  .track .pin{position:absolute;left:46%;top:-3px;width:3px;height:12px;border-radius:2px;background:var(--re-amber);}
+  .recommended{background:var(--re-charcoal);color:#fff;border-radius:var(--re-r);padding:var(--re-s5);text-align:center;position:relative;border:1px solid var(--re-charcoal-line);}
+  .recommended .rl{display:flex;align-items:center;justify-content:center;gap:7px;font-size:var(--re-text-2xs);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--re-on-dark-3);}
+  .recommended .rl svg{width:13px;height:13px;color:var(--re-amber);}
+  .recommended .big{font-size:var(--re-text-display);font-weight:700;letter-spacing:-.02em;line-height:1.05;margin:6px 0 2px;color:var(--re-amber-bright);font-variant-numeric:tabular-nums;}
+  .recommended .iva{font-size:var(--re-text-xs);color:var(--re-on-dark-3);}
+  .jcells{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--re-s2);}
+  .jcell{border:1px solid var(--re-line);border-radius:var(--re-r-sm);padding:10px 6px;text-align:center;background:var(--re-surface);}
+  .jcell.rec{background:var(--re-amber-soft);border-color:var(--re-amber-line);}
+  .jcell .jn{font-size:19px;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums;}
+  .jcell.rec .jn{color:var(--re-amber-ink);}
+  .jcell .jt{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--re-ink-4);margin-top:2px;}
+  .crosscheck{display:flex;gap:7px;align-items:flex-start;font-size:var(--re-text-xs);color:var(--re-ink-4);margin-top:var(--re-s3);line-height:1.45;}
+  .crosscheck svg{width:14px;height:14px;flex:none;margin-top:2px;}
+  .crosscheck b{color:var(--re-ink-3);font-weight:600;}
+  .coloc .v{font-size:19px;font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums;}
+  .coloc .sub{font-size:var(--re-text-xs);color:var(--re-ink-4);margin-top:3px;}
+  .totals{font-size:var(--re-text-sm);}
+  .totals .tl{display:flex;justify-content:space-between;gap:var(--re-s4);padding:4px 0;color:var(--re-ink-3);}
+  .totals .tl .num{color:var(--re-ink-2);font-weight:500;}
+  .totals .grand{margin-top:var(--re-s2);padding-top:var(--re-s3);border-top:1px solid var(--re-line);display:flex;justify-content:space-between;align-items:baseline;}
+  .totals .grand .gl{font-size:13.5px;font-weight:600;color:var(--re-ink);}
+  .totals .grand .gv{font-size:20px;font-weight:700;letter-spacing:-.015em;font-variant-numeric:tabular-nums;}
+  .ovr-row{display:flex;gap:var(--re-s2);}
+  .ovr-row .control{flex:1;}
+  .ovr-clear{width:40px;height:40px;flex:none;border:1px solid var(--re-line-2);border-radius:var(--re-r-sm);background:var(--re-surface);display:grid;place-items:center;color:var(--re-ink-3);cursor:pointer;}
+  .ovr-clear:hover{background:var(--re-surface-2);color:var(--re-ink);}
+  .ovr-echo{font-size:11.5px;color:var(--re-ink-4);margin-top:8px;}
+  .ovr-echo b{color:var(--re-ink-2);font-weight:600;}
+  .actions{display:flex;flex-direction:column;gap:var(--re-s3);}
+  .out-label{font-size:var(--re-text-2xs);font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--re-ink-4);}
+  .out-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--re-s2);}
+  .save-note{font-size:11.5px;color:var(--re-ink-4);text-align:center;line-height:1.45;}
+  .save-note b{color:var(--re-ink-3);font-weight:600;}
+  .readout{display:inline-flex;align-items:center;gap:var(--re-s2);margin-top:var(--re-s3);padding:8px 12px;background:var(--re-surface-2);border:1px solid var(--re-line);border-radius:var(--re-r-sm);font-size:var(--re-text-sm);color:var(--re-ink-3);}
+  .readout .k{color:var(--re-ink-4);}.readout b{color:var(--re-ink);font-weight:600;}.readout svg{width:15px;height:15px;color:var(--re-ink-4);}
+  .extra-check{display:flex;align-items:center;gap:10px;padding:9px 0;font-size:13.5px;color:var(--re-ink-2);cursor:pointer;border-bottom:1px solid var(--re-line);}
+  .extra-check:last-child{border-bottom:0;}
+  .extra-check input{appearance:none;-webkit-appearance:none;width:18px;height:18px;border:1px solid var(--re-line-strong);border-radius:5px;background:var(--re-surface);cursor:pointer;flex:none;position:relative;}
+  .extra-check input:checked{background:var(--re-amber);border-color:var(--re-amber);}
+  .extra-check input:checked::after{content:"";position:absolute;left:5px;top:2px;width:5px;height:9px;border:solid #0d0e11;border-width:0 2px 2px 0;transform:rotate(45deg);}
+  .extra-check .price{margin-left:auto;font-size:12px;color:var(--re-ink-4);font-variant-numeric:tabular-nums;}
+  @media (max-width:1200px){.content{grid-template-columns:1fr;}.result-col{position:static;}}
+  /* ===== save validation states ===== */
+  #saveBtn{position:relative;}
+  #saveBtn[disabled]{opacity:.5;cursor:not-allowed;pointer-events:none;}
+  #saveBtn .sb-spin{display:none;width:15px;height:15px;border:2px solid rgba(13,14,17,.3);border-top-color:#0d0e11;border-radius:50%;animation:sbspin .7s linear infinite;flex:none;}
+  #saveBtn.is-loading .sb-spin{display:inline-block;}
+  #saveBtn.is-loading .sb-ico{display:none;}
+  #saveBtn.is-success{background:var(--re-ok);border-color:var(--re-ok);color:#0d0e11;}
+  #saveBtn.is-success svg{color:#0d0e11;}
+  #saveBtn.is-error{background:var(--re-crit-soft);border-color:var(--re-crit-line);color:var(--re-crit);}
+  #saveBtn.is-error svg{color:var(--re-crit);}
+  @keyframes sbspin{to{transform:rotate(360deg);}}
+  .save-note.err{color:var(--re-crit);}
+  .save-note.ok{color:var(--re-ok-bright);}
+  .status-chip.editing{border-style:solid;border-color:var(--re-amber-line);background:var(--re-amber-soft);color:var(--re-amber-ink);}
+  .status-chip.editing .d{background:var(--re-amber);}
+  .status-chip.dirty .d{background:var(--re-warn);}
+</style>
+</head>
+<body class="re-root" data-active="calc" data-crumbs="Operación|Calculadora">
+<div class="app">
+  <aside class="sidebar" id="re-sidebar"></aside>
+  <header class="topbar" id="re-topbar"></header>
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>Calculadora</h1>
+        <div class="sub">Consulta rápida — el resultado se recalcula al editar y está siempre visible.</div>
+      </div>
+      <span class="status-chip" id="statusChip"><span class="d"></span> Sin guardar</span>
+      <div class="head-right">Actualizado 16/06/2026 · 09:20</div>
+    </div>
+
+    <!-- quote header -->
+    <section class="card card-pad" style="margin-bottom:var(--re-s5);">
+      <div class="sec-head"><span class="sec-idx">0</span><span class="sec-title">Encabezado del presupuesto</span><span class="sec-hint">siempre visible · opcional para calcular</span>
+        <div class="tools"><button class="pill-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9h16M4 15h16"/></svg> Compactar</button></div>
+      </div>
+      <div class="grid-2" style="grid-template-columns:200px 1fr 220px;align-items:end;">
+        <div class="field"><label>Fecha</label><div class="control"><input class="input with-suffix" id="qDate" type="text" value="16/06/2026"><span class="lead-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="5" width="16" height="16" rx="2.5"/><path d="M4 9.5h16M8 3.5v3M16 3.5v3" stroke-linecap="round"/></svg></span></div></div>
+        <div class="field"><label>Referencia / Obra <span class="opt">clave legible del presupuesto</span></label><div class="control"><input class="input" id="qRef" type="text" placeholder="Ej: Casa Pérez – Escalera interior"></div></div>
+        <div class="field"><label>Tipo de cliente</label><div class="select"><select id="qTipo"><option>Particular</option><option>Empresa</option><option>Arquitecto / Estudio</option><option>Constructora</option></select><span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div></div>
+      </div>
+      <div class="sub-label">Datos del cliente <span class="muted">opcionales · nunca bloquean el cálculo</span></div>
+      <div class="grid-3">
+        <div class="field"><label>Cliente</label><div class="control"><input class="input" id="qCliente" type="text" placeholder="Nombre del cliente"></div></div>
+        <div class="field"><label>Teléfono</label><div class="control"><input class="input" id="qTel" type="text" placeholder="099 000 000"></div></div>
+        <div class="field"><label>Email</label><div class="control"><input class="input" id="qEmail" type="text" placeholder="cliente@email.com"></div></div>
+      </div>
+    </section>
+
+    <div class="content">
+      <div class="form-col">
+        <section class="card card-pad">
+          <div class="sec-head"><span class="sec-idx">1</span><span class="sec-title">Producto</span></div>
+          <div class="grid-2">
+            <div class="field"><label>Familia</label><div class="select"><select id="famSel"></select><span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div></div>
+            <div class="field"><label>Subcategoría</label><div class="select"><select id="subSel"></select><span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div></div>
+          </div>
+        </section>
+
+        <section class="card card-pad">
+          <div class="sec-head"><span class="sec-idx">2</span><span class="sec-title">Dimensiones</span><span class="sec-hint">decimales con coma</span></div>
+          <div class="grid-3">
+            <div class="field"><label>Ancho de paso <span class="opt">m</span></label><div class="control"><input class="input num" id="dAncho" value="1,00"></div></div>
+            <div class="field"><label>Altura total <span class="opt">m</span></label><div class="control"><input class="input num" id="dAlt" value="2,90"></div></div>
+            <div class="field"><label>Avance <span class="opt">m</span></label><div class="control"><input class="input num" id="dAv" value="3,55"></div></div>
+          </div>
+          <div class="readout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg><span class="k">Tamaño</span> <b id="sizeBand">Mediano</b><span class="k">· calculado automáticamente</span></div>
+        </section>
+
+        <div class="row-2">
+          <section class="card card-pad">
+            <div class="sec-head"><span class="sec-idx">3</span><span class="sec-title">Extras / Opciones</span></div>
+            <label class="extra-check"><input type="checkbox" id="exBaranda" checked> Baranda un lado <span class="price">+ $14.800</span></label>
+            <label class="extra-check"><input type="checkbox" id="exContra" checked> Contrahuella <span class="price">+ 8%</span></label>
+            <label class="extra-check"><input type="checkbox" id="exPiso"> Piso / escalones <span class="price">+ $25.400</span></label>
+            <label class="extra-check"><input type="checkbox" id="exLed"> Iluminación LED <span class="price">+ $47.150</span></label>
+          </section>
+          <section class="card card-pad">
+            <div class="sec-head"><span class="sec-idx">4</span><span class="sec-title">Terminación y colocación</span></div>
+            <div class="grid-1">
+              <div class="field"><label>Terminación</label><div class="select"><select id="termSel"><option value="1.00">DTM (pintura al horno)</option><option value="1.15">Galvanizado</option><option value="1.25">Pintura especial</option><option value="0.92">Sin tratamiento</option></select><span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div></div>
+              <div class="field"><label>Colocación</label><div class="select"><select id="colocSel"><option value="0">No incluye</option><option value="0.10" selected>Incluida — simple (+10%)</option><option value="0.15">Incluida — compleja (+15%)</option></select><span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div></div>
+              <div class="field"><label>Zona <span class="opt">ajusta sólo colocación</span></label><div class="select"><select id="zonaSel"><option>Montevideo</option><option>Canelones</option><option>Interior</option></select><span class="chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div></div>
+            </div>
+          </section>
+        </div>
+
+        <section class="card card-pad">
+          <div class="sec-head"><span class="sec-idx">5</span><span class="sec-title">Notas internas</span><span class="sec-hint">opcional</span></div>
+          <textarea class="textarea" placeholder="Agregá notas, aclaraciones u observaciones del proyecto…"></textarea>
+          <div class="field-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11V7a5 5 0 0 1 10 0v4"/><rect x="5" y="11" width="14" height="9" rx="2"/></svg> No se incluyen en la salida comercial al cliente.</div>
+        </section>
+      </div>
+
+      <div class="result-col">
+        <section class="result">
+          <div class="result-top"><span class="rt-title">Resultado</span><span class="live"><span class="d"></span> En vivo</span><span class="hist">Ref. histórica<br><b class="num" id="histRef">$45.000 – $180.000</b></span></div>
+          <div class="result-body">
+            <div>
+              <div class="rlabel"><span class="step">1</span> Fabricación estimada</div>
+              <div class="range-vals"><div class="end"><small>Mínimo</small><span class="v num" id="fabMin">$—</span></div><div class="end max"><small>Máximo</small><span class="v num" id="fabMax">$—</span></div></div>
+              <div class="track"><div class="fill"></div><div class="pin"></div></div>
+            </div>
+            <div class="recommended">
+              <div class="rl"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 18.9 6.1 22l1.2-6.5L2.5 9.4l6.6-.9L12 2.5z"/></svg> Recomendado</div>
+              <div class="big num" id="recBig">$—</div>
+              <div class="iva">valor de fabricación · + IVA</div>
+            </div>
+            <div>
+              <div class="rlabel"><span class="step">2</span> Jornales (mano de obra)</div>
+              <div class="jcells"><div class="jcell"><div class="jn num" id="jMin">6,0</div><div class="jt">Mín</div></div><div class="jcell rec"><div class="jn num" id="jRec">7,0</div><div class="jt">Rec.</div></div><div class="jcell"><div class="jn num" id="jMax">8,0</div><div class="jt">Máx</div></div></div>
+              <div class="crosscheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg> Verificación de carga de trabajo — <b>no define el precio</b></div>
+            </div>
+            <div class="coloc">
+              <div class="rlabel"><span class="step">3</span> Colocación (sugerida)</div>
+              <div class="v num" id="colocVal">$—</div>
+              <div class="sub" id="colocSub">~10% de la fabricación recomendada · Zona: Montevideo</div>
+            </div>
+            <div>
+              <div class="rlabel"><span class="step">4</span> Total (Subt. + IVA)</div>
+              <div class="totals"><div class="tl"><span>Subtotal (fab. + coloc.)</span><span class="num" id="subVal">$—</span></div><div class="tl"><span>IVA 22%</span><span class="num" id="ivaVal">$—</span></div><div class="grand"><span class="gl">Total estimado</span><span class="gv num" id="grandVal">$—</span></div></div>
+            </div>
+            <div>
+              <div class="rlabel"><span class="step">5</span> Precio elegido (override)</div>
+              <div class="ovr-row"><div class="control"><span class="prefix">$</span><input class="input with-prefix num" id="ovrInput" placeholder="—"></div><button class="ovr-clear" id="ovrClear" title="Limpiar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+              <div class="ovr-echo">calculado: <b class="num" id="ovrCalc">$—</b> · elegido: <b id="ovrEcho">—</b></div>
+            </div>
+            <div class="alerts"><div class="ah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l9 16H3l9-16z"/><path d="M12 10v4M12 17h.01"/></svg> Alertas y recordatorios</div><div id="alertsList"></div></div>
+            <hr class="divider" style="margin:0;">
+            <div class="actions">
+              <div class="out-label">Generar salida</div>
+              <div class="out-grid">
+                <a class="btn" href="ClientSummary.html?mode=estimate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a8 8 0 0 0-6.9 12l-1 4 4.1-1A8 8 0 1 0 12 4z"/></svg> Estimación rápida</a>
+                <a class="btn" href="ClientSummary.html?mode=formal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5"/></svg> Presupuesto formal</a>
+              </div>
+              <button class="btn btn-primary" id="saveBtn"><span class="sb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/></svg></span><span class="sb-spin"></span><span class="sb-label">Guardar presupuesto</span></button>
+              <div class="save-note" id="saveNote">Requiere <b>Cliente</b> o <b>Referencia / Obra</b> · genera N° <b>GV-A-…</b> al guardar.</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="shell.js"></script>
+<script src="quotes.js"></script>
+<script>
+  // ---- compact pricing engine (preserves the visible S1 behaviour) ----
+  var CATALOG = {
+    'Escaleras': { subs:{'Recta':[105000,169000,252000], 'Caracol':[140000,205000,300000], 'U / con descanso':[160000,240000,360000]}, jor:[6,7,8] },
+    'Barandas': { subs:{'Recta caño':[42000,72000,110000], 'Balcón':[60000,98000,150000]}, jor:[3,4,5] },
+    'Puertas': { subs:{'Simple':[55000,82000,120000], 'Doble hoja':[90000,135000,200000]}, jor:[3,4,6] },
+    'Portones': { subs:{'Corredizo':[180000,265000,390000], 'Batiente':[150000,225000,330000]}, jor:[5,7,9] },
+    'Cerramientos': { subs:{'Patio':[60000,95000,140000]}, jor:[2,3,5] },
+  };
+  var fmt = function(n){ return '$' + Math.round(n).toLocaleString('es-UY'); };
+  var $ = function(id){ return document.getElementById(id); };
+  function parseNum(s){ return parseFloat(String(s).replace(/\./g,'').replace(',','.'))||0; }
+
+  function fillFamilies(){
+    var fam = $('famSel'); fam.innerHTML = Object.keys(CATALOG).map(function(f){return '<option>'+f+'</option>';}).join('');
+    fillSubs();
+  }
+  function fillSubs(){
+    var f = $('famSel').value, sub = $('subSel');
+    sub.innerHTML = Object.keys(CATALOG[f].subs).map(function(s){return '<option>'+s+'</option>';}).join('');
+  }
+  function sizeBand(){
+    var area = parseNum($('dAlt').value) * Math.max(parseNum($('dAv').value),1);
+    if (area < 7) return 'Chico'; if (area < 12) return 'Mediano'; return 'Grande';
+  }
+  function recalc(){
+    var f = $('famSel').value, s = $('subSel').value;
+    var base = (CATALOG[f].subs[s]) || [100000,150000,220000];
+    var term = parseFloat($('termSel').value)||1;
+    var band = sizeBand(); var bandMult = band==='Chico'?0.85:(band==='Grande'?1.18:1);
+    var extras = 0, pct = 0;
+    if ($('exBaranda').checked) extras += 14800;
+    if ($('exContra').checked) pct += 0.08;
+    if ($('exPiso').checked) extras += 25400;
+    if ($('exLed').checked) extras += 47150;
+    var min = base[0]*bandMult*term*(1+pct)+extras;
+    var rec = base[1]*bandMult*term*(1+pct)+extras;
+    var max = base[2]*bandMult*term*(1+pct)+extras;
+    $('fabMin').textContent = fmt(min); $('fabMax').textContent = fmt(max); $('recBig').textContent = fmt(rec);
+    $('sizeBand').textContent = band;
+    // jornales
+    var j = CATALOG[f].jor; $('jMin').textContent=j[0].toFixed(1).replace('.',','); $('jRec').textContent=j[1].toFixed(1).replace('.',','); $('jMax').textContent=j[2].toFixed(1).replace('.',',');
+    // colocacion
+    var cpct = parseFloat($('colocSel').value)||0;
+    var zona = $('zonaSel').value; var zmult = zona==='Montevideo'?1:(zona==='Canelones'?1.12:1.3);
+    var coloc = rec*cpct*zmult;
+    if (cpct===0){ $('colocVal').textContent='No incluida'; $('colocSub').textContent='El cliente coordina la colocación.'; }
+    else { $('colocVal').textContent=fmt(coloc*0.9)+' – '+fmt(coloc*1.1); $('colocSub').textContent='~'+Math.round(cpct*100)+'% de la fabricación recomendada · Zona: '+zona; }
+    // override
+    var ovr = parseNum($('ovrInput').value);
+    var chosen = ovr>0 ? ovr : rec;
+    $('ovrCalc').textContent = fmt(rec); $('ovrEcho').textContent = ovr>0 ? fmt(ovr) : '—';
+    // totals
+    var sub = chosen + (cpct>0?coloc:0);
+    var iva = sub*0.22;
+    $('subVal').textContent=fmt(sub); $('ivaVal').textContent=fmt(iva); $('grandVal').textContent=fmt(sub+iva);
+    // alerts
+    var alerts = [];
+    var ratio = parseNum($('dAlt').value) / Math.max(parseNum($('dAv').value),0.1);
+    if (f==='Escaleras' && ratio>0.95) alerts.push('Escalera empinada: relación altura–avance elevada. Verificar pedada y alzada en obra.');
+    if (f==='Escaleras' && parseNum($('dAncho').value)<0.80) alerts.push('Ancho de paso angosto (&lt; 0,80 m) — confirmar circulación.');
+    if (parseNum($('dAv').value)>3.5) alerts.push('El avance asume llegada directa a losa — verificar punto de apoyo superior.');
+    if (!alerts.length) alerts.push('Medidas dentro de los rangos de referencia.');
+    $('alertsList').innerHTML = alerts.map(function(a){return '<div class="alert"><span class="dot"></span><span>'+a+'</span></div>';}).join('');
+  }
+  ['famSel'].forEach(function(){ $('famSel').addEventListener('change',function(){fillSubs();recalc();}); });
+  ['subSel','termSel','colocSel','zonaSel','dAncho','dAlt','dAv','ovrInput','exBaranda','exContra','exPiso','exLed'].forEach(function(id){
+    var el=$(id); if(el) el.addEventListener(el.tagName==='SELECT'||el.type==='checkbox'?'change':'input',recalc);
+  });
+  $('ovrClear').addEventListener('click',function(){ $('ovrInput').value=''; recalc(); markDirty(); });
+
+  // ============ reopen loop + save validation ============
+  var params = new URLSearchParams(location.search);
+  var QID = params.get('id');                 // editing an existing saved estimate
+  var DUPID = params.get('dup');               // duplicating → prefill but stays a new quote
+  var SRC = (window.RE_QUOTES && (QID || DUPID)) ? window.RE_QUOTES[QID || DUPID] : null;
+  var EDIT = !!(QID && SRC);
+  var NEWNUM = 'GV-A-00149';
+  function money(s){ return parseInt(String(s).replace(/[^\d]/g,''),10) || 0; }
+  function whenReady(fn){ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',fn); else fn(); }
+  function setSelect(sel,val){ if(!sel)return; for(var i=0;i<sel.options.length;i++){ if(sel.options[i].value===val||sel.options[i].text===val){ sel.selectedIndex=i; return; } } }
+
+  function prefill(q){
+    $('qRef').value = q.title.replace(/ \u2014 .*$/,'');
+    $('qCliente').value = q.client; $('qTel').value = q.contact||'';
+    setSelect($('qTipo'), q.calc.tipo);
+    setSelect($('famSel'), q.fam); fillSubs(); setSelect($('subSel'), q.sub);
+    $('dAncho').value=q.calc.ancho; $('dAlt').value=q.calc.alt; $('dAv').value=q.calc.av;
+    $('exBaranda').checked=!!q.calc.baranda; $('exContra').checked=!!q.calc.contra; $('exPiso').checked=!!q.calc.piso; $('exLed').checked=!!q.calc.led;
+    setSelect($('termSel'), q.calc.term); setSelect($('colocSel'), q.calc.coloc); setSelect($('zonaSel'), q.calc.zona);
+    $('ovrInput').value = q.calc.ovr || '';
+    recalc();
+  }
+
+  fillFamilies();
+  if (SRC) prefill(SRC); else recalc();
+
+  // edit-mode chrome
+  var statusChip = $('statusChip');
+  if (EDIT) {
+    statusChip.className = 'status-chip editing';
+    statusChip.innerHTML = '<span class="d"></span> Editando · ' + QID;
+    whenReady(function(){ var crumbsEl = document.querySelector('#re-topbar .crumbs');
+    if (crumbsEl) crumbsEl.innerHTML = '<a href="History.html">Historial</a><span class="sep">/</span><a href="ClientSummary.html?id=' + QID + '">' + QID + '</a><span class="sep">/</span><b>Editar</b>'; });
+    var subEl = document.querySelector('.page-head .sub');
+    if (subEl) subEl.textContent = 'Editando el presupuesto ' + QID + ' — modificá los valores y guardá los cambios.';
+    document.querySelectorAll('.out-grid a').forEach(function(a){ a.href = a.getAttribute('href') + '&id=' + encodeURIComponent(QID); });
+  } else if (DUPID && SRC) {
+    statusChip.innerHTML = '<span class="d"></span> Copia sin guardar';
+    var subEl2 = document.querySelector('.page-head .sub');
+    if (subEl2) subEl2.textContent = 'Copia de ' + DUPID + ' — se guarda como un presupuesto nuevo.';
+  }
+
+  // ---- save state machine: disabled / loading / success / error ----
+  var saveBtn = $('saveBtn'), saveNote = $('saveNote');
+  function setLabel(t){ saveBtn.querySelector('.sb-label').textContent = t; }
+  function requiredOk(){ return !!($('qCliente').value.trim() || $('qRef').value.trim()); }
+  function overrideError(){
+    var ovr = money($('ovrInput').value); if(!ovr) return null;
+    var min = money($('fabMin').textContent), max = money($('fabMax').textContent);
+    if (min && ovr < Math.round(min*0.5)) return 'El precio elegido (' + fmt(ovr) + ') está muy por debajo del mínimo calculado (' + fmt(min) + '). Revisá el override antes de guardar.';
+    if (max && ovr > Math.round(max*2)) return 'El precio elegido (' + fmt(ovr) + ') supera el máximo razonable (' + fmt(max) + '). Revisá el override antes de guardar.';
+    return null;
+  }
+  var busy = false;
+  var defaultNote = EDIT
+    ? 'Guardás cambios sobre <b>' + QID + '</b> · al guardar volvés al resumen del cliente.'
+    : 'Requiere <b>Cliente</b> o <b>Referencia / Obra</b> · genera N° <b>' + NEWNUM + '</b> al guardar.';
+  function refreshSave(){
+    if (busy) return;
+    var ok = requiredOk();
+    saveBtn.classList.remove('is-success','is-error','is-loading');
+    saveBtn.disabled = !ok;
+    setLabel(EDIT ? 'Guardar cambios' : 'Guardar presupuesto');
+    saveNote.className = 'save-note';
+    saveNote.innerHTML = ok ? defaultNote : 'Completá <b>Cliente</b> o <b>Referencia / Obra</b> para poder guardar.';
+  }
+  function markDirty(){
+    if (busy) return;
+    if (EDIT && requiredOk()) { statusChip.className = 'status-chip editing dirty'; statusChip.innerHTML = '<span class="d"></span> Cambios sin guardar'; }
+    refreshSave();
+  }
+  function buildQuoteFromForm(num){
+    var fam=$('famSel').value, sub=$('subSel').value;
+    var rec=money($('recBig').textContent), ovr=money($('ovrInput').value);
+    var coloc=money($('colocVal').textContent);
+    var subt=money($('subVal').textContent), tot=money($('grandVal').textContent);
+    var items=[['Fabricación — ' + sub.toLowerCase() + ' (' + fam.toLowerCase() + ')', (ovr&&ovr!==rec)?'precio elegido (override)':'valor recomendado de fabricación', (ovr&&ovr!==rec)?ovr:rec]];
+    if (coloc) items.push(['Colocación', 'según zona ' + $('zonaSel').value, coloc]);
+    return {
+      num: 'PRE-2026-0' + num.slice(-3), status: 'draft', date: $('qDate').value,
+      client: $('qCliente').value.trim() || 'Sin nombre', ctype: $('qTipo').value, contact: $('qTel').value.trim() || '—',
+      obra: $('qRef').value.trim() || '—', atendido: 'Ramiro Estavillo', fam: fam, sub: sub,
+      title: $('qRef').value.trim() || (sub + ' — ' + fam),
+      desc: 'Presupuesto generado desde la calculadora con la configuración seleccionada. Las medidas se verifican en obra antes de fabricar.',
+      dims: [['Ancho de paso', $('dAncho').value + ' m'], ['Altura total', $('dAlt').value + ' m'], ['Avance', $('dAv').value + ' m'], ['Tamaño', $('sizeBand').textContent]],
+      items: items, sub: subt || Math.round(tot/1.22), total: tot
+    };
+  }
+  saveBtn.addEventListener('click', function(){
+    if (busy || saveBtn.disabled) return;
+    var err = overrideError();
+    busy = true;
+    saveBtn.classList.remove('is-success','is-error'); saveBtn.classList.add('is-loading'); saveBtn.disabled = true;
+    setLabel(EDIT ? 'Guardando cambios…' : 'Guardando…');
+    saveNote.className = 'save-note'; saveNote.innerHTML = 'Validando y guardando el presupuesto…';
+    setTimeout(function(){
+      saveBtn.classList.remove('is-loading'); busy = false;
+      if (err){
+        saveBtn.classList.add('is-error'); saveBtn.disabled = false;
+        setLabel('No se pudo guardar');
+        saveNote.className = 'save-note err'; saveNote.innerHTML = '<b>Error:</b> ' + err;
+        window.REToast && REToast('No se pudo guardar · revisá el precio elegido');
+        return;
+      }
+      saveBtn.classList.add('is-success'); saveBtn.disabled = true;
+      var num = EDIT ? QID : NEWNUM;
+      setLabel(EDIT ? 'Cambios guardados ✓' : 'Guardado ✓');
+      saveNote.className = 'save-note ok';
+      saveNote.innerHTML = EDIT ? ('Cambios guardados en <b>' + QID + '</b>. Abriendo el resumen…') : ('Guardado como N° <b>' + num + '</b>. Abriendo el resumen…');
+      window.REToast && REToast(EDIT ? ('Cambios guardados · ' + QID) : ('Presupuesto guardado · N° ' + num));
+      if (!EDIT){ try{ sessionStorage.setItem('re_quote_' + num, JSON.stringify(buildQuoteFromForm(num))); }catch(e){} }
+      setTimeout(function(){ window.location.href = 'ClientSummary.html?id=' + encodeURIComponent(num); }, 1150);
+    }, 850);
+  });
+
+  // dirty/validation listeners (in addition to the recalc listeners above)
+  ['qCliente','qRef','qTel','qTipo','famSel','subSel','termSel','colocSel','zonaSel','dAncho','dAlt','dAv','ovrInput','exBaranda','exContra','exPiso','exLed'].forEach(function(id){
+    var el = $(id); if(!el) return; var ev = (el.tagName==='SELECT'||el.type==='checkbox') ? 'change' : 'input';
+    el.addEventListener(ev, markDirty);
+  });
+  refreshSave();
+</script>
+</body>
+</html>

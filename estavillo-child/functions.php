@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'ES_CHILD_VERSION', '0.2.65' );
+define( 'ES_CHILD_VERSION', '0.2.66' );
 define( 'ES_CHILD_DIR', get_stylesheet_directory() );
 define( 'ES_CHILD_URI', get_stylesheet_directory_uri() );
 
@@ -27,6 +27,7 @@ require ES_CHILD_DIR . '/inc/how-i-work-illustrations.php';
 require ES_CHILD_DIR . '/inc/header-footer.php';
 require ES_CHILD_DIR . '/inc/theme-dark-mode.php';
 require ES_CHILD_DIR . '/inc/page-hero-meta.php';
+require ES_CHILD_DIR . '/inc/ds-restimator.php';
 
 /**
  * Textdomain del child theme.
@@ -152,6 +153,26 @@ function es_child_ui_strings() {
 		'connect_eyebrow'     => 'Get in touch',
 		'connect_title'       => 'Start a conversation.',
 		'connect_lead'        => "I'm open to Product Design, Design Systems and UX Research roles — anywhere the goal is making a real system work better, not just look better.",
+
+		/*
+		 * REstimator Design System (templates/page-restimator-ds.php).
+		 *
+		 * El CONTENIDO del Design System está en español y no se traduce acá:
+		 * el documento vive en ds/restimator/master-<lang>.php y se elige por
+		 * idioma (ver es_ds_restimator_lang()). Estas claves son sólo el
+		 * chrome del portfolio alrededor de ese documento, más las labels del
+		 * visor de pantallas — todo eso sí queda traducible por Polylang como
+		 * cualquier otro string del tema.
+		 */
+		'ds_back_to_case'     => 'Back to the REstimator case',
+		'ds_owner'            => 'Ramiro Estavillo',
+		'ds_missing'          => 'The Design System document is not available in this installation.',
+		/* translators: %s: nombre de la pantalla (p. ej. "Calculadora"). */
+		'ds_expand_screen'    => 'Expand screen: %s',
+		'lightbox_close'      => 'Close image',
+		'lightbox_zoom_in'    => 'Zoom in',
+		'lightbox_zoom_out'   => 'Zoom out',
+		'lightbox_reset'      => 'Reset zoom',
 	);
 }
 

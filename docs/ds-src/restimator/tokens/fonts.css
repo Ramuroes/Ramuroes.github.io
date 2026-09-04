@@ -1,0 +1,8 @@
+/* ============================================================
+   Presupuestador RE — Webfonts
+   Both families are open-source and ship via Google Fonts.
+   They match the frozen V1 product exactly (no substitution).
+   - Hanken Grotesk : UI / display — humanist grotesque, industrial-neutral
+   - JetBrains Mono : codes, IDs, tabular figures
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');

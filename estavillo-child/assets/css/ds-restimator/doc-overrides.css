@@ -1,0 +1,395 @@
+/* =========================================================================
+   ESTAVILLO — REstimator Design System: capa propia
+   -------------------------------------------------------------------------
+   ÚNICO archivo de este directorio escrito a mano: tokens.css y doc.css los
+   genera tools/build-ds.mjs y se sobrescriben en cada build.
+
+   Acá va sólo lo que la integración necesita y el Design System no trae:
+     1. blindaje contra el CSS global de Kadence dentro de .re-doc;
+     2. la barra institucional del portfolio;
+     3. el estilo de las previews de pantalla (que dejaron de ser iframes);
+     4. los arreglos de overflow horizontal en mobile.
+
+   NO se rediseña nada del Design System: no se tocan colores, tipografía,
+   espaciado, jerarquía ni el rail.
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   0. Página
+   ------------------------------------------------------------------------- */
+
+/* scroll-behavior vive en el elemento que scrollea de verdad (<html>), no en
+   el wrapper. Es lo que hace que los anchors del rail se deslicen en vez de
+   saltar. Mismo criterio de :has() ya usado en pages-home.css. */
+html:has(> body.es-ds-page) {
+	scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html:has(> body.es-ds-page) {
+		scroll-behavior: auto;
+	}
+}
+
+body.es-ds-page {
+	margin: 0;
+	background: var(--re-bg);
+}
+
+/* -------------------------------------------------------------------------
+   1. Blindaje contra Kadence
+   -------------------------------------------------------------------------
+   Esta página imprime wp_head(), así que el CSS global del tema padre se
+   carga igual aunque no se use ninguno de sus componentes. Kadence estila
+   elementos genéricos por nombre —y en particular pinta <button> en
+   :hover/:focus con color propio: está documentado en vivo en
+   case-figure-lightbox.css, donde un botón redondo se ponía azul—. El
+   Design System usa botones, inputs, tablas y headings por todos lados, así
+   que el riesgo es real y no teórico.
+
+   :where() mantiene la especificidad en 0, de modo que cualquier regla real
+   del DS (que siempre tiene al menos una clase) le gana sin necesidad de
+   !important. Los !important quedan sólo donde hay que ganarle a una regla
+   de Kadence con especificidad propia — mismo criterio ya usado en el
+   lightbox. */
+
+.re-doc :where(h1, h2, h3, h4, h5, h6, p, ul, ol, li, dl, dt, dd, figure, figcaption, blockquote) {
+	margin: 0;
+	padding: 0;
+	font: inherit;
+	color: inherit;
+	letter-spacing: inherit;
+	text-transform: none;
+}
+
+.re-doc :where(ul, ol) {
+	list-style: none;
+}
+
+.re-doc :where(table) {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+.re-doc :where(th, td) {
+	text-align: left;
+	vertical-align: top;
+}
+
+.re-doc :where(a) {
+	box-shadow: none;
+	text-decoration: none;
+}
+
+/* Botones: el DS los usa como superficies de demo y como trigger del visor.
+   Kadence les impone relleno, borde, sombra y color de foco propios. */
+.re-doc :where(button) {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	font: inherit;
+	color: inherit;
+	text-transform: none;
+	appearance: none;
+}
+
+.re-doc button:hover,
+.re-doc button:focus,
+.re-doc button:focus-visible {
+	box-shadow: none !important;
+}
+
+.re-doc :where(input, select, textarea) {
+	font: inherit;
+	color: inherit;
+}
+
+/* El tema padre puede fijar un ancho máximo o un padding a los contenedores
+   de contenido; el documento del DS maneja su propio layout de punta a punta. */
+.re-doc {
+	max-width: none;
+	margin: 0;
+	padding: 0;
+}
+
+/* -------------------------------------------------------------------------
+   2. Barra institucional del portfolio
+   -------------------------------------------------------------------------
+   Única franja de la página que pertenece al portfolio: usa tokens --es-*,
+   no --re-*. Discreta a propósito — no compite con el rail del DS. No es
+   sticky (ver el docblock de template-parts/ds-topbar.php). */
+
+.es-ds-topbar {
+	background: var(--es-bg, #0d0c0b);
+	border-bottom: 1px solid var(--es-line, rgba(255, 255, 255, 0.09));
+	font-family: var(--es-sans, system-ui, sans-serif);
+}
+
+.es-ds-topbar__in {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	max-width: 1180px;
+	padding: 11px 24px;
+}
+
+.es-ds-topbar a {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 12.5px;
+	line-height: 1.2;
+	letter-spacing: 0.01em;
+	text-decoration: none;
+	transition: color 160ms ease;
+}
+
+.es-ds-topbar__back {
+	color: var(--es-ink-2, #b9b3ab);
+}
+
+.es-ds-topbar__back:hover,
+.es-ds-topbar__back:focus-visible {
+	color: var(--es-ink, #f3efe9);
+}
+
+.es-ds-topbar__arrow {
+	font-size: 14px;
+	line-height: 1;
+}
+
+.es-ds-topbar__owner {
+	color: var(--es-ink-3, #8b857e);
+	font-size: 12px;
+}
+
+.es-ds-topbar__owner:hover,
+.es-ds-topbar__owner:focus-visible {
+	color: var(--es-ink-2, #b9b3ab);
+}
+
+.es-ds-topbar a:focus-visible {
+	outline: 2px solid var(--es-accent, #c9a227);
+	outline-offset: 3px;
+	border-radius: 3px;
+}
+
+/* En pantallas angostas el que cede es el "volver", no el nombre: el nombre es
+   la atribución del portfolio y es la razón de ser de esta barra. El enlace se
+   trunca con puntos suspensivos en vez de empujar la fila.
+   (min-width:0 es obligatorio: sin él un ítem flex no baja del ancho de su
+   contenido y el text-overflow nunca llega a activarse.) */
+.es-ds-topbar__back {
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.es-ds-topbar__arrow {
+	flex: none;
+}
+
+.es-ds-topbar__owner {
+	flex: none;
+}
+
+@media (max-width: 640px) {
+	.es-ds-topbar__in {
+		padding: 10px 16px;
+	}
+}
+
+/* Si faltara el partial del documento (theme instalado sin ds/). */
+.es-ds-missing {
+	padding: 64px 24px;
+	color: var(--re-ink-3, #8b857e);
+	font-family: var(--re-font-sans, system-ui, sans-serif);
+	text-align: center;
+}
+
+/* -------------------------------------------------------------------------
+   3. Previews de pantalla (§08 Screen Examples)
+   -------------------------------------------------------------------------
+   Las tarjetas dejaron de ser <div> con un <iframe> escalado y pasaron a ser
+   <figure> con un <button> que abre el visor compartido del portfolio. La
+   caja y el borde los sigue poniendo el CSS del DS (.shot / .vp); acá sólo
+   se define lo que el markup nuevo necesita. */
+
+.re-doc .shot .cap .zoom-hint {
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--re-amber-ink);
+}
+
+/* .vp era un contenedor; ahora es el botón que dispara el visor. */
+.re-doc button.vp {
+	display: block;
+	width: 100%;
+	cursor: zoom-in;
+	/* Las capturas son full-page y muy altas: la tarjeta muestra la franja
+	   superior de la pantalla, igual que hacía el iframe recortado, y el
+	   visor muestra la pantalla entera. */
+	max-height: 352px;
+	overflow: hidden;
+}
+
+.re-doc button.vp img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.re-doc .shot--mobile button.vp {
+	/* Las pantallas de mobile son verticales y entran completas. */
+	max-height: none;
+}
+
+/* Afordancia de "ampliar": aparece en hover/foco, nunca tapa la captura. */
+.re-doc .vp-expand {
+	position: absolute;
+	right: 10px;
+	bottom: 10px;
+	display: grid;
+	place-items: center;
+	width: 34px;
+	height: 34px;
+	border: 1px solid var(--re-line-2);
+	border-radius: 999px;
+	background: rgba(13, 14, 17, 0.82);
+	color: var(--re-ink-2);
+	opacity: 0;
+	transform: translateY(4px);
+	transition: opacity 160ms ease, transform 160ms ease, border-color 160ms ease, color 160ms ease;
+	pointer-events: none;
+}
+
+.re-doc .vp-expand svg {
+	width: 15px;
+	height: 15px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.7;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.re-doc button.vp:hover .vp-expand,
+.re-doc button.vp:focus-visible .vp-expand {
+	opacity: 1;
+	transform: translateY(0);
+	border-color: var(--re-amber);
+	color: var(--re-amber);
+}
+
+/* El anillo de foco tiene que dibujarse HACIA ADENTRO.
+   assets/css/base.css impone, para todo el sitio y con !important,
+   `outline: 2px solid var(--es-accent) !important; outline-offset: 3px
+   !important` sobre :focus-visible (es su red anti-Kadence, ver el comentario
+   ahí). Con offset positivo el anillo cae fuera del botón y lo recorta
+   `.shot{overflow:hidden}` del propio Design System: el foco de teclado
+   quedaba invisible. Especificidad (0,3,1) contra (0,1,1) de la regla base,
+   así que con !important de los dos lados gana esta. */
+.re-doc button.vp:focus-visible {
+	outline: 2px solid var(--re-amber) !important;
+	outline-offset: -3px !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.re-doc .vp-expand {
+		transition: none;
+		transform: none;
+	}
+}
+
+/* La grilla de mobile muestra tres teléfonos: caben tres columnas. */
+.re-doc .shots--mobile {
+	grid-template-columns: repeat(3, 1fr);
+}
+
+/* Inventario de artefactos (ex-tabla de enlaces a .html locales). */
+.re-doc .art-name {
+	font-weight: 600;
+	color: var(--re-ink-2);
+}
+
+.re-doc .art-kind {
+	display: inline-block;
+	padding: 2px 8px;
+	border: 1px solid var(--re-line-2);
+	border-radius: 999px;
+	background: var(--re-surface-2);
+	font-family: var(--re-font-mono);
+	font-size: 10.5px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--re-ink-3);
+	white-space: nowrap;
+}
+
+/* -------------------------------------------------------------------------
+   4. Overflow horizontal en mobile
+   -------------------------------------------------------------------------
+   Defecto real del documento original, medido antes de tocar nada: a 390px
+   el scrollWidth daba 632px contra un clientWidth de 390. Las causas NO eran
+   las previews (esas ya estaban contenidas) sino:
+
+     a) cadenas largas sin corte en <span class="mono"> de §02 Components
+        (nombres de export del namespace) — una llegaba a 564px de ancho
+        dentro de una columna de 350px;
+     b) las tarjetas de §10 Design → Implementation, que no encogían.
+
+   Se arregla en el elemento que desborda, NUNCA con overflow-x:hidden en un
+   ancestro: el rail del DS es position:sticky y este repo ya tiene
+   documentado que un overflow en un ancestro rompe el sticky (misma razón
+   por la que .es-page nunca lleva overflow-x). */
+
+.re-doc .mono {
+	overflow-wrap: anywhere;
+}
+
+/* Las celdas de tabla ya viven dentro de .scrollx y deben poder ser anchas:
+   ahí el corte agresivo estorbaría la lectura de la tabla. */
+.re-doc .scrollx .mono {
+	overflow-wrap: normal;
+}
+
+@media (max-width: 1100px) {
+	/* Ítems de grilla/flex: sin min-width:0 se niegan a bajar del ancho de su
+	   contenido y empujan la página. */
+	.re-doc .card,
+	.re-doc .card-b,
+	.re-doc .stage,
+	.re-doc .lk,
+	.re-doc .prin > *,
+	.re-doc .chain > * {
+		min-width: 0;
+	}
+
+	.re-doc .shots--mobile {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+@media (max-width: 640px) {
+	.re-doc .shots--mobile {
+		grid-template-columns: 1fr;
+	}
+
+	/* El rail pasa a bloque estático arriba del contenido (regla del propio
+	   DS). Con 12 ítems ocupa demasiado: se compacta en dos columnas para no
+	   empujar el documento entero fuera de la primera pantalla. */
+	.re-doc .rail {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		align-items: start;
+	}
+
+	.re-doc .rail-brand,
+	.re-doc .rail-grp {
+		grid-column: 1 / -1;
+	}
+}
