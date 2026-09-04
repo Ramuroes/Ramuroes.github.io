@@ -2,13 +2,13 @@
    Fuente: docs/ds-src/restimator/tokens/ (orden de styles.css).
    Los custom properties --re-* viven en :root y no colisionan con --es-*. */
 
-.re-doc /* ---------- tokens/fonts.css ---------- */
+/* ---------- tokens/fonts.css ---------- */
 /* ============================================================
    Presupuestador RE — Webfonts
    Both families are open-source and ship via Google Fonts.
    They match the frozen V1 product exactly (no substitution).
-   - Hanken Grotesk : UI / display — humanist grotesque,.re-doc industrial-neutral
-   - JetBrains Mono : codes,.re-doc IDs,.re-doc tabular figures
+   - Hanken Grotesk : UI / display — humanist grotesque, industrial-neutral
+   - JetBrains Mono : codes, IDs, tabular figures
    ============================================================ */
 /* @import movido a wp_enqueue_style(): https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap */
 
@@ -16,10 +16,10 @@
 /* ---------- tokens/colors.css ---------- */
 /* ============================================================
    Presupuestador RE — COLOR SYSTEM (Dark Industrial)
-   Black / graphite surfaces,.re-doc near-white ink,.re-doc a single amber
-   brand accent. No gradients,.re-doc no glass. Amber is concentrated
-   on the few moments that matter: the recommended price,.re-doc the
-   active nav rail,.re-doc the primary send action,.re-doc the logo mark.
+   Black / graphite surfaces, near-white ink, a single amber
+   brand accent. No gradients, no glass. Amber is concentrated
+   on the few moments that matter: the recommended price, the
+   active nav rail, the primary send action, the logo mark.
    ============================================================ */
 :root{
   /* ---- Graphite ramp (base, dark) ---- */
@@ -87,14 +87,14 @@
 }
 
 
-.re-doc /* ---------- tokens/typography.css ---------- */
+/* ---------- tokens/typography.css ---------- */
 /* ============================================================
    Presupuestador RE — TYPOGRAPHY  ·  FROZEN (2026-06-16)
    Typeface pairing is final — do not re-explore.
      · Primary UI       : Hanken Grotesk (400/500/600/700)
      · Technical / codes: JetBrains Mono (400/500/600)
-   Hanken for everything UI; JetBrains Mono for codes,.re-doc IDs and
-   tabular figures. Tight tracking on headings,.re-doc tabular numerals
+   Hanken for everything UI; JetBrains Mono for codes, IDs and
+   tabular figures. Tight tracking on headings, tabular numerals
    everywhere money/measurements appear.
    ============================================================ */
 :root{
@@ -133,8 +133,8 @@
   --re-ls-caps:       0.05em;
 }
 
-.re-doc /* Base document type — applied by consumers via .re-root or body */
-.re-root,.re-doc{
+/* Base document type — applied by consumers via .re-root or body */
+.re-doc,.re-doc{
   font-family: var(--re-font-sans);
   font-size: var(--re-text-base);
   line-height: var(--re-lh-normal);
@@ -145,12 +145,12 @@
   font-feature-settings: "tnum" 1, "ss01" 1;
 }
 
-.re-doc /* Tabular figures — money,.re-doc measurements,.re-doc codes,.re-doc dates */
-.re-num{ font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+/* Tabular figures — money, measurements, codes, dates */
+.re-doc .re-num{ font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
 .re-doc .re-mono{ font-family: var(--re-font-mono); }
 
-.re-doc /* Eyebrow / section kicker */
-.re-eyebrow{
+/* Eyebrow / section kicker */
+.re-doc .re-eyebrow{
   font-size: var(--re-text-2xs);
   font-weight: var(--re-fw-semibold);
   letter-spacing: var(--re-ls-eyebrow);
@@ -159,7 +159,7 @@
 }
 
 
-.re-doc /* ---------- tokens/spacing.css ---------- */
+/* ---------- tokens/spacing.css ---------- */
 /* ============================================================
    Presupuestador RE — SPACING & RADII
    4px base grid. Dense but breathable; desktop-first.
@@ -193,10 +193,10 @@
 }
 
 
-.re-doc /* ---------- tokens/elevation.css ---------- */
+/* ---------- tokens/elevation.css ---------- */
 /* ============================================================
    Presupuestador RE — ELEVATION (Dark Industrial)
-   On dark surfaces,.re-doc depth comes from a lighter surface + a
+   On dark surfaces, depth comes from a lighter surface + a
    1px border; shadows are deep and quiet underneath. The
    client "paper" lifts most; cards barely.
    ============================================================ */
@@ -218,7 +218,7 @@
 }
 
 
-.re-doc /* ---------- tokens/theme-light.css ---------- */
+/* ---------- tokens/theme-light.css ---------- */
 /* ============================================================
    Presupuestador RE — LIGHT THEME (second supported theme)
    ------------------------------------------------------------
@@ -227,8 +227,8 @@
 
        <html data-theme="light">  …  </html>
 
-   This is a COLOR-ONLY remap — surfaces,.re-doc ink,.re-doc borders,.re-doc shadows.
-   Spacing,.re-doc typography,.re-doc radii,.re-doc hierarchy,.re-doc interaction and
+   This is a COLOR-ONLY remap — surfaces, ink, borders, shadows.
+   Spacing, typography, radii, hierarchy, interaction and
    accessibility are untouched. Only the tokens declared below
    change; everything else inherits the :root (dark) values.
 
@@ -241,10 +241,11 @@
      lightened for legibility on white.
    · The charcoal "feature" blocks (recommended value, totals,
      KPI accent tile) DELIBERATELY stay dark — a premium contrast
-     anchor that keeps the industrial tone and avoids flat,.re-doc colorful-dashboard SaaS. (the charcoal and on-dark tokens are
+     anchor that keeps the industrial tone and avoids flat,
+     colorful-dashboard SaaS. (the charcoal and on-dark tokens are
      intentionally NOT overridden, so they inherit the dark values.)
    ============================================================ */
-[data-theme="light"]{
+.re-doc[data-theme="light"], .re-doc [data-theme="light"]{
   /* ---- Warm-gray / white surfaces ---- */
   --re-canvas:        #f3f1ec;  /* app background — warm off-white */
   --re-surface:       #ffffff;  /* cards, panels, inputs */
@@ -302,33 +303,33 @@
   --re-ring-amber:  0 0 0 3px rgba(224,145,30,.34);
 }
 
-.re-doc /* Give the light root a sensible base canvas + ink when the attribute
+/* Give the light root a sensible base canvas + ink when the attribute
    sits on <html>/<body> directly (mirrors base.css .re-root). */
-[data-theme="light"]{
+.re-doc[data-theme="light"], .re-doc [data-theme="light"]{
   background-color: var(--re-canvas);
   color: var(--re-ink);
 }
 
 
-.re-doc /* ---------- tokens/base.css ---------- */
+/* ---------- tokens/base.css ---------- */
 /* ============================================================
    Presupuestador RE — base reset & shared primitives
    Loaded after tokens. Keeps consumer pages consistent with
    the frozen V1 shell without forcing a class on <body>.
    ============================================================ */
-*,.re-doc::before, .re-doc *::before,.re-doc::after, .re-doc *::after{ box-sizing: border-box; }
+.re-doc, .re-doc *,.re-doc::before, .re-doc *::before,.re-doc::after, .re-doc *::after{ box-sizing: border-box; }
 
 .re-doc svg{ display: block; }
 .re-doc a{ color: inherit; text-decoration: none; }
 .re-doc ::placeholder{ color: var(--re-ink-4); }
 
-.re-doc /* Opt-in document styling: add class="re-root" to <body> (or a wrapper). */
-.re-root{
+/* Opt-in document styling: add class="re-root" to <body> (or a wrapper). */
+.re-doc{
   margin: 0;
   background: var(--re-bg);
   color: var(--re-text);
 }
 
-.re-doc /* Selection uses the brand amber,.re-doc lightly. */
-.re-root ::selection{ background: rgba(224,145,30,.22); }
+/* Selection uses the brand amber, lightly. */
+.re-doc .re-root ::selection{ background: rgba(224,145,30,.22); }
 

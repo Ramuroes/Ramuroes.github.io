@@ -1129,7 +1129,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         data-es-zoom-out-label="<?php echo esc_attr( es__( 'lightbox_zoom_out' ) ); ?>"
         data-es-zoom-reset-label="<?php echo esc_attr( es__( 'lightbox_reset' ) ); ?>"
         aria-label="<?php echo esc_attr( sprintf( es__( 'ds_expand_screen' ), 'Calculadora' ) ); ?>">
-        <img src="<?php echo esc_url( $es_ds_screens . 'mobile-calculator-preview.webp' ); ?>"
+        <img src="<?php echo esc_url( $es_ds_screens . 'mobile-calculator.webp' ); ?>"
              alt="Calculadora — Presupuestador RE"
              width="1176" height="2349" loading="lazy" decoding="async">
         <span class="vp-expand" aria-hidden="true">
@@ -1151,7 +1151,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         data-es-zoom-out-label="<?php echo esc_attr( es__( 'lightbox_zoom_out' ) ); ?>"
         data-es-zoom-reset-label="<?php echo esc_attr( es__( 'lightbox_reset' ) ); ?>"
         aria-label="<?php echo esc_attr( sprintf( es__( 'ds_expand_screen' ), 'Inicio' ) ); ?>">
-        <img src="<?php echo esc_url( $es_ds_screens . 'mobile-home-preview.webp' ); ?>"
+        <img src="<?php echo esc_url( $es_ds_screens . 'mobile-home.webp' ); ?>"
              alt="Inicio — Presupuestador RE"
              width="1176" height="2349" loading="lazy" decoding="async">
         <span class="vp-expand" aria-hidden="true">
@@ -1173,7 +1173,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         data-es-zoom-out-label="<?php echo esc_attr( es__( 'lightbox_zoom_out' ) ); ?>"
         data-es-zoom-reset-label="<?php echo esc_attr( es__( 'lightbox_reset' ) ); ?>"
         aria-label="<?php echo esc_attr( sprintf( es__( 'ds_expand_screen' ), 'Historial' ) ); ?>">
-        <img src="<?php echo esc_url( $es_ds_screens . 'mobile-history-preview.webp' ); ?>"
+        <img src="<?php echo esc_url( $es_ds_screens . 'mobile-history.webp' ); ?>"
              alt="Historial — Presupuestador RE"
              width="1176" height="2349" loading="lazy" decoding="async">
         <span class="vp-expand" aria-hidden="true">

@@ -85,7 +85,15 @@ function es_is_generic_shell() {
 	if ( is_search() || is_archive() || is_home() ) {
 		return true;
 	}
-	if ( is_page() && ! es_is_home_template() && ! es_is_estavillo_static_page() ) {
+	/*
+	 * La página del REstimator Design System queda EXPLÍCITAMENTE afuera.
+	 * Sin esta línea caería acá por descarte (es una Página, no es la Home y
+	 * no está en la lista de páginas fijas) y se llevaría site.css +
+	 * pages-home.css + pages.css encima del Design System — justo el CSS del
+	 * portfolio que esa página no usa y que contaminaría el documento.
+	 * Tiene su propia capa de assets, más abajo en este mismo archivo.
+	 */
+	if ( is_page() && ! es_is_home_template() && ! es_is_estavillo_static_page() && ! es_is_ds_restimator_page() ) {
 		return true;
 	}
 	// single.php: entradas del blog y cualquier CPT sin template propio. El
@@ -485,6 +493,46 @@ function es_child_enqueue_assets() {
 	 */
 	if ( $es_has_flow_v2 ) {
 		wp_enqueue_style( 'es-case-flow-v2', ES_CHILD_URI . '/assets/css/case-flow-v2.css', array( 'es-case-flow' ), es_asset_ver( 'assets/css/case-flow-v2.css' ) );
+	}
+
+	/*
+	 * REstimator Design System (templates/page-restimator-ds.php).
+	 *
+	 * Capa aparte y excluyente: esta página NO carga site.css / pages-home.css
+	 * / pages.css (ver la exclusión en es_is_generic_shell() arriba) ni las
+	 * tres familias tipográficas del portfolio — el Design System trae su
+	 * propio layout y sus propias dos familias (Hanken Grotesk + JetBrains
+	 * Mono). Cargar las dos cosas sería peso muerto y ruido visual.
+	 *
+	 * Sí se apoya en la capa global (es-tokens/es-base/es-components), que ya
+	 * está encolada más arriba para todo el sitio: de ahí salen los --es-*
+	 * que usa la barra institucional y los estilos del visor compartido.
+	 *
+	 * doc-overrides.css depende de doc.css, y doc.css de tokens.css, así que
+	 * el orden lo garantiza WordPress y no el orden de estas líneas.
+	 */
+	if ( es_is_ds_restimator_page() ) {
+		wp_enqueue_style(
+			'es-ds-fonts',
+			'https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap',
+			array(),
+			null
+		);
+		wp_enqueue_style( 'es-ds-tokens', ES_CHILD_URI . '/assets/css/ds-restimator/tokens.css', array( 'es-components' ), es_asset_ver( 'assets/css/ds-restimator/tokens.css' ) );
+		wp_enqueue_style( 'es-ds-doc', ES_CHILD_URI . '/assets/css/ds-restimator/doc.css', array( 'es-ds-tokens' ), es_asset_ver( 'assets/css/ds-restimator/doc.css' ) );
+		wp_enqueue_style( 'es-ds-overrides', ES_CHILD_URI . '/assets/css/ds-restimator/doc-overrides.css', array( 'es-ds-doc' ), es_asset_ver( 'assets/css/ds-restimator/doc-overrides.css' ) );
+
+		/*
+		 * Visor de pantallas: es EXACTAMENTE el mismo lightbox que usa Case
+		 * Figure (assets/js|css/case-figure-lightbox.*), sin una línea nueva.
+		 * Se dispara con [data-es-zoom-trigger], que no está acoplado a ningún
+		 * bloque — el documento del DS emite esos atributos en cada preview.
+		 */
+		wp_enqueue_style( 'es-case-figure-lightbox', ES_CHILD_URI . '/assets/css/case-figure-lightbox.css', array( 'es-components' ), es_asset_ver( 'assets/css/case-figure-lightbox.css' ) );
+		wp_enqueue_script( 'es-case-figure-lightbox', ES_CHILD_URI . '/assets/js/case-figure-lightbox.js', array(), es_asset_ver( 'assets/js/case-figure-lightbox.js' ), array( 'in_footer' => true, 'strategy' => 'defer' ) );
+
+		// Scroll-spy del rail. Mejora progresiva: sin él el rail navega igual.
+		wp_enqueue_script( 'es-ds-restimator', ES_CHILD_URI . '/assets/js/ds-restimator.js', array(), es_asset_ver( 'assets/js/ds-restimator.js' ), array( 'in_footer' => true, 'strategy' => 'defer' ) );
 	}
 
 	/*

@@ -41,6 +41,10 @@ const THEME = join(ROOT, 'estavillo-child');
 const CSS_OUT = join(THEME, 'assets/css/ds-restimator');
 const PHP_OUT = join(THEME, 'ds/restimator');
 const SHOT_OUT = join(THEME, 'assets/ds/restimator/screens');
+/* Dimensiones de cada captura. Vive en docs/ (fuera del ZIP): es metadata de
+   build que buildHtml() necesita para emitir width/height reales, no un asset
+   que el sitio sirva. Un solo archivo en vez de un .json por pantalla. */
+const SHOT_META = join(SRC, 'screens-meta.json');
 
 /** Raíz de scope: toda regla del DS cuelga de acá. */
 const SCOPE = '.re-doc';
@@ -118,13 +122,15 @@ function scopeCss(css) {
 	let i = 0;
 
 	while (i < css.length) {
-		// Comentarios: se copian tal cual.
-		if (css.startsWith('/*', i)) {
-			const end = css.indexOf('*/', i + 2);
-			const stop = end === -1 ? css.length : end + 2;
-			out += css.slice(i, stop);
-			i = stop;
-			continue;
+		// Espacios y comentarios ANTES de una regla se copian tal cual y no
+		// entran al prelude. Sin este paso, un comentario en la línea previa
+		// al selector queda dentro del prelude y se scopea junto con él
+		// (producía `.re-doc /* … */ .shots{…}`, que deja la regla sin scope).
+		const ws = css.slice(i).match(/^(?:\s+|\/\*[\s\S]*?\*\/)+/);
+		if (ws) {
+			out += ws[0];
+			i += ws[0].length;
+			if (i >= css.length) break;
 		}
 
 		const brace = css.indexOf('{', i);
@@ -185,7 +191,22 @@ function buildCss() {
 		scopeCss(tokens);
 	writeFileSync(join(CSS_OUT, 'tokens.css'), tokensOut);
 	log(`tokens.css  ${(tokensOut.length / 1024).toFixed(1)} KB  (${order.length} archivos)`);
-	if (fontImport) writeFileSync(join(CSS_OUT, '.fonts-url.txt'), fontImport + '\n');
+
+	// Las fuentes se encolan desde inc/enqueue.php. Si el Design System cambia
+	// de familias, el build lo avisa acá en vez de dejar la página cargando en
+	// silencio unas fuentes y usando otras.
+	if (fontImport) {
+		const enqueue = readFileSync(join(THEME, 'inc/enqueue.php'), 'utf8');
+		const families = [...fontImport.matchAll(/family=([^&:]+)/g)].map((m) => decodeURIComponent(m[1]));
+		const missing = families.filter((f) => !enqueue.includes(f));
+		if (missing.length) {
+			throw new Error(
+				`inc/enqueue.php no encola estas familias del DS: ${missing.join(', ')}\n` +
+				`  URL en la fuente: ${fontImport}`
+			);
+		}
+		log(`fuentes verificadas contra inc/enqueue.php: ${families.join(', ')}`);
+	}
 
 	// --- documentación: ds-master.css scopeado ----------------------------
 	const master = readFileSync(join(SRC, 'docs/ds-master.css'), 'utf8');
@@ -299,9 +320,8 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 
 /** Lee las dimensiones reales de un PNG/WebP generado, para emitir width/height. */
 function readSize(id) {
-	const meta = join(SHOT_OUT, `${id}.json`);
-	if (!existsSync(meta)) return null;
-	return JSON.parse(readFileSync(meta, 'utf8'));
+	if (!existsSync(SHOT_META)) return null;
+	return JSON.parse(readFileSync(SHOT_META, 'utf8'))[id] || null;
 }
 
 /**
@@ -314,7 +334,8 @@ function readSize(id) {
  * <figure> con <button> adentro y no un <div>.
  */
 function shotCard(shot, { mobile = false } = {}) {
-	const full = readSize(shot.id) || { w: 0, h: 0, pw: 0, ph: 0 };
+	const full = readSize(shot.id) || { w: 0, h: 0, pw: 0, ph: 0, samePreview: false };
+	const previewFile = full.samePreview ? `${shot.id}.webp` : `${shot.id}-preview.webp`;
 	const cls = mobile ? 'shot shot--mobile' : 'shot';
 	const meta = mobile ? shot.note : shot.file;
 	return `
@@ -332,7 +353,7 @@ function shotCard(shot, { mobile = false } = {}) {
         data-es-zoom-out-label="<?php echo esc_attr( es__( 'lightbox_zoom_out' ) ); ?>"
         data-es-zoom-reset-label="<?php echo esc_attr( es__( 'lightbox_reset' ) ); ?>"
         aria-label="<?php echo esc_attr( sprintf( es__( 'ds_expand_screen' ), '${esc(shot.name).replace(/'/g, "\\'")}' ) ); ?>">
-        <img src="<?php echo esc_url( $es_ds_screens . '${shot.id}-preview.webp' ); ?>"
+        <img src="<?php echo esc_url( $es_ds_screens . '${previewFile}' ); ?>"
              alt="${esc(shot.name)} — Presupuestador RE"
              width="${full.pw}" height="${full.ph}" loading="lazy" decoding="async">
         <span class="vp-expand" aria-hidden="true">
@@ -537,6 +558,12 @@ async function buildShots() {
 	await ctx.close();
 
 	await browser.close();
+
+	// Dimensiones para que buildHtml() emita width/height reales (sin CLS).
+	const meta = {};
+	for (const r of results) meta[r.id] = { w: r.w, h: r.h, pw: r.pw, ph: r.ph, samePreview: r.samePreview };
+	writeFileSync(SHOT_META, JSON.stringify(meta, null, 2) + '\n');
+
 	const total = results.reduce((n, r) => n + r.bytes, 0);
 	log(`${results.length} pantallas · ${(total / 1024 / 1024).toFixed(2)} MB total`);
 	for (const r of results) log(`  ${r.id.padEnd(20)} ${r.w}x${r.h}  full ${String(r.full).padStart(5)} KB  preview ${String(r.prev).padStart(4)} KB`);
@@ -569,14 +596,17 @@ async function emit(encoder, id, png) {
 		};
 	}, { b64: png.toString('base64'), previewW: PREVIEW_W * 2 });
 
-	for (const [suffix, data] of [['', out.full], ['-preview', out.preview]]) {
+	// Cuando la captura ya es más angosta que el ancho de preview (las
+	// pantallas de mobile), la derivada saldría byte por byte igual que la
+	// original: se omite y la tarjeta referencia la misma imagen.
+	const samePreview = out.pw >= out.w;
+	const files = samePreview ? [['', out.full]] : [['', out.full], ['-preview', out.preview]];
+	for (const [suffix, data] of files) {
 		if (!data.startsWith('data:image/webp')) throw new Error(`${id}${suffix}: Chromium no devolvió WebP`);
 		writeFileSync(join(SHOT_OUT, `${id}${suffix}.webp`), Buffer.from(data.split(',')[1], 'base64'));
 	}
-	// Dimensiones para que buildHtml() emita width/height reales (sin CLS).
-	writeFileSync(join(SHOT_OUT, `${id}.json`), JSON.stringify({ w: out.w, h: out.h, pw: out.pw, ph: out.ph }));
 	return {
-		id, w: out.w, h: out.h, bytes: out.full.length * 0.75,
+		id, w: out.w, h: out.h, pw: out.pw, ph: out.ph, samePreview, bytes: out.full.length * 0.75,
 		full: Math.round(out.full.length * 0.75 / 1024),
 		prev: Math.round(out.preview.length * 0.75 / 1024),
 	};
