@@ -5,10 +5,13 @@
    genera tools/build-ds.mjs y se sobrescriben en cada build.
 
    Acá va sólo lo que la integración necesita y el Design System no trae:
-     1. blindaje contra el CSS global de Kadence dentro de .re-doc;
-     2. la barra institucional del portfolio;
+     1. blindaje contra el CSS global de Kadence y de .es-page dentro de .re-doc;
+     2. la barra mínima de salida (fallback cuando el header está apagado);
      3. el estilo de las previews de pantalla (que dejaron de ser iframes);
-     4. los arreglos de overflow horizontal en mobile.
+     4. los arreglos de overflow horizontal en mobile;
+     5. el offset del rail sticky cuando el header institucional está activo;
+     6. el ensanchado del contenedor en pantallas grandes;
+     7. el bloque "System evolution" que cierra el documento.
 
    NO se rediseña nada del Design System: no se tocan colores, tipografía,
    espaciado, jerarquía ni el rail.
@@ -37,7 +40,7 @@ body.es-ds-page {
 }
 
 /* -------------------------------------------------------------------------
-   1. Blindaje contra Kadence
+   1. Blindaje contra Kadence y contra .es-page
    -------------------------------------------------------------------------
    Esta página imprime wp_head(), así que el CSS global del tema padre se
    carga igual aunque no se use ninguno de sus componentes. Kadence estila
@@ -51,7 +54,48 @@ body.es-ds-page {
    del DS (que siempre tiene al menos una clase) le gana sin necesidad de
    !important. Los !important quedan sólo donde hay que ganarle a una regla
    de Kadence con especificidad propia — mismo criterio ya usado en el
-   lightbox. */
+   lightbox.
+
+   AHORA HAY UN SEGUNDO FRENTE. Desde que el header/footer institucionales son
+   opcionales en esta página, el documento vive dentro de <div class="es-page">
+   — que base.css documenta como ancestro necesario del header sticky, y donde
+   están los resets que el chrome del portfolio necesita. Eso abre una vía de
+   contaminación que antes no existía, y contra la que :where() NO sirve:
+
+     .es-page h1, .es-page h2, .es-page h3 { color: var(--es-ink); }
+
+   tiene especificidad (0,1,1); `.re-doc :where(h2)` tiene (0,1,0), o sea que
+   PIERDE. Los <h2> de sección del DS no declaran color propio (su regla
+   `.re-doc .sec-h h2` sólo fija tamaño y margen), así que habrían pasado de
+   --re-ink (#f2f3f4, blanco frío) a --es-ink (#ebe7df, crema): medido, no
+   supuesto.
+
+   Por eso el bloque de abajo repite esos dos resets con selectores REALES, a
+   especificidad (0,1,1) — exactamente la misma que .es-page. El desempate lo
+   decide el orden de carga, y ese orden está garantizado por las dependencias
+   declaradas en inc/enqueue.php: es-ds-overrides → es-ds-doc → es-ds-tokens →
+   es-components → … → es-base. doc-overrides.css siempre llega último.
+
+   NO se sube más la especificidad a propósito: con (0,2,1) —p. ej.
+   `.re-doc.re-root h1`— este reset empataría con las reglas propias del Design
+   System que sí fijan color, como `.re-doc .hero h1 { color:#fff }`, y al
+   cargar después se las comería. (0,1,1) le gana a .es-page y pierde contra
+   cualquier regla del DS con dos clases, que es justo lo que se busca. */
+
+.re-doc h1,
+.re-doc h2,
+.re-doc h3,
+.re-doc h4,
+.re-doc h5,
+.re-doc h6 {
+	color: inherit;
+}
+
+/* El ::selection propio del sistema sólo declara background; sin esta línea,
+   el color del texto seleccionado lo seguiría poniendo .es-page ::selection. */
+.re-doc ::selection {
+	color: inherit;
+}
 
 .re-doc :where(h1, h2, h3, h4, h5, h6, p, ul, ol, li, dl, dt, dd, figure, figcaption, blockquote) {
 	margin: 0;
@@ -214,9 +258,17 @@ body.es-ds-page {
    3. Previews de pantalla (§08 Screen Examples)
    -------------------------------------------------------------------------
    Las tarjetas dejaron de ser <div> con un <iframe> escalado y pasaron a ser
-   <figure> con un <button> que abre el visor compartido del portfolio. La
-   caja y el borde los sigue poniendo el CSS del DS (.shot / .vp); acá sólo
-   se define lo que el markup nuevo necesita. */
+   <figure> con un <button> que abre el visor compartido del portfolio.
+
+   TODA la tarjeta es el botón, cabecera incluida. Antes la cabecera (nombre ·
+   archivo · "Ampliar") era HERMANA del botón, y como el visor se dispara por
+   delegación —`e.target.closest('[data-es-zoom-trigger]')`— un click sobre la
+   palabra "Ampliar" no encontraba trigger y no abría nada. Con la cabecera
+   adentro hay un único elemento interactivo, nativo, que cubre la tarjeta
+   entera; el teclado no cambia porque sigue siendo el mismo <button>.
+
+   La caja y el borde los sigue poniendo el CSS del Design System (.shot,
+   .shot .cap); acá sólo va lo que el markup nuevo necesita. */
 
 .re-doc .shot .cap .zoom-hint {
 	font-size: 11.5px;
@@ -224,25 +276,37 @@ body.es-ds-page {
 	color: var(--re-amber-ink);
 }
 
+.re-doc button.vp:hover .zoom-hint {
+	color: var(--re-amber-bright);
+}
+
 /* .vp era un contenedor; ahora es el botón que dispara el visor. */
 .re-doc button.vp {
 	display: block;
 	width: 100%;
+	text-align: left;
 	cursor: zoom-in;
-	/* Las capturas son full-page y muy altas: la tarjeta muestra la franja
-	   superior de la pantalla, igual que hacía el iframe recortado, y el
-	   visor muestra la pantalla entera. */
+}
+
+/* El recorte vive acá y no en el botón: la cabecera pasó a estar dentro del
+   botón, así que un max-height en el botón le descontaría alto a la imagen.
+   Las capturas son full-page y muy altas — la tarjeta muestra la franja
+   superior, igual que hacía el iframe recortado, y el visor muestra la
+   pantalla entera. */
+.re-doc .vp-media {
+	position: relative;
+	display: block;
 	max-height: 352px;
 	overflow: hidden;
 }
 
-.re-doc button.vp img {
+.re-doc .vp-media img {
 	display: block;
 	width: 100%;
 	height: auto;
 }
 
-.re-doc .shot--mobile button.vp {
+.re-doc .shot--mobile .vp-media {
 	/* Las pantallas de mobile son verticales y entran completas. */
 	max-height: none;
 }
@@ -391,5 +455,237 @@ body.es-ds-page {
 	.re-doc .rail-brand,
 	.re-doc .rail-grp {
 		grid-column: 1 / -1;
+	}
+}
+
+/* -------------------------------------------------------------------------
+   5. Rail persistente con el header institucional
+   -------------------------------------------------------------------------
+   El rail del Design System es `position:sticky; top:0; height:100vh`. Con el
+   header institucional activo —que es sticky y ocupa la franja superior— el
+   rail arrancaba tapado por él, y su alto de 100vh se pasaba del viewport por
+   exactamente la altura del header: la metadata del pie del rail (.rail-foot,
+   anclada con margin-top:auto) quedaba empujada fuera de la vista.
+
+   El offset se resuelve con los MISMOS valores que ya usa .es-case-index en
+   case-study.css, que tiene este problema resuelto desde antes: 66px de header
+   (.es-nav), 98px con la admin bar de escritorio (66+32) y 112px con la de
+   mobile (66+46). Se mantiene ese criterio en vez de introducir una variable
+   nueva, para que haya un solo número que actualizar si el header cambia.
+
+   Todo va gateado por .es-header-sticky (clase que ya imprime el propio tema
+   vía body_class): con el header estático o apagado, el rail vuelve a 100vh
+   sin ninguna regla extra. */
+
+.es-header-sticky .re-doc .rail {
+	top: 66px;
+	height: calc(100vh - 66px);
+}
+
+.admin-bar.es-header-sticky .re-doc .rail {
+	top: 98px;
+	height: calc(100vh - 98px);
+}
+
+@media (max-width: 782px) {
+	.admin-bar.es-header-sticky .re-doc .rail {
+		top: 112px;
+		height: calc(100vh - 112px);
+	}
+}
+
+/* Los anchors del rail tienen que caer por debajo del header, no atrás. */
+.es-header-sticky .re-doc .sec {
+	scroll-margin-top: 78px;
+}
+
+.admin-bar.es-header-sticky .re-doc .sec {
+	scroll-margin-top: 110px;
+}
+
+/* Bajo 1100px el rail deja de ser sticky (regla del propio Design System) y
+   pasa a ser un bloque arriba del contenido: ahí no compite con el header y
+   no debe llevar ni offset ni alto calculado. */
+@media (max-width: 1100px) {
+	.es-header-sticky .re-doc .rail,
+	.admin-bar.es-header-sticky .re-doc .rail {
+		top: auto;
+		height: auto;
+	}
+}
+
+/* -------------------------------------------------------------------------
+   6. Aprovechamiento de pantallas grandes
+   -------------------------------------------------------------------------
+   Medido antes de tocar nada: `.pad{max-width:1180px}` es un tope fijo y sin
+   margin:auto, así que a 1600px quedaban 156px muertos a la derecha y a 1920px
+   quedaban 476px, con todo el documento pegado a la izquierda.
+
+   La legibilidad del texto NO depende de este contenedor: el propio Design
+   System ya acota la prosa por su cuenta (`p.body{max-width:78ch}`,
+   `.lede{max-width:76ch}`), independientemente de lo ancho que sea el padre.
+   Por eso alcanza con ensanchar el contenedor: los párrafos siguen igual de
+   angostos y son las grillas, las tarjetas, las tablas, las demos de
+   componentes y las Screen Examples —todas fluidas, sin tope propio— las que
+   se llevan el ancho extra.
+
+   La fórmula es fluida y no por saltos, y está construida para no poder
+   empeorar nada:
+
+     max()  — nunca por debajo del ancho de hoy (1180px de caja / 1100px de
+              contenido), así ningún viewport queda más angosto que antes;
+     calc() — reserva el rail (264px) y deja ~100px de margen a la derecha, para
+              que el documento no termine pegado al borde de la pantalla;
+     min()  — tope duro, para que en un monitor muy ancho las tablas y las
+              grillas no se estiren sin límite.
+
+   `.hero .in` lleva la misma fórmula menos los 80px de padding de `.pad`, así
+   el hero y el cuerpo quedan alineados al mismo ancho de contenido.
+
+   Las Screen Examples se quedan en 2 columnas a propósito (decisión del
+   ticket): la idea es que cada pantalla gane tamaño y detalle con el ancho
+   extra, no que entren más por fila. */
+
+@media (min-width: 1500px) {
+	.re-doc .pad {
+		max-width: max(1180px, min(1720px, calc(100vw - 364px)));
+	}
+
+	.re-doc .hero .in {
+		max-width: max(1100px, min(1640px, calc(100vw - 444px)));
+	}
+}
+
+/* -------------------------------------------------------------------------
+   7. System evolution (cierre del documento)
+   -------------------------------------------------------------------------
+   Reemplaza al registro "Needs review" como cierre público. Las 13 notas de
+   auditoría siguen publicadas, pero dentro de un <details>: son material de
+   trabajo interno y como cierre del documento se leían como una lista de
+   defectos del producto.
+
+   Usa los mismos tokens y el mismo lenguaje visual del Design System (fila con
+   hairline, mono para el estado, ámbar racionado): no se inventa un componente
+   nuevo. */
+
+.re-doc .ev-grid {
+	display: grid;
+	gap: 0;
+	border: 1px solid var(--re-line);
+	border-radius: var(--re-r-lg);
+	overflow: hidden;
+	margin-bottom: var(--re-s6);
+}
+
+.re-doc .ev {
+	display: flex;
+	align-items: baseline;
+	gap: var(--re-s4);
+	padding: var(--re-s4) var(--re-s5);
+	background: var(--re-surface);
+}
+
+.re-doc .ev + .ev {
+	border-top: 1px solid var(--re-line);
+}
+
+.re-doc .ev-name {
+	font-size: 14.5px;
+	font-weight: 600;
+	color: var(--re-ink);
+}
+
+.re-doc .ev-state {
+	margin-left: auto;
+	flex: none;
+	font-family: var(--re-font-mono);
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	padding: 3px 9px;
+	border-radius: 999px;
+	border: 1px solid var(--re-line-2);
+	color: var(--re-ink-3);
+	white-space: nowrap;
+}
+
+/* En progreso / En desarrollo: ámbar, que es el único acento del sistema.
+   Planificado se queda en neutro a propósito — todavía no es trabajo en curso. */
+.re-doc .ev-state--progress {
+	color: var(--re-amber-ink);
+	border-color: var(--re-amber-line);
+	background: var(--re-amber-soft);
+}
+
+.re-doc .ev-state--planned {
+	color: var(--re-ink-4);
+}
+
+/* --- disclosure de auditoría --- */
+
+.re-doc .ev-audit {
+	border-top: 1px solid var(--re-line);
+	padding-top: var(--re-s5);
+	margin-top: var(--re-s6);
+}
+
+.re-doc .ev-audit > summary {
+	cursor: pointer;
+	list-style: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-family: var(--re-font-mono);
+	font-size: 11.5px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--re-ink-4);
+	transition: color 160ms ease;
+}
+
+.re-doc .ev-audit > summary::-webkit-details-marker {
+	display: none;
+}
+
+/* Triángulo propio: el nativo no se puede estilar de forma consistente. */
+.re-doc .ev-audit > summary::before {
+	content: "";
+	width: 0;
+	height: 0;
+	border-left: 5px solid currentColor;
+	border-top: 4px solid transparent;
+	border-bottom: 4px solid transparent;
+	transition: transform 160ms ease;
+}
+
+.re-doc .ev-audit[open] > summary::before {
+	transform: rotate(90deg);
+}
+
+.re-doc .ev-audit > summary:hover,
+.re-doc .ev-audit[open] > summary {
+	color: var(--re-ink-2);
+}
+
+.re-doc .ev-audit > summary:focus-visible {
+	outline: 2px solid var(--re-amber);
+	outline-offset: 3px;
+	border-radius: 3px;
+}
+
+.re-doc .ev-audit > .body {
+	margin-top: var(--re-s4);
+}
+
+.re-doc .ev-audit .stack {
+	margin-top: var(--re-s4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.re-doc .ev-audit > summary,
+	.re-doc .ev-audit > summary::before {
+		transition: none;
 	}
 }

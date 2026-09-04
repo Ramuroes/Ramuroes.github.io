@@ -331,5 +331,5 @@
 }
 
 /* Selection uses the brand amber, lightly. */
-.re-doc .re-root ::selection{ background: rgba(224,145,30,.22); }
+.re-doc ::selection{ background: rgba(224,145,30,.22); }
 

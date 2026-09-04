@@ -124,7 +124,15 @@ function es_uses_estavillo_chrome() {
 		|| es_is_case_study_single()
 		|| es_is_estavillo_static_page()
 		|| is_404()
-		|| es_is_generic_shell();
+		|| es_is_generic_shell()
+		/*
+		 * La página del Design System imprime el header/footer REALES del
+		 * portfolio cuando su meta box los tiene activos, así que necesita
+		 * site.css + nav.js + motion.js igual que cualquier otra página con
+		 * chrome. Sigue afuera de es_is_generic_shell() (ver ahí), o sea que
+		 * esto NO le trae pages-home.css ni pages.css: sólo el chrome.
+		 */
+		|| es_ds_needs_chrome_assets();
 }
 
 /**

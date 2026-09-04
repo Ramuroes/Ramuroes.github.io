@@ -1,0 +1,2876 @@
+{
+ "RE": {
+  "en": "RE"
+ },
+ "REstimator<span>Design System · master doc</span>": {
+  "en": "REstimator<span>Design System · master doc</span>"
+ },
+ "Documentación": {
+  "en": "Documentation"
+ },
+ "<span class=\"n\">00</span> Overview": {
+  "en": "<span class=\"n\">00</span> Overview",
+  "es": "<span class=\"n\">00</span> Visión general"
+ },
+ "<span class=\"n\">01</span> Foundations": {
+  "en": "<span class=\"n\">01</span> Foundations",
+  "es": "<span class=\"n\">01</span> Fundamentos"
+ },
+ "<span class=\"n\">02</span> Components": {
+  "en": "<span class=\"n\">02</span> Components",
+  "es": "<span class=\"n\">02</span> Componentes"
+ },
+ "<span class=\"n\">03</span> Navigation &amp; App Shell": {
+  "en": "<span class=\"n\">03</span> Navigation &amp; App Shell",
+  "es": "<span class=\"n\">03</span> Navegación y App Shell"
+ },
+ "<span class=\"n\">04</span> Forms &amp; Data Entry": {
+  "en": "<span class=\"n\">04</span> Forms &amp; Data Entry",
+  "es": "<span class=\"n\">04</span> Formularios y entrada de datos"
+ },
+ "<span class=\"n\">05</span> Data Display": {
+  "en": "<span class=\"n\">05</span> Data Display",
+  "es": "<span class=\"n\">05</span> Visualización de datos"
+ },
+ "<span class=\"n\">06</span> Product Patterns": {
+  "en": "<span class=\"n\">06</span> Product Patterns",
+  "es": "<span class=\"n\">06</span> Patrones de producto"
+ },
+ "<span class=\"n\">07</span> Responsive System": {
+  "en": "<span class=\"n\">07</span> Responsive System",
+  "es": "<span class=\"n\">07</span> Sistema responsive"
+ },
+ "<span class=\"n\">08</span> Screen Examples": {
+  "en": "<span class=\"n\">08</span> Screen Examples",
+  "es": "<span class=\"n\">08</span> Ejemplos de pantalla"
+ },
+ "<span class=\"n\">09</span> Component Inventory": {
+  "en": "<span class=\"n\">09</span> Component Inventory",
+  "es": "<span class=\"n\">09</span> Inventario de componentes"
+ },
+ "<span class=\"n\">10</span> Design → Implementation": {
+  "en": "<span class=\"n\">10</span> Design → Implementation",
+  "es": "<span class=\"n\">10</span> Diseño → Implementación"
+ },
+ "Auditoría": {
+  "en": "Status",
+  "es": "Estado"
+ },
+ "<span class=\"n\">NR</span> Needs review": {
+  "en": "<span class=\"n\">SE</span> System evolution",
+  "es": "<span class=\"n\">EV</span> Evolución del sistema"
+ },
+ "Design System · Documentación maestra": {
+  "en": "Design System · Master documentation"
+ },
+ "REstimator Design System": {
+  "en": "REstimator Design System"
+ },
+ "El sistema de diseño de <b style=\"color:#fff\">Presupuestador RE</b> — una herramienta B2B de presupuestación para talleres de herrería y metalurgia. Dark industrial, denso, desktop‑first y con un único acento ámbar racionado. Este documento consolida foundations, componentes, patrones de producto y el sistema responsive en una sola referencia navegable para diseño, desarrollo y archivo.": {
+  "en": "The design system behind <b style=\"color:#fff\">Presupuestador RE</b> — a B2B quoting tool for metalwork and ironwork shops. Dark, industrial, dense, desktop-first, with a single rationed amber accent. This document consolidates foundations, components, product patterns and the responsive system into one navigable reference for design, development and archive."
+ },
+ "Tokens": {
+  "en": "Tokens"
+ },
+ "color · tipo · espacio · elevación": {
+  "en": "colour · type · space · elevation"
+ },
+ "Componentes": {
+  "en": "Components"
+ },
+ "exports en el namespace": {
+  "en": "exports in the namespace"
+ },
+ "Pantallas": {
+  "en": "Screens"
+ },
+ "desktop kit + mobile v1": {
+  "en": "desktop kit + mobile v1"
+ },
+ "Overview": {
+  "en": "Overview",
+  "es": "Visión general"
+ },
+ "Presupuestador RE ayuda a presupuestadores y dueños de taller a producir cotizaciones más rápidas y consistentes con criterios estandarizados: familias → subcategorías → dimensiones, rangos de precio calibrados, jornales y referencias de material. Es software operativo, no un sitio de marketing.": {
+  "en": "Presupuestador RE helps estimators and shop owners produce faster, more consistent quotes from standardised criteria: families → subcategories → dimensions, calibrated price ranges, labour days and material references. It is operational software, not a marketing site."
+ },
+ "<span class=\"tick\"></span>Propósito del sistema": {
+  "en": "<span class=\"tick\"></span>What the system is for"
+ },
+ "Codificar ese producto como foundations, componentes y recreaciones de pantalla reutilizables, para que cualquier superficie nueva se construya on‑brand en minutos. El prototipo mid‑fi <b>V1 congelado</b> es la referencia canónica: la arquitectura de información, los flujos y la estructura de pantallas están congelados — el sistema eleva <b>únicamente la calidad visual</b>, no rediseña flujos ni cambia la IA.": {
+  "en": "To codify that product as reusable foundations, components and screen recreations, so any new surface is built on-brand in minutes. The mid-fi prototype <b>V1, frozen</b> is the canonical reference: the information architecture, the flows and the screen structure are frozen — the system raises <b>visual quality only</b>, it does not redesign flows or change the IA."
+ },
+ "<span class=\"tick\"></span>Principios": {
+  "en": "<span class=\"tick\"></span>Principles"
+ },
+ "Velocidad": {
+  "en": "Speed"
+ },
+ "Densidad operativa. El estimador carga medidas y lee el recomendado en bucle; nada se interpone.": {
+  "en": "Operational density. The estimator enters measurements and reads the recommended value in a loop; nothing gets in the way."
+ },
+ "Claridad": {
+  "en": "Clarity"
+ },
+ "Estructura dibujada con hairlines de 1px, no con fills pesados. Jerarquía tipográfica antes que color.": {
+  "en": "Structure drawn with 1px hairlines, not heavy fills. Typographic hierarchy before colour."
+ },
+ "Confianza": {
+  "en": "Trust"
+ },
+ "Cada número explica de dónde sale. Los avisos son warn‑only y nunca bloquean el cálculo.": {
+  "en": "Every number explains where it comes from. Warnings are warn-only and never block the calculation."
+ },
+ "Eficiencia": {
+  "en": "Efficiency"
+ },
+ "Sin gradientes, glass, blur decorativo ni coreografía de entrada. Motion mínimo y funcional.": {
+  "en": "No gradients, glass, decorative blur or entrance choreography. Motion is minimal and functional."
+ },
+ "<span class=\"tick\"></span>Arquitectura general": {
+  "en": "<span class=\"tick\"></span>Overall architecture"
+ },
+ "Capa": {
+  "en": "Layer"
+ },
+ "Ubicación": {
+  "en": "Location"
+ },
+ "Qué contiene": {
+  "en": "What it holds"
+ },
+ "Entrada global": {
+  "en": "Global entry point"
+ },
+ "Manifiesto de <span class=\"mono\">@import</span> únicamente. Los consumidores enlazan este archivo.": {
+  "en": "An <span class=\"mono\">@import</span> manifest only. Consumers link this file."
+ },
+ "React, 6 categorías. Namespace <span class=\"mono\">window.PresupuestadorREDesignSystem_84f335</span>": {
+  "en": "React, 6 categories. Namespace <span class=\"mono\">window.PresupuestadorREDesignSystem_84f335</span>"
+ },
+ "Foundation cards": {
+  "en": "Foundation cards"
+ },
+ "16 especímenes de color, tipo, espacio, marca y validación de tema.": {
+  "en": "16 specimens of colour, type, space, brand and theme validation."
+ },
+ "UI kit": {
+  "en": "UI kit"
+ },
+ "5 pantallas hi‑fi interactivas del producto congelado, dark. Token‑driven vía <span class=\"mono\">kit.css</span> + <span class=\"mono\">shell.js</span>": {
+  "en": "5 interactive hi-fi screens of the frozen product, dark. Token-driven via <span class=\"mono\">kit.css</span> + <span class=\"mono\">shell.js</span>"
+ },
+ "Spec mobile": {
+  "en": "Mobile spec"
+ },
+ "3 pantallas mobile finales con medidas, spacing, sticky y componentes.": {
+  "en": "3 final mobile screens with measurements, spacing, sticky behaviour and components."
+ },
+ "Agent skill": {
+  "en": "Agent skill"
+ },
+ "Hace la carpeta usable como Agent Skill en Claude Code.": {
+  "en": "Makes the folder usable as an Agent Skill in Claude Code."
+ },
+ "<span class=\"tick\"></span>Estado y versionado": {
+  "en": "<span class=\"tick\"></span>Status and versioning"
+ },
+ "Congelado": {
+  "en": "Frozen"
+ },
+ "IA, flujos y estructura de pantallas (V1).": {
+  "en": "IA, flows and screen structure (V1)."
+ },
+ "Pairing tipográfico (2026‑06‑16) — no re‑explorar.": {
+  "en": "Type pairing (2026‑06‑16) — not to be re-explored."
+ },
+ "Las 5 reglas de producto (abajo).": {
+  "en": "The 5 product rules (below)."
+ },
+ "Estable y en uso": {
+  "en": "Stable and in use"
+ },
+ "33 componentes exportados.": {
+  "en": "33 exported components."
+ },
+ "5 pantallas desktop del kit.": {
+  "en": "5 desktop screens from the kit."
+ },
+ "Especificado, sin construir": {
+  "en": "Specified, not built"
+ },
+ "6 componentes mobile (Mobile v1).": {
+  "en": "6 mobile components (Mobile v1)."
+ },
+ "Capa tablet (documentada, sin artefacto).": {
+  "en": "Tablet layer (documented, no artifact)."
+ },
+ "<span class=\"mono\">templates/</span> — 0 templates.": {
+  "en": "<span class=\"mono\">templates/</span> — 0 templates."
+ },
+ "<span class=\"tick\"></span>Reglas de producto no negociables": {
+  "en": "<span class=\"tick\"></span>Non-negotiable product rules"
+ },
+ "Provienen de S12 y se respetan en toda superficie nueva. No son decisiones de diseño: son reglas del dominio.": {
+  "en": "They come from S12 and are respected on every new surface. They are not design decisions: they are domain rules."
+ },
+ "<b>Freeze</b>Cada presupuesto congela la versión de parámetros con la que fue calculado; los publicados son inmutables.": {
+  "en": "<b>Freeze</b>Every quote freezes the parameter version it was calculated with; published ones are immutable."
+ },
+ "<b>QA‑gate</b>Un cambio de parámetro o producto llega a producción sólo a través de un QA Run.": {
+  "en": "<b>QA gate</b>A parameter or product change only reaches production through a QA Run."
+ },
+ "<b>Moneda</b>El producto opera en UYU; el tipo de cambio sólo convierte costos internos.": {
+  "en": "<b>Currency</b>The product operates in UYU; the exchange rate only converts internal costs."
+ },
+ "<b>Editor</b>S5A (<span class=\"mono\">ProductEditor</span>) es el único editor de producto.": {
+  "en": "<b>Editor</b>S5A (<span class=\"mono\">ProductEditor</span>) is the only product editor."
+ },
+ "<b>Privacidad</b>El resumen al cliente nunca serializa márgenes, jornales ni calibración.": {
+  "en": "<b>Privacy</b>The client summary never serialises margins, labour days or calibration."
+ },
+ "Foundations": {
+  "en": "Foundations",
+  "es": "Fundamentos"
+ },
+ "147 tokens": {
+  "en": "147 tokens"
+ },
+ "Todos los valores de esta sección son los tokens reales del sistema, leídos de <span class=\"mono\">tokens/</span>. Los componentes leen siempre <span class=\"mono\">var(--re-*)</span>, por eso el tema light es un remap de color puro.": {
+  "en": "Every value in this section is a real system token, read from <span class=\"mono\">tokens/</span>. Components always read <span class=\"mono\">var(--re-*)</span>, so nothing hardcodes a value."
+ },
+ "<span class=\"tick\"></span>Color · rampa grafito (base dark)": {
+  "en": "<span class=\"tick\"></span>Colour · graphite ramp (dark base)"
+ },
+ "Fondo de app — casi negro": {
+  "en": "App background — near black"
+ },
+ "Cards, paneles": {
+  "en": "Cards, panels"
+ },
+ "Inset / hover, inputs": {
+  "en": "Inset / hover, inputs"
+ },
+ "Inset profundo, tracks": {
+  "en": "Deep inset, tracks"
+ },
+ "Texto primario": {
+  "en": "Primary text"
+ },
+ "#c2c6cc": {
+  "en": "#c2c6cc"
+ },
+ "Texto secundario": {
+  "en": "Secondary text"
+ },
+ "Terciario / hints": {
+  "en": "Tertiary / hints"
+ },
+ "Labels tenues, placeholders — elevado para AA": {
+  "en": "Faint labels, placeholders — raised for AA"
+ },
+ "Hairlines, bordes de card": {
+  "en": "Hairlines, card borders"
+ },
+ "Bordes de input": {
+  "en": "Input borders"
+ },
+ "Bordes enfatizados, dashed": {
+  "en": "Emphasised borders, dashed"
+ },
+ "Charcoal — paneles más profundos": {
+  "en": "Charcoal — deeper panels"
+ },
+ "Bloque de recomendado, total del documento": {
+  "en": "Recommended block, document total"
+ },
+ "Sub‑bloque sobre charcoal": {
+  "en": "Sub-block on charcoal"
+ },
+ "Hairline sobre charcoal": {
+  "en": "Hairline on charcoal"
+ },
+ "Ámbar — el único color de marca": {
+  "en": "Amber — the only brand colour"
+ },
+ "CTA primario, rail activo": {
+  "en": "Primary CTA, active rail"
+ },
+ "Hover / press (aclara en dark)": {
+  "en": "Hover / press (lightens on dark)"
+ },
+ "Valor recomendado, cifras headline": {
+  "en": "Recommended value, headline figures"
+ },
+ "rgba(224,145,30,.13)": {
+  "en": "rgba(224,145,30,.13)"
+ },
+ "Fondo tintado": {
+  "en": "Tinted background"
+ },
+ "rgba(224,145,30,.34)": {
+  "en": "rgba(224,145,30,.34)"
+ },
+ "Borde tintado": {
+  "en": "Tinted border"
+ },
+ "Texto ámbar sobre tinte": {
+  "en": "Amber text on tint"
+ },
+ "<b>Regla de racionamiento del ámbar.</b> El ámbar aparece en exactamente cuatro clases de momento: el <b>precio recomendado</b> (cifra ámbar sobre el charcoal más profundo), el <b>rail de navegación activo</b>, el <b>CTA primario / de envío</b> y el <b>logo</b>. Todo lo demás se resuelve con grafito y hairlines. Ver <a href=\"#needs-review\">NR‑08</a> por la extensión de esta regla a mobile.": {
+  "en": "<b>Amber rationing rule.</b> Amber appears in exactly four kinds of moment: the <b>recommended price</b> (amber figure on the deepest charcoal), the <b>active navigation rail</b>, the <b>primary / submit CTA</b> and the <b>logo</b>. Everything else is resolved with graphite and hairlines. See <a href=\"#needs-review\">NR‑08</a> for how this rule extends to mobile."
+ },
+ "Semánticos (ajustados para dark)": {
+  "en": "Semantic (tuned for dark)"
+ },
+ "+ <span class=\"mono\">ok-bright #6fd08a</span>, soft, line": {
+  "en": "+ <span class=\"mono\">ok-bright #6fd08a</span>, soft, line"
+ },
+ "+ <span class=\"mono\">warn-ink #e6c188</span>, soft, line": {
+  "en": "+ <span class=\"mono\">warn-ink #e6c188</span>, soft, line"
+ },
+ "+ soft, line": {
+  "en": "+ soft, line"
+ },
+ "#5b9be0": {
+  "en": "#5b9be0"
+ },
+ "Ciclo de vida del presupuesto (Historial)": {
+  "en": "Quote lifecycle (History)"
+ },
+ "<span class=\"st\"><span class=\"d d-draft\"></span> Borrador</span> <span class=\"st\"><span class=\"d d-sent\"></span> Enviado</span> <span class=\"st\"><span class=\"d d-appr\"></span> Aprobado</span> <span class=\"st\"><span class=\"d d-rej\"></span> Rechazado</span> <span class=\"st\"><span class=\"d d-cancel\"></span> Cancelado</span> <span style=\"font-size:12px;color:var(--re-ink-4)\">punto de color sobre pill neutra · <span class=\"mono\">--re-st-draft/sent/appr/rej/cancel</span></span>": {
+  "en": "<span class=\"st\"><span class=\"d d-draft\"></span> Draft</span> <span class=\"st\"><span class=\"d d-sent\"></span> Sent</span> <span class=\"st\"><span class=\"d d-appr\"></span> Approved</span> <span class=\"st\"><span class=\"d d-rej\"></span> Rejected</span> <span class=\"st\"><span class=\"d d-cancel\"></span> Cancelled</span>"
+ },
+ "Aliases semánticos — preferilos en componentes y pantallas": {
+  "en": "Semantic aliases — prefer these in components and screens"
+ },
+ "Alias": {
+  "en": "Alias"
+ },
+ "Resuelve a": {
+  "en": "Resolves to"
+ },
+ "<span class=\"tick\"></span>Tipografía · CONGELADA": {
+  "en": "<span class=\"tick\"></span>Typography · FROZEN"
+ },
+ "El pairing es final y no se re‑explora. Se evaluó una alternativa con Plus Jakarta Sans contra las pantallas reales (<span class=\"mono\">Typography Comparison.html</span>) y fue rechazada: Hanken ganó en densidad, legibilidad a tamaño chico y tono industrial.": {
+  "en": "The pairing is final and is not re-explored. An alternative with Plus Jakarta Sans was evaluated against the real screens (<span class=\"mono\">Typography Comparison.html</span>) and rejected: Hanken won on density, legibility at small sizes and industrial tone."
+ },
+ "Primary UI — Hanken Grotesk": {
+  "en": "Primary UI — Hanken Grotesk"
+ },
+ "Presupuesto recomendado": {
+  "en": "Recommended quote"
+ },
+ "400 · 500 · 600 · 700 — grotesca humanista, industrial‑neutra, no “startup redondeada”. Se usa para todo: headings, body, controles, tablas.": {
+  "en": "400 · 500 · 600 · 700 — humanist grotesque, industrial-neutral, not “rounded startup”. Used for everything: headings, body, controls, tables."
+ },
+ "Technical — JetBrains Mono": {
+  "en": "Technical — JetBrains Mono"
+ },
+ "400 · 500 · 600 — códigos, IDs, fechas y cifras tabulares. Códigos de producto <span class=\"mono\">ESC-RECT</span>.": {
+  "en": "400 · 500 · 600 — codes, IDs, dates and tabular figures. Product codes <span class=\"mono\">ESC-RECT</span>."
+ },
+ "Escala real": {
+  "en": "Actual scale"
+ },
+ "Token": {
+  "en": "Token"
+ },
+ "Valor": {
+  "en": "Value"
+ },
+ "Uso": {
+  "en": "Use"
+ },
+ "Muestra": {
+  "en": "Sample"
+ },
+ "La cifra hero de “recomendado”": {
+  "en": "The hero “recommended” figure"
+ },
+ "H1 de página": {
+  "en": "Page H1"
+ },
+ "<span style=\"font-size:23px;font-weight:600;letter-spacing:-.02em\">Calculadora</span>": {
+  "en": "<span style=\"font-size:23px;font-weight:600;letter-spacing:-.02em\">Calculator</span>"
+ },
+ "H1 compacto": {
+  "en": "Compact H1"
+ },
+ "<span style=\"font-size:21px;font-weight:600;letter-spacing:-.02em\">Historial</span>": {
+  "en": "<span style=\"font-size:21px;font-weight:600;letter-spacing:-.02em\">History</span>"
+ },
+ "H2 de sección": {
+  "en": "Section H2"
+ },
+ "<span style=\"font-size:17px;font-weight:600\">Dimensiones</span>": {
+  "en": "<span style=\"font-size:17px;font-weight:600\">Dimensions</span>"
+ },
+ "Títulos de card": {
+  "en": "Card titles"
+ },
+ "<span style=\"font-size:14.5px;font-weight:600\">Encabezado del presupuesto</span>": {
+  "en": "<span style=\"font-size:14.5px;font-weight:600\">Quote header</span>"
+ },
+ "Body / controles": {
+  "en": "Body / controls"
+ },
+ "<span style=\"font-size:14px\">Ancho de paso</span>": {
+  "en": "<span style=\"font-size:14px\">Tread width</span>"
+ },
+ "Body secundario, celdas": {
+  "en": "Secondary body, cells"
+ },
+ "<span style=\"font-size:13px;color:var(--re-ink-2)\">Pedro Núñez · Barandas</span>": {
+  "en": "<span style=\"font-size:13px;color:var(--re-ink-2)\">Pedro Núñez · Railings</span>"
+ },
+ "Hints, captions": {
+  "en": "Hints, captions"
+ },
+ "<span style=\"font-size:12px;color:var(--re-ink-3)\">decimales con coma</span>": {
+  "en": "<span style=\"font-size:12px;color:var(--re-ink-3)\">decimals with a comma</span>"
+ },
+ "Eyebrows, labels uppercase": {
+  "en": "Eyebrows, uppercase labels"
+ },
+ "<span class=\"re-eyebrow\">FABRICACIÓN ESTIMADA</span>": {
+  "en": "<span class=\"re-eyebrow\">ESTIMATED FABRICATION</span>"
+ },
+ "Pesos · line-heights · tracking · helpers": {
+  "en": "Weights · line-heights · tracking · helpers"
+ },
+ "Regular": {
+  "en": "Regular"
+ },
+ "Medium": {
+  "en": "Medium"
+ },
+ "Semibold": {
+  "en": "Semibold"
+ },
+ "Bold": {
+  "en": "Bold"
+ },
+ "tight": {
+  "en": "tight"
+ },
+ "snug": {
+  "en": "snug"
+ },
+ "normal": {
+  "en": "normal"
+ },
+ "relaxed": {
+  "en": "relaxed"
+ },
+ "ls-body": {
+  "en": "ls-body"
+ },
+ "-0.005em": {
+  "en": "-0.005em"
+ },
+ "ls-heading": {
+  "en": "ls-heading"
+ },
+ "-0.02em": {
+  "en": "-0.02em"
+ },
+ "ls-tight": {
+  "en": "ls-tight"
+ },
+ "-0.01em": {
+  "en": "-0.01em"
+ },
+ "ls-eyebrow": {
+  "en": "ls-eyebrow"
+ },
+ "0.06em": {
+  "en": "0.06em"
+ },
+ "ls-caps": {
+  "en": "ls-caps"
+ },
+ "0.05em": {
+  "en": "0.05em"
+ },
+ "Clase": {
+  "en": "Class"
+ },
+ "Qué hace": {
+  "en": "What it does"
+ },
+ "Tipo base del documento: family, 14px, lh 1.45, tracking, color, antialiasing, <span class=\"mono\">font-feature-settings:\"tnum\" 1,\"ss01\" 1</span>. Opt‑in en <span class=\"mono\">&lt;body&gt;</span> o wrapper.": {
+  "en": "Base document type: family, 14px, lh 1.45, tracking, colour, antialiasing, <span class=\"mono\">font-feature-settings:\"tnum\" 1,\"ss01\" 1</span>. Opt-in on <span class=\"mono\">&lt;body&gt;</span> or a wrapper."
+ },
+ "Cifras tabulares — dinero, medidas, códigos, fechas.": {
+  "en": "Tabular figures — money, measurements, codes, dates."
+ },
+ "Cambia a JetBrains Mono.": {
+  "en": "Switches to JetBrains Mono."
+ },
+ "Eyebrow / kicker: 11px, 600, +0.06em, uppercase, color faint.": {
+  "en": "Eyebrow / kicker: 11px, 600, +0.06em, uppercase, faint colour."
+ },
+ "Números y unidades — formato uruguayo, siempre tabular": {
+  "en": "Numbers and units — Uruguayan format, always tabular"
+ },
+ "Tipo": {
+  "en": "Type"
+ },
+ "Formato": {
+  "en": "Format"
+ },
+ "Ejemplo": {
+  "en": "Example"
+ },
+ "Dinero": {
+  "en": "Money"
+ },
+ "punto de miles, sin decimales": {
+  "en": "dot as thousands separator, no decimals"
+ },
+ "Medidas": {
+  "en": "Measurements"
+ },
+ "coma decimal + unidad": {
+  "en": "decimal comma + unit"
+ },
+ "Jornales": {
+  "en": "Labour days"
+ },
+ "coma decimal, un decimal": {
+  "en": "decimal comma, one decimal place"
+ },
+ "Porcentajes": {
+  "en": "Percentages"
+ },
+ "signo + valor": {
+  "en": "sign + value"
+ },
+ "Códigos": {
+  "en": "Codes"
+ },
+ "mono, mayúsculas": {
+  "en": "mono, uppercase"
+ },
+ "<span class=\"tick\"></span>Spacing · grilla de 4px": {
+  "en": "<span class=\"tick\"></span>Spacing · 4px grid"
+ },
+ "<span class=\"tick\"></span>Sizing · constantes de layout (del shell V1 congelado)": {
+  "en": "<span class=\"tick\"></span>Sizing · layout constants (from the frozen V1 shell)"
+ },
+ "Sidebar": {
+  "en": "Sidebar"
+ },
+ "248px": {
+  "en": "248px"
+ },
+ "Topbar": {
+  "en": "Topbar"
+ },
+ "60px": {
+  "en": "60px"
+ },
+ "Ancho de documento": {
+  "en": "Document width"
+ },
+ "1080px": {
+  "en": "1080px"
+ },
+ "<span class=\"mono\">--re-content-max</span> — documento / lectura": {
+  "en": "<span class=\"mono\">--re-content-max</span> — document / reading"
+ },
+ "Control estándar": {
+  "en": "Standard control"
+ },
+ "40px": {
+  "en": "40px"
+ },
+ "Control compacto": {
+  "en": "Compact control"
+ },
+ "32px": {
+  "en": "32px"
+ },
+ "<span class=\"mono\">--re-control-h · --re-control-h-sm</span> · ver <a href=\"#needs-review\">NR‑04</a>": {
+  "en": "<span class=\"mono\">--re-control-h · --re-control-h-sm</span> · see <a href=\"#needs-review\">NR‑04</a>"
+ },
+ "<span class=\"tick\"></span>Radius": {
+  "en": "<span class=\"tick\"></span>Radius"
+ },
+ "Consistente y modesto — nada completamente redondeado excepto avatares y puntos.": {
+  "en": "Consistent and modest — nothing fully rounded except avatars and dots."
+ },
+ "<span class=\"tick\"></span>Borders": {
+  "en": "<span class=\"tick\"></span>Borders"
+ },
+ "La estructura se dibuja con líneas de 1px, no con fills pesados. Hairlines en todas partes: <span class=\"mono\">--re-line</span> para divisores y bordes de card, <span class=\"mono\">--re-line-2</span> en inputs, <span class=\"mono\">--re-line-strong</span> para énfasis y dashed.": {
+  "en": "Structure is drawn with 1px lines, not heavy fills. Hairlines everywhere: <span class=\"mono\">--re-line</span> for dividers and card borders, <span class=\"mono\">--re-line-2</span> on inputs, <span class=\"mono\">--re-line-strong</span> for emphasis and dashed rules."
+ },
+ "<span class=\"tick\"></span>Elevation": {
+  "en": "<span class=\"tick\"></span>Elevation"
+ },
+ "En dark la profundidad es <b>una superficie más clara + un borde de 1px</b>; las sombras son profundas y calladas por debajo. Sin glow, sin sombra de color.": {
+  "en": "In dark, depth is <b>a lighter surface plus a 1px border</b>; shadows sit deep and quiet underneath. No glow, no coloured shadow."
+ },
+ "Lift hairline — cards por defecto, tiles": {
+  "en": "Hairline lift — cards by default, tiles"
+ },
+ "Card en reposo": {
+  "en": "Card at rest"
+ },
+ "Panel flotante — result sticky, preview, menús": {
+  "en": "Floating panel — sticky result, preview, menus"
+ },
+ "El “papel” del documento al cliente": {
+  "en": "The “paper” of the client-facing document"
+ },
+ "Save bar fija — la sombra apunta hacia arriba": {
+  "en": "Fixed save bar — the shadow points upwards"
+ },
+ "Focus — 3px ámbar sobre dark": {
+  "en": "Focus — 3px amber on dark"
+ },
+ "<span class=\"tick\"></span>Iconography": {
+  "en": "<span class=\"tick\"></span>Iconography"
+ },
+ "Reglas": {
+  "en": "Rules"
+ },
+ "SVG de línea inline únicamente. viewBox <span class=\"mono\">24×24</span>, <span class=\"mono\">stroke=\"currentColor\"</span>, <span class=\"mono\">stroke-width</span> ~1.7–1.8 (1.7 nav/UI, 2 chevrons/flechas), caps y joins redondos.": {
+  "en": "Inline line SVG only. viewBox <span class=\"mono\">24×24</span>, <span class=\"mono\">stroke=\"currentColor\"</span>, <span class=\"mono\">stroke-width</span> ~1.7–1.8 (1.7 for nav/UI, 2 for chevrons/arrows), round caps and joins."
+ },
+ "Heredan el color del texto y se sitúan a <b>15–18px</b>.": {
+  "en": "They inherit text colour and sit at <b>15–18px</b>."
+ },
+ "Sin icon font, sin sprite, sin PNG, sin emoji, sin pictogramas unicode. Un “✓” en toasts transitorios es la única excepción.": {
+  "en": "No icon font, no sprite, no PNG, no emoji, no unicode pictograms. A “✓” in transient toasts is the only exception."
+ },
+ "Para superficies nuevas, copiá las formas del kit antes de recurrir a una librería. No hay set de CDN incluido: el set es chico y mantenido a mano.": {
+  "en": "For new surfaces, copy the shapes from the kit before reaching for a library. There is no bundled CDN set: the set is small and hand-maintained."
+ },
+ "Glifos recurrentes": {
+  "en": "Recurring glyphs"
+ },
+ "calculadora · reloj · cubo · sliders · shield‑check · warning · estrella (recomendado) · lápiz · duplicar · documento · burbuja · lupa": {
+  "en": "calculator · clock · cube · sliders · shield-check · warning · star (recommended) · pencil · duplicate · document · bubble · magnifier"
+ },
+ "Familia de taxonomía de producto — <span class=\"mono\" style=\"text-transform:none;letter-spacing:0\">TaxonomyIcon</span>": {
+  "en": "Product taxonomy family — <span class=\"mono\" style=\"text-transform:none;letter-spacing:0\">TaxonomyIcon</span>"
+ },
+ "10 glifos de categoría de fabricación dibujados en el mismo lenguaje (24×24, stroke 1.7, sin fills, sin librería externa): <span class=\"mono\">escaleras · barandas · rejas · cerramientos · puertas · portones · mobiliario · estructuras · techos · parrilleros</span>. Se usan en rails de rubro, dropdowns, cards de catálogo y chips para que el producto lea como herramienta especializada de metalurgia y no como app de negocio genérica. API: <span class=\"mono\">&lt;TaxonomyIcon name=\"rejas\" size={18} strokeWidth={1.7}/&gt;</span>; iterá <span class=\"mono\">TAXONOMY_ICONS</span> para menús; color vía <span class=\"mono\">currentColor</span> (ámbar en activo).": {
+  "en": "10 fabrication-category glyphs drawn in the same language (24×24, stroke 1.7, no fills, no external library): <span class=\"mono\">stairs · railings · grilles · enclosures · doors · gates · furniture · structures · roofs · grills</span>. They are used in category rails, dropdowns, catalogue cards and chips, so the product reads as a specialised metalwork tool and not as a generic business app. API: <span class=\"mono\">&lt;TaxonomyIcon name=\"rejas\" size={18} strokeWidth={1.7}/&gt;</span>; iterate <span class=\"mono\">TAXONOMY_ICONS</span> for menus; colour via <span class=\"mono\">currentColor</span> (amber when active)."
+ },
+ "<span class=\"tick\"></span>Motion": {
+  "en": "<span class=\"tick\"></span>Motion"
+ },
+ "Mínimo y funcional. <span class=\"mono\">.12–.15s ease</span> en hover / border / background; los toggles deslizan su knob; el único movimiento ambiente es el pulso lento del punto “En vivo” en paneles live. Sin bounces, sin parallax, sin coreografía de entrada, sin efectos de escala.": {
+  "en": "Minimal and functional. <span class=\"mono\">.12–.15s ease</span> on hover / border / background; toggles slide their knob; the only ambient movement is the slow pulse of the “Live” dot in live panels. No bounces, no parallax, no entrance choreography, no scale effects."
+ },
+ "<span class=\"tick\"></span>Breakpoints": {
+  "en": "<span class=\"tick\"></span>Breakpoints"
+ },
+ "Ancho de referencia": {
+  "en": "Reference width"
+ },
+ "Rol": {
+  "en": "Role"
+ },
+ "Desktop": {
+  "en": "Desktop"
+ },
+ "Capa primaria. Sidebar fijo + panel de resultado lateral.": {
+  "en": "Primary layer. Fixed sidebar + side result panel."
+ },
+ "Tablet": {
+  "en": "Tablet"
+ },
+ "Capa intermedia con identidad propia: tabs superiores + bottom sheet.": {
+  "en": "Intermediate layer with an identity of its own: top tabs + bottom sheet."
+ },
+ "Mobile": {
+  "en": "Mobile"
+ },
+ "Diseñada, no adaptada. Bottom tab bar + resumen pinneado.": {
+  "en": "Designed, not adapted. Bottom tab bar + pinned summary."
+ },
+ "NR‑05": {
+  "en": "NR‑05"
+ },
+ "Los breakpoints <b>no están tokenizados</b>: viven en prosa y en las specs, no en <span class=\"mono\">tokens/</span>. Cualquier implementación los está hardcodeando.": {
+  "en": "Breakpoints are <b>not tokenised</b>: they live in prose and in the specs, not in <span class=\"mono\">tokens/</span>. Any implementation is hardcoding them."
+ },
+ "<span class=\"tick\"></span>Accessibility foundations": {
+  "en": "<span class=\"tick\"></span>Accessibility foundations"
+ },
+ "Decisión": {
+  "en": "Decision"
+ },
+ "Por qué": {
+  "en": "Why"
+ },
+ "Contraste de labels tenues": {
+  "en": "Contrast of faint labels"
+ },
+ "Elevado desde <span class=\"mono\">#686d76</span> (≈3.4:1) para superar WCAG AA 4.5:1 sobre superficies.": {
+  "en": "Raised from <span class=\"mono\">#686d76</span> (≈3.4:1) to clear WCAG AA 4.5:1 on surfaces."
+ },
+ "Focus visible": {
+  "en": "Visible focus"
+ },
+ "Anillo de 3px + borde ámbar en todo control enfocable. Nunca se remueve el outline sin reemplazo.": {
+  "en": "A 3px ring + amber border on every focusable control. The outline is never removed without a replacement."
+ },
+ "Touch targets": {
+  "en": "Touch targets"
+ },
+ "Mínimo táctil en mobile/tablet; los controles de 42px visuales llevan área extendida.": {
+  "en": "Minimum touch size on mobile/tablet; 42px visual controls carry an extended hit area."
+ },
+ "Iconos sin texto": {
+  "en": "Icons without text"
+ },
+ "<span class=\"mono\">IconButton</span> exige <span class=\"mono\">title</span>, usado como tooltip y <span class=\"mono\">aria-label</span>.": {
+  "en": "<span class=\"mono\">IconButton</span> requires <span class=\"mono\">title</span>, used both as tooltip and <span class=\"mono\">aria-label</span>."
+ },
+ "Cifras": {
+  "en": "Figures"
+ },
+ "Dinero y medidas nunca “bailan” entre estados; comparación vertical fiable.": {
+  "en": "Money and measurements never “dance” between states; vertical comparison stays reliable."
+ },
+ "Estado nunca sólo por color": {
+  "en": "State never by colour alone"
+ },
+ "punto + etiqueta": {
+  "en": "dot + label"
+ },
+ "El ciclo de vida usa punto de color <b>y</b> etiqueta en español.": {
+  "en": "The lifecycle uses a coloured dot <b>and</b> a written label."
+ },
+ "Components": {
+  "en": "Components",
+  "es": "Componentes"
+ },
+ "33 exports · 6 categorías": {
+  "en": "33 exports · 6 categories"
+ },
+ "Los 33 componentes exportados por <span class=\"mono\">window.PresupuestadorREDesignSystem_84f335</span>. Cada directorio tiene <span class=\"mono\">&lt;Name&gt;.jsx</span> + <span class=\"mono\">.d.ts</span> + <span class=\"mono\">.prompt.md</span> y un specimen <span class=\"mono\">*.card.html</span>. Los especímenes de abajo son réplicas token‑driven de los componentes reales (mismos tokens, misma anatomía) para que este documento no dependa de un runtime React.": {
+  "en": "The 33 components exported by <span class=\"mono\">window.PresupuestadorREDesignSystem_84f335</span>. Each directory holds <span class=\"mono\">&lt;Name&gt;.jsx</span> + <span class=\"mono\">.d.ts</span> + <span class=\"mono\">.prompt.md</span> and a <span class=\"mono\">*.card.html</span> specimen. The specimens below are token-driven replicas of the real components (same tokens, same anatomy), so this document does not depend on a React runtime."
+ },
+ "<b>Cómo leer los subcomponentes.</b> Varios exports viven en un archivo padre: <span class=\"mono\">Field/Input/Select/Textarea</span> ← <span class=\"mono\">forms/Input.jsx</span> · <span class=\"mono\">Card/CardHead/CardBody/SectionHead</span> ← <span class=\"mono\">layout/Card.jsx</span> · <span class=\"mono\">AppShell/LogoMark/Sidebar/NavGroup/NavItem/Topbar/Breadcrumbs/UserChip</span> ← <span class=\"mono\">navigation/AppShell.jsx</span> · <span class=\"mono\">Table/TableToolbar/RowActions/Pagination</span> ← <span class=\"mono\">data/Table.jsx</span> · <span class=\"mono\">Badge/StatusBadge</span> y <span class=\"mono\">Alert/AlertGroup</span> ← sus archivos de <span class=\"mono\">feedback/</span>.": {
+  "en": "<b>How to read the subcomponents.</b> Several exports live in one parent file: <span class=\"mono\">Field/Input/Select/Textarea</span> ← <span class=\"mono\">forms/Input.jsx</span> · <span class=\"mono\">Card/CardHead/CardBody/SectionHead</span> ← <span class=\"mono\">layout/Card.jsx</span> · <span class=\"mono\">AppShell/LogoMark/Sidebar/NavGroup/NavItem/Topbar/Breadcrumbs/UserChip</span> ← <span class=\"mono\">navigation/AppShell.jsx</span> · <span class=\"mono\">Table/TableToolbar/RowActions/Pagination</span> ← <span class=\"mono\">data/Table.jsx</span> · <span class=\"mono\">Badge/StatusBadge</span> and <span class=\"mono\">Alert/AlertGroup</span> ← their own <span class=\"mono\">feedback/</span> files."
+ },
+ "<span class=\"tick\"></span>Button": {
+  "en": "<span class=\"tick\"></span>Button"
+ },
+ "<span class=\"ic\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><rect x=\"3\" y=\"8\" width=\"18\" height=\"8\" rx=\"3\"/></svg></span><span class=\"tt\">Variantes</span><span class=\"hint\">secondary · primary · accent · ghost</span>": {
+  "en": "<span class=\"ic\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><rect x=\"3\" y=\"8\" width=\"18\" height=\"8\" rx=\"3\"/></svg></span><span class=\"tt\">Variants</span><span class=\"hint\">secondary · primary · accent · ghost</span>"
+ },
+ "Secondary": {
+  "en": "Secondary"
+ },
+ "Primary": {
+  "en": "Primary"
+ },
+ "Accent": {
+  "en": "Accent"
+ },
+ "Ghost": {
+  "en": "Ghost"
+ },
+ "Tamaños · sm 32 · md 40 · lg 46": {
+  "en": "Sizes · sm 32 · md 40 · lg 46"
+ },
+ "sm": {
+  "en": "sm"
+ },
+ "md": {
+  "en": "md"
+ },
+ "lg": {
+  "en": "lg"
+ },
+ "Estados": {
+  "en": "States"
+ },
+ "Default": {
+  "en": "Default"
+ },
+ "Focus": {
+  "en": "Focus"
+ },
+ "Disabled": {
+  "en": "Disabled"
+ },
+ "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12l16-8-6 16-2-6z\"/></svg> Con icono": {
+  "en": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 12l16-8-6 16-2-6z\"/></svg> With icon"
+ },
+ "Propósito": {
+  "en": "Purpose"
+ },
+ "Control de acción principal. <b>Exactamente un</b> <span class=\"mono\">primary</span> (o <span class=\"mono\">accent</span>) por vista; todo lo demás es <span class=\"mono\">secondary</span> o <span class=\"mono\">ghost</span>.": {
+  "en": "The main action control. <b>Exactly one</b> <span class=\"mono\">primary</span> (or <span class=\"mono\">accent</span>) per view; everything else is <span class=\"mono\">secondary</span> or <span class=\"mono\">ghost</span>."
+ },
+ "API": {
+  "en": "API"
+ },
+ "variant": {
+  "en": "variant"
+ },
+ "secondary | primary | accent | ghost": {
+  "en": "secondary | primary | accent | ghost"
+ },
+ "size": {
+  "en": "size"
+ },
+ "sm | md | lg": {
+  "en": "sm | md | lg"
+ },
+ "block": {
+  "en": "block"
+ },
+ "boolean": {
+  "en": "boolean"
+ },
+ "iconLeft / iconRight": {
+  "en": "iconLeft / iconRight"
+ },
+ "ReactNode (16px)": {
+  "en": "ReactNode (16px)"
+ },
+ "Semántica de variantes": {
+  "en": "Variant semantics"
+ },
+ "<b>secondary</b> — outline neutro, el caballo de batalla.": {
+  "en": "<b>secondary</b> — neutral outline, the workhorse."
+ },
+ "<b>primary</b> — fill charcoal sólido, la acción principal única de la pantalla.": {
+  "en": "<b>primary</b> — solid charcoal fill, the screen's single main action."
+ },
+ "<b>accent</b> — fill ámbar de marca, reservado a acciones hero de envío/compartir.": {
+  "en": "<b>accent</b> — brand amber fill, reserved for hero send/share actions."
+ },
+ "<b>ghost</b> — sin borde, acciones inline de baja énfasis.": {
+  "en": "<b>ghost</b> — no border, low-emphasis inline actions."
+ },
+ "<span class=\"tick\"></span>IconButton · Toggle · SegmentedControl": {
+  "en": "<span class=\"tick\"></span>IconButton · Toggle · SegmentedControl"
+ },
+ "<span class=\"tt\">IconButton</span>": {
+  "en": "<span class=\"tt\">IconButton</span>"
+ },
+ "default 34 | bare 30": {
+  "en": "default 34 | bare 30"
+ },
+ "danger": {
+  "en": "danger"
+ },
+ "title": {
+  "en": "title"
+ },
+ "obligatorio": {
+  "en": "required"
+ },
+ "Icon‑only para topbar y acciones de fila. <span class=\"mono\">title</span> se usa como tooltip y <span class=\"mono\">aria-label</span>.": {
+  "en": "Icon-only, for the topbar and row actions. <span class=\"mono\">title</span> is used both as tooltip and <span class=\"mono\">aria-label</span>."
+ },
+ "<span class=\"tt\">Toggle</span>": {
+  "en": "<span class=\"tt\">Toggle</span>"
+ },
+ "<span class=\"tg\"><i></i></span><span style=\"font-size:13px;color:var(--re-ink-3)\">off · md 38</span>": {
+  "en": "<span class=\"tg\"><i></i></span><span style=\"font-size:13px;color:var(--re-ink-3)\">off · md 38</span>"
+ },
+ "<span class=\"tg on\"><i></i></span><span style=\"font-size:13px;color:var(--re-ink-2)\">on · track charcoal</span>": {
+  "en": "<span class=\"tg on\"><i></i></span><span style=\"font-size:13px;color:var(--re-ink-2)\">on · charcoal track</span>"
+ },
+ "<span class=\"tg on am\"><i></i></span><span style=\"font-size:13px;color:var(--re-ink-2)\">on · accent ámbar</span>": {
+  "en": "<span class=\"tg on am\"><i></i></span><span style=\"font-size:13px;color:var(--re-ink-2)\">on · amber accent</span>"
+ },
+ "<span class=\"tg sm on\"><i></i></span><span style=\"font-size:13px;color:var(--re-ink-3)\">sm 32 · filas de tabla</span>": {
+  "en": "<span class=\"tg sm on\"><i></i></span><span style=\"font-size:13px;color:var(--re-ink-3)\">sm 32 · table rows</span>"
+ },
+ "pressed / defaultPressed": {
+  "en": "pressed / defaultPressed"
+ },
+ "md | sm": {
+  "en": "md | sm"
+ },
+ "accent": {
+  "en": "accent"
+ },
+ "disabled": {
+  "en": "disabled"
+ },
+ "<span class=\"tt\">SegmentedControl</span>": {
+  "en": "<span class=\"tt\">SegmentedControl</span>"
+ },
+ "<span class=\"on\">Estimación</span><span>Formal</span>": {
+  "en": "<span class=\"on\">Estimate</span><span>Formal</span>"
+ },
+ "<span class=\"on\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"/></svg> Tabla</span><span><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><rect x=\"3\" y=\"4\" width=\"8\" height=\"8\" rx=\"1.5\"/><rect x=\"13\" y=\"4\" width=\"8\" height=\"8\" rx=\"1.5\"/></svg> Cards</span>": {
+  "en": "<span class=\"on\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"/></svg> Table</span><span><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><rect x=\"3\" y=\"4\" width=\"8\" height=\"8\" rx=\"1.5\"/><rect x=\"13\" y=\"4\" width=\"8\" height=\"8\" rx=\"1.5\"/></svg> Cards</span>"
+ },
+ "options": {
+  "en": "options"
+ },
+ "2–3 items": {
+  "en": "2–3 items"
+ },
+ "value": {
+  "en": "value"
+ },
+ "string": {
+  "en": "string"
+ },
+ "onChange": {
+  "en": "onChange"
+ },
+ "(value) =&gt; void": {
+  "en": "(value) =&gt; void"
+ },
+ "Más de 3 opciones → usar <span class=\"mono\">Select</span>.": {
+  "en": "More than 3 options → use <span class=\"mono\">Select</span>."
+ },
+ "<span class=\"tick\"></span>Field · Input · Select · Textarea": {
+  "en": "<span class=\"tick\"></span>Field · Input · Select · Textarea"
+ },
+ "<span class=\"tt\">Anatomía y estados</span><span class=\"hint\">label + hint + control + note</span>": {
+  "en": "<span class=\"tt\">Anatomy and states</span><span class=\"hint\">label + hint + control + note</span>"
+ },
+ "Ancho de paso <span class=\"op\">m</span>": {
+  "en": "Tread width <span class=\"op\">m</span>"
+ },
+ "Valor del jornal": {
+  "en": "Labour day rate"
+ },
+ "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v5M12 8h.01\"/></svg> Referencia y control — no define el precio.": {
+  "en": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v5M12 8h.01\"/></svg> Reference and control — it does not set the price."
+ },
+ "Familia": {
+  "en": "Family"
+ },
+ "Escaleras <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 9l6 6 6-6\"/></svg>": {
+  "en": "Stairs <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 9l6 6 6-6\"/></svg>"
+ },
+ "Buscar": {
+  "en": "Search"
+ },
+ "<svg style=\"width:16px;height:16px;color:var(--re-ink-4);flex:none\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"M20 20l-3.5-3.5\"/></svg><span class=\"val\">Buscar por N°, cliente, obra…</span>": {
+  "en": "<svg style=\"width:16px;height:16px;color:var(--re-ink-4);flex:none\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"M20 20l-3.5-3.5\"/></svg><span class=\"val\">Search by number, client, project…</span>"
+ },
+ "Notas <span class=\"op\">opcional</span>": {
+  "en": "Notes <span class=\"op\">optional</span>"
+ },
+ "<span class=\"val\">Agregá notas para el cliente…</span>": {
+  "en": "<span class=\"val\">Add notes for the client…</span>"
+ },
+ "Bloqueado por freeze": {
+  "en": "Locked by freeze"
+ },
+ "Export": {
+  "en": "Export"
+ },
+ "Props relevantes": {
+  "en": "Relevant props"
+ },
+ "Field": {
+  "en": "Field"
+ },
+ "Input": {
+  "en": "Input"
+ },
+ "Select": {
+  "en": "Select"
+ },
+ "Textarea": {
+  "en": "Textarea"
+ },
+ "Comportamiento": {
+  "en": "Behaviour"
+ },
+ "<b>Field</b> envuelve: label + hint inline (“opcional”) + control + note con icono.": {
+  "en": "<b>Field</b> wraps: label + inline hint (“optional”) + control + note with icon."
+ },
+ "<b>num</b> activa cifras tabulares y alineación para dinero y medidas.": {
+  "en": "<b>num</b> switches on tabular figures and alignment for money and measurements."
+ },
+ "<b>prefix/suffix</b> para <span class=\"mono\">$</span> y unidades (<span class=\"mono\">m</span>, <span class=\"mono\">%</span>).": {
+  "en": "<b>prefix/suffix</b> for <span class=\"mono\">$</span> and units (<span class=\"mono\">m</span>, <span class=\"mono\">%</span>)."
+ },
+ "Focus: borde ámbar + <span class=\"mono\">--re-ring</span>. Disabled: opacidad .45.": {
+  "en": "Focus: amber border + <span class=\"mono\">--re-ring</span>. Disabled: opacity .45."
+ },
+ "NR‑06": {
+  "en": "NR‑06"
+ },
+ "No existe prop de <b>error/invalid</b> en <span class=\"mono\">Field</span> ni <span class=\"mono\">Input</span>. La validación del producto es warn‑only vía <span class=\"mono\">Alert</span>, así que el error inline a nivel campo <b>no está definido</b> en el sistema.": {
+  "en": "There is no <b>error/invalid</b> prop on <span class=\"mono\">Field</span> or <span class=\"mono\">Input</span>. The product's validation is warn-only via <span class=\"mono\">Alert</span>, so field-level inline errors are <b>undefined</b> in the system."
+ },
+ "<span class=\"tick\"></span>Badge · StatusBadge": {
+  "en": "<span class=\"tick\"></span>Badge · StatusBadge"
+ },
+ "<span class=\"tt\">Tonos y formas</span>": {
+  "en": "<span class=\"tt\">Tones and shapes</span>"
+ },
+ "<span class=\"bdg\">neutral</span><span class=\"bdg ok\">ok</span><span class=\"bdg wn\">warn</span><span class=\"bdg cr\">crit</span><span class=\"bdg inf\">info</span>": {
+  "en": "<span class=\"bdg\">neutral</span><span class=\"bdg ok\">ok</span><span class=\"bdg wn\">warn</span><span class=\"bdg cr\">crit</span><span class=\"bdg inf\">info</span>"
+ },
+ "<span class=\"bdg\"><span class=\"d\"></span> con dot</span><span class=\"bdg sq\">ESC-RECT</span><span class=\"bdg sq\">GV-A-00148</span>": {
+  "en": "<span class=\"bdg\"><span class=\"d\"></span> with dot</span><span class=\"bdg sq\">ESC-RECT</span><span class=\"bdg sq\">GV-A-00148</span>"
+ },
+ "<span class=\"stage-lab\" style=\"width:100%;margin:0 0 4px\">StatusBadge — ciclo de vida</span> <span class=\"st\"><span class=\"d d-draft\"></span> Borrador</span><span class=\"st\"><span class=\"d d-sent\"></span> Enviado</span><span class=\"st\"><span class=\"d d-appr\"></span> Aprobado</span><span class=\"st\"><span class=\"d d-rej\"></span> Rechazado</span><span class=\"st\"><span class=\"d d-cancel\"></span> Cancelado</span>": {
+  "en": "<span class=\"stage-lab\" style=\"width:100%;margin:0 0 4px\">StatusBadge — lifecycle</span> <span class=\"st\"><span class=\"d d-draft\"></span> Draft</span><span class=\"st\"><span class=\"d d-sent\"></span> Sent</span><span class=\"st\"><span class=\"d d-appr\"></span> Approved</span><span class=\"st\"><span class=\"d d-rej\"></span> Rejected</span><span class=\"st\"><span class=\"d d-cancel\"></span> Cancelled</span>"
+ },
+ "Badge · tone": {
+  "en": "Badge · tone"
+ },
+ "neutral | ok | warn | crit | info": {
+  "en": "neutral | ok | warn | crit | info"
+ },
+ "Badge · dot": {
+  "en": "Badge · dot"
+ },
+ "Badge · square": {
+  "en": "Badge · square"
+ },
+ "chip mono de código": {
+  "en": "mono code chip"
+ },
+ "Badge · icon": {
+  "en": "Badge · icon"
+ },
+ "ReactNode": {
+  "en": "ReactNode"
+ },
+ "StatusBadge · status": {
+  "en": "StatusBadge · status"
+ },
+ "draft | sent | appr | rej | cancel": {
+  "en": "draft | sent | appr | rej | cancel"
+ },
+ "StatusBadge · label": {
+  "en": "StatusBadge · label"
+ },
+ "override del español": {
+  "en": "overrides the default label"
+ },
+ "Usage": {
+  "en": "Usage",
+  "es": "Uso"
+ },
+ "<b>StatusBadge</b> mapea automáticamente color de punto + etiqueta en español — no armes el pill a mano.": {
+  "en": "<b>StatusBadge</b> maps dot colour + written label automatically — do not assemble the pill by hand."
+ },
+ "<b>square</b> para códigos (<span class=\"mono\">GV-A-00148</span>, <span class=\"mono\">ESC-RECT</span>): mono, radio 5px.": {
+  "en": "<b>square</b> for codes (<span class=\"mono\">GV-A-00148</span>, <span class=\"mono\">ESC-RECT</span>): mono, 5px radius."
+ },
+ "El estado nunca se comunica sólo por color: siempre punto + texto.": {
+  "en": "State is never communicated by colour alone: always dot + text."
+ },
+ "<span class=\"tick\"></span>Alert · AlertGroup": {
+  "en": "<span class=\"tick\"></span>Alert · AlertGroup"
+ },
+ "<span class=\"tt\">Tonos</span><span class=\"hint\">warn es el default — el motor nunca bloquea</span>": {
+  "en": "<span class=\"tt\">Tones</span><span class=\"hint\">warn is the default — the engine never blocks</span>"
+ },
+ "<b>Inclinación fuera de rango cómodo</b>Revisá altura y avance. Es un aviso: no bloquea el cálculo.": {
+  "en": "<b>Pitch outside the comfortable range</b>Check height and run. It is a warning: it does not block the calculation."
+ },
+ "<b>Inclinación recomendada</b>≈ 14 escalones · contrahuella 17,4 cm · 34°": {
+  "en": "<b>Recommended pitch</b>≈ 14 steps · 17.4 cm riser · 34°"
+ },
+ "Los cambios aplican sólo a nuevos cálculos.": {
+  "en": "Changes apply only to new calculations."
+ },
+ "Falta la versión de parámetros para congelar el presupuesto.": {
+  "en": "The parameter version needed to freeze the quote is missing."
+ },
+ "No se incluyen en la salida comercial al cliente.": {
+  "en": "These are not included in the commercial output sent to the client."
+ },
+ "Alert · tone": {
+  "en": "Alert · tone"
+ },
+ "warn | ok | info | crit | neutral": {
+  "en": "warn | ok | info | crit | neutral"
+ },
+ "Alert · icon": {
+  "en": "Alert · icon"
+ },
+ "ReactNode · null oculta": {
+  "en": "ReactNode · null hides it"
+ },
+ "Alert · title": {
+  "en": "Alert · title"
+ },
+ "lead line en negrita": {
+  "en": "bold lead line"
+ },
+ "AlertGroup · title": {
+  "en": "AlertGroup · title"
+ },
+ "“Alertas y recordatorios”": {
+  "en": "“Alerts and reminders”"
+ },
+ "AlertGroup · items": {
+  "en": "AlertGroup · items"
+ },
+ "ReactNode[]": {
+  "en": "ReactNode[]"
+ },
+ "El motor es <b>warn‑only y nunca bloquea</b>; por eso <span class=\"mono\">warn</span> es el tono por defecto y el icono default es el triángulo.": {
+  "en": "The engine is <b>warn-only and never blocks</b>; that is why <span class=\"mono\">warn</span> is the default tone and the triangle is the default icon."
+ },
+ "<b>AlertGroup</b> es el panel titulado de recordatorios con bullets.": {
+  "en": "<b>AlertGroup</b> is the titled reminders panel with bullets."
+ },
+ "Microcopy: icono info/lock + una sola oración.": {
+  "en": "Microcopy: info/lock icon + a single sentence."
+ },
+ "<span class=\"tick\"></span>Card · CardHead · CardBody · SectionHead": {
+  "en": "<span class=\"tick\"></span>Card · CardHead · CardBody · SectionHead"
+ },
+ "<span class=\"ic\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 9h18\"/></svg></span><span class=\"tt\">Encabezado del presupuesto</span><span class=\"hint\">opcional</span><span class=\"r\"><button class=\"b sm\">Compactar</button></span>": {
+  "en": "<span class=\"ic\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 9h18\"/></svg></span><span class=\"tt\">Quote header</span><span class=\"hint\">optional</span><span class=\"r\"><button class=\"b sm\">Collapse</button></span>"
+ },
+ "Esta card <b>es</b> el especímen: <span class=\"mono\">CardHead</span> (tile de icono + título + hint + acciones) sobre un divisor, luego <span class=\"mono\">CardBody</span>.": {
+  "en": "This card <b>is</b> the specimen: <span class=\"mono\">CardHead</span> (icon tile + title + hint + actions) over a divider, then <span class=\"mono\">CardBody</span>."
+ },
+ "<span class=\"ix\">1</span><span class=\"tt\">Producto</span>": {
+  "en": "<span class=\"ix\">1</span><span class=\"tt\">Product</span>"
+ },
+ "<span class=\"ix\">2</span><span class=\"tt\">Dimensiones</span><span class=\"hn\">decimales con coma</span>": {
+  "en": "<span class=\"ix\">2</span><span class=\"tt\">Dimensions</span><span class=\"hn\">decimals with a comma</span>"
+ },
+ "<span class=\"ix\">3</span><span class=\"tt\">Opciones constructivas</span>": {
+  "en": "<span class=\"ix\">3</span><span class=\"tt\">Construction options</span>"
+ },
+ "SectionHead — pasos numerados dentro de calculadora / editor": {
+  "en": "SectionHead — numbered steps inside the calculator / editor"
+ },
+ "Props": {
+  "en": "Props"
+ },
+ "Card": {
+  "en": "Card"
+ },
+ "CardHead": {
+  "en": "CardHead"
+ },
+ "CardBody": {
+  "en": "CardBody"
+ },
+ "SectionHead": {
+  "en": "SectionHead"
+ },
+ "Anatomía": {
+  "en": "Anatomy"
+ },
+ "Superficie grafito, borde <span class=\"mono\">--re-line</span> de 1px, <span class=\"mono\">--re-shadow-sm</span>, radio <span class=\"mono\">--re-r-lg 13px</span>. <span class=\"mono\">flush</span> cuando la card envuelve una tabla a sangre.": {
+  "en": "Graphite surface, 1px <span class=\"mono\">--re-line</span> border, <span class=\"mono\">--re-shadow-sm</span>, <span class=\"mono\">--re-r-lg 13px</span> radius. <span class=\"mono\">flush</span> when the card wraps a full-bleed table."
+ },
+ "Do / Don't": {
+  "en": "Do / Don't",
+  "es": "Hacer / No hacer"
+ },
+ "<b>Do</b> — usar <span class=\"mono\">SectionHead</span> numerado para pasos de un flujo largo (calculadora, editor).": {
+  "en": "<b>Do</b> — use a numbered <span class=\"mono\">SectionHead</span> for the steps of a long flow (calculator, editor)."
+ },
+ "<b>Don't</b> — anidar cards dentro de cards; para agrupar dentro de una card usá <span class=\"mono\">SectionHead</span> + divisores.": {
+  "en": "<b>Don't</b> — nest cards inside cards; to group content within a card use <span class=\"mono\">SectionHead</span> + dividers."
+ },
+ "<span class=\"tick\"></span>StatTile": {
+  "en": "<span class=\"tick\"></span>StatTile"
+ },
+ "Presupuestos del mes": {
+  "en": "Quotes this month"
+ },
+ "+3 vs. mes anterior": {
+  "en": "+3 vs. last month"
+ },
+ "Aprobados": {
+  "en": "Approved"
+ },
+ "37,5% de conversión": {
+  "en": "37.5% conversion"
+ },
+ "Monto cotizado": {
+  "en": "Quoted amount"
+ },
+ "acumulado del mes": {
+  "en": "month to date"
+ },
+ "Motor": {
+  "en": "Engine"
+ },
+ "QA al día": {
+  "en": "QA up to date"
+ },
+ "label": {
+  "en": "label"
+ },
+ "uppercase": {
+  "en": "uppercase"
+ },
+ "tabular": {
+  "en": "tabular"
+ },
+ "sub": {
+  "en": "sub"
+ },
+ "línea de apoyo": {
+  "en": "supporting line"
+ },
+ "variante charcoal": {
+  "en": "charcoal variant"
+ },
+ "dot": {
+  "en": "dot"
+ },
+ "punto de estado live": {
+  "en": "live status dot"
+ },
+ "amberValue": {
+  "en": "amberValue"
+ },
+ "cifra en ámbar": {
+  "en": "figure in amber"
+ },
+ "Fila de KPI del dashboard y grillas de estado.": {
+  "en": "Dashboard KPI row and status grids."
+ },
+ "<b>accent</b> es para <b>un solo</b> tile destacado por fila — es el ancla charcoal.": {
+  "en": "<b>accent</b> is for <b>one single</b> highlighted tile per row — it is the charcoal anchor."
+ },
+ "<b>amberValue</b> con moderación: sólo cifras headline (respeta el racionamiento del ámbar).": {
+  "en": "<b>amberValue</b> sparingly: headline figures only (it respects amber rationing)."
+ },
+ "<b>dot</b> se combina con <span class=\"mono\">accent</span> para paneles “En vivo”.": {
+  "en": "<b>dot</b> combines with <span class=\"mono\">accent</span> for “Live” panels."
+ },
+ "<span class=\"tick\"></span>TechnicalPreviewCard · TechnicalRenderers": {
+  "en": "<span class=\"tick\"></span>TechnicalPreviewCard · TechnicalRenderers"
+ },
+ "El <b>único dibujo sancionado</b> del sistema: planos y elevaciones esquemáticos generados paramétricamente desde las dimensiones del propio presupuesto. Son diagramas medidos, no ilustración — líneas de estructura grafito de 1px, overlays de dimensión token‑driven, ámbar reservado al indicio de entrada/baranda.": {
+  "en": "The <b>only sanctioned drawing</b> in the system: schematic plans and elevations generated parametrically from the quote's own dimensions. They are measured diagrams, not illustration — 1px graphite structure lines, token-driven dimension overlays, amber reserved for the entry/railing cue."
+ },
+ "Registry": {
+  "en": "Registry",
+  "es": "Registro"
+ },
+ "Basado en registro: <span class=\"mono\">family</span>/<span class=\"mono\">variant</span> seleccionan un renderer. Escaleras trae cuatro — <span class=\"mono\">recta</span> (elevación lateral), <span class=\"mono\">L</span>, <span class=\"mono\">U</span> y <span class=\"mono\">caracol</span> (vistas en planta). Las familias desconocidas caen a un placeholder “sin vista técnica”.": {
+  "en": "Registry-based: <span class=\"mono\">family</span>/<span class=\"mono\">variant</span> select a renderer. Stairs ships four — <span class=\"mono\">straight</span> (side elevation), <span class=\"mono\">L</span>, <span class=\"mono\">U</span> and <span class=\"mono\">spiral</span> (plan views). Unknown families fall back to a “no technical view” placeholder."
+ },
+ "Uso permitido": {
+  "en": "Permitted use"
+ },
+ "Previews de calculadora y editor, filas de historial, documento al cliente.": {
+  "en": "Calculator and editor previews, history rows, the client-facing document."
+ },
+ "<b>Nunca</b> dibujar arte de producto decorativo a mano.": {
+  "en": "<b>Never</b> hand-draw decorative product art."
+ },
+ "family": {
+  "en": "family"
+ },
+ "Escaleras | otras → placeholder": {
+  "en": "Stairs | others → placeholder"
+ },
+ "recta | L | U | caracol": {
+  "en": "straight | L | U | spiral"
+ },
+ "dims": {
+  "en": "dims"
+ },
+ "ancho · altura · avance · escalones · huella · contrahuella · diametro": {
+  "en": "width · height · run · steps · tread · riser · diameter"
+ },
+ "config": {
+  "en": "config"
+ },
+ "string[] de chips": {
+  "en": "string[] of chips"
+ },
+ "compact | standard | large": {
+  "en": "compact | standard | large"
+ },
+ "title / code": {
+  "en": "title / code"
+ },
+ "override · código mono": {
+  "en": "override · mono code"
+ },
+ "showDims": {
+  "en": "showDims"
+ },
+ "default true": {
+  "en": "default true"
+ },
+ "live": {
+  "en": "live"
+ },
+ "indicador “En vivo”": {
+  "en": "“Live” indicator"
+ },
+ "Densidades": {
+  "en": "Densities"
+ },
+ "<b>compact</b> — head + dibujo + footer.": {
+  "en": "<b>compact</b> — head + drawing + footer."
+ },
+ "<b>standard</b> — + 4 dimensiones + chips.": {
+  "en": "<b>standard</b> — + 4 dimensions + chips."
+ },
+ "<b>large</b> — stage más grande + 6 dimensiones.": {
+  "en": "<b>large</b> — bigger stage + 6 dimensions."
+ },
+ "Extender": {
+  "en": "Extending"
+ },
+ "<span class=\"mono\">TechnicalRenderers.register(family, variant, def)</span> · <span class=\"mono\">setFamilyLabel</span> · <span class=\"mono\">has</span> · <span class=\"mono\">variants</span> · <span class=\"mono\">families</span> — encadenables. <span class=\"mono\">escalones</span> se clampea a 4–16; un chip que matchee <span class=\"mono\">/baranda|pasamano/</span> dibuja la baranda en <span class=\"mono\">recta</span>.": {
+  "en": "<span class=\"mono\">TechnicalRenderers.register(family, variant, def)</span> · <span class=\"mono\">setFamilyLabel</span> · <span class=\"mono\">has</span> · <span class=\"mono\">variants</span> · <span class=\"mono\">families</span> — chainable. <span class=\"mono\">escalones</span> is clamped to 4–16; a chip matching <span class=\"mono\">/baranda|pasamano/</span> draws the railing on <span class=\"mono\">recta</span>."
+ },
+ "Navigation &amp; App Shell": {
+  "en": "Navigation &amp; App Shell",
+  "es": "Navegación y App Shell"
+ },
+ "El shell desktop es la capa primaria y está congelado desde V1: sidebar sticky de 248px + topbar sticky de 60px + main con scroll. Mobile no comprime ese shell: cambia de patrón.": {
+  "en": "The desktop shell is the primary layer and has been frozen since V1: a 248px sticky sidebar + a 60px sticky topbar + a scrolling main. Mobile does not compress that shell: it changes pattern."
+ },
+ "<span class=\"tick\"></span>Desktop — AppShell": {
+  "en": "<span class=\"tick\"></span>Desktop — AppShell"
+ },
+ "<span class=\"tt\">Sidebar · LogoMark · NavGroup · NavItem</span><span class=\"hint\">248px</span>": {
+  "en": "<span class=\"tt\">Sidebar · LogoMark · NavGroup · NavItem</span><span class=\"hint\">248px</span>"
+ },
+ "Presupuestador": {
+  "en": "Presupuestador"
+ },
+ "RE · v1.0": {
+  "en": "RE · v1.0"
+ },
+ "Operación": {
+  "en": "Operations"
+ },
+ "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2.5\"/><path d=\"M8 7h8M8 11h3\" stroke-linecap=\"round\"/><rect x=\"13.5\" y=\"11\" width=\"3\" height=\"6\" rx=\"1\"/></svg> Calculadora": {
+  "en": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"2.5\"/><path d=\"M8 7h8M8 11h3\" stroke-linecap=\"round\"/><rect x=\"13.5\" y=\"11\" width=\"3\" height=\"6\" rx=\"1\"/></svg> Calculator"
+ },
+ "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\" stroke-linecap=\"round\"/></svg> Historial": {
+  "en": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\" stroke-linecap=\"round\"/></svg> History"
+ },
+ "Configuración": {
+  "en": "Configuration"
+ },
+ "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linejoin=\"round\"><path d=\"M12 2.5l8 4.2v10.6L12 21.5 4 17.3V6.7z\"/><path d=\"M4 6.7l8 4.3 8-4.3M12 11v10.5\"/></svg> Catálogos": {
+  "en": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linejoin=\"round\"><path d=\"M12 2.5l8 4.2v10.6L12 21.5 4 17.3V6.7z\"/><path d=\"M4 6.7l8 4.3 8-4.3M12 11v10.5\"/></svg> Catalogues"
+ },
+ "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\"><path d=\"M4 7h10M18 7h2M4 17h2M10 17h10\"/><circle cx=\"16\" cy=\"7\" r=\"2.3\"/><circle cx=\"8\" cy=\"17\" r=\"2.3\"/></svg> Parámetros": {
+  "en": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\"><path d=\"M4 7h10M18 7h2M4 17h2M10 17h10\"/><circle cx=\"16\" cy=\"7\" r=\"2.3\"/><circle cx=\"8\" cy=\"17\" r=\"2.3\"/></svg> Parameters"
+ },
+ "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linejoin=\"round\"><path d=\"M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z\"/><path d=\"M9 12l2 2 4-4\" stroke-linecap=\"round\"/></svg> QA": {
+  "en": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linejoin=\"round\"><path d=\"M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z\"/><path d=\"M9 12l2 2 4-4\" stroke-linecap=\"round\"/></svg> QA"
+ },
+ "Topbar · Breadcrumbs · UserChip": {
+  "en": "Topbar · Breadcrumbs · UserChip"
+ },
+ "<span>Operación</span><span class=\"sp\">/</span><b>Calculadora</b><span class=\"mono\" style=\"font-size:12px;color:var(--re-ink-4)\">(sin guardar)</span>": {
+  "en": "<span>Operations</span><span class=\"sp\">/</span><b>Calculator</b><span class=\"mono\" style=\"font-size:12px;color:var(--re-ink-4)\">(unsaved)</span>"
+ },
+ "<span class=\"ib\" title=\"Buscar\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"M20 20l-3.5-3.5\"/></svg></span> <span class=\"uchip\"><span class=\"av\">RE</span><span class=\"w\"><b>Ramiro</b><span>Presupuestador</span></span></span>": {
+  "en": "<span class=\"ib\" title=\"Search\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"M20 20l-3.5-3.5\"/></svg></span> <span class=\"uchip\"><span class=\"av\">RE</span><span class=\"w\"><b>Ramiro</b><span>Estimator</span></span></span>"
+ },
+ "AppShell": {
+  "en": "AppShell"
+ },
+ "LogoMark": {
+  "en": "LogoMark"
+ },
+ "NavGroup": {
+  "en": "NavGroup"
+ },
+ "NavItem": {
+  "en": "NavItem"
+ },
+ "Breadcrumbs": {
+  "en": "Breadcrumbs"
+ },
+ "UserChip": {
+  "en": "UserChip"
+ },
+ "NR‑02": {
+  "en": "NR‑02"
+ },
+ "<span class=\"mono\">LogoMark</span> tiene <b>tagline por defecto <span class=\"mono\">'RE · v1.0'</span></b>, pero las pantallas del kit y los mockups muestran <span class=\"mono\">“REstimator · motor v1.5”</span>. Hay que unificar el default o pasarlo siempre explícito.": {
+  "en": "<span class=\"mono\">LogoMark</span> has <b>the default tagline <span class=\"mono\">'RE · v1.0'</span></b>, but the kit screens and the mockups show <span class=\"mono\">“REstimator · motor v1.5”</span>. The default needs to be unified, or passed explicitly every time."
+ },
+ "<span class=\"tick\"></span>Mobile — bottom navigation + header compacto": {
+  "en": "<span class=\"tick\"></span>Mobile — bottom navigation + compact header",
+  "es": "<span class=\"tick\"></span>Mobile — navegación inferior y header compacto"
+ },
+ "Mobile es <b>diseñada, no adaptada</b>: el sidebar no se “oculta”, se reemplaza por una bottom tab bar de 5 familias. Los breadcrumbs desaparecen (los sustituye título + back) y el branding aparece una sola vez por header.": {
+  "en": "Mobile is <b>designed, not adapted</b>: the sidebar is not “hidden”, it is replaced by a bottom tab bar of 5 families. Breadcrumbs disappear (title + back replace them) and branding appears only once per header."
+ },
+ "Elemento": {
+  "en": "Element"
+ },
+ "Medida": {
+  "en": "Size"
+ },
+ "Estado en el DS": {
+  "en": "Status in the DS"
+ },
+ "BottomTabBar": {
+  "en": "BottomTabBar"
+ },
+ "fixed bottom. 5 tabs: Inicio · Calc · Historial · Catálogos · Parám. Iconos 21, label 10. Activo <span class=\"mono\">--re-amber-ink</span>.": {
+  "en": "fixed bottom. 5 tabs: Home · Calc · History · Catalogues · Params. Icons 21, label 10. Active <span class=\"mono\">--re-amber-ink</span>."
+ },
+ "<span class=\"tag new\">New</span>": {
+  "en": "<span class=\"tag new\">New</span>",
+  "es": "<span class=\"tag new\">Nuevo</span>"
+ },
+ "MobileHeader": {
+  "en": "MobileHeader"
+ },
+ "sticky top. Back + título (Calculadora) o marca + título (Inicio / Historial). Sin breadcrumbs, sin sub‑copy.": {
+  "en": "sticky top. Back + title (Calculator) or brand + title (Home / History). No breadcrumbs, no sub-copy."
+ },
+ "BottomActionBar": {
+  "en": "BottomActionBar"
+ },
+ "fixed sobre la tab bar. Sólo Calculadora: Guardar (primary) · Estimación · Presupuesto.": {
+  "en": "fixed above the tab bar. Calculator only: Save (primary) · Estimate · Quote."
+ },
+ "AppShell (modo mobile)": {
+  "en": "AppShell (mobile mode)"
+ },
+ "Mismo árbol de rutas, tres modos de navegación (sidebar / tabs / bottom bar).": {
+  "en": "Same route tree, three navigation modes (sidebar / tabs / bottom bar)."
+ },
+ "<span class=\"tag ext\">Extended</span>": {
+  "en": "<span class=\"tag ext\">Extended</span>",
+  "es": "<span class=\"tag ext\">Extendido</span>"
+ },
+ "<span class=\"tick\"></span>Sticky / fixed behavior": {
+  "en": "<span class=\"tick\"></span>Sticky / fixed behaviour",
+  "es": "<span class=\"tick\"></span>Comportamiento sticky / fijo"
+ },
+ "Capa (de abajo hacia arriba)": {
+  "en": "Layer (bottom to top)"
+ },
+ "Alto": {
+  "en": "Height"
+ },
+ "Posición": {
+  "en": "Position"
+ },
+ "z-index": {
+  "en": "z-index"
+ },
+ "Dónde": {
+  "en": "Where"
+ },
+ "Bottom tab bar": {
+  "en": "Bottom tab bar"
+ },
+ "Action bar": {
+  "en": "Action bar"
+ },
+ "Mobile · Calculadora": {
+  "en": "Mobile · Calculator"
+ },
+ "Header compacto": {
+  "en": "Compact header"
+ },
+ "Resumen recomendado": {
+  "en": "Recommended summary"
+ },
+ "Bottom sheet (desglose)": {
+  "en": "Bottom sheet (breakdown)"
+ },
+ "Mobile · Tablet": {
+  "en": "Mobile · Tablet"
+ },
+ "Sidebar / Topbar": {
+  "en": "Sidebar / Topbar"
+ },
+ "Panel de resultado": {
+  "en": "Result panel"
+ },
+ "Desktop · Calculadora": {
+  "en": "Desktop · Calculator"
+ },
+ "Save bar": {
+  "en": "Save bar"
+ },
+ "Desktop · Editor / Parámetros": {
+  "en": "Desktop · Editor / Parameters"
+ },
+ "Forms &amp; Data Entry": {
+  "en": "Forms &amp; Data Entry",
+  "es": "Formularios y entrada de datos"
+ },
+ "Los formularios son el corazón del producto: la calculadora es un formulario largo con resultado en vivo. La entrada de datos privilegia velocidad de tipeo y lectura tabular por encima de adornos.": {
+  "en": "Forms are the heart of the product: the calculator is a long form with a live result. Data entry favours typing speed and tabular reading over ornament."
+ },
+ "<span class=\"tick\"></span>Inventario de controles": {
+  "en": "<span class=\"tick\"></span>Control inventory"
+ },
+ "Control": {
+  "en": "Control"
+ },
+ "Variantes / tamaños": {
+  "en": "Variants / sizes"
+ },
+ "Estados definidos": {
+  "en": "Defined states"
+ },
+ "Text input": {
+  "en": "Text input"
+ },
+ "prefix · suffix · leadIcon · num": {
+  "en": "prefix · suffix · leadIcon · num"
+ },
+ "default · focus · disabled · placeholder": {
+  "en": "default · focus · disabled · placeholder"
+ },
+ "native + chevron propio": {
+  "en": "native + custom chevron"
+ },
+ "default · focus · disabled": {
+  "en": "default · focus · disabled"
+ },
+ "resize vertical": {
+  "en": "vertical resize"
+ },
+ "Search": {
+  "en": "Search"
+ },
+ "patrón, no componente aparte": {
+  "en": "a pattern, not a separate component"
+ },
+ "default · focus · con valor": {
+  "en": "default · focus · with a value"
+ },
+ "Toggle": {
+  "en": "Toggle"
+ },
+ "md 38 · sm 32 · accent": {
+  "en": "md 38 · sm 32 · accent"
+ },
+ "on · off · disabled": {
+  "en": "on · off · disabled"
+ },
+ "Segmented": {
+  "en": "Segmented"
+ },
+ "2–3 opciones, con/sin icono": {
+  "en": "2–3 options, with or without icon"
+ },
+ "selected · unselected": {
+  "en": "selected · unselected"
+ },
+ "Wrapper de campo": {
+  "en": "Field wrapper"
+ },
+ "label · optional · note": {
+  "en": "label · optional · note"
+ },
+ "Checkbox · Radio": {
+  "en": "Checkbox · Radio"
+ },
+ "<b>No existen como componentes.</b> El producto resuelve la elección con <span class=\"mono\">Select</span>, <span class=\"mono\">SegmentedControl</span> y <span class=\"mono\">Toggle</span>. Ver <a href=\"#needs-review\">NR‑13</a>.": {
+  "en": "<b>They do not exist as components.</b> The product resolves choice with <span class=\"mono\">Select</span>, <span class=\"mono\">SegmentedControl</span> and <span class=\"mono\">Toggle</span>. See <a href=\"#needs-review\">NR‑13</a>."
+ },
+ "<span class=\"tick\"></span>Estados de control": {
+  "en": "<span class=\"tick\"></span>Control states"
+ },
+ "Focus — borde ámbar + ring 3px": {
+  "en": "Focus — amber border + 3px ring"
+ },
+ "Disabled — opacidad .45": {
+  "en": "Disabled — opacity .45"
+ },
+ "Placeholder — ink-4": {
+  "en": "Placeholder — ink-4"
+ },
+ "Con prefijo monetario": {
+  "en": "With currency prefix"
+ },
+ "Montevideo <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 9l6 6 6-6\"/></svg>": {
+  "en": "Montevideo <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 9l6 6 6-6\"/></svg>"
+ },
+ "Hover · focus · pressed · disabled — reglas globales": {
+  "en": "Hover · focus · pressed · disabled — global rules"
+ },
+ "Estado": {
+  "en": "State"
+ },
+ "Tratamiento": {
+  "en": "Treatment"
+ },
+ "Hover": {
+  "en": "Hover"
+ },
+ "fill a <span class=\"mono\">--re-surface-2</span> + borde a <span class=\"mono\">--re-line-strong</span> (o amber‑darken en CTAs ámbar)": {
+  "en": "fill to <span class=\"mono\">--re-surface-2</span> + border to <span class=\"mono\">--re-line-strong</span> (or amber-darken on amber CTAs)"
+ },
+ "ring ámbar de 3px (<span class=\"mono\">--re-ring</span>) + borde ámbar": {
+  "en": "3px amber ring (<span class=\"mono\">--re-ring</span>) + amber border"
+ },
+ "Pressed / activo": {
+  "en": "Pressed / active"
+ },
+ "toggles y páginas activas <b>voltean a ámbar</b>": {
+  "en": "toggles and active pages <b>flip to amber</b>"
+ },
+ "opacidad <span class=\"mono\">.45</span>, sin eventos": {
+  "en": "opacity <span class=\"mono\">.45</span>, no events"
+ },
+ "Transición": {
+  "en": "Transition"
+ },
+ "<span class=\"mono\">.12–.15s ease</span> en background / border. Sin shrink ni scale.": {
+  "en": "<span class=\"mono\">.12–.15s ease</span> on background / border. No shrink, no scale."
+ },
+ "<span class=\"tick\"></span>Validación · errores · éxito": {
+  "en": "<span class=\"tick\"></span>Validation · errors · success"
+ },
+ "El motor de cálculo es <b>warn‑only y nunca bloquea</b>. Esa decisión de producto define toda la validación: los avisos se agrupan como <span class=\"mono\">Alert</span> junto al resultado, no como errores de campo que impidan avanzar.": {
+  "en": "The calculation engine is <b>warn-only and never blocks</b>. That product decision defines all validation: warnings are grouped as an <span class=\"mono\">Alert</span> next to the result, not as field errors that stop you from moving on."
+ },
+ "Aviso — no bloquea": {
+  "en": "Warning — does not block"
+ },
+ "<b>Avance fuera del rango cómodo</b>Podés continuar: el cálculo se realiza igual.": {
+  "en": "<b>Run outside the comfortable range</b>You can continue: the calculation still runs."
+ },
+ "Éxito / confirmación calma": {
+  "en": "Success / calm confirmation"
+ },
+ "Guardado en historial · <span class=\"mono\">GV-A-00159</span>": {
+  "en": "Saved to history · <span class=\"mono\">GV-A-00159</span>"
+ },
+ "Nota de campo — icono + una oración": {
+  "en": "Field note — icon + one sentence"
+ },
+ "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/><rect x=\"5\" y=\"11\" width=\"14\" height=\"9\" rx=\"2\"/></svg> No se incluyen en la salida comercial al cliente.": {
+  "en": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/><rect x=\"5\" y=\"11\" width=\"14\" height=\"9\" rx=\"2\"/></svg> These are not included in the commercial output sent to the client."
+ },
+ "Patrón de data entry — formularios largos": {
+  "en": "Data entry pattern — long forms"
+ },
+ "<b>Pasos numerados</b> con <span class=\"mono\">SectionHead</span>: Producto → Dimensiones → Opciones constructivas → Terminación / colocación / zona.": {
+  "en": "<b>Numbered steps</b> with <span class=\"mono\">SectionHead</span>: Product → Dimensions → Construction options → Finish / installation / zone."
+ },
+ "<b>Una card por paso</b>; grilla de 2–3 columnas en desktop, 1–2 en tablet, 1 en mobile.": {
+  "en": "<b>One card per step</b>; a 2–3 column grid on desktop, 1–2 on tablet, 1 on mobile."
+ },
+ "<b>Unidades siempre visibles</b> como <span class=\"mono\">suffix</span>, nunca sólo en el label.": {
+  "en": "<b>Units always visible</b> as a <span class=\"mono\">suffix</span>, never only in the label."
+ },
+ "<b>Coma decimal</b> en medidas — el hint del paso lo recuerda (“decimales con coma”).": {
+  "en": "<b>Decimal comma</b> on measurements — the step hint is a reminder (“decimals with a comma”)."
+ },
+ "<b>Recálculo en vivo</b>: no hay botón “calcular”; el panel de resultado muestra el punto “En vivo”.": {
+  "en": "<b>Live recalculation</b>: there is no “calculate” button; the result panel shows the “Live” dot."
+ },
+ "<b>Campos opcionales</b> marcados con hint inline <span class=\"mono\">optional</span>, no con asterisco en los obligatorios.": {
+  "en": "<b>Optional fields</b> marked with an inline <span class=\"mono\">optional</span> hint, rather than an asterisk on the required ones."
+ },
+ "Editor y Parámetros usan una barra fija inferior con recuento de cambios (“1 cambio de calibración local”) + <span class=\"mono\">Restaurar por defecto</span> + <span class=\"mono\">Guardar cambios</span>. Sombra hacia arriba (<span class=\"mono\">--re-shadow-bar</span>).": {
+  "en": "The Editor and Parameters screens use a fixed bottom bar with a change count (“1 local calibration change”) + <span class=\"mono\">Restore defaults</span> + <span class=\"mono\">Save changes</span>. Shadow cast upwards (<span class=\"mono\">--re-shadow-bar</span>)."
+ },
+ "Data Display": {
+  "en": "Data Display",
+  "es": "Visualización de datos"
+ },
+ "Historial es la superficie de datos principal: tabla densa, filtros que funcionan, estado como punto de color sobre pill neutra y acciones de fila reveladas en hover.": {
+  "en": "History is the main data surface: a dense table, filters that work, state as a coloured dot on a neutral pill, and row actions revealed on hover."
+ },
+ "<span class=\"tick\"></span>Table · TableToolbar · RowActions · Pagination": {
+  "en": "<span class=\"tick\"></span>Table · TableToolbar · RowActions · Pagination"
+ },
+ "<span class=\"tt\">Presupuestos guardados</span><span class=\"ct\">58 resultados</span> <span class=\"r\"><button class=\"b sm\">Exportar</button><button class=\"b sm\">Columnas</button></span>": {
+  "en": "<span class=\"tt\">Saved quotes</span><span class=\"ct\">58 results</span> <span class=\"r\"><button class=\"b sm\">Export</button><button class=\"b sm\">Columns</button></span>"
+ },
+ "Código": {
+  "en": "Code"
+ },
+ "Cliente / obra": {
+  "en": "Client / project"
+ },
+ "Monto": {
+  "en": "Amount"
+ },
+ "Baranda de balcón": {
+  "en": "Balcony railing"
+ },
+ "Pedro Núñez · 15/06/2026": {
+  "en": "Pedro Núñez · 15/06/2026"
+ },
+ "Barandas": {
+  "en": "Railings"
+ },
+ "<span class=\"st\"><span class=\"d d-draft\"></span> Borrador</span>": {
+  "en": "<span class=\"st\"><span class=\"d d-draft\"></span> Draft</span>"
+ },
+ "Baranda de balcón — inicial": {
+  "en": "Balcony railing — initial"
+ },
+ "Pedro Núñez · 13/06/2026": {
+  "en": "Pedro Núñez · 13/06/2026"
+ },
+ "<span class=\"st\"><span class=\"d d-sent\"></span> Enviado</span>": {
+  "en": "<span class=\"st\"><span class=\"d d-sent\"></span> Sent</span>"
+ },
+ "Escalera recta — 1er contacto": {
+  "en": "Straight staircase — first contact"
+ },
+ "Valentina Cruz · 12/06/2026": {
+  "en": "Valentina Cruz · 12/06/2026"
+ },
+ "Escaleras": {
+  "en": "Stairs"
+ },
+ "<span class=\"st\"><span class=\"d d-appr\"></span> Aprobado</span>": {
+  "en": "<span class=\"st\"><span class=\"d d-appr\"></span> Approved</span>"
+ },
+ "<span style=\"font-size:12.5px;color:var(--re-ink-4)\">Mostrando 1–12 de 58</span> <span class=\"pgn\" style=\"margin-left:auto\"><span class=\"pg\">‹</span><span class=\"pg on\">1</span><span class=\"pg\">2</span><span class=\"pg\">3</span><span class=\"pg dots\">…</span><span class=\"pg\">5</span><span class=\"pg\">›</span></span>": {
+  "en": "<span style=\"font-size:12.5px;color:var(--re-ink-4)\">Showing 1–12 of 58</span> <span class=\"pgn\" style=\"margin-left:auto\"><span class=\"pg\">‹</span><span class=\"pg on\">1</span><span class=\"pg\">2</span><span class=\"pg\">3</span><span class=\"pg dots\">…</span><span class=\"pg\">5</span><span class=\"pg\">›</span></span>"
+ },
+ "Table": {
+  "en": "Table"
+ },
+ "TableToolbar": {
+  "en": "TableToolbar"
+ },
+ "RowActions": {
+  "en": "RowActions"
+ },
+ "Pagination": {
+  "en": "Pagination"
+ },
+ "Helpers": {
+  "en": "Helpers"
+ },
+ "Clases de header: <span class=\"mono\">is-right</span> · <span class=\"mono\">is-center</span> · <span class=\"mono\">is-sortable</span>.": {
+  "en": "Header classes: <span class=\"mono\">is-right</span> · <span class=\"mono\">is-center</span> · <span class=\"mono\">is-sortable</span>."
+ },
+ "Clases de celda: <span class=\"mono\">re-cell-strong</span> (primaria) · <span class=\"mono\">re-cell-sub</span> (línea secundaria).": {
+  "en": "Cell classes: <span class=\"mono\">re-cell-strong</span> (primary) · <span class=\"mono\">re-cell-sub</span> (secondary line)."
+ },
+ "<b>Envolver en <span class=\"mono\">&lt;Card flush&gt;</span></b> — la card recorta el desborde de la tabla.": {
+  "en": "<b>Wrap in <span class=\"mono\">&lt;Card flush&gt;</span></b> — the card clips the table's overflow."
+ },
+ "<span class=\"mono\">RowActions</span> se revela en hover de fila.": {
+  "en": "<span class=\"mono\">RowActions</span> is revealed on row hover."
+ },
+ "Montos y cifras": {
+  "en": "Amounts and figures"
+ },
+ "Columna de monto alineada a la derecha, <span class=\"mono\">tabular-nums</span>, peso 600.": {
+  "en": "The amount column is right-aligned, <span class=\"mono\">tabular-nums</span>, weight 600."
+ },
+ "Código en mono a 11,5px, color <span class=\"mono\">--re-ink-3</span>.": {
+  "en": "Code in mono at 11.5px, colour <span class=\"mono\">--re-ink-3</span>."
+ },
+ "Fila de dos líneas: primaria (<span class=\"mono\">re-cell-strong</span>) + secundaria cliente · fecha.": {
+  "en": "Two-line row: primary (<span class=\"mono\">re-cell-strong</span>) + secondary client · date."
+ },
+ "Empty state — el patrón real del producto": {
+  "en": "Empty state — the product's real pattern"
+ },
+ "Sólo se listan presupuestos guardados. No hay borrado físico — el estado se cambia de forma suave.": {
+  "en": "Only saved quotes are listed. There are no hard deletes — the state is changed softly."
+ },
+ "Los estados vacíos <b>explican la regla</b>, no sólo dicen “sin resultados”.": {
+  "en": "Empty states <b>explain the rule</b>, they do not just say “no results”."
+ },
+ "NR‑07": {
+  "en": "NR‑07"
+ },
+ "No hay componente de <b>loading / skeleton</b> en el sistema, y los empty states existen sólo como copy dentro de pantallas, no como componente reutilizable.": {
+  "en": "There is no <b>loading / skeleton</b> component in the system, and empty states exist only as copy inside screens, not as a reusable component."
+ },
+ "<span class=\"tick\"></span>Cards, tiles y badges como display": {
+  "en": "<span class=\"tick\"></span>Cards, tiles and badges as display"
+ },
+ "Ya documentados en §02: <span class=\"mono\">Card</span> family para contenedores, <span class=\"mono\">StatTile</span> para KPI y grillas de estado, <span class=\"mono\">Badge</span>/<span class=\"mono\">StatusBadge</span> para etiquetas, códigos y ciclo de vida, <span class=\"mono\">TechnicalPreviewCard</span> para el dibujo esquemático del producto.": {
+  "en": "Already documented in §02: the <span class=\"mono\">Card</span> family for containers, <span class=\"mono\">StatTile</span> for KPIs and status grids, <span class=\"mono\">Badge</span>/<span class=\"mono\">StatusBadge</span> for labels, codes and lifecycle, <span class=\"mono\">TechnicalPreviewCard</span> for the product's schematic drawing."
+ },
+ "Product Patterns": {
+  "en": "Product Patterns",
+  "es": "Patrones de producto"
+ },
+ "Patrones propios de REstimator. No son componentes: son composiciones con significado de negocio, y varias están gobernadas por las reglas no negociables del §00.": {
+  "en": "Patterns specific to REstimator. They are not components: they are compositions with business meaning, and several are governed by the non-negotiable rules in §00."
+ },
+ "<span class=\"tick\"></span>Valor recomendado y rangos": {
+  "en": "<span class=\"tick\"></span>Recommended value and ranges"
+ },
+ "<svg style=\"width:13px;height:13px;color:var(--re-amber)\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"none\"><path d=\"M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 18.9 6.1 22l1.2-6.5L2.5 9.4l6.6-.9z\"/></svg> Recomendado": {
+  "en": "<svg style=\"width:13px;height:13px;color:var(--re-amber)\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"none\"><path d=\"M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 18.9 6.1 22l1.2-6.5L2.5 9.4l6.6-.9z\"/></svg> Recommended"
+ },
+ "valor de fabricación · + IVA": {
+  "en": "fabrication value · + VAT"
+ },
+ "Mínimo": {
+  "en": "Minimum"
+ },
+ "Máximo": {
+  "en": "Maximum"
+ },
+ "Reglas del patrón": {
+  "en": "Pattern rules"
+ },
+ "El <b>recomendado</b> es la única cifra ámbar de la pantalla y vive sobre el charcoal más profundo.": {
+  "en": "The <b>recommended value</b> is the only amber figure on the screen and sits on the deepest charcoal."
+ },
+ "Siempre se muestra <b>con su rango</b> (mín / máx) y un pin en el track — el número nunca aparece solo.": {
+  "en": "It is always shown <b>with its range</b> (min / max) and a pin on the track — the number never appears alone."
+ },
+ "El precio sale de <span class=\"mono\">Fab_min/Fab_max</span> calibrados, <b>no</b> de jornales × valor.": {
+  "en": "The price comes from calibrated <span class=\"mono\">Fab_min/Fab_max</span>, <b>not</b> from labour days × rate."
+ },
+ "Siempre etiquetado <b>“valor de fabricación · + IVA”</b>: nunca se insinúa que es precio final.": {
+  "en": "Always labelled <b>“fabrication value · + VAT”</b>: it is never implied to be a final price."
+ },
+ "El panel lleva el punto “En vivo”: recálculo continuo, sin botón calcular.": {
+  "en": "The panel carries the “Live” dot: continuous recalculation, no calculate button."
+ },
+ "Jornales — control, no precio": {
+  "en": "Labour days — a control, not a price"
+ },
+ "Mín": {
+  "en": "Min"
+ },
+ "Rec.": {
+  "en": "Rec."
+ },
+ "Máx": {
+  "en": "Max"
+ },
+ "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v5M12 8h.01\"/></svg> Verificación de carga de trabajo — <b style=\"color:var(--re-ink-3)\">no define el precio</b>. Copy literal del producto.": {
+  "en": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v5M12 8h.01\"/></svg> Workload check — <b style=\"color:var(--re-ink-3)\">it does not set the price</b>. Literal product copy."
+ },
+ "<span class=\"tick\"></span>Pasos del resultado": {
+  "en": "<span class=\"tick\"></span>Result steps"
+ },
+ "El panel de resultado siempre presenta los mismos pasos numerados, en el mismo orden, en los tres breakpoints:": {
+  "en": "The result panel always presents the same numbered steps, in the same order, across all three breakpoints:"
+ },
+ "Paso": {
+  "en": "Step"
+ },
+ "Bloque": {
+  "en": "Block"
+ },
+ "Qué comunica": {
+  "en": "What it communicates"
+ },
+ "Fabricación estimada": {
+  "en": "Estimated fabrication"
+ },
+ "Rango mín–máx + track con pin del recomendado.": {
+  "en": "Min–max range + track with the recommended pin."
+ },
+ "Recomendado": {
+  "en": "Recommended"
+ },
+ "Bloque charcoal con la cifra ámbar. El ancla visual.": {
+  "en": "Charcoal block with the amber figure. The visual anchor."
+ },
+ "Jornales · mano de obra": {
+  "en": "Labour days · workforce"
+ },
+ "Mín / Rec. / Máx como control de carga.": {
+  "en": "Min / Rec. / Max as a workload check."
+ },
+ "Colocación (sugerida)": {
+  "en": "Installation (suggested)"
+ },
+ "Rango + base de cálculo (~10% de fabricación) + zona.": {
+  "en": "Range + calculation basis (~10% of fabrication) + zone."
+ },
+ "Subtotal": {
+  "en": "Subtotal"
+ },
+ "Fabricación + colocación → subtotal, con “+ IVA” explícito.": {
+  "en": "Fabrication + installation → subtotal, with an explicit “+ VAT”."
+ },
+ "Override": {
+  "en": "Override"
+ },
+ "Ajuste manual del precio final, siempre visible como campo aparte.": {
+  "en": "Manual adjustment of the final price, always visible as a separate field."
+ },
+ "Alertas": {
+  "en": "Alerts"
+ },
+ "<span class=\"mono\">AlertGroup</span> warn‑only al pie del panel.": {
+  "en": "A warn-only <span class=\"mono\">AlertGroup</span> at the foot of the panel."
+ },
+ "<span class=\"tick\"></span>Creación y edición de presupuestos": {
+  "en": "<span class=\"tick\"></span>Creating and editing quotes"
+ },
+ "Flujo de la calculadora": {
+  "en": "Calculator flow"
+ },
+ "<b>1 Producto</b> — familia → subcategoría (taxonomía de 10 rubros).": {
+  "en": "<b>1 Product</b> — family → subcategory (10-category taxonomy)."
+ },
+ "<b>2 Dimensiones</b> — medidas en metros, coma decimal.": {
+  "en": "<b>2 Dimensions</b> — measurements in metres, decimal comma."
+ },
+ "<b>3 Opciones constructivas</b> — estructura, contrahuella, antideslizante, baranda.": {
+  "en": "<b>3 Construction options</b> — structure, riser, anti-slip, railing."
+ },
+ "<b>4 Terminación · colocación · zona</b> — DTM, tipo de colocación, zona geográfica.": {
+  "en": "<b>4 Finish · installation · zone</b> — DTM, installation type, geographic zone."
+ },
+ "Encabezado del presupuesto <b>opcional y compactable</b>: no roba protagonismo al formulario.": {
+  "en": "The quote header is <b>optional and collapsible</b>: it does not steal focus from the form."
+ },
+ "Clasificación": {
+  "en": "Classification"
+ },
+ "Familias → subcategorías es la columna vertebral. <span class=\"mono\">TaxonomyIcon</span> acompaña cada rubro en rails, dropdowns, cards de catálogo y chips.": {
+  "en": "Families → subcategories is the backbone. <span class=\"mono\">TaxonomyIcon</span> accompanies each category in rails, dropdowns, catalogue cards and chips."
+ },
+ "Ciclo de vida y acciones": {
+  "en": "Lifecycle and actions"
+ },
+ "<b>Estados</b>: Borrador → Enviado → Aprobado / Rechazado / Cancelado.": {
+  "en": "<b>States</b>: Draft → Sent → Approved / Rejected / Cancelled."
+ },
+ "<b>Sin borrado físico</b>: el cambio de estado es suave y reversible.": {
+  "en": "<b>No hard deletes</b>: the state change is soft and reversible."
+ },
+ "<b>Duplicar</b> es de primera clase — retomar una cotización previa es el camino más común.": {
+  "en": "<b>Duplicate</b> is first-class — picking up a previous quote is the most common path."
+ },
+ "<b>Freeze</b>: al publicarse, el presupuesto congela su versión de parámetros y queda inmutable.": {
+  "en": "<b>Freeze</b>: on publication, the quote freezes its version of the parameters and becomes immutable."
+ },
+ "<b>Override</b>: el ajuste manual queda registrado, no reemplaza silenciosamente al recomendado.": {
+  "en": "<b>Override</b>: the manual adjustment is recorded; it does not silently replace the recommended value."
+ },
+ "Filtros y búsqueda": {
+  "en": "Filters and search"
+ },
+ "Búsqueda por N°, cliente u obra en un único input con <span class=\"mono\">leadIcon</span>.": {
+  "en": "Search by number, client or project in a single input with a <span class=\"mono\">leadIcon</span>."
+ },
+ "Filtros por tipo/estado en una línea; en mobile con scroll horizontal y activo ámbar sólido.": {
+  "en": "Type/state filters on one line; on mobile they scroll horizontally, with a solid amber active state."
+ },
+ "Contador de resultados siempre visible (“58 resultados”).": {
+  "en": "The result count is always visible (“58 results”)."
+ },
+ "<span class=\"tick\"></span>El documento al cliente — la única superficie clara": {
+  "en": "<span class=\"tick\"></span>The client-facing document — the only light surface"
+ },
+ "El resumen al cliente se renderiza como una <b>hoja de papel blanca real</b> (es el artefacto imprimible / WhatsApp / PDF) apoyada sobre el banco de trabajo oscuro; su fila de total es charcoal con el total en ámbar. Todo lo demás del producto es oscuro. Modos <b>estimación</b> y <b>formal</b> vía <span class=\"mono\">SegmentedControl</span>. Voz en tercera persona formal (“Le compartimos una estimación…”), nunca voseo. <b>Nunca serializa rangos, jornales, márgenes ni calibración</b> (regla 5).": {
+  "en": "The client summary is rendered as <b>a real sheet of white paper</b> (it is the printable / WhatsApp / PDF artifact) resting on the dark workbench; its total row is charcoal with the total in amber. Everything else in the product is dark. <b>Estimate</b> and <b>formal</b> modes via <span class=\"mono\">SegmentedControl</span>. Formal third-person voice (“Please find attached an estimate…”), never informal address. It <b>never serialises ranges, labour days, margins or calibration</b> (rule 5)."
+ },
+ "<span class=\"tick\"></span>Voz y microcopy": {
+  "en": "<span class=\"tick\"></span>Voice and microcopy"
+ },
+ "Regla": {
+  "en": "Rule"
+ },
+ "Aplicación": {
+  "en": "Application"
+ },
+ "Idioma": {
+  "en": "Language"
+ },
+ "Español de Uruguay, voseo rioplatense en imperativo: <i>“Agregá notas…”, “buscá, filtrá y retomá”</i>. Nunca “añade/busca”.": {
+  "en": "Uruguayan Spanish, Rioplatense <i>voseo</i> in the imperative: <i>“Agregá notas…”, “buscá, filtrá y retomá”</i>. Never “añade/busca”."
+ },
+ "Tono": {
+  "en": "Tone"
+ },
+ "Llano, operativo, confiable. Declarativas cortas. Explica por qué existe un número sin titubear.": {
+  "en": "Plain, operational, trustworthy. Short declaratives. It explains why a number exists without hedging."
+ },
+ "Casing": {
+  "en": "Casing"
+ },
+ "Sentence case en todo lo legible. UPPERCASE + tracking sólo en eyebrows chicos.": {
+  "en": "Sentence case for everything readable. UPPERCASE + tracking only on small eyebrows."
+ },
+ "Persona": {
+  "en": "Person"
+ },
+ "La app te habla a vos (el presupuestador). El documento al cliente es formal en tercera persona.": {
+  "en": "The app speaks to you (the estimator). The client-facing document is formal and third-person."
+ },
+ "Emoji": {
+  "en": "Emoji"
+ },
+ "Nunca. Un “✓” en confirmaciones transitorias es el único carácter decorativo.": {
+  "en": "Never. A “✓” in transient confirmations is the only decorative character."
+ },
+ "Notas de ayuda": {
+  "en": "Help notes"
+ },
+ "Icono info/lock + una sola oración.": {
+  "en": "Info/lock icon + a single sentence."
+ },
+ "Responsive System": {
+  "en": "Responsive System",
+  "es": "Sistema responsive"
+ },
+ "El mismo sistema en tres densidades. Mobile <b>no es otro producto</b>: son los mismos tokens, la misma taxonomía, los mismos pasos de resultado y el mismo vocabulario — con el patrón de navegación y de resultado que corresponde al espacio disponible.": {
+  "en": "The same system at three densities. Mobile is <b>not another product</b>: same tokens, same taxonomy, same result steps and same vocabulary — with the navigation and result pattern that suits the available space."
+ },
+ "<span class=\"tick\"></span>Transformación por aspecto": {
+  "en": "<span class=\"tick\"></span>Transformation by aspect"
+ },
+ "Aspecto": {
+  "en": "Aspect"
+ },
+ "Mobile · 390": {
+  "en": "Mobile · 390"
+ },
+ "Tablet · 834": {
+  "en": "Tablet · 834"
+ },
+ "Desktop · 1440": {
+  "en": "Desktop · 1440"
+ },
+ "Navegación": {
+  "en": "Navigation"
+ },
+ "Bottom tab bar (5 familias) + título contextual": {
+  "en": "Bottom tab bar (5 families) + contextual title"
+ },
+ "Tabs superiores de familia bajo el header": {
+  "en": "Top family tabs under the header"
+ },
+ "Sidebar izquierdo fijo 248px": {
+  "en": "Fixed 248px left sidebar"
+ },
+ "Branding": {
+  "en": "Branding"
+ },
+ "Monograma RE en header (avatar = usuario, no marca)": {
+  "en": "RE monogram in the header (avatar = user, not brand)"
+ },
+ "Monograma + nombre compactos": {
+  "en": "Compact monogram + name"
+ },
+ "Logo + nombre + versión de motor en sidebar": {
+  "en": "Logo + name + engine version in the sidebar"
+ },
+ "Ocultos — los reemplaza título + back": {
+  "en": "Hidden — replaced by title + back"
+ },
+ "Compactos, opcionales": {
+  "en": "Compact, optional"
+ },
+ "Completos en el topbar": {
+  "en": "Complete, in the topbar"
+ },
+ "Header": {
+  "en": "Header"
+ },
+ "Sticky compacto: back + título; sin sub‑copy": {
+  "en": "Compact sticky: back + title; no sub-copy"
+ },
+ "Sticky: título + acción": {
+  "en": "Sticky: title + action"
+ },
+ "Topbar + page‑head": {
+  "en": "Topbar + page head"
+ },
+ "Resultado": {
+  "en": "Result"
+ },
+ "Resumen pinneado arriba + sheet a demanda": {
+  "en": "Pinned summary on top + sheet on demand"
+ },
+ "Bottom sheet colapsable con peek": {
+  "en": "Collapsible bottom sheet with a peek"
+ },
+ "Panel lateral sticky 380px": {
+  "en": "380px sticky side panel"
+ },
+ "Acciones primarias": {
+  "en": "Primary actions"
+ },
+ "Barra fija sobre el tab bar": {
+  "en": "Fixed bar above the tab bar"
+ },
+ "En el peek del sheet + dentro del panel": {
+  "en": "In the sheet's peek + inside the panel"
+ },
+ "Dentro del panel de resultado": {
+  "en": "Inside the result panel"
+ },
+ "Sticky": {
+  "en": "Sticky"
+ },
+ "Header + resumen + barra de acciones": {
+  "en": "Header + summary + action bar"
+ },
+ "Header + peek del sheet": {
+  "en": "Header + sheet peek"
+ },
+ "Panel de resultado + save bar": {
+  "en": "Result panel + save bar"
+ },
+ "Formularios": {
+  "en": "Forms"
+ },
+ "1 campo por fila; secciones numeradas con anclas": {
+  "en": "1 field per row; numbered sections with anchors"
+ },
+ "Grilla de 2 columnas con respiración": {
+  "en": "2-column grid with breathing room"
+ },
+ "Grilla de 2–3 columnas": {
+  "en": "2–3 column grid"
+ },
+ "Densidad": {
+  "en": "Density"
+ },
+ "Cards apiladas, gap 14, padding 16": {
+  "en": "Stacked cards, gap 14, padding 16"
+ },
+ "Intermedia, padding 22": {
+  "en": "Intermediate, padding 22"
+ },
+ "Densa, padding 20/24, gap 16–20": {
+  "en": "Dense, padding 20/24, gap 16–20"
+ },
+ "Tablas / listas": {
+  "en": "Tables / lists"
+ },
+ "Fila = card; tap abre; secundarias en ⋯": {
+  "en": "Row = card; tap opens it; secondary actions in ⋯"
+ },
+ "Tabla reducida o cards según ancho": {
+  "en": "Reduced table or cards depending on width"
+ },
+ "Tabla completa + RowActions en hover": {
+  "en": "Full table + RowActions on hover"
+ },
+ "<span class=\"tick\"></span>Patrón de resultado — decisión por breakpoint": {
+  "en": "<span class=\"tick\"></span>Result pattern — a decision per breakpoint"
+ },
+ "Se evaluaron cuatro opciones (lateral sticky · superior resumido · bottom sheet · híbrida) y se eligió la <b>composición híbrida</b>: ninguna opción única gana en los tres tamaños, así que el patrón se adapta al espacio. El recomendado queda <b>siempre glanceable</b>; el desglose está <b>a un tap</b>.": {
+  "en": "Four options were evaluated (sticky side · summarised top · bottom sheet · hybrid) and the <b>hybrid composition</b> was chosen: no single option wins at all three sizes, so the pattern adapts to the space. The recommended value stays <b>glanceable at all times</b>; the breakdown is <b>one tap away</b>."
+ },
+ "Desktop ≥ 1200": {
+  "en": "Desktop ≥ 1200"
+ },
+ "Panel lateral": {
+  "en": "Side panel"
+ },
+ "Espacio horizontal de sobra: desglose completo sticky junto al formulario. Es lo que ya funcionaba — se conserva.": {
+  "en": "Horizontal space to spare: the full breakdown stays sticky beside the form. It is what already worked — it is kept."
+ },
+ "Tablet 834": {
+  "en": "Tablet 834"
+ },
+ "Bottom sheet": {
+  "en": "Bottom sheet"
+ },
+ "Formulario a ancho cómodo; barra‑peek inferior con recomendado + rango + CTA. Se expande sin tapar campos.": {
+  "en": "Form at a comfortable width; a bottom peek bar with the recommended value + range + CTA. It expands without covering fields."
+ },
+ "Mobile 390": {
+  "en": "Mobile 390"
+ },
+ "Resumen arriba + sheet": {
+  "en": "Summary on top + sheet"
+ },
+ "Header de resultado pinneado (recomendado + rango + tamaño); “Ver desglose” abre el sheet. Acciones en barra fija.": {
+  "en": "Pinned result header (recommended + range + size); “View breakdown” opens the sheet. Actions live in a fixed bar."
+ },
+ "<span class=\"tick\"></span>Constantes mobile v1": {
+  "en": "<span class=\"tick\"></span>Mobile v1 constants"
+ },
+ "Viewport base": {
+  "en": "Base viewport"
+ },
+ "Rango fluido": {
+  "en": "Fluid range"
+ },
+ "Grilla": {
+  "en": "Grid"
+ },
+ "4px (--re-s*)": {
+  "en": "4px (--re-s*)"
+ },
+ "Padding de pantalla": {
+  "en": "Screen padding"
+ },
+ "Gap entre cards": {
+  "en": "Gap between cards"
+ },
+ "r13 · pad 16": {
+  "en": "r13 · pad 16"
+ },
+ "Touch target": {
+  "en": "Touch target"
+ },
+ "Safe area": {
+  "en": "Safe area"
+ },
+ "Reglas de adaptación de componentes": {
+  "en": "Component adaptation rules"
+ },
+ "<b>Nada se “oculta” solamente.</b> Si un elemento no cabe, se reemplaza por su equivalente táctil.": {
+  "en": "<b>Nothing is merely “hidden”.</b> If an element does not fit, it is replaced by its touch equivalent."
+ },
+ "<b>Acción dominante por tap</b>: la fila entera abre; las secundarias van a un overflow ⋯.": {
+  "en": "<b>One dominant action per tap</b>: the whole row opens; secondary actions move to a ⋯ overflow."
+ },
+ "<b>Chips en una línea</b> con scroll horizontal; el activo es ámbar sólido, nunca wrap a dos líneas.": {
+  "en": "<b>Chips on one line</b> with horizontal scroll; the active one is solid amber, never wrapping to two lines."
+ },
+ "<b>Sin sub‑copy en headers</b> táctiles: título + back y nada más.": {
+  "en": "<b>No sub-copy in touch headers</b>: title + back and nothing else."
+ },
+ "<b>Una sola marca por header</b>: monograma = app, avatar = usuario.": {
+  "en": "<b>One brand mark per header</b>: monogram = app, avatar = user."
+ },
+ "El bottom sheet <b>sólo</b> transporta el desglose — no se convierte en navegación.": {
+  "en": "The bottom sheet carries <b>only</b> the breakdown — it never becomes navigation."
+ },
+ "Spec completa: <span class=\"art-name\">Mobile v1 — Spec de implementación</span>": {
+  "en": "Full spec: <span class=\"art-name\">Mobile v1 — Implementation spec</span>"
+ },
+ "NR‑12": {
+  "en": "NR‑12"
+ },
+ "La capa <b>tablet</b> está documentada y especificada, pero <b>no existe artefacto de pantalla tablet</b> en <span class=\"mono\">ui_kits/</span>. Los valores tablet provienen de los mockups de refinamiento, no de una pantalla del kit.": {
+  "en": "The <b>tablet</b> layer is documented and specified, but <b>there is no tablet screen artifact</b> in <span class=\"mono\">ui_kits/</span>. The tablet values come from the refinement mockups, not from a screen in the kit."
+ },
+ "Screen Examples": {
+  "en": "Screen Examples",
+  "es": "Ejemplos de pantalla"
+ },
+ "5 desktop · 3 mobile": {
+  "en": "5 desktop · 3 mobile"
+ },
+ "<span class=\"tick\"></span>Desktop — UI kit": {
+  "en": "<span class=\"tick\"></span>Desktop — UI kit"
+ },
+ "<span class=\"tick\"></span>Mobile v1 — pantallas finales": {
+  "en": "<span class=\"tick\"></span>Mobile v1 — final screens"
+ },
+ "Calculadora, Inicio e Historial quedaron congeladas para implementación, con medidas, spacing, componentes y comportamiento sticky por pantalla. Se documentan en su propio archivo para no duplicar la fuente de verdad.": {
+  "en": "Calculator, Home and History were frozen for implementation, with measurements, spacing, components and sticky behaviour per screen. They are documented in their own file so the source of truth is not duplicated."
+ },
+ "<span class=\"tick\"></span>Otras piezas del proyecto": {
+  "en": "<span class=\"tick\"></span>Other pieces of the project"
+ },
+ "Component Inventory": {
+  "en": "Component Inventory",
+  "es": "Inventario de componentes"
+ },
+ "33 construidos · 6 especificados": {
+  "en": "33 built · 6 specified"
+ },
+ "Inventario completo. <b>Status</b>: <span class=\"tag stable\">Stable</span> construido y en uso · <span class=\"tag ext\">Extended</span> existe pero necesita ampliarse para mobile · <span class=\"tag new\">New</span> especificado en Mobile v1, sin construir · <span class=\"tag rev\">Needs review</span> inconsistencia documentada.": {
+  "en": "Full inventory. <b>Status</b>: <span class=\"tag stable\">Stable</span> built and in use · <span class=\"tag ext\">Extended</span> exists but needs extending for mobile · <span class=\"tag new\">New</span> specified in Mobile v1, not built · <span class=\"tag rev\">Needs review</span> documented inconsistency.",
+  "es": "Inventario completo. <b>Estado</b>: <span class=\"tag stable\">Estable</span> construido y en uso · <span class=\"tag ext\">Extendido</span> existe pero necesita ampliarse para mobile · <span class=\"tag new\">Nuevo</span> especificado en Mobile v1, sin construir · <span class=\"tag rev\">Requiere revisión</span> inconsistencia documentada."
+ },
+ "Component": {
+  "en": "Component"
+ },
+ "Category": {
+  "en": "Category"
+ },
+ "Variants": {
+  "en": "Variants"
+ },
+ "States": {
+  "en": "States"
+ },
+ "Status": {
+  "en": "Status",
+  "es": "Estado"
+ },
+ "Implementation notes": {
+  "en": "Implementation notes"
+ },
+ "Button": {
+  "en": "Button"
+ },
+ "Forms": {
+  "en": "Forms",
+  "es": "Formularios"
+ },
+ "secondary · primary · accent · ghost / sm·md·lg": {
+  "en": "secondary · primary · accent · ghost / sm·md·lg"
+ },
+ "default · hover · focus · disabled": {
+  "en": "default · hover · focus · disabled"
+ },
+ "Sí": {
+  "en": "Yes"
+ },
+ "<span class=\"tag stable\">Stable</span>": {
+  "en": "<span class=\"tag stable\">Stable</span>",
+  "es": "<span class=\"tag stable\">Estable</span>"
+ },
+ "Un solo primary/accent por vista. Mobile usa h42 en barras de acción.": {
+  "en": "One primary/accent per view. Mobile uses h42 in action bars."
+ },
+ "IconButton": {
+  "en": "IconButton"
+ },
+ "default 34 · bare 30 · danger": {
+  "en": "default 34 · bare 30 · danger"
+ },
+ "Parcial": {
+  "en": "Partial"
+ },
+ "<span class=\"mono\">title</span> obligatorio. En mobile subir a ≥44 de área.": {
+  "en": "<span class=\"mono\">title</span> required. On mobile, raise the hit area to ≥44."
+ },
+ "Wrapper de todos los controles.": {
+  "en": "Wrapper for every control."
+ },
+ "<span class=\"tag rev\">Needs review</span>": {
+  "en": "<span class=\"tag rev\">Needs review</span>",
+  "es": "<span class=\"tag rev\">Requiere revisión</span>"
+ },
+ "Sin estado de error/invalid — ver NR‑06.": {
+  "en": "No error/invalid state — see NR‑06."
+ },
+ "native + chevron": {
+  "en": "native + chevron"
+ },
+ "Pasar <span class=\"mono\">&lt;option&gt;</span> como children.": {
+  "en": "Pass <span class=\"mono\">&lt;option&gt;</span> as children."
+ },
+ "Notas del presupuesto.": {
+  "en": "Quote notes."
+ },
+ "Track charcoal on; <span class=\"mono\">sm</span> para filas de tabla.": {
+  "en": "Charcoal track when on; <span class=\"mono\">sm</span> for table rows."
+ },
+ "SegmentedControl": {
+  "en": "SegmentedControl"
+ },
+ "&gt;3 opciones → Select.": {
+  "en": "&gt;3 options → Select."
+ },
+ "Badge": {
+  "en": "Badge"
+ },
+ "Feedback": {
+  "en": "Feedback"
+ },
+ "5 tonos · dot · square": {
+  "en": "5 tones · dot · square"
+ },
+ "estático": {
+  "en": "static"
+ },
+ "<span class=\"mono\">square</span> para códigos mono.": {
+  "en": "<span class=\"mono\">square</span> for mono codes."
+ },
+ "StatusBadge": {
+  "en": "StatusBadge"
+ },
+ "draft·sent·appr·rej·cancel": {
+  "en": "draft·sent·appr·rej·cancel"
+ },
+ "Mapea color + etiqueta español automáticamente.": {
+  "en": "Maps colour + Spanish label automatically."
+ },
+ "Alert": {
+  "en": "Alert"
+ },
+ "warn·ok·info·crit·neutral": {
+  "en": "warn·ok·info·crit·neutral"
+ },
+ "estático · con/sin título": {
+  "en": "static · with or without title"
+ },
+ "warn es default: el motor nunca bloquea.": {
+  "en": "warn is the default: the engine never blocks."
+ },
+ "AlertGroup": {
+  "en": "AlertGroup"
+ },
+ "title · items": {
+  "en": "title · items"
+ },
+ "Panel “Alertas y recordatorios”.": {
+  "en": "“Alerts and reminders” panel."
+ },
+ "Layout": {
+  "en": "Layout"
+ },
+ "pad · flush": {
+  "en": "pad · flush"
+ },
+ "estático · hover en filas": {
+  "en": "static · hover on rows"
+ },
+ "<span class=\"mono\">flush</span> para tablas a sangre.": {
+  "en": "<span class=\"mono\">flush</span> for full-bleed tables."
+ },
+ "icon · title · hint · actions": {
+  "en": "icon · title · hint · actions"
+ },
+ "En mobile las actions suelen pasar a overflow.": {
+  "en": "On mobile the actions usually move to an overflow."
+ },
+ "default · tight": {
+  "en": "default · tight"
+ },
+ "<span class=\"mono\">tight</span> para tablas y listas de opciones.": {
+  "en": "<span class=\"mono\">tight</span> for tables and option lists."
+ },
+ "index · title · hint · tools": {
+  "en": "index · title · hint · tools"
+ },
+ "Pasos numerados de calculadora / editor.": {
+  "en": "Numbered steps in the calculator / editor."
+ },
+ "StatTile": {
+  "en": "StatTile"
+ },
+ "default · accent · dot · amberValue": {
+  "en": "default · accent · dot · amberValue"
+ },
+ "Un solo accent por fila.": {
+  "en": "One accent per row."
+ },
+ "TechnicalPreviewCard": {
+  "en": "TechnicalPreviewCard"
+ },
+ "compact · standard · large / 4 renderers": {
+  "en": "compact · standard · large / 4 renderers"
+ },
+ "live · placeholder": {
+  "en": "live · placeholder"
+ },
+ "No documentado": {
+  "en": "Not documented"
+ },
+ "Registry extensible. Comportamiento mobile sin especificar.": {
+  "en": "Extensible registry. Mobile behaviour unspecified.",
+  "es": "Registro extensible. Comportamiento mobile sin especificar."
+ },
+ "TechnicalRenderers": {
+  "en": "TechnicalRenderers"
+ },
+ "registry API": {
+  "en": "registry API"
+ },
+ "Navigation": {
+  "en": "Navigation",
+  "es": "Navegación"
+ },
+ "sidebar + topbar + main": {
+  "en": "sidebar + topbar + main"
+ },
+ "Requiere modo": {
+  "en": "Mode required"
+ },
+ "Necesita 3 modos: sidebar / tabs / bottom bar.": {
+  "en": "Needs 3 modes: sidebar / tabs / bottom bar."
+ },
+ "logo · footer": {
+  "en": "logo · footer"
+ },
+ "No aplica": {
+  "en": "Not applicable"
+ },
+ "248px fijo, sticky.": {
+  "en": "248px fixed, sticky."
+ },
+ "mark · name · tagline": {
+  "en": "mark · name · tagline"
+ },
+ "Tagline default desalineado — ver NR‑02.": {
+  "en": "Default tagline is misaligned — see NR‑02."
+ },
+ "label · first": {
+  "en": "label · first"
+ },
+ "Eyebrow uppercase del sidebar.": {
+  "en": "The sidebar's uppercase eyebrow."
+ },
+ "icon · label · as": {
+  "en": "icon · label · as"
+ },
+ "default · hover · active": {
+  "en": "default · hover · active"
+ },
+ "Sustituido": {
+  "en": "Replaced"
+ },
+ "Active = rail ámbar de 3px + label bold.": {
+  "en": "Active = 3px amber rail + bold label."
+ },
+ "breadcrumbs · actions": {
+  "en": "breadcrumbs · actions"
+ },
+ "Variante compacta": {
+  "en": "Compact variant"
+ },
+ "Mobile: back + título, sin breadcrumbs.": {
+  "en": "Mobile: back + title, no breadcrumbs."
+ },
+ "items[]": {
+  "en": "items[]"
+ },
+ "Ocultos": {
+  "en": "Hidden"
+ },
+ "Último item en bold.": {
+  "en": "Last item in bold."
+ },
+ "name · role · initials": {
+  "en": "name · role · initials"
+ },
+ "Sólo avatar": {
+  "en": "Avatar only"
+ },
+ "En mobile colapsa al avatar.": {
+  "en": "On mobile it collapses to the avatar."
+ },
+ "Data": {
+  "en": "Data",
+  "es": "Datos"
+ },
+ "helpers is-right/center/sortable": {
+  "en": "is-right/center/sortable helpers"
+ },
+ "row hover": {
+  "en": "row hover"
+ },
+ "Fila → card": {
+  "en": "Row → card"
+ },
+ "Envolver en <span class=\"mono\">Card flush</span>.": {
+  "en": "Wrap in <span class=\"mono\">Card flush</span>."
+ },
+ "title · count · actions": {
+  "en": "title · count · actions"
+ },
+ "Simplificado": {
+  "en": "Simplified"
+ },
+ "Pill de recuento de resultados.": {
+  "en": "Result count pill."
+ },
+ "cluster de IconButtons": {
+  "en": "cluster of IconButtons"
+ },
+ "revelado en hover": {
+  "en": "revealed on hover"
+ },
+ "Overflow ⋯": {
+  "en": "⋯ overflow"
+ },
+ "En táctil no hay hover: requiere menú ⋯.": {
+  "en": "There is no hover on touch: it needs a ⋯ menu."
+ },
+ "showing · pages · current": {
+  "en": "showing · pages · current"
+ },
+ "current · hover": {
+  "en": "current · hover"
+ },
+ "Mobile probablemente scroll infinito o “cargar más” — sin definir.": {
+  "en": "Mobile will probably be infinite scroll or “load more” — undefined."
+ },
+ "TaxonomyIcon": {
+  "en": "TaxonomyIcon"
+ },
+ "Icons": {
+  "en": "Icons",
+  "es": "Iconos"
+ },
+ "10 categorías · size · strokeWidth": {
+  "en": "10 categories · size · strokeWidth"
+ },
+ "currentColor · activo ámbar": {
+  "en": "currentColor · amber when active"
+ },
+ "Usado también en el bottom tab bar.": {
+  "en": "Also used in the bottom tab bar."
+ },
+ "TAXONOMY_ICONS": {
+  "en": "TAXONOMY_ICONS"
+ },
+ "array ordenado": {
+  "en": "ordered array"
+ },
+ "Iterar para menús y catálogos.": {
+  "en": "Iterate it for menus and catalogues."
+ },
+ "5 tabs": {
+  "en": "5 tabs"
+ },
+ "active · inactive": {
+  "en": "active · inactive"
+ },
+ "h64 + safe-area. Iconos 21, label 10.": {
+  "en": "h64 + safe area. Icons 21, label 10."
+ },
+ "back+título · marca+título": {
+  "en": "back+title · brand+title"
+ },
+ "sticky": {
+  "en": "sticky"
+ },
+ "Variante compacta de Topbar.": {
+  "en": "Compact variant of Topbar."
+ },
+ "1 primary + 2 secundarias": {
+  "en": "1 primary + 2 secondary"
+ },
+ "fixed": {
+  "en": "fixed"
+ },
+ "h62, bottom 64, shadow hacia arriba.": {
+  "en": "h62, bottom 64, shadow cast upwards."
+ },
+ "ResultSummary": {
+  "en": "ResultSummary"
+ },
+ "Product": {
+  "en": "Product",
+  "es": "Producto"
+ },
+ "pinned charcoal": {
+  "en": "pinned charcoal"
+ },
+ "sticky · live": {
+  "en": "sticky · live"
+ },
+ "Variante de ResultPanel: recomendado + rango + tamaño + “Ver desglose”.": {
+  "en": "A ResultPanel variant: recommended + range + size + “View breakdown”."
+ },
+ "ResultSheet": {
+  "en": "ResultSheet"
+ },
+ "bottom sheet": {
+  "en": "bottom sheet"
+ },
+ "abierto · cerrado": {
+  "en": "open · closed"
+ },
+ "Radio sup. 18, máx 78%, grab 38×4, scrim .6.": {
+  "en": "Top radius 18, max 78%, grab 38×4, scrim .6."
+ },
+ "FilterChips": {
+  "en": "FilterChips"
+ },
+ "una línea scroll-x": {
+  "en": "one line, scroll-x"
+ },
+ "active ámbar sólido · inactive": {
+  "en": "active solid amber · inactive"
+ },
+ "Nunca wrap a dos líneas.": {
+  "en": "Never wraps to two lines."
+ },
+ "No": {
+  "en": "No"
+ },
+ "No existen en el sistema — ver NR‑13.": {
+  "en": "They do not exist in the system — see NR‑13."
+ },
+ "Skeleton · Spinner": {
+  "en": "Skeleton · Spinner"
+ },
+ "Sin componente de loading — ver NR‑07.": {
+  "en": "No loading component — see NR‑07."
+ },
+ "Design → Implementation": {
+  "en": "Design → Implementation",
+  "es": "Diseño → Implementación"
+ },
+ "Cómo escala el sistema: una decisión de foundation se convierte en token, el token viste un componente, el componente compone un patrón de producto y el patrón se instancia en una pantalla. La cadena es la misma para todo.": {
+  "en": "How the system scales: a foundation decision becomes a token, the token dresses a component, the component composes a product pattern, and the pattern is instanced on a screen. The chain is the same for everything."
+ },
+ "01 · Foundation": {
+  "en": "01 · Foundation"
+ },
+ "Un solo acento cálido, racionado": {
+  "en": "A single warm accent, rationed"
+ },
+ "El ámbar marca sólo los momentos que importan; el resto es grafito.": {
+  "en": "Amber marks only the moments that matter; everything else is graphite."
+ },
+ "02 · Token": {
+  "en": "02 · Token"
+ },
+ "Variable": {
+  "en": "Variable"
+ },
+ "--re-amber #e0911e<br>--re-amber-bright #f5b342": {
+  "en": "--re-amber #e0911e<br>--re-amber-bright #f5b342"
+ },
+ "Vive en <span class=\"mono\">tokens/colors.css</span>. Todo lo demás lo referencia.": {
+  "en": "It lives in <span class=\"mono\">tokens/colors.css</span>. Everything else references it."
+ },
+ "03 · Component": {
+  "en": "03 · Component"
+ },
+ "Primitivo": {
+  "en": "Primitive"
+ },
+ "Button variant=\"accent\"<br>StatTile amberValue": {
+  "en": "Button variant=\"accent\"<br>StatTile amberValue"
+ },
+ "El componente nunca hardcodea el hex: lee la variable.": {
+  "en": "The component never hardcodes the hex: it reads the variable."
+ },
+ "04 · Pattern": {
+  "en": "04 · Pattern"
+ },
+ "Composición": {
+  "en": "Composition"
+ },
+ "Valor recomendado<br>+ rango + track": {
+  "en": "Recommended value<br>+ range + track"
+ },
+ "La cifra ámbar sobre charcoal con su rango: significado de negocio.": {
+  "en": "The amber figure on charcoal with its range: business meaning."
+ },
+ "05 · Screen": {
+  "en": "05 · Screen"
+ },
+ "Instancia": {
+  "en": "Instance"
+ },
+ "Calculator.html<br>ResultSummary (mobile)": {
+  "en": "Calculator.html<br>ResultSummary (mobile)"
+ },
+ "El mismo patrón, tres densidades — sin volver a decidir nada.": {
+  "en": "The same pattern, three densities — without deciding anything again."
+ },
+ "<span class=\"tick\"></span>Cómo consumir el sistema": {
+  "en": "<span class=\"tick\"></span>How to consume the system"
+ },
+ "1 · Estilos": {
+  "en": "1 · Styles"
+ },
+ "Enlazá <b>un solo archivo</b>. Es un manifiesto de <span class=\"mono\">@import</span>: trae fuentes, colores, tipografía, spacing, elevación, tema light y el reset base.": {
+  "en": "Link <b>one single file</b>. It is an <span class=\"mono\">@import</span> manifest: it brings fonts, colours, typography, spacing, elevation and the base reset.",
+  "es": "Enlazá <b>un solo archivo</b>. Es un manifiesto de <span class=\"mono\">@import</span>: trae fuentes, colores, tipografía, spacing, elevación y el reset base."
+ },
+ "3 · Componentes": {
+  "en": "3 · Components"
+ },
+ "Reglas para superficies nuevas": {
+  "en": "Rules for new surfaces"
+ },
+ "<b>Nunca</b> un hex literal: siempre <span class=\"mono\">var(--re-*)</span>. Si falta un token, se agrega al sistema, no a la pantalla.": {
+  "en": "<b>Never</b> a literal hex: always <span class=\"mono\">var(--re-*)</span>. If a token is missing, it is added to the system, not to the screen."
+ },
+ "<b>Nunca</b> re‑explorar tipografía — está congelada.": {
+  "en": "<b>Never</b> re-explore typography — it is frozen."
+ },
+ "<b>Respetá el racionamiento del ámbar</b>: recomendado · rail/tab activo · CTA · logo.": {
+  "en": "<b>Respect amber rationing</b>: recommended value · active rail/tab · CTA · logo."
+ },
+ "<b>Iconos</b>: copiá las formas del kit; 24×24, stroke 1.7–1.8, round caps.": {
+  "en": "<b>Icons</b>: copy the shapes from the kit; 24×24, stroke 1.7–1.8, round caps."
+ },
+ "<b>Sin emoji</b>, sin gradientes, sin glass, sin blur decorativo.": {
+  "en": "<b>No emoji</b>, no gradients, no glass, no decorative blur."
+ },
+ "<b>Las 5 reglas de producto</b> del §00 no se negocian desde diseño.": {
+  "en": "<b>The 5 product rules</b> in §00 are not negotiable from design."
+ },
+ "Cifras: <span class=\"mono\">tabular-nums</span> y formato uruguayo siempre.": {
+  "en": "Figures: <span class=\"mono\">tabular-nums</span> and Uruguayan format, always."
+ },
+ "Migración a Figma": {
+  "en": "Migrating to Figma"
+ },
+ "Los tokens de §01 mapean 1:1 a variables de Figma (color, number para spacing/radius, string para families).": {
+  "en": "The §01 tokens map 1:1 to Figma variables (colour, number for spacing/radius, string for families)."
+ },
+ "Las variantes de §02 mapean a component properties (<span class=\"mono\">variant</span>, <span class=\"mono\">size</span>, <span class=\"mono\">tone</span>, <span class=\"mono\">status</span>).": {
+  "en": "The §02 variants map to component properties (<span class=\"mono\">variant</span>, <span class=\"mono\">size</span>, <span class=\"mono\">tone</span>, <span class=\"mono\">status</span>)."
+ },
+ "Los tres breakpoints de §07 mapean a page/frame widths 390 · 834 · 1440.": {
+  "en": "The three breakpoints in §07 map to page/frame widths 390 · 834 · 1440."
+ },
+ "NR‑01": {
+  "en": "NR‑01"
+ },
+ "<b>Prosa vs token en <span class=\"mono\">--re-ink-4</span>.</b> El readme describe <span class=\"mono\">#686d76</span>; el token real es <span class=\"mono\">#7f858e</span> (elevado para cumplir WCAG AA). La prosa del readme quedó desactualizada respecto del archivo de tokens.": {
+  "en": "<b>Prose vs. token in <span class=\"mono\">--re-ink-4</span>.</b> The readme describes <span class=\"mono\">#686d76</span>; the real token is <span class=\"mono\">#7f858e</span> (raised to meet WCAG AA). The readme's prose fell out of date with the token file."
+ },
+ "<b>Tagline por defecto de <span class=\"mono\">LogoMark</span>.</b> El componente trae <span class=\"mono\">'RE · v1.0'</span>; el kit y los mockups muestran <span class=\"mono\">“REstimator · motor v1.5”</span>. Definir cuál es el canónico.": {
+  "en": "<b><span class=\"mono\">LogoMark</span> default tagline.</b> The component ships <span class=\"mono\">'RE · v1.0'</span>; the kit and the mockups show <span class=\"mono\">“REstimator · motor v1.5”</span>. Decide which one is canonical."
+ },
+ "NR‑03": {
+  "en": "NR‑03"
+ },
+ "<b><span class=\"mono\">--re-text-xl (21px)</span> no documentado.</b> Existe en <span class=\"mono\">tokens/typography.css</span> pero falta en la escala descrita en el readme (40 · 23 · 17 · 14.5 · 14 · 13 · 12 · 11).": {
+  "en": "<b><span class=\"mono\">--re-text-xl (21px)</span> undocumented.</b> It exists in <span class=\"mono\">tokens/typography.css</span> but is missing from the scale described in the readme (40 · 23 · 17 · 14.5 · 14 · 13 · 12 · 11)."
+ },
+ "NR‑04": {
+  "en": "NR‑04"
+ },
+ "<b>Altura de control por breakpoint.</b> <span class=\"mono\">--re-control-h</span> es 40px (desktop) pero la spec Mobile v1 usa 42px. No hay token de control mobile: hoy el 42 está hardcodeado.": {
+  "en": "<b>Control height per breakpoint.</b> <span class=\"mono\">--re-control-h</span> is 40px (desktop) but the Mobile v1 spec uses 42px. There is no mobile control token: today the 42 is hardcoded."
+ },
+ "<b>Breakpoints sin tokenizar.</b> 390 / 834 / 1200–1440 viven en prosa y specs, no en <span class=\"mono\">tokens/</span>.": {
+  "en": "<b>Breakpoints not tokenised.</b> 390 / 834 / 1200–1440 live in prose and specs, not in <span class=\"mono\">tokens/</span>."
+ },
+ "<b>Sin estado de error de campo.</b> <span class=\"mono\">Field</span>/<span class=\"mono\">Input</span> no exponen <span class=\"mono\">error</span>/<span class=\"mono\">invalid</span>. Coherente con el motor warn‑only, pero deja sin definir la validación inline si alguna vez se necesita.": {
+  "en": "<b>No field error state.</b> <span class=\"mono\">Field</span>/<span class=\"mono\">Input</span> do not expose <span class=\"mono\">error</span>/<span class=\"mono\">invalid</span>. Consistent with the warn-only engine, but it leaves inline validation undefined should it ever be needed."
+ },
+ "<b>Sin loading ni empty state como componentes.</b> No existe skeleton/spinner; los empty states son copy dentro de pantallas.": {
+  "en": "<b>No loading or empty state as components.</b> There is no skeleton/spinner; empty states are copy inside screens."
+ },
+ "NR‑08": {
+  "en": "NR‑08"
+ },
+ "<b>Racionamiento del ámbar en mobile.</b> La regla define cuatro momentos; mobile agrega el tab activo (ámbar‑ink) y el filter chip activo (ámbar sólido). Hay que reformular la regla para táctil o reclasificar esos usos como “rail activo”.": {
+  "en": "<b>Amber rationing on mobile.</b> The rule defines four moments; mobile adds the active tab (amber-ink) and the active filter chip (solid amber). The rule needs restating for touch, or those uses reclassifying as “active rail”."
+ },
+ "NR‑09": {
+  "en": "NR‑09"
+ },
+ "<b>6 componentes mobile especificados sin construir.</b> <span class=\"mono\">BottomTabBar · MobileHeader · BottomActionBar · ResultSummary · ResultSheet · FilterChips</span> existen en Mobile v1 pero no en <span class=\"mono\">components/</span>.": {
+  "en": "<b>6 mobile components specified but not built.</b> <span class=\"mono\">BottomTabBar · MobileHeader · BottomActionBar · ResultSummary · ResultSheet · FilterChips</span> exist in Mobile v1 but not in <span class=\"mono\">components/</span>."
+ },
+ "NR‑10": {
+  "en": "NR‑10"
+ },
+ "<b>Starting points obsoletos.</b> Las 4 pantallas del kit están marcadas <span class=\"mono\">@startingPoint</span>, mecanismo que los proyectos consumidores ya no ofrecen — los reemplazaron los <span class=\"mono\">templates/</span>, y hoy hay 0 templates.": {
+  "en": "<b>Obsolete starting points.</b> The kit's 4 screens are marked <span class=\"mono\">@startingPoint</span>, a mechanism consuming projects no longer offer — <span class=\"mono\">templates/</span> replaced it, and today there are 0 templates."
+ },
+ "NR‑11": {
+  "en": "NR‑11"
+ },
+ "<b>Fuentes por CDN.</b> <span class=\"mono\">tokens/fonts.css</span> importa Hanken Grotesk y JetBrains Mono desde Google Fonts. Para un export standalone verdaderamente offline hay que auto‑hospedarlas o inlinearlas.": {
+  "en": "<b>Fonts over CDN.</b> <span class=\"mono\">tokens/fonts.css</span> imports Hanken Grotesk and JetBrains Mono from Google Fonts. A truly offline standalone export would need them self-hosted or inlined."
+ },
+ "<b>Tablet sin artefacto.</b> La capa está documentada pero no hay pantalla tablet en <span class=\"mono\">ui_kits/</span>; sus valores vienen de los mockups de refinamiento.": {
+  "en": "<b>Tablet without an artifact.</b> The layer is documented but there is no tablet screen in <span class=\"mono\">ui_kits/</span>; its values come from the refinement mockups."
+ },
+ "NR‑13": {
+  "en": "NR‑13"
+ },
+ "<b>Sin Checkbox ni Radio.</b> El producto los evita (usa Select, SegmentedControl y Toggle), pero conviene declararlo como decisión explícita del sistema en vez de un hueco.": {
+  "en": "<b>No Checkbox or Radio.</b> The product avoids them (it uses Select, SegmentedControl and Toggle), but this is worth stating as an explicit system decision rather than leaving it as a gap."
+ },
+ "<span>REstimator Design System — Master Documentation</span> <span class=\"mono\">147 tokens · 33 componentes</span>": {
+  "en": "<span>REstimator Design System — Master Documentation</span> <span class=\"mono\">147 tokens · 33 components</span>"
+ }
+}
