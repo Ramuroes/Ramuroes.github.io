@@ -700,3 +700,72 @@ Las dos mitades hacen falta:
 
 Los listeners van en el lienzo y no en el `<dialog>`, así la barra, el %, los
 botones y el cerrar nunca escalan.
+
+---
+
+## 16. Estados interactivos: de dónde salía el azul
+
+En producción aparecían superficies **azules** al interactuar con la subnav de
+mobile y con el botón de cerrar del visor. No es un color de este proyecto: lo
+pone el tema padre, que estila `<button>` por nombre de elemento y le pinta
+`background`, `border` y `box-shadow` propios en `:hover` y en `:focus`. Es el
+mismo mecanismo ya documentado en vivo en dos lugares del repo —el círculo azul
+de las flechas del índice del Case Study (`case-figure-lightbox.css`) y el texto
+azul de los botones sin clase (`components.css`)—, sólo que acá golpeaba a
+controles agregados después.
+
+### Los dos huecos
+
+| Hueco | Por qué pasaba |
+|---|---|
+| La armadura de `.re-doc button:hover/:focus` | Sólo neutralizaba `box-shadow`. Nunca tocó `background-color` ni `border-color`. |
+| El visor entero | `ds-screen-viewer.js` hace `document.body.appendChild(dialog)`: el `<dialog>` **no está dentro de `.re-doc` ni de `.es-page`**, así que no le llega ni la armadura del documento ni la red de foco de `base.css`. Y como el JS le da el foco al abrir (`closeBtn.focus()`), el azul era lo primero que se veía. |
+
+Además, en la barra mínima los links sólo declaraban `:hover` y
+`:focus-visible`: en el `:focus` **plano** —un click con mouse— quedaban con el
+`a:focus` del tema padre.
+
+### Por qué no se arregla en la raíz
+
+Poner `background: none !important` sobre `.re-doc button:hover` (0,1,1) le
+ganaría también a `.re-doc .b:hover` (0,2,1) de `doc.css`, que es el hover real
+de los botones de demostración del sistema: se apagarían los especímenes de §02
+para arreglar la subnav. Por eso las reglas son **por control**, como ya lo hace
+`.es-lightbox__close` para este mismo problema.
+
+### Qué token se reusa
+
+El verde interactivo del portfolio, sin inventar nada:
+
+| Token | Valor (dark) | Dónde ya se usaba |
+|---|---|---|
+| `--es-accent` | `#58b183` | `.es-btn`, links, y la red de foco de `base.css` |
+| `--es-accent-soft` | `rgba(88,177,131,.12)` | el relleno de `.es-btn` en hover |
+
+Siguen al Customizer (`body.es-accent--orange`) y al modo claro como el resto
+del sitio. El patrón también es el de `.es-btn`: **hover, `:focus-visible` y
+`:active` comparten superficie** —fondo del acento con transparencia y borde del
+acento— y `:focus-visible` **suma** el anillo. El `:focus` plano no dibuja
+anillo, igual que en todo el sitio, pero sí limpia el relleno del tema padre.
+
+`!important` sólo en las propiedades que pinta el tema padre: sin él,
+`button:hover` (0,1,1) empata con `.esv__btn:hover` y decide el orden de carga,
+que contra un tema padre no está garantizado. **Nunca `outline: none`**.
+
+### Lo que NO cambió
+
+- El marcador ámbar del ítem actual de la subnav (`box-shadow: inset 3px`) —
+  es estado, no interacción, y espeja el marcador del rail.
+- El chip "Ampliar" de las previews, que sigue en ámbar: es la afordancia
+  propia del Design System, no un estado de foco.
+- Los hovers de los botones de demostración del documento (`.b`, `.b.acc`).
+- Geometría: los botones ya eran `border-box`, así que el borde de 1px del
+  hover **no mueve nada** — medido en reposo y en hover, mismo tamaño.
+
+### Cómo se verifica
+
+`state-qa.mjs` levanta la página con una **simulación adversarial del CSS del
+tema padre** (`kadence-sim.css`, que reproduce el mecanismo documentado arriba a
+la misma especificidad), recorre cada control nuevo en reposo / hover / foco de
+teclado / activo y falla si algún color computado cae en la zona azul. Antes del
+arreglo: 51 fallos. Después: 0.

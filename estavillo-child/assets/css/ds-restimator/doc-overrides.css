@@ -321,8 +321,13 @@ body.es-ds-page {
 	text-overflow: ellipsis;
 }
 
+/* :focus PLANO además de :focus-visible: sin él, un click con mouse dejaba el
+   link en el `a:focus` del tema padre, que lo pinta de azul. Mismo criterio
+   que .es-lightbox__close en case-figure-lightbox.css. */
 .es-ds-topbar__back:hover,
-.es-ds-topbar__back:focus-visible {
+.es-ds-topbar__back:focus,
+.es-ds-topbar__back:focus-visible,
+.es-ds-topbar__back:active {
 	color: var(--re-ink);
 }
 
@@ -352,12 +357,18 @@ body.es-ds-page {
 }
 
 .es-ds-topbar__owner:hover,
-.es-ds-topbar__owner:focus-visible {
+.es-ds-topbar__owner:focus,
+.es-ds-topbar__owner:focus-visible,
+.es-ds-topbar__owner:active {
 	color: var(--re-ink-2);
 }
 
+/* El anillo lo termina imponiendo `.es-page a:focus-visible` de base.css, que
+   lleva !important y la misma especificidad: esta regla nunca llegaba a
+   pintarse en ámbar. Se la deja declarada —el offset y el radio sí son
+   propios— pero con el token que realmente se ve. */
 .es-ds-topbar a:focus-visible {
-	outline: 2px solid var(--re-amber);
+	outline: 2px solid var(--es-accent);
 	outline-offset: 3px;
 	border-radius: 3px;
 }
@@ -639,7 +650,7 @@ body.es-ds-page {
    quedaba invisible. Especificidad (0,3,1) contra (0,1,1) de la regla base,
    así que con !important de los dos lados gana esta. */
 .re-doc button.vp:focus-visible {
-	outline: 2px solid var(--re-amber) !important;
+	outline: 2px solid var(--es-accent) !important;
 	outline-offset: -3px !important;
 }
 
@@ -820,7 +831,7 @@ body.es-ds-page {
 }
 
 .esv__btn:focus-visible {
-	outline: 2px solid var(--re-amber) !important;
+	outline: 2px solid var(--es-accent) !important;
 	outline-offset: -2px !important;
 }
 
@@ -841,7 +852,7 @@ body.es-ds-page {
 }
 
 .esv__scroll:focus-visible {
-	outline: 2px solid var(--re-amber) !important;
+	outline: 2px solid var(--es-accent) !important;
 	outline-offset: -2px !important;
 }
 
@@ -1616,12 +1627,16 @@ body.es-ds-page {
 }
 
 .re-doc .ev-audit > summary:hover,
+.re-doc .ev-audit > summary:focus,
+.re-doc .ev-audit > summary:active,
 .re-doc .ev-audit[open] > summary {
 	color: var(--re-ink-2);
 }
 
+/* Igual que en la barra mínima: el anillo real lo pone base.css con
+   !important; acá sólo viven el offset y el radio. */
 .re-doc .ev-audit > summary:focus-visible {
-	outline: 2px solid var(--re-amber);
+	outline: 2px solid var(--es-accent);
 	outline-offset: 3px;
 	border-radius: 3px;
 }
@@ -1771,8 +1786,10 @@ body.es-ds-page {
 	transform: rotate(180deg);
 }
 
+/* Anillo de foco: el verde interactivo del portfolio (--es-accent), igual que
+   el resto del sitio. El offset negativo es lo único propio — ver §16. */
 .ds-subnav__trigger:focus-visible {
-	outline: 2px solid var(--re-amber) !important;
+	outline: 2px solid var(--es-accent) !important;
 	outline-offset: -3px !important;
 }
 
@@ -1810,7 +1827,7 @@ body.es-ds-page {
 }
 
 .re-doc .ds-subnav__item:focus-visible {
-	outline: 2px solid var(--re-amber) !important;
+	outline: 2px solid var(--es-accent) !important;
 	outline-offset: -3px !important;
 }
 
@@ -1953,4 +1970,156 @@ body.es-ds-page {
 		margin-left: 0;
 		width: 100%;
 	}
+}
+
+/* -------------------------------------------------------------------------
+   16. Estados interactivos de los controles nuevos
+   -------------------------------------------------------------------------
+   En producción aparecían superficies AZULES al interactuar con la subnav y
+   con el botón de cerrar del visor. No es un color de este proyecto: lo pone
+   el tema padre, que estila <button> por nombre de elemento y le pinta
+   background, border y box-shadow propios en :hover y en :focus. Es el mismo
+   mecanismo ya documentado en vivo en dos lugares de este repo —el círculo
+   azul de las flechas del índice del Case Study (case-figure-lightbox.css) y
+   el texto azul de los botones sin clase (components.css)—, sólo que acá
+   golpea a controles que se agregaron después.
+
+   POR QUÉ NO ALCANZABA LO QUE YA HABÍA. Dos huecos distintos:
+
+    · La armadura de §1 (`.re-doc button:hover/:focus`) sólo neutraliza
+      `box-shadow`. Nunca tocó `background-color` ni `border-color`, así que
+      el relleno del tema padre pasaba igual.
+    · El visor vive FUERA de todo. `ds-screen-viewer.js` hace
+      `document.body.appendChild(dialog)`, o sea que el <dialog> no está ni
+      dentro de `.re-doc` ni dentro de `.es-page`: no le llega la armadura del
+      documento NI la red de foco de base.css. Sin una regla propia, el
+      <button> de cerrar quedaba a merced del tema padre — y como el JS le da
+      el foco al abrir (`closeBtn.focus()`), el azul era lo primero que se veía.
+
+   POR QUÉ NO SE ARREGLA EN LA RAÍZ. Poner `background: none !important` sobre
+   `.re-doc button:hover` (0,1,1) le ganaría también a `.re-doc .b:hover`
+   (0,2,1) de doc.css, que es el hover REAL de los botones de demostración del
+   Design System: se apagarían los especímenes de §02 para arreglar la subnav.
+   Por eso las reglas de abajo son por control, como ya lo hace
+   `.es-lightbox__close` para este mismo problema.
+
+   QUÉ COLOR. El verde interactivo del portfolio, sin inventar nada:
+   `--es-accent` (+ `--es-accent-soft` para el relleno), los mismos tokens que
+   usan `.es-btn`, los links y la red de foco de base.css. Siguen al
+   Customizer como el resto del sitio. El patrón también es el de `.es-btn`:
+   hover, focus-visible y active comparten superficie —fondo del acento con
+   transparencia y borde del acento— y focus-visible SUMA el anillo. El
+   `:focus` plano no dibuja anillo, igual que en todo el sitio, pero sí limpia
+   el relleno del tema padre.
+
+   `!important` en las propiedades que pinta el tema padre, y sólo en esas: sin
+   él, `button:hover` (0,1,1) empata con `.esv__btn:hover` y decide el orden de
+   carga, que contra un tema padre no está garantizado. Nunca `outline: none`:
+   el anillo de foco se mantiene en los tres controles.
+   ------------------------------------------------------------------------- */
+
+/* ---------- subnav: el disparador ---------- */
+
+.ds-subnav__trigger:hover,
+.ds-subnav__trigger:focus,
+.ds-subnav__trigger:focus-visible,
+.ds-subnav__trigger:active {
+	background: var(--es-accent-soft) !important;
+	border-color: var(--es-accent) !important;
+	box-shadow: none !important;
+	color: var(--re-ink) !important;
+}
+
+/* El número y el chevron son hijos: sin esto heredarían el color de texto que
+   el tema padre le pone al botón. */
+.ds-subnav__trigger:hover .ds-subnav__chev,
+.ds-subnav__trigger:focus .ds-subnav__chev,
+.ds-subnav__trigger:active .ds-subnav__chev {
+	color: var(--es-accent);
+}
+
+.ds-subnav__trigger:hover .ds-subnav__num,
+.ds-subnav__trigger:focus .ds-subnav__num,
+.ds-subnav__trigger:active .ds-subnav__num {
+	color: var(--re-amber-ink);
+}
+
+/* ---------- subnav: los ítems del desplegable ---------- */
+
+/* Son <a>, así que el riesgo acá es el `a:hover` del tema padre pintando el
+   TEXTO de azul. Mismo verde, mismo patrón. */
+.re-doc .ds-subnav__item:hover,
+.re-doc .ds-subnav__item:focus,
+.re-doc .ds-subnav__item:focus-visible,
+.re-doc .ds-subnav__item:active {
+	background: var(--es-accent-soft) !important;
+	color: var(--re-ink) !important;
+	box-shadow: none;
+}
+
+/* El ítem actual conserva su marca ámbar —es estado, no interacción— y la
+   mantiene también mientras se lo recorre. */
+.re-doc .ds-subnav__item.is-current,
+.re-doc .ds-subnav__item.is-current:hover,
+.re-doc .ds-subnav__item.is-current:focus,
+.re-doc .ds-subnav__item.is-current:focus-visible {
+	box-shadow: inset 3px 0 0 var(--re-amber);
+}
+
+/* ---------- visor: cerrar, − y + ---------- */
+
+.esv__btn:hover:not(:disabled),
+.esv__btn:focus:not(:disabled),
+.esv__btn:focus-visible:not(:disabled),
+.esv__btn:active:not(:disabled) {
+	background: var(--es-accent-soft) !important;
+	border: 1px solid var(--es-accent) !important;
+	box-shadow: none !important;
+	color: var(--re-ink) !important;
+}
+
+/* Un botón deshabilitado (− al ancho de ajuste, + al tope de zoom) no toma
+   ningún estado: sin esta línea el tema padre se lo pintaba igual. */
+.esv__btn:disabled,
+.esv__btn:disabled:hover,
+.esv__btn:disabled:focus {
+	background: none !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
+	color: var(--re-ink-3) !important;
+}
+
+/* El <dialog> está fuera de .es-page, así que tampoco le llegó el
+   `-webkit-tap-highlight-color: transparent` de base.css: en Android el toque
+   dejaba un destello propio del navegador sobre los controles. */
+.esv,
+.esv button,
+.esv [tabindex] {
+	-webkit-tap-highlight-color: transparent;
+}
+
+/* ---------- visor: el lienzo ---------- */
+
+/* Es focusable (tabindex=0) para recorrer la captura con el teclado, así que
+   también es un control. No lleva superficie: sólo hay que impedir que el
+   tema padre le dibuje su propio anillo en el :focus plano. El anillo verde de
+   :focus-visible se declara junto al resto del visor. */
+.esv__scroll:focus {
+	outline-color: transparent;
+	box-shadow: none !important;
+}
+
+/* ---------- disparador de las previews de pantalla ---------- */
+
+/* `button.vp` ya trae su propio hover (el chip "Ampliar" del Design System) y
+   ese no cambia: lo único que se corrige es el borde que le pinta el tema
+   padre, invisible hoy porque el botón tiene border-width 0, pero que
+   reaparecería con cualquier hoja que le devuelva un ancho. */
+.re-doc button.vp:hover,
+.re-doc button.vp:focus,
+.re-doc button.vp:focus-visible,
+.re-doc button.vp:active {
+	background: none !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
 }
