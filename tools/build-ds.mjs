@@ -258,36 +258,49 @@ const DESKTOP_SHOTS = [
 	},
 ];
 
+/** Pares esperados en la comparación: las 5 pantallas de desktop documentadas. */
+const LIGHT_DARK_PAIRS = 5;
+
 /**
  * La comparación light/dark es un composite de 10 <iframe> a las pantallas
- * reales. Dos correcciones necesarias para capturarla:
+ * reales, dos por pantalla.
  *
- *  1. Los iframes son loading="lazy": el script de la página les asigna src de
- *     entrada, pero Chromium igual difiere los que están fuera del viewport, y
- *     una captura fullPage no los despierta. Se fuerzan a eager y se espera a
- *     que carguen los diez (más el remapeo a data-theme="light" de la columna
- *     derecha, que corre en el 'load' de cada frame).
+ * Los iframes son loading="lazy": el script de la página les asigna src de
+ * entrada, pero Chromium igual difiere los que están fuera del viewport, y una
+ * captura fullPage no los despierta. Se fuerzan a eager y se espera a que
+ * carguen los diez (más el remapeo a data-theme="light" de la columna derecha,
+ * que corre en el 'load' de cada frame).
  *
- *  2. La fila "01 Dashboard" apunta a ui_kits/presupuestador/index.html, que es
- *     un stub de redirección: el propio kit la marca "Dashboard removed from V1
- *     (scope lock · Decision 1)". Es una fila obsoleta de la fuente. Se excluye
- *     de la captura para no publicar un panel vacío o una redirección; el resto
- *     del documento no se toca. Queda anotado en docs/DS-RESTIMATOR.md.
+ * Antes acá también se borraba la fila "01 Dashboard", que apuntaba a
+ * ui_kits/presupuestador/index.html — un stub de redirección que el propio kit
+ * marca "Dashboard removed from V1 (scope lock · Decision 1)". Esa fila ya no
+ * existe en la fuente: la reemplazó Catálogos, que sí es una de las cinco
+ * pantallas documentadas. La verificación de abajo garantiza que las cinco
+ * estén y que ninguna apunte al stub.
+ *
+ * EL TEMA LIGHT SE APLICA DESDE ACÁ, no desde la página.
+ * La página trae un script que hace `f.contentDocument.documentElement
+ * .setAttribute('data-theme','light')` — correcto si el documento se sirve por
+ * http, donde padre e iframe comparten origen. Pero el build abre todo con
+ * file://, y ahí Chromium le da a cada documento un ORIGEN OPACO: el acceso a
+ * contentDocument falla, el `catch(e){}` del script se lo traga en silencio, y
+ * la columna "Light" terminaba renderizando el tema oscuro. La comparación
+ * publicada mostraba dark contra dark — verificado: contentDocument.
+ * documentElement es inalcanzable desde el padre bajo file://.
+ *
+ * Playwright sí puede evaluar dentro de un frame de origen opaco, así que el
+ * tema se fija por frame y después se verifica que haya quedado puesto: si no,
+ * el build rompe en vez de publicar otra comparación falsa.
  */
 async function prepareLightDark(page) {
 	// Los iframes son file:// desde un padre file://: contentDocument es origen
 	// opaco y no sirve para saber si terminaron. Se cuentan eventos 'load'
 	// reales, enganchados ANTES de reasignar src.
-	const removed = await page.evaluate(() => {
-		let dropped = 0;
+	const info = await page.evaluate(() => {
 		window.__loaded = 0;
 		window.__expected = 0;
-		document.querySelectorAll('iframe[data-src]').forEach((f) => {
-			if (/\/index\.html$/.test(f.getAttribute('data-src') || '')) {
-				const section = f.closest('section');
-				if (section) { section.remove(); dropped++; }
-				return;
-			}
+		const frames = [...document.querySelectorAll('iframe[data-src]')];
+		frames.forEach((f) => {
 			window.__expected++;
 			f.addEventListener('load', () => { window.__loaded++; }, { once: true });
 			f.loading = 'eager';
@@ -295,14 +308,73 @@ async function prepareLightDark(page) {
 			// Reasignar src fuerza la carga aunque el lazy la haya diferido.
 			f.src = f.dataset.src;
 		});
-		return dropped;
+		return {
+			frames: frames.length,
+			pairs: document.querySelectorAll('section.screen').length,
+			srcs: frames.map((f) => f.dataset.src),
+		};
 	});
-	if (removed === 0) throw new Error('light-dark: no se encontró la fila obsoleta del Dashboard');
+
+	if (info.pairs !== LIGHT_DARK_PAIRS) {
+		throw new Error(`light-dark: esperaba ${LIGHT_DARK_PAIRS} pares, hay ${info.pairs}`);
+	}
+	if (info.frames !== LIGHT_DARK_PAIRS * 2) {
+		throw new Error(`light-dark: esperaba ${LIGHT_DARK_PAIRS * 2} iframes, hay ${info.frames}`);
+	}
+	const stub = info.srcs.filter((s) => /\/index\.html$/.test(s || ''));
+	if (stub.length) throw new Error('light-dark: quedó una fila apuntando al stub del Dashboard');
+
+	// Las cinco pantallas documentadas, y sólo esas.
+	const expected = DESKTOP_SHOTS.filter((s) => s.kind === 'screen').map((s) => s.file).sort();
+	const got = [...new Set(info.srcs.map((s) => s.split('/').pop()))].sort();
+	if (expected.join('|') !== got.join('|')) {
+		throw new Error(`light-dark: las pantallas no coinciden con §08.\n  esperaba: ${expected.join(', ')}\n  hay:      ${got.join(', ')}`);
+	}
 
 	await page.waitForFunction(() => window.__loaded >= window.__expected, null, { timeout: 60000 });
-	// El remapeo a data-theme="light" corre en requestAnimationFrame anidado
-	// dentro del handler 'load' de cada frame de la columna derecha.
-	await page.waitForTimeout(2500);
+	await page.waitForTimeout(600);
+
+	// --- tema light, frame por frame ---------------------------------------
+	const lightFrames = [];
+	for (const handle of await page.$$('iframe[data-light]')) {
+		const frame = await handle.contentFrame();
+		if (!frame) throw new Error('light-dark: un iframe de la columna light no expone su frame');
+		await frame.evaluate(() => {
+			// Estas pantallas ponen `transition: background` en muchos elementos;
+			// cambiar el tema en caliente puede dejarlos a mitad de transición.
+			const kill = document.createElement('style');
+			kill.textContent = '*,*::before,*::after{transition:none !important;animation:none !important}';
+			document.head.appendChild(kill);
+			document.documentElement.setAttribute('data-theme', 'light');
+			void document.body.offsetWidth;
+		});
+		lightFrames.push(frame);
+	}
+	if (lightFrames.length !== LIGHT_DARK_PAIRS) {
+		throw new Error(`light-dark: esperaba ${LIGHT_DARK_PAIRS} frames light, apliqué ${lightFrames.length}`);
+	}
+
+	await page.waitForTimeout(900);
+
+	/*
+	 * Verificación real: no alcanza con que el atributo esté puesto, tiene que
+	 * haber CAMBIADO EL PIXEL. Se compara el fondo computado del <body> contra
+	 * el canvas oscuro. Es lo que habría detectado que la comparación anterior
+	 * era dark contra dark.
+	 */
+	for (const frame of lightFrames) {
+		const bg = await frame.evaluate(() => getComputedStyle(document.body).backgroundColor);
+		const rgb = (bg.match(/\d+/g) || []).slice(0, 3).map(Number);
+		const light = rgb.length === 3 && (rgb[0] + rgb[1] + rgb[2]) / 3 > 128;
+		if (!light) throw new Error(`light-dark: un frame de la columna light quedó oscuro (body bg ${bg})`);
+	}
+
+	// Las columnas dark NO deben haber recibido el atributo.
+	for (const handle of await page.$$('iframe[data-src]:not([data-light])')) {
+		const frame = await handle.contentFrame();
+		const theme = frame ? await frame.evaluate(() => document.documentElement.getAttribute('data-theme')) : null;
+		if (theme) throw new Error(`light-dark: una columna dark quedó con data-theme="${theme}"`);
+	}
 }
 
 /**
@@ -403,7 +475,7 @@ const UI = {
 		zoomHint: 'Ampliar',
 		expandAria: 'Abrir pantalla: %s',
 		explorationTitle: 'Exploración de color',
-		explorationNote: 'Una prueba de remap de color hecha durante el diseño del sistema, guardada como registro. El sistema publicado tiene un solo tema, dark; esta comparación no es un tema disponible.',
+		explorationNote: 'Las cinco pantallas de desktop con un remap de color claro, lado a lado contra el sistema oscuro. Cambian superficies, tinta, bordes y sombras; el espaciado, la tipografía, los componentes y la jerarquía son los mismos, y el ámbar sigue siendo el único acento. La rampa de tinta está calibrada contra el contraste que ya alcanzaba el tema oscuro, no elegida a ojo. Es una exploración: el sistema publicado tiene un solo tema, dark.',
 		artifactsTitle: 'Documentación de respaldo',
 		artifactsLede: 'Los documentos donde se decidieron las cosas que este sistema da por resueltas: auditorías, el cierre de alcance de la V1 y el paquete de handoff.',
 		artifactsHead: ['Artefacto', 'Tipo', 'Qué contiene'],
@@ -436,7 +508,7 @@ const UI = {
 		zoomHint: 'Expand',
 		expandAria: 'Open screen: %s',
 		explorationTitle: 'Colour exploration',
-		explorationNote: 'A colour remap tried while the system was being designed, kept as a record. The published system has one theme, dark; this comparison is not an available theme.',
+		explorationNote: 'The five desktop screens with a light colour remap, side by side against the dark system. Surfaces, ink, borders and shadows change; spacing, typography, components and hierarchy do not, and amber remains the only accent. The ink ramp is calibrated against the contrast the dark theme already achieved, rather than picked by eye. It is an exploration: the published system has one theme, dark.',
 		artifactsTitle: 'Supporting documentation',
 		artifactsLede: 'The documents where the things this system takes as settled were decided: audits, the V1 scope lock and the handoff package.',
 		artifactsHead: ['Artifact', 'Type', 'What it contains'],
