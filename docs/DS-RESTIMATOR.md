@@ -487,3 +487,92 @@ La comparación tenía una fila "01 Dashboard" que apuntaba a un stub de
 redirección, y le faltaba Catálogos. Ahora son las **mismas cinco** de §08, y el
 build lo verifica contra `DESKTOP_SHOTS`: si alguna vez dejan de coincidir, falla
 en vez de publicar una comparación incompleta.
+
+---
+
+## 13. Cache busting de las capturas
+
+Las capturas se sirven desde una URL fija (`…/screens/light-dark.webp`). Cuando
+el build las regenera, el archivo cambia pero la URL no, así que ni el navegador
+ni el CDN tienen forma de saber que hay algo nuevo. Medido en producción: en
+incógnito se veía la captura nueva y en una sesión existente seguía apareciendo
+la vieja **incluso después de hard refresh** — la respuesta venía del edge de
+Cloudflare, no del navegador.
+
+`es_ds_restimator_screen_url()` arma la URL con la versión del propio archivo:
+
+```
+…/screens/light-dark.webp?v=1788790826
+                              └─ filemtime()
+```
+
+Es el mismo mecanismo que `es_asset_ver()` usa para el CSS y el JS del tema. Se
+aplica a **las dos** URLs de cada tarjeta: la preview del `<img>` y la que abre
+el visor (`data-es-screen-src`). Alcance: sólo estas capturas.
+
+No se usa `ES_CHILD_VERSION` porque obligaría a subirla a mano cada vez que se
+recapturan pantallas, que es justo el paso que se olvida.
+
+Verificado sobre la función real:
+
+| | |
+|---|---|
+| dos llamadas sin tocar el archivo | misma URL (el caché sigue sirviendo) |
+| después de reescribir el archivo | URL nueva |
+| mtime restaurado | vuelve a la URL original |
+| archivo inexistente | cae a `?v=<ES_CHILD_VERSION>`, nunca un `?v=` vacío |
+
+> **Cloudflare.** Con el cache level en **Standard** (el default) el query string
+> forma parte de la clave de caché, así que un `?v=` nuevo es un objeto nuevo en
+> el edge. Si la zona estuviera en **Ignore Query String**, esto no alcanzaría y
+> habría que versionar en la ruta del archivo, no en la query.
+
+> **Nota operativa.** WordPress no restaura los timestamps del ZIP al instalar
+> un tema: escribe los archivos, así que el `mtime` pasa a ser el momento de la
+> instalación. O sea que cada reinstalación cambia la versión de todas las
+> capturas, aunque la imagen sea la misma. Es una invalidación de más —una
+> descarga extra, nunca una imagen vieja— y es el mismo comportamiento que ya
+> tenía el resto de los assets del tema.
+
+---
+
+## 14. Cómo se sale del documento
+
+Hay dos salidas y son **excluyentes**, según el toggle del header institucional.
+
+**Header OFF** — la barra mínima sticky, con `← Volver al caso REstimator`
+(§2 de `doc-overrides.css`). Sin breadcrumb.
+
+**Header ON** — no se agrega una segunda barra. Va un breadcrumb contextual
+dentro de la columna principal, justo antes del hero:
+
+```
+Proyectos / REstimator / Design System      (ES)
+Work / REstimator / Design System           (EN)
+```
+
+Lo imprime `es_ds_restimator_breadcrumb()`, que **retorna temprano si el header
+está apagado**. La llamada vive en el documento generado (una línea PHP que
+inserta el build antes del hero), así que hereda la columna principal de la
+grilla y queda alineada con el eyebrow sin repetir ningún cálculo de layout.
+
+Reusa `template-parts/breadcrumbs.php` — el mismo partial y las mismas clases
+que el Case Study y las páginas fijas — así que el color, el separador, el hover
+y el truncado del último nivel ya vienen de `site.css`, que en esta página se
+carga junto con el header. Lo único propio es neutralizar el `.es-container` del
+partial y darle el padding lateral del documento.
+
+- **Work / Proyectos** → `es_page_url_by_template( 'templates/page-work.php' )`,
+  que resuelve por idioma (la query lleva `suppress_filters => false`, que es lo
+  que habilita el filtro de Polylang).
+- **REstimator** → `es_ds_restimator_case_url()`, que ya traducía vía
+  `pll_get_post()`.
+- **Design System** → nivel actual, sin link, con `aria-current="page"`.
+
+Los textos salen de `es_ds_text()` y no de `es__()`, por la misma razón que la
+barra mínima: `es__()` depende de que alguien cargue las String translations de
+Polylang a mano.
+
+Si el Case Study todavía no existe (plugin inactivo, caso sin publicar) ese
+nivel se omite: antes que un link muerto, un nivel menos. Con un solo nivel el
+breadcrumb no se imprime — sería un rótulo, no una navegación.

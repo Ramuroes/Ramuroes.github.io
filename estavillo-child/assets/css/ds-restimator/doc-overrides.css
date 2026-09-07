@@ -489,6 +489,45 @@ body.es-ds-page {
 	}
 }
 
+/* -------------------------------------------------------------------------
+   2c. Breadcrumb contextual (sólo con el header institucional activo)
+   -------------------------------------------------------------------------
+   Es el breadcrumb INSTITUCIONAL: el mismo template-part y las mismas clases
+   que usan el Case Study y las páginas fijas, así que el color, el separador,
+   el hover y el truncado del último nivel ya vienen de site.css —que en esta
+   página se carga junto con el header— y acá no se define ningún componente
+   nuevo.
+
+   Lo único propio es la geometría. El partial envuelve la lista en un
+   `.es-container` (max-width 1140px, centrado), que dentro del documento
+   dejaría el breadcrumb desalineado del contenido. Se neutraliza y se le da el
+   mismo padding lateral que `.hero .in`, que es su vecino inmediato: los dos
+   viven en la columna principal, así que "Proyectos" arranca exactamente donde
+   arranca el eyebrow del hero.
+
+   La tipografía la fuerza el documento (`.re-doc` fija font-family en la
+   raíz), así que se devuelve la del portfolio: el breadcrumb pertenece al
+   chrome, no al Design System. */
+
+.re-doc .es-breadcrumbs {
+	font-family: var(--es-sans, system-ui, sans-serif);
+	padding: var(--re-s6) var(--es-ds-gutter) 0;
+}
+
+.re-doc .es-breadcrumbs .es-container {
+	max-width: none;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+@media (max-width: 1100px) {
+	/* Sin rail, el documento toma --re-s5 de margen lateral. */
+	.re-doc .es-breadcrumbs {
+		padding-left: var(--re-s5);
+		padding-right: var(--re-s5);
+	}
+}
+
 /* Si faltara el partial del documento (theme instalado sin ds/). */
 .es-ds-missing {
 	padding: 64px 24px;
