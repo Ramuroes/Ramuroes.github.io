@@ -54,6 +54,43 @@ function es_ds_restimator_screens_uri() {
 	return ES_CHILD_URI . '/assets/ds/restimator/screens/';
 }
 
+/** Directorio en disco de las capturas, para poder leerles el mtime. */
+const ES_DS_RESTIMATOR_SCREENS_REL = 'assets/ds/restimator/screens/';
+
+/**
+ * URL de una captura, versionada por el propio archivo.
+ *
+ * El problema que resuelve, medido en producción: las capturas se sirven desde
+ * una URL FIJA (`…/screens/light-dark.webp`). Cuando el build las regenera, el
+ * archivo cambia pero la URL no, así que ni el navegador ni el CDN tienen forma
+ * de saber que hay algo nuevo. En una ventana de incógnito se veía la captura
+ * nueva y en una sesión existente seguía apareciendo la vieja, incluso después
+ * de hard refresh: la respuesta venía del edge de Cloudflare, no del navegador.
+ *
+ * La versión sale de `filemtime()`, igual que `es_asset_ver()` para el CSS y el
+ * JS del tema. Es la propiedad que se necesita: estable mientras el archivo no
+ * cambie —así el caché sigue sirviendo— y distinta en cuanto el build lo
+ * reescribe. No se usa ES_CHILD_VERSION porque obligaría a acordarse de subirla
+ * a mano cada vez que se recapturan pantallas, que es exactamente el paso que
+ * se olvida.
+ *
+ * Alcance: SÓLO estas capturas. El resto del portfolio no cambia.
+ *
+ * @param string $file Nombre del archivo dentro de screens/ (p. ej. 'light-dark.webp').
+ * @return string URL con `?v=<mtime>`.
+ */
+function es_ds_restimator_screen_url( $file ) {
+	$es_file = ltrim( (string) $file, '/' );
+	$es_url  = es_ds_restimator_screens_uri() . $es_file;
+	$es_path = ES_CHILD_DIR . '/' . ES_DS_RESTIMATOR_SCREENS_REL . $es_file;
+
+	// Sin archivo en disco (theme instalado sin assets/ds/) cae a la versión del
+	// tema: la URL sigue siendo válida y no se emite un `?v=` vacío.
+	$es_mtime = file_exists( $es_path ) ? filemtime( $es_path ) : false;
+
+	return add_query_arg( 'v', $es_mtime ? (string) $es_mtime : ES_CHILD_VERSION, $es_url );
+}
+
 /**
  * Idioma efectivo de esta página del Design System.
  *
@@ -99,6 +136,9 @@ function es_ds_text( $key ) {
 			'back_to_case'  => 'Volver al caso REstimator',
 			'owner'         => 'Ramiro Estavillo',
 			'nav_aria'      => 'Salir de la documentación',
+			'crumb_work'    => 'Proyectos',
+			'crumb_case'    => 'REstimator',
+			'crumb_current' => 'Design System',
 			'missing'       => 'El documento del Design System no está disponible en esta instalación.',
 			'viewer_close'  => 'Cerrar la pantalla',
 			'viewer_in'     => 'Acercar',
@@ -109,6 +149,9 @@ function es_ds_text( $key ) {
 			'back_to_case'  => 'Back to the REstimator case',
 			'owner'         => 'Ramiro Estavillo',
 			'nav_aria'      => 'Leave the documentation',
+			'crumb_work'    => 'Work',
+			'crumb_case'    => 'REstimator',
+			'crumb_current' => 'Design System',
 			'missing'       => 'The Design System document is not available in this installation.',
 			'viewer_close'  => 'Close the screen',
 			'viewer_in'     => 'Zoom in',
@@ -127,15 +170,15 @@ function es_ds_text( $key ) {
 /**
  * Imprime el documento del Design System.
  *
- * El partial usa $es_ds_screens para construir las URLs de las capturas y
- * es_ds_text() para las labels del visor, así que $es_ds_screens tiene que
- * existir en el scope antes del include.
+ * El partial llama a es_ds_restimator_screen_url() para cada captura, que le
+ * agrega la versión del archivo a la URL, y a es_ds_text() para las labels del
+ * visor. Las dos son funciones de este archivo: el include no necesita que haya
+ * ninguna variable preparada en el scope.
  *
  * @return bool true si se imprimió algo.
  */
 function es_ds_restimator_render_document() {
-	$es_ds_screens = es_ds_restimator_screens_uri(); // phpcs:ignore VariableAnalysis -- lo usa el partial incluido abajo.
-	$es_file       = ES_DS_RESTIMATOR_DIR . 'master-' . es_ds_restimator_lang() . '.php';
+	$es_file = ES_DS_RESTIMATOR_DIR . 'master-' . es_ds_restimator_lang() . '.php';
 
 	if ( ! file_exists( $es_file ) ) {
 		return false;
@@ -201,6 +244,79 @@ function es_ds_restimator_back_url() {
 		$es_url = es_page_url_by_template( 'templates/page-work.php' );
 	}
 	return '' !== $es_url ? $es_url : home_url( '/' );
+}
+
+/**
+ * URL del listado de Work en el idioma actual.
+ *
+ * es_page_url_by_template() ya resuelve por idioma: la query lleva
+ * `suppress_filters => false`, que es lo que habilita el filtro de Polylang, y
+ * cachea por template+idioma. Es la misma función que usa la barra mínima para
+ * su fallback, así que las dos salidas de la página apuntan al mismo lugar.
+ *
+ * @return string URL, o '' si no hay página de Work publicada.
+ */
+function es_ds_restimator_work_url() {
+	if ( ! function_exists( 'es_page_url_by_template' ) ) {
+		return '';
+	}
+	return (string) es_page_url_by_template( 'templates/page-work.php' );
+}
+
+/**
+ * Breadcrumb contextual: Work / REstimator / Design System.
+ *
+ * SÓLO se imprime con el header institucional activo. Con el header apagado la
+ * salida ya la da la barra mínima ("← Volver al caso REstimator"), y sumarle un
+ * breadcrumb sería una segunda navegación para lo mismo.
+ *
+ * Reusa template-parts/breadcrumbs.php: el MISMO partial y las mismas clases
+ * que el Case Study y las páginas fijas, así que el estilo lo pone site.css
+ * —que en esta página ya se carga por el header— y acá no se inventa ningún
+ * componente. Lo único propio es la alineación con la columna del documento
+ * (ver doc-overrides.css).
+ *
+ * Los textos salen de es_ds_text() y no de es__(): el resto del tema delega en
+ * Polylang → String translations, que depende de que alguien cargue la
+ * traducción a mano en wp-admin. Mismo criterio que la barra mínima.
+ *
+ * El crumb del caso se omite si el Case Study no existe todavía (plugin
+ * inactivo, o caso sin publicar): antes que un link muerto, un nivel menos.
+ */
+function es_ds_restimator_breadcrumb() {
+	if ( ! es_ds_show_header() ) {
+		return;
+	}
+
+	$es_trail = array();
+
+	$es_work = es_ds_restimator_work_url();
+	if ( '' !== $es_work ) {
+		$es_trail[] = array(
+			'label' => es_ds_text( 'crumb_work' ),
+			'url'   => $es_work,
+		);
+	}
+
+	$es_case = es_ds_restimator_case_url();
+	if ( '' !== $es_case ) {
+		$es_trail[] = array(
+			'label' => es_ds_text( 'crumb_case' ),
+			'url'   => $es_case,
+		);
+	}
+
+	// El último nivel es el estado actual y nunca lleva link (lo resuelve el
+	// partial: el último ítem del trail se imprime como <span aria-current>).
+	$es_trail[] = array( 'label' => es_ds_text( 'crumb_current' ) );
+
+	// Con un solo nivel no hay nada que navegar: sería un rótulo, no un
+	// breadcrumb.
+	if ( count( $es_trail ) < 2 ) {
+		return;
+	}
+
+	get_template_part( 'template-parts/breadcrumbs', null, array( 'trail' => $es_trail ) );
 }
 
 /* -------------------------------------------------------------------------

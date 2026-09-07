@@ -583,11 +583,18 @@ function shotCard(shot, lang, { mobile = false } = {}) {
 	const dpr = mobile ? 3 : 2;
 	const cssW = full.w ? Math.round(full.w / dpr) : 0;
 
+	/*
+	 * Las URLs de las capturas salen versionadas por el mtime del archivo
+	 * (es_ds_restimator_screen_url), no concatenando la base: si no, el build
+	 * puede reescribir la imagen y la URL queda igual, así que el navegador y
+	 * el CDN siguen sirviendo la vieja. Aplica tanto a la preview como a la que
+	 * abre el visor.
+	 */
 	return `
     <figure class="${cls}" data-i18n-skip>
       <button type="button" class="vp"
         data-es-screen-trigger
-        data-es-screen-src="<?php echo esc_url( $es_ds_screens . '${shot.id}.webp' ); ?>"
+        data-es-screen-src="<?php echo esc_url( es_ds_restimator_screen_url( '${shot.id}.webp' ) ); ?>"
         data-es-screen-w="${full.w}" data-es-screen-h="${full.h}" data-es-screen-cssw="${cssW}"
         data-es-screen-name="${esc(name)}"
         data-es-screen-meta="${esc(meta)}"
@@ -597,7 +604,7 @@ function shotCard(shot, lang, { mobile = false } = {}) {
           <span class="r"><span class="zoom-hint">${esc(t.zoomHint)}</span></span>
         </span>
         <span class="vp-media">
-          <img src="<?php echo esc_url( $es_ds_screens . '${previewFile}' ); ?>"
+          <img src="<?php echo esc_url( es_ds_restimator_screen_url( '${previewFile}' ) ); ?>"
                alt="${esc(name)} — Presupuestador RE"
                width="${full.pw}" height="${full.ph}" loading="lazy" decoding="async">
           <span class="vp-expand" aria-hidden="true">
@@ -679,6 +686,25 @@ function systemEvolutionBlock(lang) {
 function transformDoc(doc, lang) {
 	const t = UI[lang];
 	const skip = ' data-i18n-skip';
+
+	/*
+	 * --- Breadcrumb contextual -------------------------------------------
+	 *
+	 * Va DENTRO de <main class="main">, justo antes del hero: así hereda la
+	 * columna principal de la grilla del documento y queda alineado con el
+	 * contenido sin repetir ningún cálculo de layout.
+	 *
+	 * Es una llamada PHP y no markup: quién decide si se imprime es
+	 * es_ds_restimator_breadcrumb(), que sólo lo hace con el header
+	 * institucional activo. Con el header apagado la salida la da la barra
+	 * mínima y un breadcrumb sería una segunda navegación para lo mismo.
+	 */
+	doc = mustReplace(
+		doc,
+		/<main class="main">\s*\n/,
+		'<main class="main">\n<?php es_ds_restimator_breadcrumb(); ?>\n',
+		'breadcrumb antes del hero'
+	);
 
 	/*
 	 * --- §08 Screen Examples: desktop --------------------------------------
@@ -1044,7 +1070,9 @@ function buildHtml() {
  * El resto del markup NO se reordena ni se simplifica: es el mismo documento.
  *
  * @package estavillo-child
- * @var string $es_ds_screens URI base de assets/ds/restimator/screens/.
+ * Las URLs de las capturas las arma es_ds_restimator_screen_url(), que les
+ * agrega la versión del propio archivo (mtime) para que un cambio de captura
+ * cambie también la URL.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

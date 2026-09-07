@@ -29,7 +29,9 @@
  * El resto del markup NO se reordena ni se simplifica: es el mismo documento.
  *
  * @package estavillo-child
- * @var string $es_ds_screens URI base de assets/ds/restimator/screens/.
+ * Las URLs de las capturas las arma es_ds_restimator_screen_url(), que les
+ * agrega la versión del propio archivo (mtime) para que un cambio de captura
+ * cambie también la URL.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -59,7 +61,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 </nav>
 
 <main class="main">
-
+<?php es_ds_restimator_breadcrumb(); ?>
 <!-- ================= HERO / PORTFOLIO ENTRY ================= -->
 <header class="hero">
   <div class="in">
@@ -970,7 +972,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <figure class="shot">
       <button type="button" class="vp"
         data-es-screen-trigger
-        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'calculator.webp' ); ?>"
+        data-es-screen-src="<?php echo esc_url( es_ds_restimator_screen_url( 'calculator.webp' ) ); ?>"
         data-es-screen-w="2880" data-es-screen-h="3224" data-es-screen-cssw="1440"
         data-es-screen-name="Calculadora"
         data-es-screen-meta="Calculator.html"
@@ -980,7 +982,7 @@ if ( ! defined( 'ABSPATH' ) ) {
           <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
         <span class="vp-media">
-          <img src="<?php echo esc_url( $es_ds_screens . 'calculator-preview.webp' ); ?>"
+          <img src="<?php echo esc_url( es_ds_restimator_screen_url( 'calculator-preview.webp' ) ); ?>"
                alt="Calculadora — Presupuestador RE"
                width="1520" height="1702" loading="lazy" decoding="async">
           <span class="vp-expand" aria-hidden="true">
@@ -992,7 +994,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <figure class="shot">
       <button type="button" class="vp"
         data-es-screen-trigger
-        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'history.webp' ); ?>"
+        data-es-screen-src="<?php echo esc_url( es_ds_restimator_screen_url( 'history.webp' ) ); ?>"
         data-es-screen-w="2880" data-es-screen-h="3086" data-es-screen-cssw="1440"
         data-es-screen-name="Historial"
         data-es-screen-meta="History.html"
@@ -1002,7 +1004,7 @@ if ( ! defined( 'ABSPATH' ) ) {
           <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
         <span class="vp-media">
-          <img src="<?php echo esc_url( $es_ds_screens . 'history-preview.webp' ); ?>"
+          <img src="<?php echo esc_url( es_ds_restimator_screen_url( 'history-preview.webp' ) ); ?>"
                alt="Historial — Presupuestador RE"
                width="1520" height="1629" loading="lazy" decoding="async">
           <span class="vp-expand" aria-hidden="true">
@@ -1014,7 +1016,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <figure class="shot">
       <button type="button" class="vp"
         data-es-screen-trigger
-        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'product-editor.webp' ); ?>"
+        data-es-screen-src="<?php echo esc_url( es_ds_restimator_screen_url( 'product-editor.webp' ) ); ?>"
         data-es-screen-w="2880" data-es-screen-h="4592" data-es-screen-cssw="1440"
         data-es-screen-name="Editor de producto"
         data-es-screen-meta="ProductEditor.html"
@@ -1024,7 +1026,7 @@ if ( ! defined( 'ABSPATH' ) ) {
           <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
         <span class="vp-media">
-          <img src="<?php echo esc_url( $es_ds_screens . 'product-editor-preview.webp' ); ?>"
+          <img src="<?php echo esc_url( es_ds_restimator_screen_url( 'product-editor-preview.webp' ) ); ?>"
                alt="Editor de producto — Presupuestador RE"
                width="1520" height="2424" loading="lazy" decoding="async">
           <span class="vp-expand" aria-hidden="true">
@@ -1036,7 +1038,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <figure class="shot">
       <button type="button" class="vp"
         data-es-screen-trigger
-        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'client-summary.webp' ); ?>"
+        data-es-screen-src="<?php echo esc_url( es_ds_restimator_screen_url( 'client-summary.webp' ) ); ?>"
         data-es-screen-w="2880" data-es-screen-h="4098" data-es-screen-cssw="1440"
         data-es-screen-name="Resumen cliente"
         data-es-screen-meta="ClientSummary.html"
@@ -1046,7 +1048,7 @@ if ( ! defined( 'ABSPATH' ) ) {
           <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
         <span class="vp-media">
-          <img src="<?php echo esc_url( $es_ds_screens . 'client-summary-preview.webp' ); ?>"
+          <img src="<?php echo esc_url( es_ds_restimator_screen_url( 'client-summary-preview.webp' ) ); ?>"
                alt="Resumen cliente — Presupuestador RE"
                width="1520" height="2163" loading="lazy" decoding="async">
           <span class="vp-expand" aria-hidden="true">
@@ -1058,7 +1060,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <figure class="shot">
       <button type="button" class="vp"
         data-es-screen-trigger
-        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'catalogs.webp' ); ?>"
+        data-es-screen-src="<?php echo esc_url( es_ds_restimator_screen_url( 'catalogs.webp' ) ); ?>"
         data-es-screen-w="2880" data-es-screen-h="3274" data-es-screen-cssw="1440"
         data-es-screen-name="Catálogos"
         data-es-screen-meta="Catalogs.html"
@@ -1068,7 +1070,7 @@ if ( ! defined( 'ABSPATH' ) ) {
           <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
         <span class="vp-media">
-          <img src="<?php echo esc_url( $es_ds_screens . 'catalogs-preview.webp' ); ?>"
+          <img src="<?php echo esc_url( es_ds_restimator_screen_url( 'catalogs-preview.webp' ) ); ?>"
                alt="Catálogos — Presupuestador RE"
                width="1520" height="1728" loading="lazy" decoding="async">
           <span class="vp-expand" aria-hidden="true">
@@ -1086,7 +1088,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <figure class="shot shot--mobile">
       <button type="button" class="vp"
         data-es-screen-trigger
-        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'mobile-calculator.webp' ); ?>"
+        data-es-screen-src="<?php echo esc_url( es_ds_restimator_screen_url( 'mobile-calculator.webp' ) ); ?>"
         data-es-screen-w="1176" data-es-screen-h="2349" data-es-screen-cssw="392"
         data-es-screen-name="Calculadora"
         data-es-screen-meta="390 · por defecto — formulario + resumen fijo"
@@ -1096,7 +1098,7 @@ if ( ! defined( 'ABSPATH' ) ) {
           <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
         <span class="vp-media">
-          <img src="<?php echo esc_url( $es_ds_screens . 'mobile-calculator.webp' ); ?>"
+          <img src="<?php echo esc_url( es_ds_restimator_screen_url( 'mobile-calculator.webp' ) ); ?>"
                alt="Calculadora — Presupuestador RE"
                width="1176" height="2349" loading="lazy" decoding="async">
           <span class="vp-expand" aria-hidden="true">
@@ -1108,7 +1110,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <figure class="shot shot--mobile">
       <button type="button" class="vp"
         data-es-screen-trigger
-        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'mobile-home.webp' ); ?>"
+        data-es-screen-src="<?php echo esc_url( es_ds_restimator_screen_url( 'mobile-home.webp' ) ); ?>"
         data-es-screen-w="1176" data-es-screen-h="2349" data-es-screen-cssw="392"
         data-es-screen-name="Inicio"
         data-es-screen-meta="390 · por defecto"
@@ -1118,7 +1120,7 @@ if ( ! defined( 'ABSPATH' ) ) {
           <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
         <span class="vp-media">
-          <img src="<?php echo esc_url( $es_ds_screens . 'mobile-home.webp' ); ?>"
+          <img src="<?php echo esc_url( es_ds_restimator_screen_url( 'mobile-home.webp' ) ); ?>"
                alt="Inicio — Presupuestador RE"
                width="1176" height="2349" loading="lazy" decoding="async">
           <span class="vp-expand" aria-hidden="true">
@@ -1130,7 +1132,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <figure class="shot shot--mobile">
       <button type="button" class="vp"
         data-es-screen-trigger
-        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'mobile-history.webp' ); ?>"
+        data-es-screen-src="<?php echo esc_url( es_ds_restimator_screen_url( 'mobile-history.webp' ) ); ?>"
         data-es-screen-w="1176" data-es-screen-h="2349" data-es-screen-cssw="392"
         data-es-screen-name="Historial"
         data-es-screen-meta="390 · por defecto"
@@ -1140,7 +1142,7 @@ if ( ! defined( 'ABSPATH' ) ) {
           <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
         <span class="vp-media">
-          <img src="<?php echo esc_url( $es_ds_screens . 'mobile-history.webp' ); ?>"
+          <img src="<?php echo esc_url( es_ds_restimator_screen_url( 'mobile-history.webp' ) ); ?>"
                alt="Historial — Presupuestador RE"
                width="1176" height="2349" loading="lazy" decoding="async">
           <span class="vp-expand" aria-hidden="true">
@@ -1157,7 +1159,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <figure class="shot">
       <button type="button" class="vp"
         data-es-screen-trigger
-        data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'light-dark.webp' ); ?>"
+        data-es-screen-src="<?php echo esc_url( es_ds_restimator_screen_url( 'light-dark.webp' ) ); ?>"
         data-es-screen-w="2880" data-es-screen-h="9442" data-es-screen-cssw="1440"
         data-es-screen-name="Comparación light / dark"
         data-es-screen-meta="Light &amp; Dark Comparison.html"
@@ -1167,7 +1169,7 @@ if ( ! defined( 'ABSPATH' ) ) {
           <span class="r"><span class="zoom-hint">Ampliar</span></span>
         </span>
         <span class="vp-media">
-          <img src="<?php echo esc_url( $es_ds_screens . 'light-dark-preview.webp' ); ?>"
+          <img src="<?php echo esc_url( es_ds_restimator_screen_url( 'light-dark-preview.webp' ) ); ?>"
                alt="Comparación light / dark — Presupuestador RE"
                width="1520" height="4983" loading="lazy" decoding="async">
           <span class="vp-expand" aria-hidden="true">
