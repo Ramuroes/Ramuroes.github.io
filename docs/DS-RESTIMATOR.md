@@ -162,20 +162,24 @@ captura:
 No se capturan pantallas extra sólo porque existan archivos HTML en el proyecto
 (hay variantes `.light.html` y un `QA.html` que el documento no expone).
 
-### Dos defectos de la fuente, corregidos en la captura
+### Defectos de la fuente, corregidos en la captura
 
 1. **Los iframes de la comparación son `loading="lazy"`** y Chromium no rasteriza
    lo que queda fuera del viewport — tampoco alcanza con recorrer la página
    scrolleando. Sin corregirlo, 4 de los 5 pares salían en blanco. Se resuelve
    agrandando el viewport hasta cubrir el documento entero
    (`shotTallViewport()`).
-2. **Su fila "01 Dashboard" apunta a un stub de redirección.** El propio kit lo
-   marca: *"Dashboard removed from V1 (scope lock · Decision 1)"*. Es una fila
-   obsoleta de la fuente y se excluye de la captura, para no publicar un panel
-   vacío. El resto del documento no se toca.
+2. **El tema light de la columna derecha lo aplica el build**, no la página: bajo
+   `file://` el origen es opaco y el script de la fuente no puede entrar al
+   iframe. Ver §12.
 
-Ninguna de las dos correcciones modifica el Design System: son ajustes del
-proceso de captura.
+La fila "01 Dashboard" de la comparación apuntaba a un stub de redirección
+(*"Dashboard removed from V1 · scope lock · Decision 1"*) y se borraba en la
+captura. Ya no existe: la reemplazó Catálogos, que sí es una de las cinco
+pantallas documentadas.
+
+Ninguna de estas correcciones modifica el Design System: son ajustes del proceso
+de captura.
 
 ### El defecto que rompía el contenedor (y el guard que lo impide)
 
@@ -387,3 +391,99 @@ aplicación.
 El lightbox compartido **no se toca ni se carga acá**: sigue igual en los case
 studies.
 
+
+---
+
+## 12. La exploración de tema light
+
+**Light NO es un tema del sistema.** Se publica como exploración y se anuncia
+así en los tres lugares donde aparece: el pill `Exploración / Exploration` en la
+tarjeta, la nota que la acompaña, y `System evolution`, donde figura como
+*Planificado / Planned*. El hero, el pie del rail y el contador de temas no la
+mencionan.
+
+### De dónde sale
+
+De `tokens/theme-light.css`, que ya existía en la fuente: un remap de color bajo
+`[data-theme="light"]`. Nada de lo que hay ahí puede alcanzar al render por
+defecto — verificado en cada build recapturando las cinco pantallas dark y
+comparando hashes.
+
+Esta pasada corrigió tres cosas del remap.
+
+**1. La rampa de tinta estaba elegida a ojo.** Los cuatro pasos se abrían
+demasiado arriba y no dejaban lugar abajo: `--re-ink-4` caía a 2.68:1 sobre
+blanco y 2.38:1 sobre el canvas — exactamente el error que el tema oscuro ya
+había corregido (`colors.css` documenta haber subido su propio `--re-ink-4` de
+`#686d76` a `#7f858e` para pasar AA). Ahora los cuatro pasos reproducen las
+RELACIONES de contraste de dark:
+
+| paso | dark | light |
+|---|---|---|
+| `--re-ink` | 16.0:1 | 16.9:1 |
+| `--re-ink-2` | 10.4:1 | 10.4:1 |
+| `--re-ink-3` | 6.0:1 | 6.0:1 |
+| `--re-ink-4` | 4.8:1 | 4.8:1 |
+
+Sólo se movió la luminosidad; tono y saturación quedaron intactos.
+
+**2. Los semánticos tampoco pasaban como texto.** `ok`, `warn`, `crit` e `info`
+se usan como etiqueta sobre su propio tinte, y ahí daban 3.00 / 2.90 / 3.93 /
+4.26:1 contra los 5.41 / 6.03 / 4.41 / 5.04:1 que las mismas badges alcanzan en
+dark. Se oscurecieron hasta 4.5:1 sobre su tinte. Los `-soft` y `-line` **no**
+se re-derivaron, así que el fondo del tinte no cambió: sólo se oscureció el
+texto.
+
+**3. Dos tokens de panel oscuro usados como texto sobre una card blanca.**
+`.kv .v.amber` (el "3 · por recalibrar") y `.kv .v.ok-c` (el "14 / 18") pintan
+con `--re-amber` y `--re-ok-bright`, que están pensados para el tile charcoal.
+Sobre blanco daban 2.55:1 y 1.90:1. Son las **dos únicas** reglas de componente
+del archivo, y sólo redirigen al token que el sistema ya tiene para ese trabajo
+(`--re-amber-ink`, `--re-ok`). No se tocó el componente base porque eso cambiaría
+dark.
+
+### Lo que queda por debajo de AA, y por qué se deja
+
+Medido nodo por nodo sobre el render real de las cinco pantallas: **light 56,
+dark 47**. La diferencia no es un componente roto, es la asimetría del propio
+esquema:
+
+- en dark el canvas es MÁS oscuro que las cards, así que el texto gana contraste
+  al caer sobre él;
+- en light el canvas es más oscuro que las cards blancas, así que lo pierde.
+
+`--re-ink-4` da 4.75:1 sobre la card y 4.03:1 sobre el inset. Llevarlo a 4.5:1
+también en el inset exige `#676b76`, y ahí la separación con `--re-ink-3` cae de
+1.27x a 1.13x — la jerarquía de cuatro pasos se aplana y light pasaría a ser más
+estricto que dark. Se prioriza que los dos temas se lean igual. En dark ese mismo
+inset da 4.39:1, o sea que tampoco llegaba.
+
+Los 26 nodos de "Resumen cliente" que aparecen en las dos listas son la escala
+propia del documento al cliente (`--p-*`), que por diseño **no** se re-tematiza:
+es una hoja blanca en los dos temas.
+
+`.arrow` (el "→" de `Escaleras → Recta`) usa `--re-line-strong` como color de
+texto y falla en ambos temas (2.13:1 dark, 1.68:1 light). Es un defecto del kit,
+no del remap, y arreglarlo cambiaría dark.
+
+### La comparación estaba mostrando dark contra dark
+
+`light-dark-comparison.html` activa la columna derecha con un script que hace
+`f.contentDocument.documentElement.setAttribute('data-theme','light')`. Correcto
+si el documento se sirve por http, donde padre e iframe comparten origen — pero
+el build abre todo con `file://`, y ahí Chromium le da a cada documento un
+**origen opaco**: el acceso falla, el `catch(e){}` del script se lo traga, y la
+columna "Light" venía renderizando el tema oscuro. La comparación publicada era
+dark contra dark.
+
+Ahora el tema lo aplica el build, frame por frame (Playwright sí puede evaluar
+dentro de un frame de origen opaco), y después **verifica el píxel**: si el
+`background-color` computado del `<body>` de un frame light no es claro, el build
+rompe. También verifica que ninguna columna dark haya recibido el atributo.
+
+### Las cinco pantallas
+
+La comparación tenía una fila "01 Dashboard" que apuntaba a un stub de
+redirección, y le faltaba Catálogos. Ahora son las **mismas cinco** de §08, y el
+build lo verifica contra `DESKTOP_SHOTS`: si alguna vez dejan de coincidir, falla
+en vez de publicar una comparación incompleta.

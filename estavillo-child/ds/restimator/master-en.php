@@ -1103,13 +1103,13 @@ if ( ! defined( 'ABSPATH' ) ) {
   </div>
 
   <h3 class="sub"><span class="tick"></span>Colour exploration</h3>
-  <p class="body" style="max-width:78ch">A colour remap tried while the system was being designed, kept as a record. The published system has one theme, dark; this comparison is not an available theme.</p>
+  <p class="body" style="max-width:78ch">The five desktop screens with a light colour remap, side by side against the dark system. Surfaces, ink, borders and shadows change; spacing, typography, components and hierarchy do not, and amber remains the only accent. The ink ramp is calibrated against the contrast the dark theme already achieved, rather than picked by eye. It is an exploration: the published system has one theme, dark.</p>
   <div class="shots shots--single">
     <figure class="shot">
       <button type="button" class="vp"
         data-es-screen-trigger
         data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'light-dark.webp' ); ?>"
-        data-es-screen-w="2880" data-es-screen-h="6224" data-es-screen-cssw="1440"
+        data-es-screen-w="2880" data-es-screen-h="9442" data-es-screen-cssw="1440"
         data-es-screen-name="Light / dark comparison"
         data-es-screen-meta="Light &amp; Dark Comparison.html"
         aria-label="Open screen: Light / dark comparison">
@@ -1120,7 +1120,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <span class="vp-media">
           <img src="<?php echo esc_url( $es_ds_screens . 'light-dark-preview.webp' ); ?>"
                alt="Light / dark comparison — Presupuestador RE"
-               width="1520" height="3285" loading="lazy" decoding="async">
+               width="1520" height="4983" loading="lazy" decoding="async">
           <span class="vp-expand" aria-hidden="true">
             <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
           </span>

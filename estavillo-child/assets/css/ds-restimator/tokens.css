@@ -252,11 +252,26 @@
   --re-surface-2:     #efece5;  /* inset / hover fill, segmented track */
   --re-surface-3:     #e6e1d8;  /* deeper inset, slider tracks */
 
-  /* ---- Graphite ink on light ---- */
+  /* ---- Graphite ink on light ----
+     The four steps mirror the CONTRAST RELATIONSHIPS of the dark ramp rather
+     than being picked by eye, so the hierarchy reads the same in both themes.
+     Measured on --re-surface (#fff), dark equivalent in brackets:
+
+         ink    16.9:1  [16.0]      step ink→ink-2   1.63x  [1.54]
+         ink-2  10.4:1  [10.4]      step ink-2→ink-3 1.72x  [1.72]
+         ink-3   6.0:1  [ 6.0]      step ink-3→ink-4 1.27x  [1.26]
+         ink-4   4.8:1  [ 4.8]
+
+     The previous values (#474b54 / #6b7079 / #9a9ea7) opened too wide at the
+     top, which left no room at the bottom: --re-ink-4 landed at 2.68:1 on
+     white and 2.38:1 on the canvas. That is the exact mistake the dark ramp
+     had already corrected — colors.css documents lifting its own --re-ink-4
+     from #686d76 to #7f858e to clear AA. Hue and saturation are unchanged;
+     only lightness moved. */
   --re-ink:           #1b1d22;  /* primary text — graphite near-black */
-  --re-ink-2:         #474b54;  /* secondary text */
-  --re-ink-3:         #6b7079;  /* tertiary / hints */
-  --re-ink-4:         #9a9ea7;  /* faint labels, placeholders */
+  --re-ink-2:         #3d4048;  /* secondary text */
+  --re-ink-3:         #5f636b;  /* tertiary / hints */
+  --re-ink-4:         #6e737e;  /* faint labels, placeholders — 4.75:1 on white */
 
   /* ---- Warm borders ---- */
   --re-line:          #e7e3da;  /* hairline dividers, card borders */
@@ -271,15 +286,29 @@
   --re-amber-line:    rgba(224,145,30,.40);  /* tint border */
   --re-amber-ink:     #9a6510;               /* amber text on white / tint */
 
-  /* ---- Semantic — hues preserved, tuned for white ---- */
-  --re-ok:            #2f9e54;
+  /* ---- Semantic — hues preserved, darkened for text on white ----
+     These four are used as TEXT (badge labels, alert copy, the green KPI
+     figure), sitting on their own soft tint over a white card. Measured on
+     that composite, the first pass landed at 3.00 / 2.90 / 3.93 / 4.26:1 —
+     against 5.41 / 6.03 / 4.41 / 5.04:1 for the same badges on dark. Same
+     failure mode as the ink ramp: values chosen against white by eye instead
+     of against what dark already achieved.
+
+     Hue and saturation are untouched; only lightness moved, until each one
+     clears 4.5:1 on its own tint (and ≥5:1 on plain white). The -soft and
+     -line variants are NOT re-derived: they keep the original hue, so the
+     tint backgrounds are exactly the same and only the text darkens. */
+  --re-ok:            #257d42;  /* 4.50:1 on ok-soft · 5.13:1 on white */
   --re-ok-soft:       rgba(47,158,84,.12);   --re-ok-line: rgba(47,158,84,.30);
   /* --re-ok-bright kept (on dark KPI accent tile) */
-  --re-warn:          #b9831f;  --re-warn-soft: rgba(185,131,31,.13);
+  --re-warn:          #906618;  /* 4.47:1 on warn-soft · 5.12:1 on white */
+  --re-warn-soft:     rgba(185,131,31,.13);
   --re-warn-line:     rgba(185,131,31,.32);  --re-warn-ink: #8a6312;
-  --re-crit:          #c2543c;  --re-crit-soft: rgba(194,84,60,.11);
+  --re-crit:          #b34d37;  /* 4.51:1 on crit-soft · 5.21:1 on white */
+  --re-crit-soft:     rgba(194,84,60,.11);
   --re-crit-line:     rgba(194,84,60,.30);
-  --re-info:          #2f72c4;  --re-info-soft: rgba(47,114,196,.10);
+  --re-info:          #2d6ebe;  /* 4.51:1 on info-soft · 5.14:1 on white */
+  --re-info-soft:     rgba(47,114,196,.10);
   --re-info-line:     rgba(47,114,196,.30);
 
   /* ---- Quote lifecycle status dots (on white pills) ---- */
@@ -309,6 +338,39 @@
   background-color: var(--re-canvas);
   color: var(--re-ink);
 }
+
+/* ============================================================
+   TWO component corrections, light only
+   ------------------------------------------------------------
+   Everything above is a pure token remap. These two are the only
+   places where that is not enough, and both are the same defect:
+   a token meant to sit on a DARK panel being used as text on a
+   card — which is invisible only once the card turns white.
+
+   · .kv .v.amber   — the "3 · por recalibrar" figure in Catalogs,
+     painted with the raw brand amber. 6.97:1 on dark, 2.55:1 on
+     white, under the 3:1 a 24px/700 figure needs.
+   · .kv .v.ok-c    — the "14 / 18 calibrados" figure, painted with
+     --re-ok-bright, which this theme deliberately keeps at its
+     dark value because it belongs on the charcoal KPI tile. On a
+     white card it lands at 1.90:1.
+
+   Both redirect to the token the system already has for that job
+   on a light ground: --re-amber-ink (4.95:1) and --re-ok (5.13:1).
+
+   They are not applied to the base components because that would
+   change the dark theme, and dark is untouched in this pass.
+   Every other use of --re-amber is a FILL carrying dark ink on
+   top, which reads identically in both themes.
+
+   On the .ok-c selector: the screen's own <style> carries
+   `.health .kv .v.ok-c`, and it is parsed after this file. At
+   equal specificity that one wins, so the rule below repeats its
+   shape and adds the theme attribute on top rather than reaching
+   for !important.
+   ============================================================ */
+.re-doc[data-theme="light"] .kv .v.amber, .re-doc [data-theme="light"] .kv .v.amber{ color: var(--re-amber-ink); }
+.re-doc[data-theme="light"] .kv .v.ok-c, .re-doc [data-theme="light"] .kv .v.ok-c,.re-doc[data-theme="light"] .health .kv .v.ok-c, .re-doc [data-theme="light"] .health .kv .v.ok-c{ color: var(--re-ok); }
 
 
 /* ---------- tokens/base.css ---------- */

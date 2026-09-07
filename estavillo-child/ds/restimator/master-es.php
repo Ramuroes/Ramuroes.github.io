@@ -1152,13 +1152,13 @@ if ( ! defined( 'ABSPATH' ) ) {
   </div>
 
   <h3 class="sub"><span class="tick"></span>Exploración de color</h3>
-  <p class="body" style="max-width:78ch">Una prueba de remap de color hecha durante el diseño del sistema, guardada como registro. El sistema publicado tiene un solo tema, dark; esta comparación no es un tema disponible.</p>
+  <p class="body" style="max-width:78ch">Las cinco pantallas de desktop con un remap de color claro, lado a lado contra el sistema oscuro. Cambian superficies, tinta, bordes y sombras; el espaciado, la tipografía, los componentes y la jerarquía son los mismos, y el ámbar sigue siendo el único acento. La rampa de tinta está calibrada contra el contraste que ya alcanzaba el tema oscuro, no elegida a ojo. Es una exploración: el sistema publicado tiene un solo tema, dark.</p>
   <div class="shots shots--single">
     <figure class="shot">
       <button type="button" class="vp"
         data-es-screen-trigger
         data-es-screen-src="<?php echo esc_url( $es_ds_screens . 'light-dark.webp' ); ?>"
-        data-es-screen-w="2880" data-es-screen-h="6224" data-es-screen-cssw="1440"
+        data-es-screen-w="2880" data-es-screen-h="9442" data-es-screen-cssw="1440"
         data-es-screen-name="Comparación light / dark"
         data-es-screen-meta="Light &amp; Dark Comparison.html"
         aria-label="Abrir pantalla: Comparación light / dark">
@@ -1169,7 +1169,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <span class="vp-media">
           <img src="<?php echo esc_url( $es_ds_screens . 'light-dark-preview.webp' ); ?>"
                alt="Comparación light / dark — Presupuestador RE"
-               width="1520" height="3285" loading="lazy" decoding="async">
+               width="1520" height="4983" loading="lazy" decoding="async">
           <span class="vp-expand" aria-hidden="true">
             <svg viewBox="0 0 20 20"><path d="M12 3h5v5M8 17H3v-5M17 3l-6 6M3 17l6-6"/></svg>
           </span>

@@ -48,7 +48,10 @@
   .frame.l .fh .sw{background:#f3f1ec;border-color:#d9d4ca;}
   .frame .fh .tag{margin-left:auto;font-weight:500;text-transform:none;letter-spacing:0;color:var(--ink-4);}
   .frame.l .fh .tag{color:#9a9ea7;}
-  .viewport{position:relative;width:100%;height:430px;overflow:hidden;}
+  /* 620 y no 430: la comparación se publica como una captura que se recorre
+     en el visor del documento, así que cada par puede mostrar bastante más de
+     la pantalla sin que eso obligue a nada. */
+  .viewport{position:relative;width:100%;height:620px;overflow:hidden;}
   .frame.d .viewport{background:#0d0e11;}
   .frame.l .viewport{background:#f3f1ec;}
   .viewport iframe{position:absolute;top:0;left:0;border:0;
@@ -70,29 +73,22 @@
 <body>
 
   <header class="doc-head">
-    <div class="doc-eyebrow">Tema · Light Mode — segundo tema soportado</div>
+    <div class="doc-eyebrow">Exploración de color · tema light</div>
     <h1>Light &amp; Dark — lado a lado</h1>
-    <p>Las cinco pantallas reales del producto, renderizadas en ambos temas. El tema claro es un
-      remapeo de <b>color</b> únicamente —superficies, tinta, bordes y sombras— activado con
+    <p>Las cinco pantallas de desktop del producto, renderizadas con el remap de color light.
+      Es un remapeo de <b>color</b> únicamente —superficies, tinta, bordes y sombras— activado con
       <code>data-theme="light"</code>. Espaciado, tipografía, jerarquía, interacción y componentes
-      son idénticos. El sistema oscuro sigue siendo el predeterminado.</p>
+      son idénticos. <b>Dark es el único tema del sistema publicado</b>: esto es una exploración,
+      no un tema disponible.</p>
     <div class="meta">
-      <span class="chip d"><span class="sw"></span>Dark — predeterminado</span>
-      <span class="chip l"><span class="sw"></span>Light — data-theme="light"</span>
+      <span class="chip d"><span class="sw"></span>Dark — el tema del sistema</span>
+      <span class="chip l"><span class="sw"></span>Light — exploración</span>
       <span class="chip a"><span class="sw"></span>Amber — acento en ambos</span>
     </div>
   </header>
 
   <section class="screen">
-    <div class="screen-head"><span class="idx">01</span><h2>Dashboard</h2><span class="note">KPIs, recordatorios, actividad — el tile "total" sigue oscuro en ambos</span></div>
-    <div class="pair">
-      <div class="frame d"><div class="fh"><span class="sw"></span>Dark<span class="tag">predeterminado</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/index.html" loading="lazy"></iframe></div></div>
-      <div class="frame l"><div class="fh"><span class="sw"></span>Light<span class="tag">data-theme</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/index.html" data-light="1" loading="lazy"></iframe></div></div>
-    </div>
-  </section>
-
-  <section class="screen">
-    <div class="screen-head"><span class="idx">02</span><h2>Calculadora</h2><span class="note">El valor recomendado conserva el bloque charcoal oscuro como ancla premium</span></div>
+    <div class="screen-head"><span class="idx">01</span><h2>Calculadora</h2><span class="note">El valor recomendado conserva el bloque charcoal oscuro como ancla premium</span></div>
     <div class="pair">
       <div class="frame d"><div class="fh"><span class="sw"></span>Dark<span class="tag">predeterminado</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/Calculator.html" loading="lazy"></iframe></div></div>
       <div class="frame l"><div class="fh"><span class="sw"></span>Light<span class="tag">data-theme</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/Calculator.html" data-light="1" loading="lazy"></iframe></div></div>
@@ -100,7 +96,7 @@
   </section>
 
   <section class="screen">
-    <div class="screen-head"><span class="idx">03</span><h2>Historial</h2><span class="note">Tabla densa — badges de estado y cifras tabulares en ambos temas</span></div>
+    <div class="screen-head"><span class="idx">02</span><h2>Historial</h2><span class="note">Tabla densa — badges de estado y cifras tabulares en ambos temas</span></div>
     <div class="pair">
       <div class="frame d"><div class="fh"><span class="sw"></span>Dark<span class="tag">predeterminado</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/History.html" loading="lazy"></iframe></div></div>
       <div class="frame l"><div class="fh"><span class="sw"></span>Light<span class="tag">data-theme</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/History.html" data-light="1" loading="lazy"></iframe></div></div>
@@ -108,7 +104,7 @@
   </section>
 
   <section class="screen">
-    <div class="screen-head"><span class="idx">04</span><h2>Editor de producto</h2><span class="note">Formulario + preview en vivo; barra de guardado fija</span></div>
+    <div class="screen-head"><span class="idx">03</span><h2>Editor de producto</h2><span class="note">Formulario + preview en vivo; barra de guardado fija</span></div>
     <div class="pair">
       <div class="frame d"><div class="fh"><span class="sw"></span>Dark<span class="tag">predeterminado</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/ProductEditor.html" loading="lazy"></iframe></div></div>
       <div class="frame l"><div class="fh"><span class="sw"></span>Light<span class="tag">data-theme</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/ProductEditor.html" data-light="1" loading="lazy"></iframe></div></div>
@@ -116,10 +112,18 @@
   </section>
 
   <section class="screen">
-    <div class="screen-head"><span class="idx">05</span><h2>Resumen cliente</h2><span class="note">El documento blanco es igual en ambos — sólo cambia el banco de trabajo</span></div>
+    <div class="screen-head"><span class="idx">04</span><h2>Resumen cliente</h2><span class="note">El documento blanco es igual en ambos — sólo cambia el banco de trabajo</span></div>
     <div class="pair">
       <div class="frame d"><div class="fh"><span class="sw"></span>Dark<span class="tag">predeterminado</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/ClientSummary.html" loading="lazy"></iframe></div></div>
       <div class="frame l"><div class="fh"><span class="sw"></span>Light<span class="tag">data-theme</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/ClientSummary.html" data-light="1" loading="lazy"></iframe></div></div>
+    </div>
+  </section>
+
+  <section class="screen">
+    <div class="screen-head"><span class="idx">05</span><h2>Catálogos</h2><span class="note">Tiles KPI, toggles y badges de calibración — el tile de publicación sigue oscuro</span></div>
+    <div class="pair">
+      <div class="frame d"><div class="fh"><span class="sw"></span>Dark<span class="tag">predeterminado</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/Catalogs.html" loading="lazy"></iframe></div></div>
+      <div class="frame l"><div class="fh"><span class="sw"></span>Light<span class="tag">data-theme</span></div><div class="viewport"><iframe data-src="ui_kits/presupuestador/Catalogs.html" data-light="1" loading="lazy"></iframe></div></div>
     </div>
   </section>
 
@@ -127,7 +131,8 @@
     <div class="vk">Cómo funciona / decisiones</div>
     <h3>Un solo remapeo de tokens — cero cambios en componentes</h3>
     <ul>
-      <li><b>Activación:</b> <code>data-theme="light"</code> en <code>&lt;html&gt;</code> (o cualquier contenedor). El alcance es un único selector, así que el compilador lo indexa como variante de tema. Dark queda como predeterminado en <code>:root</code>.</li>
+      <li><b>Activación:</b> <code>data-theme="light"</code> en <code>&lt;html&gt;</code> (o cualquier contenedor). El alcance es un único selector. Dark vive en <code>:root</code> y es lo que se renderiza si nadie pone el atributo.</li>
+      <li><b>Tinta calibrada contra dark:</b> los cuatro pasos de la rampa (<code>--re-ink</code> a <code>--re-ink-4</code>) reproducen las RELACIONES de contraste del sistema oscuro, no valores elegidos a ojo: 16.9 / 10.4 / 6.0 / 4.8 sobre superficie, contra 16.0 / 10.4 / 6.0 / 4.8 en dark. Así la jerarquía se lee igual en los dos.</li>
       <li><b>Sólo color:</b> superficies (blanco / gris cálido), tinta grafito, bordes cálidos y sombras suaves. <b>No</b> se tocó spacing, tipografía, radios, jerarquía ni interacción — los mismos componentes se re-tematizan solos porque ya leen <code>var(--re-*)</code>.</li>
       <li><b>Amber se mantiene</b> como único acento de marca (riel activo, CTA, logo, valor recomendado). En claro, el hover/press <b>oscurece</b> el amber (en oscuro lo aclara).</li>
       <li><b>Bloques charcoal a propósito oscuros:</b> el valor recomendado, el total del documento y el tile KPI "total" siguen en grafito oscuro — un ancla de contraste premium que mantiene el tono industrial y evita el dashboard plano y colorido de SaaS.</li>
@@ -135,7 +140,7 @@
     </ul>
   </section>
 
-  <p class="disclaimer">No destructivo. El tema claro se añade como <code>tokens/theme-light.css</code> en la cadena de imports; las pantallas oscuras no se modifican (su render por defecto sigue siendo oscuro). La columna derecha sólo fija <code>data-theme="light"</code> en el documento del iframe.</p>
+  <p class="disclaimer">No destructivo. La exploración vive en <code>tokens/theme-light.css</code>, dentro de <code>[data-theme="light"]</code>: nada de lo que hay ahí puede alcanzar al render por defecto, que sigue siendo el oscuro. Las pantallas no se modifican — la columna derecha sólo fija <code>data-theme="light"</code> en el documento del iframe. Light no es un tema disponible del sistema.</p>
 
 <script>
   // Activate light mode in the right column. We suppress CSS transitions during
