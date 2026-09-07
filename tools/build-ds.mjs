@@ -495,6 +495,14 @@ const UI = {
 		auditIntro: 'Inconsistencias y huecos detectados al auditar el sistema. Quedan escritos para resolverse como decisión explícita en vez de corregirse sobre la marcha. Es material de trabajo interno.',
 		railFoot: 'Documentación maestra del sistema.<br>Tema dark.<br>Tipografía congelada 2026‑06‑16.',
 		screensFactLabel: 'Pantallas',
+		artColor: 'Color',
+		artPrimary: 'Primario',
+		artSecondary: 'Secundario',
+		artSelect: 'Seleccioná una opción',
+		artApproved: 'Aprobado',
+		artSent: 'Enviado',
+		artDraft: 'Borrador',
+		artRejected: 'Rechazado',
 		screensDesktop: 'desktop',
 		screensMobile: 'mobile',
 		screensFactNote: 'del UI kit y de la spec Mobile v1',
@@ -528,6 +536,14 @@ const UI = {
 		auditIntro: 'Inconsistencies and gaps found while auditing the system. They stay written down so each is resolved as an explicit decision rather than patched along the way. This is internal working material.',
 		railFoot: 'Master documentation for the system.<br>Dark theme.<br>Typography frozen 2026‑06‑16.',
 		screensFactLabel: 'Screens',
+		artColor: 'Colour',
+		artPrimary: 'Primary',
+		artSecondary: 'Secondary',
+		artSelect: 'Select an option',
+		artApproved: 'Approved',
+		artSent: 'Sent',
+		artDraft: 'Draft',
+		artRejected: 'Rejected',
 		screensDesktop: 'desktop',
 		screensMobile: 'mobile',
 		screensFactNote: 'from the UI kit and the Mobile v1 spec',
@@ -613,6 +629,95 @@ function shotCard(shot, lang, { mobile = false } = {}) {
         </span>
       </button>
     </figure>`;
+}
+
+/**
+ * Composición visual del hero: la columna derecha.
+ *
+ * Todo lo que hay acá es material REAL del sistema, no una recreación:
+ *
+ *  · las fichas flotantes usan las MISMAS clases que los especímenes del
+ *    documento — `.sw`/`.chip` para los swatches, `.b`/`.b.acc` para los
+ *    botones, `.st` + `.d-*` para el StatusBadge, `.fld` para el campo. Si el
+ *    Design System cambia un componente, esta composición cambia con él;
+ *  · la tipografía que se muestra es la que el sistema usa de verdad (Hanken
+ *    Grotesk con sus cuatro pesos reales, leídos de tokens/fonts.css), no una
+ *    familia de ejemplo;
+ *  · los colores son los tokens reales, escritos con var(--re-*);
+ *  · las dos pantallas del fondo son las capturas ya generadas, con su URL
+ *    versionada por el helper de cache busting.
+ *
+ * Por qué no es una sola imagen rasterizada: el texto de las fichas queda como
+ * texto —nítido en cualquier DPI, seleccionable, y traducido por el mismo
+ * diccionario que el resto del documento—, y el único peso extra son las dos
+ * capturas, que ya existen. Una composición pre-renderizada pesaría más (habría
+ * que servirla a 2× para que no se vea blanda), no se adaptaría al viewport y
+ * habría que regenerarla a mano cada vez que el sistema cambie un componente.
+ *
+ * `aria-hidden`: es decoración. Todo lo que dice está escrito en el documento.
+ */
+function heroComposition(lang) {
+	const t = UI[lang];
+	const shot = (id, cls) => {
+		const full = readSize(id) || { pw: 0, ph: 0 };
+		return `<span class="hc-screen ${cls}"><img src="<?php echo esc_url( es_ds_restimator_screen_url( '${id}-preview.webp' ) ); ?>" alt="" width="${full.pw}" height="${full.ph}" decoding="async"></span>`;
+	};
+
+	return `<div class="hero-art" aria-hidden="true" data-i18n-skip>
+      <div class="hc-stage">
+        ${shot('catalogs', 'hc-screen--back')}
+        ${shot('calculator', 'hc-screen--front')}
+        <div class="hc-card hc-card--type">
+          <div class="hc-aa">Aa</div>
+          <div class="hc-face">Hanken Grotesk</div>
+          <div class="hc-weights"><span>Regular</span><span>Medium</span><span>Semibold</span><span>Bold</span></div>
+        </div>
+        <div class="hc-card hc-card--color">
+          <div class="hc-chips">
+            <span class="hc-chip" style="background:var(--re-amber)"></span>
+            <span class="hc-chip" style="background:var(--re-surface-2)"></span>
+            <span class="hc-chip" style="background:var(--re-surface-3)"></span>
+            <span class="hc-chip" style="background:var(--re-ink)"></span>
+          </div>
+          <div class="hc-lab">${esc(t.artColor)}</div>
+        </div>
+        <div class="hc-card hc-card--ctrl">
+          <div class="hc-btns"><span class="b acc">${esc(t.artPrimary)}</span><span class="b">${esc(t.artSecondary)}</span></div>
+          <div class="hc-select"><span>${esc(t.artSelect)}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+        </div>
+        <div class="hc-card hc-card--state">
+          <span class="st"><span class="d d-appr"></span>${esc(t.artApproved)}</span>
+          <span class="st"><span class="d d-sent"></span>${esc(t.artSent)}</span>
+          <span class="st"><span class="d d-draft"></span>${esc(t.artDraft)}</span>
+          <span class="st"><span class="d d-rej"></span>${esc(t.artRejected)}</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+/**
+ * Las cuatro métricas del hero, como tarjetas.
+ *
+ * Antes eran cuatro columnas separadas por hairlines, que a ancho completo se
+ * leían como una tabla a medio terminar. Los VALORES no cambian —son los mismos
+ * datos y los mismos textos, que siguen saliendo del diccionario—: lo único
+ * nuevo es el contenedor y el icono.
+ */
+const HERO_ICONS = {
+	tokens: '<path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/>',
+	components: '<path d="M12 2.8l7.5 4.3v9.8L12 21.2 4.5 16.9V7.1z"/><path d="M4.5 7.1L12 11.4l7.5-4.3M12 11.4v9.8"/>',
+	screens: '<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>',
+	theme: '<path d="M20 13.5A8 8 0 0 1 10.5 4a8 8 0 1 0 9.5 9.5z"/>',
+};
+
+function heroFact(icon, label, value, note, { skip = false, pair = false } = {}) {
+	const s = skip ? ' data-i18n-skip' : '';
+	return `<div class="fact"${s}>
+        <span class="fact-i" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${HERO_ICONS[icon]}</svg></span>
+        <div class="k">${label}</div>
+        <div class="v${pair ? ' v--pair' : ''}">${value}</div>
+        <div class="d">${note}</div>
+      </div>`;
 }
 
 /**
@@ -824,31 +929,63 @@ function transformDoc(doc, lang) {
 	}
 
 	/*
-	 * --- Hero: las cuatro métricas -----------------------------------------
+	 * --- Hero -------------------------------------------------------------
 	 *
-	 * "5 + 3" no se entiende sin leer el pie de la métrica: un visitante no
-	 * tiene por qué saber que el primer número son pantallas de desktop y el
-	 * segundo de mobile. El valor pasa a decirlo solo, con los números todavía
-	 * como el elemento dominante (.n los mantiene grandes y en ámbar) y las
-	 * unidades en texto chico. No cambia ningún dato: siguen siendo 5 y 3.
+	 * Dos cambios, ninguno de contenido:
+	 *
+	 * 1. El hero pasa a dos columnas. La izquierda es exactamente lo que había
+	 *    —eyebrow, h1, descripción—; la derecha es una composición con material
+	 *    real del sistema (ver heroComposition()). Antes todo el peso caía a la
+	 *    izquierda y sobraba media pantalla a la derecha.
+	 *
+	 * 2. Las cuatro métricas dejan de ser columnas separadas por hairlines y
+	 *    pasan a tarjetas con icono. A ancho completo, cuatro columnas con una
+	 *    regla arriba se leían como una tabla a medio terminar.
+	 *
+	 * Los TEXTOS de las métricas no cambian: son los mismos que ya estaban
+	 * traducidos y aprobados. Lo único que se reescribe es el contenedor.
+	 * "5 + 3" ya se había resuelto antes a "5 desktop · 3 mobile" porque el
+	 * valor suelto no se entendía sin leer el pie.
 	 */
-	doc = mustReplace(
+	/*
+	 * Tokens y Componentes se re-emiten con el texto ESPAÑOL ORIGINAL y SIN
+	 * data-i18n-skip: sus hojas `.k`/`.v`/`.d` conservan las mismas claves que
+	 * ya tiene el diccionario, así que se siguen traduciendo solas y no se
+	 * duplica ni se reescribe nada de lo aprobado. Sólo cambia el contenedor.
+	 *
+	 * Pantallas y Tema sí van con skip: su contenido ya se había reescrito en
+	 * pasadas anteriores (el "5 + 3" que no se entendía, y el fact de temas que
+	 * afirmaba que había dos), y vive en UI.
+	 */
+	const factsBlock = `<div class="facts">
+      ${heroFact('tokens', 'Tokens', '<span class="num">147</span>', 'color · tipo · espacio · elevación')}
+      ${heroFact('components', 'Componentes', '<span class="num">33</span>', 'exports en el namespace')}
+      ${heroFact('screens', esc(t.screensFactLabel),
+		`<span class="n num">5</span> ${esc(t.screensDesktop)} <span class="n num">3</span> ${esc(t.screensMobile)}`,
+		esc(t.screensFactNote), { skip: true, pair: true })}
+      ${heroFact('theme', esc(t.themeFactLabel), esc(t.themeFactValue), esc(t.themeFactNote), { skip: true })}
+    </div>`;
+
+	doc = spliceBetween(
 		doc,
-		/<div><div class="k">Pantallas<\/div><div class="v num">5 \+ 3<\/div><div class="d">desktop kit \+ mobile v1<\/div><\/div>/,
-		`<div${skip}><div class="k">${esc(t.screensFactLabel)}</div>` +
-		`<div class="v v--pair"><span class="n num">5</span> ${esc(t.screensDesktop)} <span class="n num">3</span> ${esc(t.screensMobile)}</div>` +
-		`<div class="d">${esc(t.screensFactNote)}</div></div>`,
-		'hero: fact de pantallas'
+		'<div class="facts">',
+		'</div>\n  </div>\n</header>',
+		factsBlock + '\n    ' + heroComposition(lang) + '\n  </div>\n</header>',
+		'hero: métricas y composición'
 	);
 
-	// --- Tema: la publicación no afirma que existan dos temas -------------
-	// Sólo existe dark. Light es trabajo planificado y se anuncia UNA sola vez,
-	// en System evolution — no acá.
+	// La columna izquierda se envuelve para que la grilla tenga dos hijos.
 	doc = mustReplace(
 		doc,
-		/<div><div class="k">Temas<\/div><div class="v num">2<\/div><div class="d">dark \(default\) · light<\/div><\/div>/,
-		`<div${skip}><div class="k">${esc(t.themeFactLabel)}</div><div class="v">${esc(t.themeFactValue)}</div><div class="d">${esc(t.themeFactNote)}</div></div>`,
-		'hero: fact de temas'
+		/<div class="in">\n/,
+		'<div class="in">\n    <div class="hero-copy">\n',
+		'hero: apertura de la columna de texto'
+	);
+	doc = mustReplace(
+		doc,
+		/(<p class="sub">[\s\S]*?<\/p>)\n/,
+		'$1\n    </div>\n',
+		'hero: cierre de la columna de texto'
 	);
 
 	doc = mustReplace(
