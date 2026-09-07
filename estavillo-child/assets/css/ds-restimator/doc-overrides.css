@@ -1031,92 +1031,430 @@ body.es-ds-page {
 /* -------------------------------------------------------------------------
    6. Hero
    -------------------------------------------------------------------------
-   Tres problemas medidos a 1920px, con el contenedor del documento ya
-   ensanchado a 1556px:
+   El hero pasa a dos columnas: la izquierda es el texto de siempre y la
+   derecha una composición con material real del sistema. Debajo, a ancho
+   completo, las cuatro métricas como tarjetas.
 
-     a) `.hero .facts{max-width:880px}` es un tope fijo. Las cuatro métricas
-        quedaban apretadas en los primeros 880px de un área de 1476, con 596px
-        vacíos a la derecha — justo lo contrario de lo que se buscaba al
-        ensanchar el contenedor;
-     b) cada columna traía su propio `border-top`. Con cuatro columnas y el
-        `border-bottom` del hero abajo, la franja se leía como dos reglas
-        horizontales paralelas encerrando las métricas: mucho peso estructural
-        para cuatro cifras;
-     c) el bloque nacía pegado al párrafo de arriba.
+   Qué se corrige. Medido a 1920px con el contenedor ya ensanchado a 1556:
+   todo el peso caía en los primeros ~700px y quedaban ~800 vacíos a la
+   derecha. Las métricas eran cuatro columnas separadas por hairlines, que a
+   ese ancho se leían como una tabla a medio terminar.
 
-   Se recompone SÓLO esta franja: una regla horizontal única arriba, divisores
-   verticales entre columnas y la banda ocupando el ancho del hero. Ni el
-   párrafo ni el h1 se ensanchan: siguen con sus topes de 70ch y 20ch, que es
-   lo que sostiene la legibilidad. */
+   La composición NO es una imagen: son las clases reales de los especímenes
+   del documento (.sw, .b, .st, .d-*) más dos capturas ya generadas. El texto
+   sigue siendo texto —nítido a cualquier DPI y traducido por el mismo
+   diccionario— y el único peso extra son esas dos previews. Ver
+   heroComposition() en tools/build-ds.mjs. */
+
+.re-doc .hero {
+	position: relative;
+	overflow: hidden;
+}
+
+/* Resplandor cálido detrás de la composición. Un solo radial-gradient, sin
+   imagen: es lo que da profundidad a la esquina sin sumar una request. */
+.re-doc .hero::before {
+	content: "";
+	position: absolute;
+	top: -30%;
+	right: -10%;
+	width: 70%;
+	height: 150%;
+	background: radial-gradient(closest-side, rgba(224, 145, 30, 0.13), rgba(224, 145, 30, 0) 70%);
+	pointer-events: none;
+}
+
+.re-doc .hero .in {
+	position: relative;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	grid-template-areas: "copy" "facts";
+	gap: var(--re-s8) 0;
+}
+
+.re-doc .hero .hero-copy {
+	grid-area: copy;
+	min-width: 0;
+}
+
+.re-doc .hero .hero-art {
+	grid-area: art;
+	display: none;
+}
 
 .re-doc .hero .facts {
+	grid-area: facts;
+}
+
+/* El degradé del H1 lo dibuja el texto, no una capa: color de respaldo
+   primero, así un navegador sin background-clip:text sigue viendo blanco. */
+.re-doc .hero h1 {
+	max-width: 16ch;
+	color: #fff;
+	background: linear-gradient(102deg, #fff 38%, #9aa0aa 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+	.re-doc .hero h1 {
+		background: none;
+		-webkit-text-fill-color: #fff;
+	}
+}
+
+/* ---------- las cuatro métricas, como tarjetas ---------- */
+
+.re-doc .hero .facts {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--re-s4);
 	max-width: none;
-	gap: 0;
-	margin-top: var(--re-s9);
-	border-top: 1px solid var(--re-charcoal-line);
-}
-
-.re-doc .hero .facts > div {
+	margin-top: 0;
 	border-top: 0;
-	padding: var(--re-s5) var(--re-s6) 0;
 }
 
-.re-doc .hero .facts > div + div {
-	border-left: 1px solid var(--re-charcoal-line);
+/* `.re-doc .hero .facts div{border-top:1px}` del Design System matchea
+   CUALQUIER div descendiente, no sólo la columna: dentro de una tarjeta eso
+   volvía a dibujar una línea sobre el label, sobre el valor y sobre el pie —
+   justo la "tabla a medio terminar" que esta pasada viene a sacar. Se apagan
+   todas y la tarjeta pone su propio borde. */
+.re-doc .hero .facts div {
+	border-top: 0;
+	padding-top: 0;
 }
 
-.re-doc .hero .facts > div:first-child {
-	padding-left: 0;
+.re-doc .hero .facts .fact {
+	border: 1px solid var(--re-charcoal-line);
+	border-radius: var(--re-r-lg);
+	background: rgba(255, 255, 255, 0.022);
+	padding: var(--re-s5);
 }
 
-/* Métrica de dos cifras ("5 desktop + 3 mobile"): los números mantienen el
-   peso visual de las otras métricas y las unidades van en texto chico, así el
-   dato se entiende sin leer el pie. Antes decía "5 + 3", que fuera de contexto
-   no dice qué es cada número. */
+.re-doc .hero .facts .fact-i {
+	display: grid;
+	place-items: center;
+	width: 40px;
+	height: 40px;
+	margin-bottom: var(--re-s4);
+	border: 1px solid var(--re-amber-line);
+	border-radius: var(--re-r);
+	background: var(--re-amber-soft);
+	color: var(--re-amber-bright);
+}
+
+.re-doc .hero .facts .fact-i svg {
+	width: 19px;
+	height: 19px;
+}
+
+.re-doc .hero .facts .k {
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	color: var(--re-on-dark-2);
+}
+
+.re-doc .hero .facts .v {
+	font-size: 38px;
+	line-height: 1.05;
+	margin-top: 6px;
+}
+
+.re-doc .hero .facts .d {
+	margin-top: 8px;
+	line-height: 1.45;
+}
+
+/* Métrica de dos cifras ("5 desktop 3 mobile"): los números mantienen el peso
+   de las otras métricas y las unidades van en texto chico, así el dato se
+   entiende sin leer el pie. */
 .re-doc .hero .facts .v--pair {
 	display: flex;
 	align-items: baseline;
 	flex-wrap: wrap;
-	gap: 0 6px;
-	font-size: 13px;
+	gap: 0 7px;
+	font-size: 14px;
 	font-weight: 500;
 	letter-spacing: 0;
 	color: var(--re-on-dark-2);
 }
 
 .re-doc .hero .facts .v--pair .n {
-	font-size: 26px;
+	font-size: 38px;
 	font-weight: 700;
 	letter-spacing: -0.02em;
 	color: var(--re-amber-bright);
 }
 
-.re-doc .hero .facts .v--pair .n + .n,
 .re-doc .hero .facts .v--pair .n:not(:first-child) {
-	margin-left: 4px;
+	margin-left: 6px;
 }
 
+/* ---------- composición de la columna derecha ---------- */
+
+.re-doc .hero .hc-stage {
+	position: absolute;
+	inset: 0;
+	/* La composición sangra fuera de su columna a propósito: es lo que la
+	   hace leer como una pila de material y no como una ilustración
+	   encuadrada. El recorte lo pone .hero{overflow:hidden}, así que nunca
+	   genera scroll horizontal. */
+	transform: perspective(1600px) rotateX(6deg) rotateY(-15deg) rotate(2deg) scale(1.06);
+	transform-origin: 50% 40%;
+}
+
+.re-doc .hero .hc-screen,
+.re-doc .hero .hc-card {
+	position: absolute;
+	border: 1px solid var(--re-charcoal-line);
+	border-radius: var(--re-r-lg);
+	background: var(--re-surface);
+	box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+	overflow: hidden;
+}
+
+/* Las capturas se recortan por arriba: se muestra la franja superior, que es
+   donde vive la identidad de cada pantalla. */
+.re-doc .hero .hc-screen img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.re-doc .hero .hc-screen--back {
+	top: 2%;
+	left: 46%;
+	width: 62%;
+	height: 62%;
+	opacity: 0.72;
+}
+
+.re-doc .hero .hc-screen--front {
+	top: 20%;
+	left: 24%;
+	width: 74%;
+	height: 74%;
+	opacity: 0.95;
+}
+
+.re-doc .hero .hc-card {
+	padding: var(--re-s4);
+	background: color-mix(in srgb, var(--re-surface) 88%, transparent);
+	-webkit-backdrop-filter: blur(6px);
+	backdrop-filter: blur(6px);
+}
+
+@supports not (background: color-mix(in srgb, red 50%, transparent)) {
+	.re-doc .hero .hc-card {
+		background: var(--re-surface);
+	}
+}
+
+.re-doc .hero .hc-card--type {
+	top: 12%;
+	left: -1%;
+	width: 27%;
+}
+
+.re-doc .hero .hc-aa {
+	font-size: 40px;
+	font-weight: 600;
+	line-height: 1;
+	letter-spacing: -0.03em;
+	color: var(--re-ink);
+}
+
+.re-doc .hero .hc-face {
+	margin-top: 10px;
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--re-ink-2);
+}
+
+.re-doc .hero .hc-weights {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	margin-top: 10px;
+	font-size: 11.5px;
+	color: var(--re-ink-3);
+}
+
+.re-doc .hero .hc-weights span:nth-child(2) { font-weight: 500; }
+.re-doc .hero .hc-weights span:nth-child(3) { font-weight: 600; }
+.re-doc .hero .hc-weights span:nth-child(4) { font-weight: 700; }
+
+.re-doc .hero .hc-card--color {
+	top: 7%;
+	left: 27%;
+	width: 30%;
+}
+
+.re-doc .hero .hc-chips {
+	display: flex;
+	gap: 7px;
+}
+
+.re-doc .hero .hc-chip {
+	width: 28px;
+	height: 28px;
+	border-radius: var(--re-r-sm);
+	border: 1px solid var(--re-line-2);
+	flex: none;
+}
+
+.re-doc .hero .hc-lab {
+	margin-top: 11px;
+	font-size: 11.5px;
+	color: var(--re-ink-3);
+}
+
+/* El ancho tiene que dar para el par de botones a su tamaño real. Con 34% a
+   1440 la tarjeta medía ~180px y los dos botones ~190: el `overflow:hidden` de
+   la tarjeta cortaba "Secundario" al medio, que se lee como un bug y no como
+   profundidad. 38% deja margen y el borde derecho sigue quedando antes del 55%
+   donde arranca la tarjeta de estados. */
+.re-doc .hero .hc-card--ctrl {
+	top: 43%;
+	left: 15%;
+	width: 38%;
+}
+
+/* Red de seguridad: si algún idioma trae etiquetas más largas, los botones
+   bajan de línea en vez de recortarse. */
+.re-doc .hero .hc-btns {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 9px;
+}
+
+.re-doc .hero .hc-select {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 11px;
+	padding: 0 11px;
+	height: var(--re-control-h);
+	border: 1px solid var(--re-line-2);
+	border-radius: var(--re-r-sm);
+	background: var(--re-surface-2);
+	font-size: 13px;
+	color: var(--re-ink-4);
+	/* El select tiene alto fijo (--re-control-h) como el componente real: si el
+	   placeholder se parte en dos líneas se desborda de su propia caja. Se
+	   trunca, que es lo que hace un select de verdad. */
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.re-doc .hero .hc-select svg {
+	width: 15px;
+	height: 15px;
+	margin-left: auto;
+	flex: none;
+}
+
+.re-doc .hero .hc-card--state {
+	top: 36%;
+	left: 55%;
+	width: 30%;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 8px;
+}
+
+/* Los botones y los badges de la composición son los componentes REALES
+   (.b/.b.acc/.st/.d-*): sólo se les quita el puntero, porque acá son
+   decoración y no controles. */
+.re-doc .hero .hc-card .b,
+.re-doc .hero .hc-card .st {
+	cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.re-doc .hero .hc-stage {
+		transform: none;
+	}
+}
+
+/* ---------- desktop: dos columnas ---------- */
+
+@media (min-width: 1101px) {
+	.re-doc .hero .in {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.02fr);
+		grid-template-areas:
+			"copy art"
+			"facts facts";
+		column-gap: var(--re-s8);
+		align-items: center;
+	}
+
+	.re-doc .hero .hero-art {
+		display: block;
+		position: relative;
+		/* Alto derivado del ancho: la composición mantiene su proporción sin
+		   depender de cuánto texto tenga la columna izquierda. */
+		aspect-ratio: 16 / 11;
+		min-height: 300px;
+		max-height: 460px;
+	}
+
+	.re-doc .hero .facts {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}
+
+/* Bajo 1101px el hero ya reduce el h1 a 38px (regla del propio DS) y las
+   métricas pasan a 2×2 por el default de arriba. La composición no se
+   intenta encajar: se saca. Es decoración, y comprimida a media columna
+   dejaba de leerse como una pila de material — además de costar dos
+   descargas arriba del fold en el viewport donde más caro sale. */
 @media (max-width: 1100px) {
-	/* Dos columnas: los divisores verticales tienen que reordenarse o quedan
-	   colgando en medio de la segunda fila. */
-	.re-doc .hero .facts > div + div {
-		border-left: 0;
+	.re-doc .hero h1 {
+		max-width: 18ch;
 	}
 
-	.re-doc .hero .facts > div:nth-child(even) {
-		border-left: 1px solid var(--re-charcoal-line);
-	}
-
-	.re-doc .hero .facts > div:nth-child(odd) {
-		padding-left: 0;
-	}
-
-	.re-doc .hero .facts > div:nth-child(n + 3) {
-		margin-top: var(--re-s5);
-		border-top: 1px solid var(--re-charcoal-line);
+	.re-doc .hero .facts .v,
+	.re-doc .hero .facts .v--pair .n {
+		font-size: 32px;
 	}
 }
 
+@media (max-width: 560px) {
+	.re-doc .hero .facts {
+		gap: var(--re-s3);
+	}
+
+	.re-doc .hero .facts .fact {
+		padding: var(--re-s4);
+	}
+
+	.re-doc .hero .facts .fact-i {
+		width: 32px;
+		height: 32px;
+		margin-bottom: var(--re-s3);
+	}
+
+	.re-doc .hero .facts .fact-i svg {
+		width: 16px;
+		height: 16px;
+	}
+
+	.re-doc .hero .facts .v,
+	.re-doc .hero .facts .v--pair .n {
+		font-size: 26px;
+	}
+
+	.re-doc .hero .facts .v--pair {
+		font-size: 12.5px;
+	}
+
+	.re-doc .hero .facts .d {
+		font-size: 11px;
+	}
+}
 /* -------------------------------------------------------------------------
    6b. Leyenda del inventario (§09) y bloques de §08
    ------------------------------------------------------------------------- */
@@ -1300,5 +1638,319 @@ body.es-ds-page {
 	.re-doc .ev-audit > summary,
 	.re-doc .ev-audit > summary::before {
 		transition: none;
+	}
+}
+
+/* -------------------------------------------------------------------------
+   12. Subnav del documento (≤1100px)
+   -------------------------------------------------------------------------
+   Debajo de 1100px el Design System suelta el rail sticky y lo convierte en un
+   bloque estático. Con 12 secciones eso son ~560px de links antes del primer
+   contenido: en un teléfono de 844px de alto, el documento empezaba fuera de
+   la primera pantalla.
+
+   La subnav lo reemplaza por una barra de una línea que dice en qué sección
+   estás y despliega el resto. La construye assets/js/ds-restimator.js CLONANDO
+   el rail, así que no hay una segunda lista que mantener, y el rail sólo se
+   oculta cuando la subnav ya está montada (.es-ds-subnav-on en <body>): sin JS
+   queda el bloque de siempre, que navega igual.
+
+   1100px no es un breakpoint nuevo — es el que el propio DS ya usa. */
+
+.es-ds-subnav-on .re-doc .rail {
+	display: none;
+}
+
+.ds-subnav {
+	display: none;
+}
+
+@media (max-width: 1100px) {
+	.ds-subnav {
+		display: block;
+		position: sticky;
+		/* Justo debajo del header institucional, con la misma convención de
+		   66px que ya usan el rail y .es-case-index. */
+		top: 66px;
+		z-index: 60;
+		background: color-mix(in srgb, var(--re-surface) 94%, transparent);
+		-webkit-backdrop-filter: blur(12px);
+		backdrop-filter: blur(12px);
+		border-bottom: 1px solid var(--re-line);
+	}
+
+	@supports not (background: color-mix(in srgb, red 50%, transparent)) {
+		.ds-subnav {
+			background: var(--re-surface);
+		}
+	}
+
+	/* Con la barra mínima en vez del header institucional. */
+	.es-ds-minimal-nav .ds-subnav {
+		top: var(--es-ds-topbar-h);
+	}
+
+	.admin-bar .ds-subnav {
+		top: 98px;
+	}
+
+	.admin-bar.es-ds-minimal-nav .ds-subnav {
+		top: calc(var(--es-ds-topbar-h) + 32px);
+	}
+
+	/* Los anchors tienen que caer debajo del header Y de la subnav. */
+	.re-doc .sec,
+	.es-header-sticky .re-doc .sec {
+		scroll-margin-top: 122px;
+	}
+
+	.es-ds-minimal-nav .re-doc .sec {
+		scroll-margin-top: calc(var(--es-ds-topbar-h) + 56px);
+	}
+}
+
+@media (max-width: 782px) {
+	.admin-bar .ds-subnav {
+		top: 112px;
+	}
+
+	.admin-bar.es-ds-minimal-nav .ds-subnav {
+		top: calc(var(--es-ds-topbar-h) + 46px);
+	}
+}
+
+.ds-subnav__trigger {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	/* 52px: por encima del mínimo táctil de 44px que el propio sistema fija
+	   en §07 para mobile. */
+	min-height: 52px;
+	padding: 0 var(--re-s5);
+	border: 0;
+	background: none;
+	color: var(--re-ink);
+	font-family: var(--re-font-sans);
+	font-size: 14px;
+	font-weight: 600;
+	text-align: left;
+	cursor: pointer;
+}
+
+.ds-subnav__num {
+	font-family: var(--re-font-mono);
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--re-amber-ink);
+	flex: none;
+}
+
+.ds-subnav__label {
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.ds-subnav__chev {
+	display: grid;
+	place-items: center;
+	margin-left: auto;
+	flex: none;
+	color: var(--re-ink-3);
+	transition: transform 160ms ease;
+}
+
+.ds-subnav__chev svg {
+	width: 17px;
+	height: 17px;
+}
+
+.ds-subnav__trigger[aria-expanded="true"] .ds-subnav__chev {
+	transform: rotate(180deg);
+}
+
+.ds-subnav__trigger:focus-visible {
+	outline: 2px solid var(--re-amber) !important;
+	outline-offset: -3px !important;
+}
+
+/* El menú no ocupa media pantalla: se acota y scrollea por dentro. */
+.ds-subnav__menu {
+	max-height: min(58vh, 420px);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	border-top: 1px solid var(--re-line);
+	padding: var(--re-s2) 0 var(--re-s3);
+	background: var(--re-surface);
+}
+
+.re-doc .ds-subnav__item {
+	display: flex;
+	align-items: baseline;
+	gap: 11px;
+	min-height: 44px;
+	padding: 10px var(--re-s5);
+	color: var(--re-ink-2);
+	font-size: 14px;
+	line-height: 1.35;
+}
+
+.re-doc .ds-subnav__item:hover {
+	background: var(--re-surface-2);
+	color: var(--re-ink);
+}
+
+.re-doc .ds-subnav__item.is-current {
+	background: var(--re-surface-2);
+	color: var(--re-ink);
+	font-weight: 600;
+	box-shadow: inset 3px 0 0 var(--re-amber);
+}
+
+.re-doc .ds-subnav__item:focus-visible {
+	outline: 2px solid var(--re-amber) !important;
+	outline-offset: -3px !important;
+}
+
+.ds-subnav__inum {
+	font-family: var(--re-font-mono);
+	font-size: 10.5px;
+	color: var(--re-ink-4);
+	min-width: 18px;
+	flex: none;
+}
+
+.ds-subnav__itext {
+	min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ds-subnav__chev {
+		transition: none;
+	}
+}
+
+/* -------------------------------------------------------------------------
+   13. Breadcrumb en mobile
+   -------------------------------------------------------------------------
+   Tres niveles en 390px dejan el último apenas legible. El primero cede: con
+   la subnav y el header arriba, "Work" ya está a un toque de distancia y el
+   contexto que importa acá es REstimator → Design System. */
+
+@media (max-width: 700px) {
+	.re-doc .es-breadcrumbs__item:first-child {
+		display: none;
+	}
+
+	.re-doc .es-breadcrumbs__item:nth-child(2)::before {
+		content: none;
+	}
+}
+
+/* -------------------------------------------------------------------------
+   14. Visor en mobile: geometría y gesto
+   -------------------------------------------------------------------------
+   Nada de acá cambia el visor de desktop: son reglas de `pointer: coarse` y de
+   viewport chico, más `touch-action`, que en un mouse no tiene efecto. */
+
+/* `touch-action` es la mitad CSS del pinch (la otra está en
+   assets/js/ds-screen-viewer.js).
+
+   Al declarar los ejes de paneo explícitamente, el navegador deja de tratar el
+   gesto de dos dedos como zoom DE LA PÁGINA — que es lo que hacía que en el
+   iPhone se ampliara el documento de WordPress con el visor adentro — y se lo
+   entrega al handler, que lo usa para escalar la captura. El paneo de un dedo
+   lo sigue haciendo el navegador, nativo y con inercia:
+
+     en fit  → pan-y      (la captura sólo desborda a lo alto)
+     con zoom → pan-x pan-y (desborda en los dos ejes)
+
+   Nunca `none`: eso mataría el scroll natural, que es la forma principal de
+   recorrer una captura alta. */
+.esv__scroll {
+	touch-action: pan-y;
+}
+
+.esv__scroll.is-wide {
+	touch-action: pan-x pan-y;
+}
+
+/* La hoja del visor se decide por PUNTERO y no por ancho: un teléfono en
+   apaisado mide 844px de ancho y con un `max-width: 700px` se caía a la
+   ventana centrada de desktop —barra despegada del borde y botones de 30px
+   bajo el pulgar—. `pointer: coarse` es además la MISMA condición que usa el
+   JS (coarse()), así que CSS y JS no pueden desincronizarse. */
+@media (pointer: coarse) {
+	/* dvh y no vh: en iOS Safari `vh` mide la ventana con la barra de URL
+	   desplegada, así que con la barra colapsada el diálogo quedaba más alto
+	   que la pantalla y la ventana se iba por abajo. El fallback en vh queda
+	   primero para los navegadores sin dvh. */
+	.esv {
+		height: 100vh;
+		height: 100dvh;
+	}
+
+	/* Hoja a pantalla completa, y no una ventana centrada que se redimensiona:
+	   con el ancho y el alto fijos, la barra de título no se mueve mientras se
+	   hace pinch. El JS deja de fijarle medidas en táctil (ver apply()). */
+	.esv__win {
+		top: 0;
+		left: 0;
+		transform: none;
+		width: 100%;
+		height: 100%;
+		max-width: 100%;
+		max-height: 100%;
+		border: 0;
+		border-radius: 0;
+	}
+
+	/* La barra respeta el notch y la barra de gestos. */
+	.esv__bar {
+		padding-top: env(safe-area-inset-top, 0px);
+		height: calc(42px + env(safe-area-inset-top, 0px));
+		padding-left: max(var(--re-s4), env(safe-area-inset-left, 0px));
+		padding-right: max(var(--re-s3), env(safe-area-inset-right, 0px));
+	}
+
+	/* Controles a tamaño táctil: 30px era cómodo con mouse, no con el pulgar. */
+	.esv__btn {
+		width: 40px;
+		height: 40px;
+	}
+
+	.esv__btn svg {
+		width: 19px;
+		height: 19px;
+	}
+
+	.esv__level {
+		min-width: 42px;
+		font-size: 12px;
+	}
+
+	.esv__scroll {
+		padding-bottom: env(safe-area-inset-bottom, 0px);
+	}
+}
+
+/* -------------------------------------------------------------------------
+   15. Encabezado de sección en pantallas muy angostas
+   -------------------------------------------------------------------------
+   `.sec-h` es un flex de una línea con el contador empujado por margin-left:
+   auto. A 320px el título y el contador no entran juntos y el contador se iba
+   16px fuera del viewport (medido: right 350 contra un clientWidth de 320).
+   Baja a su propia línea en vez de empujar la página. */
+
+@media (max-width: 560px) {
+	.re-doc .sec-h {
+		flex-wrap: wrap;
+	}
+
+	.re-doc .sec-h .cnt {
+		margin-left: 0;
+		width: 100%;
 	}
 }

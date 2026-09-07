@@ -65,14 +65,66 @@ if ( ! defined( 'ABSPATH' ) ) {
 <!-- ================= HERO / PORTFOLIO ENTRY ================= -->
 <header class="hero">
   <div class="in">
+    <div class="hero-copy">
     <div class="eyebrow">Design System · Documentación maestra</div>
     <h1>REstimator Design System</h1>
     <p class="sub">El sistema de diseño de <b style="color:#fff">Presupuestador RE</b>, una herramienta B2B de presupuestación para talleres de herrería y metalurgia. Dark industrial, denso, desktop‑first y con un único acento ámbar racionado. Esta documentación reúne sus foundations, sus componentes, sus patrones de producto y su sistema responsive.</p>
+    </div>
     <div class="facts">
-      <div><div class="k">Tokens</div><div class="v num">147</div><div class="d">color · tipo · espacio · elevación</div></div>
-      <div><div class="k">Componentes</div><div class="v num">33</div><div class="d">exports en el namespace</div></div>
-      <div><div class="k">Pantallas</div><div class="v v--pair"><span class="n num">5</span> desktop <span class="n num">3</span> mobile</div><div class="d">del UI kit y de la spec Mobile v1</div></div>
-      <div><div class="k">Tema</div><div class="v">Dark</div><div class="d">el único tema del sistema</div></div>
+      <div class="fact">
+        <span class="fact-i" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg></span>
+        <div class="k">Tokens</div>
+        <div class="v"><span class="num">147</span></div>
+        <div class="d">color · tipo · espacio · elevación</div>
+      </div>
+      <div class="fact">
+        <span class="fact-i" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8l7.5 4.3v9.8L12 21.2 4.5 16.9V7.1z"/><path d="M4.5 7.1L12 11.4l7.5-4.3M12 11.4v9.8"/></svg></span>
+        <div class="k">Componentes</div>
+        <div class="v"><span class="num">33</span></div>
+        <div class="d">exports en el namespace</div>
+      </div>
+      <div class="fact">
+        <span class="fact-i" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+        <div class="k">Pantallas</div>
+        <div class="v v--pair"><span class="n num">5</span> desktop <span class="n num">3</span> mobile</div>
+        <div class="d">del UI kit y de la spec Mobile v1</div>
+      </div>
+      <div class="fact">
+        <span class="fact-i" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13.5A8 8 0 0 1 10.5 4a8 8 0 1 0 9.5 9.5z"/></svg></span>
+        <div class="k">Tema</div>
+        <div class="v">Dark</div>
+        <div class="d">el único tema del sistema</div>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="hc-stage">
+        <span class="hc-screen hc-screen--back"><img src="<?php echo esc_url( es_ds_restimator_screen_url( 'catalogs-preview.webp' ) ); ?>" alt="" width="1520" height="1728" decoding="async"></span>
+        <span class="hc-screen hc-screen--front"><img src="<?php echo esc_url( es_ds_restimator_screen_url( 'calculator-preview.webp' ) ); ?>" alt="" width="1520" height="1702" decoding="async"></span>
+        <div class="hc-card hc-card--type">
+          <div class="hc-aa">Aa</div>
+          <div class="hc-face">Hanken Grotesk</div>
+          <div class="hc-weights"><span>Regular</span><span>Medium</span><span>Semibold</span><span>Bold</span></div>
+        </div>
+        <div class="hc-card hc-card--color">
+          <div class="hc-chips">
+            <span class="hc-chip" style="background:var(--re-amber)"></span>
+            <span class="hc-chip" style="background:var(--re-surface-2)"></span>
+            <span class="hc-chip" style="background:var(--re-surface-3)"></span>
+            <span class="hc-chip" style="background:var(--re-ink)"></span>
+          </div>
+          <div class="hc-lab">Color</div>
+        </div>
+        <div class="hc-card hc-card--ctrl">
+          <div class="hc-btns"><span class="b acc">Primario</span><span class="b">Secundario</span></div>
+          <div class="hc-select"><span>Seleccioná una opción</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
+        </div>
+        <div class="hc-card hc-card--state">
+          <span class="st"><span class="d d-appr"></span>Aprobado</span>
+          <span class="st"><span class="d d-sent"></span>Enviado</span>
+          <span class="st"><span class="d d-draft"></span>Borrador</span>
+          <span class="st"><span class="d d-rej"></span>Rechazado</span>
+        </div>
+      </div>
     </div>
   </div>
 </header>

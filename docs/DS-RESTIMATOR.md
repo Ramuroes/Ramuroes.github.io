@@ -381,9 +381,9 @@ aplicación.
 - `data-es-screen-cssw` trae el ancho de la **interfaz** (1440 desktop, 390
   mobile), no el del archivo — las capturas están tomadas a 2× y 3×. Sin ese
   dato el visor no puede saber a qué escala es "100%".
-- El ancho de trabajo arranca en `min(anchoReal, anchoDisponible)`, así que al
-  abrir **nunca** hay scroll horizontal. Recién con zoom deliberado puede
-  aparecer.
+- En desktop el ancho de trabajo arranca en `min(anchoReal, anchoDisponible)`,
+  así que al abrir **nunca** hay scroll horizontal. Recién con zoom deliberado
+  puede aparecer. En táctil no: ver §15, "El visor en un teléfono".
 - `<dialog>.showModal()` aporta foco atrapado, capa superior y Escape. El área
   de scroll es focusable, así que las flechas y PageUp/PageDown recorren la
   pantalla sin mouse.
@@ -576,3 +576,127 @@ Polylang a mano.
 Si el Case Study todavía no existe (plugin inactivo, caso sin publicar) ese
 nivel se omite: antes que un link muerto, un nivel menos. Con un solo nivel el
 breadcrumb no se imprime — sería un rótulo, no una navegación.
+
+---
+
+## 15. Presentación responsive: hero, subnav y visor táctil
+
+Cuatro cosas de esta pasada. Ninguna toca el rail ni el visor de desktop.
+
+### El hero a dos columnas
+
+Medido a 1920 px con el contenedor ya ensanchado a 1556: todo el peso del hero
+caía en los primeros ~700 px y quedaban ~800 vacíos a la derecha. Las cuatro
+métricas eran columnas separadas por hairlines, que a ese ancho se leían como
+una tabla a medio terminar.
+
+Ahora el hero es `copy | art` arriba y las métricas a ancho completo abajo
+(`grid-template-areas`), y las métricas son **tarjetas** con icono, dato y pie.
+
+La composición de la derecha **no es una imagen y no inventa UI**: son las
+clases reales de los especímenes del propio documento —`.sw`, `.b`, `.b.acc`,
+`.st`, los `.d-*` de estado— más dos capturas que ya existían en
+`assets/ds/restimator/screens/`. Sale de `heroComposition()` en
+`tools/build-ds.mjs`, así que el texto sigue siendo texto: nítido a cualquier
+DPI y traducido por el mismo diccionario que el resto del documento.
+
+- La pila se inclina con **una** `transform` en `.hc-stage`
+  (`perspective + rotateX/rotateY`), no con una por tarjeta.
+- Sangra fuera de su columna a propósito; el recorte lo pone
+  `.hero { overflow: hidden }`, así que nunca genera scroll horizontal.
+- `prefers-reduced-motion` la deja plana.
+- La tarjeta de controles mide 38% del escenario y no 34%: con 34% a 1440 px
+  medía ~180 px contra ~190 px de los dos botones, y el `overflow:hidden` de la
+  tarjeta cortaba "Secundario" al medio — se leía como un bug, no como
+  profundidad. Los botones además llevan `flex-wrap`, por si un idioma trae
+  etiquetas más largas.
+
+Bajo 1101 px la composición **se saca** en vez de comprimirse: es decoración, a
+media columna deja de leerse como una pila, y son dos descargas arriba del fold
+justo en el viewport donde más caro salen. Las métricas pasan a 2×2.
+
+> ⚠️ `.re-doc .hero .facts div { border-top: 1px }` del Design System matchea
+> **cualquier** div descendiente, no sólo la columna. Dentro de una tarjeta eso
+> volvía a dibujar la línea sobre el label, sobre el valor y sobre el pie. Se
+> apagan todas y la tarjeta pone su propio borde.
+
+### La subnav de mobile
+
+Bajo 1100 px el DS ya soltaba el rail y lo convertía en un bloque estático: con
+12 secciones eso son ~560 px de links antes del primer contenido, o sea que en
+un teléfono el documento empezaba fuera de la primera pantalla (el hero
+arrancaba en y≈620).
+
+`assets/js/ds-restimator.js` lo reemplaza por una **barra sticky de una línea**
+que dice en qué sección estás y despliega el resto. El hero arranca en y≈164.
+
+- **1100 px no es un breakpoint nuevo**: es el que el propio DS ya usaba para
+  soltar el rail (`assets/css/ds-restimator/doc.css`).
+- La subnav **se construye a partir del rail**, no de una lista propia: si el
+  documento gana o pierde una sección aparece sola, y no hay dos fuentes que
+  mantener sincronizadas.
+- Un solo cálculo de "qué sección está activa" alimenta al rail y a la subnav.
+- El offset del scroll-spy **se mide**, no se adivina: es el borde inferior de
+  la barra + 8. Con el 120 fijo del script original, en mobile la sección
+  aterrizaba a ~122 px y el trigger seguía marcando la sección anterior justo
+  después de saltar.
+- No hay bottom nav. La navegación de una documentación es un índice, no un
+  conmutador de vistas.
+
+Mejora progresiva: **el rail se oculta únicamente cuando la subnav ya está
+montada** (`body.es-ds-subnav-on`), así un fallo de JS nunca deja la página sin
+navegación.
+
+### El breadcrumb en mobile
+
+Con el header institucional activo el breadcrumb es de tres niveles
+(§14). En mobile el primero se cae: `Proyectos` ya está en el menú del header y
+a 320 px los tres niveles competían con el título. Queda
+`REstimator / Design System`, que es el único salto que la página no ofrece de
+otra forma.
+
+### El visor en un teléfono
+
+Ajustar una captura de 1440 px a una ventana de 374 la dejaba **al 26%**: la
+pantalla entra entera y no se lee una palabra — exactamente el "chorizo" que
+este visor existe para evitar.
+
+Con puntero grueso el visor abre a `min(anchoReal, anchoDisponible × 2)`, o sea
+~52%: se ve una parte de la pantalla a un tamaño en el que el texto se lee, y el
+resto se recorre con el dedo. Nunca por encima del ancho real, así que una
+captura de mobile (390 px) sigue entrando completa.
+
+Lo demás de la geometría táctil:
+
+- La ventana es una **hoja a pantalla completa** con `100dvh` y
+  `env(safe-area-inset-*)`. El CSS la dimensiona; el JS no le fija ancho ni
+  alto, porque si lo hiciera la ventana cambiaría de tamaño durante el pinch
+  —al crecer la imagen crece el lienzo— y la barra de título se movería bajo los
+  dedos.
+- El espacio disponible se mide con `visualViewport` y no con `innerHeight`: en
+  iOS Safari `innerHeight` no cambia cuando la barra de URL se colapsa. En
+  desktop los dos valores coinciden.
+- Los controles pasan a 40 px.
+- El corte es `@media (pointer: coarse)`, **no** un ancho: con `max-width:700px`
+  un teléfono apaisado (844×390) caía de vuelta en la ventana de desktop. Así
+  además el CSS coincide con el `coarse()` del JS.
+
+### Pinch-to-zoom
+
+Sin ningún handler, un pinch sobre la pantalla ampliada lo toma el navegador y
+hace zoom de la **página** de WordPress: el visor se agranda entero, incluida su
+barra, y el documento queda desencuadrado.
+
+Las dos mitades hacen falta:
+
+- **`touch-action` en el lienzo.** Al ancho de ajuste vale `pan-y`; con la
+  captura más ancha que el lienzo (`.is-wide`) vale `pan-x pan-y`. En los dos
+  casos el scroll de un dedo lo sigue haciendo el navegador —nativo, con
+  inercia— y sólo el gesto de dos dedos queda para nosotros. **Nunca `none`**:
+  eso mataría la forma principal de recorrer una captura alta.
+- **Pointer Events.** Con dos punteros, la distancia entre ellos controla la
+  escala y el punto medio hace de ancla, así el zoom tira de donde están los
+  dedos y no del centro. `preventDefault()` se llama **sólo** con dos punteros.
+
+Los listeners van en el lienzo y no en el `<dialog>`, así la barra, el %, los
+botones y el cerrar nunca escalan.
