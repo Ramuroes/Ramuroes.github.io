@@ -83,25 +83,16 @@ a producción.
 
 1. **Páginas → Añadir nueva**, título *REstimator Design System*.
 2. Plantilla: **Estavillo — REstimator Design System**.
-3. Slug `restimator-design-system`, con página superior `Lab` (crear la página
-   `Lab` si no existe) → queda en `/lab/restimator-design-system/`.
-4. Publicar. **El cuerpo se deja vacío**: el contenido no sale de `post_content`
+3. Publicar. **El cuerpo se deja vacío**: el contenido no sale de `post_content`
    (ver §4).
-5. Enlazar desde el Case Study de REstimator con un CTA
+4. Enlazar desde el Case Study de REstimator con un CTA
    *"Explore the Design System"*.
 
-### Idiomas (Polylang)
-
-Duplicar la página con **"+ Agregar traducción"**, misma plantilla.
-
-El **chrome** (barra superior, labels del visor) ya está traducido: son strings
-del tema registrados en Polylang por `es_child_ui_strings()`.
-
-El **contenido del Design System está en español y no se traduce**. La
-arquitectura ya soporta inglés: en cuanto exista
-`estavillo-child/ds/restimator/master-en.php`, `es_ds_restimator_lang()` lo toma
-solo. Mientras no exista, la página en inglés sirve el documento en español —
-fallback deliberado, no se inventan traducciones.
+Los dos idiomas ya tienen su documento (`master-es.php` y `master-en.php`, ver
+§7) — no hace falta esperar a que exista el inglés como en versiones
+anteriores de esta guía. Para la arquitectura bilingüe completa (una sola
+plantilla, dos páginas WordPress traducidas por Polylang, breadcrumb y
+selector por idioma, relación estable con el Case Study) ver **§17**.
 
 ---
 
@@ -769,3 +760,179 @@ tema padre** (`kadence-sim.css`, que reproduce el mecanismo documentado arriba a
 la misma especificidad), recorre cada control nuevo en reposo / hover / foco de
 teclado / activo y falla si algún color computado cae en la zona azul. Antes del
 arreglo: 51 fallos. Después: 0.
+
+---
+
+## 17. Arquitectura bilingüe: Design System ↔ Case Study
+
+Pasada de auditoría, no de reconstrucción. Lo que sigue es el estado real
+verificado ANTES de tocar nada, qué se dejó intacto por ya ser robusto, y el
+único cambio que hizo falta.
+
+### Lo que ya funcionaba y se dejó intacto
+
+- **Detección de idioma** (`es_ds_restimator_lang()`): `pll_current_language()`
+  primero, `get_locale()` como fallback si Polylang no está activo. Nunca lee
+  slug, URL ni pathname. Cae a `es` si el idioma resuelto no tiene partial
+  (`master-{lang}.php` no existe).
+- **Selección de partial**: `es_ds_restimator_render_document()` hace
+  `require ds/restimator/master-{lang}.php` con el idioma de arriba. Una sola
+  plantilla técnica (`page-restimator-ds.php`) sirve las dos — nunca hubo
+  `page-restimator-ds-es.php` ni una variante por idioma.
+- **Selector ES ↔ EN**: lo imprime el header institucional
+  (`template-parts/site-header.php`), vía `pll_the_languages( array( 'raw' =>
+  1 ) )` — la API nativa de Polylang, no un link hardcodeado. Cuando la
+  traducción de la página actual no existe todavía, Polylang (con su
+  configuración por defecto) devuelve la URL de la home en ese idioma, nunca
+  un 404: es el comportamiento documentado en el propio código
+  (`es_print_lang_switcher()`), verificado por inspección — no hay nada que
+  reimplementar.
+- **`es_page_url_by_template()`** (Work y el resto de las páginas fijas): ya
+  resuelve por template + idioma activo, nunca por slug. No tiene ninguna
+  dependencia de REstimator en particular.
+- **Home / Work → REstimator**: el Featured Case de Home sale de un filtro
+  genérico del plugin (`es_portfolio_featured_case_for_home`, ver
+  `inc/featured-case-fallback.php`) que no sabe qué caso está marcado
+  "featured" — cualquiera puede estarlo. Work lista el CPT completo. Ninguno
+  de los dos tiene una línea que mencione REstimator, Presupuestador ni sus
+  slugs.
+
+### El problema real
+
+`es_ds_restimator_case_url()` resolvía el Case Study buscando por slug contra
+un array de candidatos: `'presupuestador'`, `'restimator'`,
+`'presupuestador-re'`. Los slugs reales en producción son `presupuestador-2`
+(ES) y `workshop-quoting-system` (EN) — **ninguno de los tres candidatos
+coincide**. En la instalación real esa función siempre devolvía `''`: el
+breadcrumb omitía el nivel "REstimator" y la barra mínima caía al listado de
+Work. Es exactamente el síntoma que reportó la auditoría de ChatGPT Work
+("el breadcrumb puede terminar contextualizando el DS bajo Work").
+
+### El cambio
+
+`es_ds_restimator_case_url()` resuelve ahora por **ID de post**, no por slug:
+
+```
+$es_id = es_ds_restimator_case_id();          // theme_mod, filtrable
+$es_post = get_post( $es_id );                // el post en CUALQUIER idioma
+pll_get_post( $es_post->ID )                  // ...traducido al idioma activo
+```
+
+Un ID de post no cambia nunca, aunque el slug se edite mañana. `pll_get_post()`
+—la misma función que ya usaba la versión anterior para no fijarse siempre en
+el idioma que ganó la búsqueda por slug— hace el resto: da igual si el ID
+configurado es el del post ES o el del EN, la traducción correcta se resuelve
+sola. Si el ID no está configurado, o el post no existe/no está publicado,
+devuelve `''` y los llamadores degradan exactamente igual que antes (breadcrumb
+sin ese nivel, barra mínima a Work) — nunca un link roto, nunca un fatal.
+
+El filtro `es_ds_restimator_case_url` (fijar la URL a mano) se mantiene
+intacto: sigue siendo la vía más directa si alguna vez hace falta.
+
+**Dónde se configura el ID**: *Apariencia → Personalizar → REstimator Design
+System → "REstimator Case Study — Post ID"*. Cualquiera de las dos
+traducciones sirve — se ve en la URL al editar el post
+(`post.php?post=123&action=edit`). Mientras quede en 0 (sin configurar), el
+comportamiento es el mismo degradado de siempre.
+
+### CTA del Case Study → Design System
+
+Nuevo shortcode `[es_ds_restimator_url]`, para pegar en el `href` de un botón
+del Case Study sin hardcodear la URL:
+
+```html
+<a href="[es_ds_restimator_url]">Ver Design System completo →</a>
+```
+
+Resuelve con `es_page_url_by_template()` sobre la plantilla del DS en el
+idioma de la página que lo imprime — la misma lógica ya probada que usa Work.
+Con la traducción del DS todavía sin crear, imprime `#` (nunca un `href`
+vacío). **No se tocó ningún Case Study en esta pasada** — es sólo el mecanismo,
+a usar cuando se edite el CTA.
+
+### Slugs: qué se auditó y qué se eliminó
+
+Se buscaron los tres slugs señalados por la auditoría
+(`presupuestador-2`, `workshop-quoting-system`, `restimator-design-system`) en
+todo el repo:
+
+| Dónde aparecían | Clasificación | Acción |
+|---|---|---|
+| El array de candidatos en `es_ds_restimator_case_url()` | **C — dependencia frágil** | Eliminado (ver arriba) |
+| Comentarios/docblocks (`page-restimator-ds.php`, este documento) | B — legacy pero inocua, sólo prosa | Sin tocar el código; este documento se actualizó |
+| `docs/content/*.md`, `docs/MULTILINGUAL-PARITY.md`, `docs/handoff/*.md` | B — notas de contenido/planificación, ningún código las lee | Sin tocar |
+
+Ningún otro archivo del theme (`inc/`, `template-parts/`, `templates/`,
+`tools/`) tenía una dependencia funcional de estos tres slugs.
+
+### Recomendación de slugs finales
+
+Con Polylang **Free** (sin Pro, sin plugin adicional), un Custom Post Type NO
+jerárquico —`es_case_study` no lo es— tiene el slug único a nivel de WordPress,
+**no** por idioma: dos traducciones no pueden compartir literalmente el mismo
+`post_name`. Es lo que ya explica el propio `-2` de hoy. Lograr
+`restimator` / `restimator` en las dos traducciones del caso exigiría un filtro
+propio sobre `wp_unique_post_slug` para hacer la unicidad por idioma — exactamente
+el tipo de hack que el ticket pidió evitar. **No se recomienda perseguirlo.**
+
+Recomendación, evaluada contra la instalación actual:
+
+| | ES | EN |
+|---|---|---|
+| Case Study | `presupuestador-restimator` | `restimator` |
+| Design System | `sistema-de-diseno-restimator` | `restimator-design-system` (sin cambios) |
+
+Mantiene "REstimator" reconocible en las cuatro URLs, no exige tocar la
+instalación de Polylang, y el DS EN queda en su slug actual (cero rotura,
+cero redirect que armar ahí). El código no depende de ninguno de estos cuatro
+valores — están libres de cambiarse en cualquier momento sin volver a tocar el
+theme.
+
+### Instrucciones para ChatGPT Work (después de este merge)
+
+1. Crear la página **DS ES** (Páginas → Añadir nueva, plantilla **Estavillo —
+   REstimator Design System**, igual que la EN existente).
+2. Asignar el idioma **Español** (selector de idioma de Polylang, en el
+   editor).
+3. **"+ Agregar traducción"** desde la página DS EN existente (o el mismo
+   control desde la ES nueva) para asociar DS ES ↔ DS EN como traducciones de
+   Polylang.
+4. Confirmar que la plantilla asignada es la misma **Estavillo — REstimator
+   Design System** en las dos.
+5. Dejar el editor de Gutenberg **vacío** en las dos — el contenido lo imprime
+   el theme (§4).
+6. Si corresponde, cambiar los slugs según la recomendación de arriba
+   (Case ES/EN, DS ES/EN). **No es necesario para que la arquitectura
+   funcione** — el código no depende de ningún slug puntual — es una decisión
+   editorial, no técnica.
+7. Si se cambia algún slug ya indexado (el Case EN o el DS EN actuales),
+   crear los redirects 301 correspondientes desde la URL vieja.
+8. En *Apariencia → Personalizar → REstimator Design System*, cargar el
+   **Post ID** del Case Study de REstimator (cualquiera de sus dos
+   traducciones) — es lo que activa el nivel "REstimator" del breadcrumb y el
+   "volver" de la barra mínima.
+9. En el Case Study **ES**, actualizar el CTA "Ver Design System completo →"
+   para que apunte a la URL de DS ES (directamente, o con el shortcode
+   `[es_ds_restimator_url]` en el `href` si el CTA vive en un bloque que lo
+   admita — ver arriba).
+10. En el Case Study **EN**, lo mismo con "View full Design System →" → DS EN.
+11. QA final: abrir DS ES y DS EN, confirmar que el selector de idioma del
+    header salta a la otra versión, que el breadcrumb "REstimator" lleva al
+    Case Study del mismo idioma, y que los dos CTA de los Case Studies abren
+    el DS correcto.
+
+### QA de esta pasada
+
+Lógica de idioma/relación —11 casos, corridos contra `inc/ds-restimator.php`
+aislado con stubs de WordPress y Polylang (sin necesitar una instalación real):
+idioma EN/ES → partial correcto; fallback sin Polylang (locale); idioma sin
+partial → es; breadcrumb EN → Case EN y ES → Case ES, con las etiquetas
+correctas ("Work" vs "Proyectos"); relación sin configurar → fallback sin
+enlace roto; slug del Case cambiado por otro (simulado) → la URL sigue
+resolviendo por ID; slug del propio DS cambiado (simulado) → idioma y partial
+no se alteran; selector delegado a Polylang verificado por inspección; cero
+referencia a los tres slugs heredados. **30/30.**
+
+Regresión visual — las tres suites existentes, sin modificar (esta pasada no
+tocó CSS/JS/HTML del documento): desktop **195/195**, mobile **182/182**,
+estados interactivos **305/305**.
