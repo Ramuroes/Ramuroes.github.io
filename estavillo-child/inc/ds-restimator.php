@@ -188,49 +188,114 @@ function es_ds_restimator_render_document() {
 }
 
 /**
- * URL del Case Study de REstimator, para el "volver" de la navegación mínima.
+ * ID configurable del Case Study de REstimator.
  *
- * Se resuelve por slug contra el CPT del plugin. El slug real del caso es
- * 'presupuestador' (documentado en
- * docs/content/presupuestador-case-study-fields.md, para ES y EN); los otros
- * dos quedan como defensa por si el caso se republica con otro nombre. Si el
- * plugin está inactivo, el CPT no existe o el caso todavía no se publicó,
- * devuelve '' y el llamador cae al listado de Work — nunca imprime un enlace
- * roto.
+ * Da igual cuál de sus dos traducciones se cargue acá: es_ds_restimator_case_url()
+ * resuelve el idioma correcto con pll_get_post(), así que un solo ID (el de
+ * cualquiera de las dos) alcanza para las dos direcciones.
+ *
+ * Se lee de un theme_mod — Apariencia → Personalizar → REstimator Design
+ * System → "REstimator Case Study — Post ID" (ver es_ds_customize_register())
+ * — y queda filtrable por si se prefiere fijarlo por código (p. ej. desde el
+ * plugin, con el mismo patrón de es_portfolio_featured_case_for_home) en vez
+ * de por Customizer.
+ *
+ * 0 = sin configurar todavía. Es el estado esperado hasta que se cargue: el
+ * breadcrumb y la barra mínima ya degradan sin URL de caso (ver más abajo),
+ * nunca rompen.
+ *
+ * @return int
+ */
+function es_ds_restimator_case_id() {
+	return (int) apply_filters( 'es_ds_restimator_case_id', (int) get_theme_mod( 'es_ds_restimator_case_id', 0 ) );
+}
+
+/**
+ * URL del Case Study de REstimator, para el breadcrumb y para el "volver" de
+ * la navegación mínima.
+ *
+ * Se resuelve por ID (es_ds_restimator_case_id()), no por slug: un slug es
+ * exactamente lo que un editor puede cambiar sin avisar, y un ID de post no
+ * cambia nunca. (Versión anterior: buscaba por un array de slugs candidatos —
+ * 'presupuestador', 'restimator', 'presupuestador-re' — que ya no coincidían
+ * con los slugs reales del caso en producción, así que esta relación no
+ * resolvía nada. Ver docs/DS-RESTIMATOR.md §17.)
+ *
+ * Si el plugin está inactivo, el ID todavía no se cargó, el post no existe o
+ * no está publicado, devuelve '' y el llamador degrada (breadcrumb omite el
+ * nivel, la barra mínima cae al listado de Work) — nunca un enlace roto.
  *
  * @return string
  */
 function es_ds_restimator_case_url() {
 	/**
-	 * Permite fijar la URL del caso a mano si el slug cambia.
+	 * Permite fijar la URL del caso a mano, sin pasar por el ID configurado.
 	 *
-	 * @param string $url URL del caso, o '' para autodetectar.
+	 * @param string $url URL del caso, o '' para autodetectar por ID.
 	 */
 	$es_url = (string) apply_filters( 'es_ds_restimator_case_url', '' );
 	if ( '' !== $es_url ) {
 		return $es_url;
 	}
 
-	if ( ! post_type_exists( 'es_case_study' ) ) {
+	$es_id = es_ds_restimator_case_id();
+	if ( $es_id <= 0 ) {
 		return '';
 	}
 
-	foreach ( array( 'presupuestador', 'restimator', 'presupuestador-re' ) as $es_slug ) {
-		$es_post = get_page_by_path( $es_slug, OBJECT, 'es_case_study' );
-		if ( $es_post && 'publish' === $es_post->post_status ) {
-			// Con Polylang, el visitante tiene que caer en la traducción de su
-			// idioma, no siempre en el post que encontró la búsqueda por slug.
-			if ( function_exists( 'pll_get_post' ) ) {
-				$es_translated = pll_get_post( $es_post->ID );
-				if ( $es_translated ) {
-					$es_post = get_post( $es_translated );
-				}
-			}
-			return get_permalink( $es_post );
+	$es_post = get_post( $es_id );
+	if ( ! $es_post || 'publish' !== $es_post->post_status || 'es_case_study' !== $es_post->post_type ) {
+		return '';
+	}
+
+	// Con Polylang, el visitante tiene que caer en la traducción de su idioma;
+	// si todavía no existe (p. ej. mientras se están cargando las dos), se
+	// queda con el post configurado — nunca un link roto.
+	if ( function_exists( 'pll_get_post' ) ) {
+		$es_translated = pll_get_post( $es_post->ID );
+		if ( $es_translated ) {
+			$es_post = get_post( $es_translated );
 		}
 	}
-	return '';
+
+	return get_permalink( $es_post );
 }
+
+/**
+ * URL del REstimator Design System en el idioma de la request actual.
+ *
+ * Pensada para el CTA "Ver Design System completo" del Case Study de
+ * REstimator (ver el shortcode más abajo), sin acoplar ese contenido a un
+ * slug: reusa es_page_url_by_template() —el mismo helper que ya resuelve
+ * Work— sobre EL MISMO template que usan las dos versiones del DS (una sola
+ * plantilla técnica, dos páginas traducidas por Polylang). No hace falta
+ * distinguir ES/EN a mano: la query de es_page_url_by_template() ya filtra
+ * por el idioma activo.
+ *
+ * @return string URL, o '' si la página del DS no existe todavía en este idioma.
+ */
+function es_ds_restimator_url() {
+	if ( ! function_exists( 'es_page_url_by_template' ) ) {
+		return '';
+	}
+	return (string) es_page_url_by_template( ES_DS_RESTIMATOR_TEMPLATE );
+}
+
+/**
+ * Shortcode [es_ds_restimator_url]: para pegar en el href de un botón del
+ * Case Study (bloque Buttons o Custom HTML) sin hardcodear la URL del DS.
+ *
+ * Uso: <a href="[es_ds_restimator_url]">Ver Design System completo →</a> — o
+ * el equivalente en un bloque Buttons de Gutenberg, en el campo URL. Con la
+ * traducción todavía sin crear devuelve '#': nunca un href vacío ni un fatal.
+ *
+ * @return string
+ */
+function es_ds_restimator_url_shortcode() {
+	$es_url = es_ds_restimator_url();
+	return '' !== $es_url ? esc_url( $es_url ) : '#';
+}
+add_shortcode( 'es_ds_restimator_url', 'es_ds_restimator_url_shortcode' );
 
 /**
  * URL de salida para la navegación mínima: el caso si existe, si no el listado
@@ -449,3 +514,53 @@ function es_ds_save_meta( $post_id ) {
 	update_post_meta( $post_id, '_es_ds_show_footer', isset( $_POST['es_ds_show_footer'] ) ? '1' : '0' );
 }
 add_action( 'save_post_page', 'es_ds_save_meta' );
+
+/* -------------------------------------------------------------------------
+ * Relación estable con el Case Study (Apariencia → Personalizar)
+ * ---------------------------------------------------------------------- */
+
+/**
+ * Registra la sección "REstimator Design System" en el Customizer, con el
+ * único control que necesita: el ID del Case Study al que pertenece el DS.
+ *
+ * Es un theme_mod y no una opción del CPT porque la relación es del lado del
+ * Design System, no del caso — el caso no tiene por qué saber que existe una
+ * documentación técnica separada. Un campo de texto con un ID numérico, no un
+ * selector de posts: mantiene esto en una sola sección chica, sin agregar un
+ * componente de UI nuevo al Customizer sólo para esto. El ID se ve en la barra
+ * de direcciones al editar el caso (wp-admin/post.php?post=123&action=edit).
+ *
+ * No comparte sección con "Estavillo" (theme-options.php): esas opciones son
+ * de todo el sitio (acento, hero, tipografía); esta es específica del DS y
+ * vive junto al resto de su código, igual que su meta box.
+ */
+function es_ds_customize_register( $wp_customize ) {
+	$wp_customize->add_section(
+		'es_ds_restimator_options',
+		array(
+			'title'       => __( 'REstimator Design System', 'estavillo-child' ),
+			'description' => __( 'Relación estable con el Case Study de REstimator, para el breadcrumb y el "volver" del Design System. Sobrevive a un cambio de slug: se resuelve por ID de post.', 'estavillo-child' ),
+			'priority'    => 31,
+		)
+	);
+
+	$wp_customize->add_setting(
+		'es_ds_restimator_case_id',
+		array(
+			'default'           => 0,
+			'type'              => 'theme_mod',
+			'sanitize_callback' => 'absint',
+			'transport'         => 'refresh',
+		)
+	);
+	$wp_customize->add_control(
+		'es_ds_restimator_case_id',
+		array(
+			'label'       => __( 'REstimator Case Study — Post ID', 'estavillo-child' ),
+			'description' => __( 'El ID de CUALQUIERA de las dos traducciones (ES o EN): el idioma correcto se resuelve solo vía Polylang. 0 = sin configurar — el breadcrumb omite ese nivel y la barra mínima cae al listado de Work.', 'estavillo-child' ),
+			'section'     => 'es_ds_restimator_options',
+			'type'        => 'text',
+		)
+	);
+}
+add_action( 'customize_register', 'es_ds_customize_register' );
